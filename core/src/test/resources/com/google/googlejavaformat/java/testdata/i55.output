@@ -5,7 +5,7 @@ import java.lang.annotation.*;
 
 public class GjfTypeAnnotationOnArrayTest {
 
-  public static void test() {
-    String @Interned [] iarray1 = new String @Interned [2];
-  }
+    public static void test() {
+        String @Interned [] iarray1 = new String @Interned [2];
+    }
 }

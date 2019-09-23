@@ -1,24 +1,24 @@
 class B33358723 {
-  {
-    f(
-        //
-        x ->
-            System.err.println(
+    {
+        f(
                 //
-                "hello"));
-    f(
-        //
-        ( //
-            x) ->
-            System.err.println(
+                x ->
+                        System.err.println(
+                                //
+                                "hello"));
+        f(
                 //
-                "hello"));
-    f(
-        //
-        (int //
-                x) ->
-            System.err.println(
+                ( //
+                        x) ->
+                        System.err.println(
+                                //
+                                "hello"));
+        f(
                 //
-                "hello"));
-  }
+                (int //
+                                x) ->
+                        System.err.println(
+                                //
+                                "hello"));
+    }
 }

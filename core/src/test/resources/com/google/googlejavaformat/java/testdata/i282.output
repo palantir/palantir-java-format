@@ -1,16 +1,16 @@
 public class ArrayVsVarargs {
 
-  void f(String[] arg) {}
+    void f(String[] arg) {}
 
-  void g(String... arg) {}
+    void g(String... arg) {}
 
-  void h(String @A [] arg) {}
+    void h(String @A [] arg) {}
 
-  void i(String @B ... arg) {}
+    void i(String @B ... arg) {}
 
-  void j(String @C [] @D [] arg) {}
+    void j(String @C [] @D [] arg) {}
 
-  void k(String @E [] @F ... arg) {}
+    void k(String @E [] @F ... arg) {}
 
-  Class<?> c = byte[].class;
+    Class<?> c = byte[].class;
 }

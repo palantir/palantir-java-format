@@ -1,47 +1,42 @@
 class Xxxx {
 
-  public static final class XxxxXxxxxxxxXxxxxxxxxXxxxxxXxxxxxxx<
-      X, X, X extends XxxxxxxxxXxxxxxxxxXxxxxxxx<X, X>> {
+    public static final class XxxxXxxxxxxxXxxxxxxxxXxxxxxXxxxxxxx<X, X, X extends XxxxxxxxxXxxxxxxxxXxxxxxxx<X, X>> {
 
-    int x;
-  }
+        int x;
+    }
 
-  public static final class XxxxXxxxxxxxXxxxxxxxxXxxxxxXxxxxxxx<
-          X, X, X extends XxxxxxxxxXxxxxxxxxXxxxxxxx<X, X>>
-      extends Xxxxx {
+    public static final class XxxxXxxxxxxxXxxxxxxxxXxxxxxXxxxxxxx<X, X, X extends XxxxxxxxxXxxxxxxxxXxxxxxxx<X, X>>
+            extends Xxxxx {
 
-    int x;
-  }
+        int x;
+    }
 
-  class XxxxxxxxXxxxxxxxxXxxxXxxx<
-          X extends XxxxxxxxxXxxxxxx, X extends XxxxxxxxxXxxxxx, X extends Xxxxxxxxxxxxx, X>
-      extends XxxxXxxx {
+    class XxxxxxxxXxxxxxxxxXxxxXxxx<X extends XxxxxxxxxXxxxxxx, X extends XxxxxxxxxXxxxxx, X extends Xxxxxxxxxxxxx, X>
+            extends XxxxXxxx {
 
-    int x;
-  }
+        int x;
+    }
 
-  @Xxx
-  class XxxxxxxxxxxXxxxxxXx<
-          X extends XxxxxxXxxxxxxxxxxXxxxxxXxxxxx, X extends Xxxxxxx, XX extends Xxxxxxxxx<X>>
-      extends XxxxxxxxXx<X, XX> {
+    @Xxx
+    class XxxxxxxxxxxXxxxxxXx<X extends XxxxxxXxxxxxxxxxxXxxxxxXxxxxx, X extends Xxxxxxx, XX extends Xxxxxxxxx<X>>
+            extends XxxxxxxxXx<X, XX> {
 
-    int x;
-  }
+        int x;
+    }
 
-  static class XxxxxXxxxxXxxx<
-      XXXXX extends XxxxxxxxXxxxxxx<XXXXX>, XXX extends XxxxxxxxXxxxxxx<XXX>> {
+    static class XxxxxXxxxxXxxx<XXXXX extends XxxxxxxxXxxxxxx<XXXXX>, XXX extends XxxxxxxxXxxxxxx<XXX>> {
 
-    int x;
-  }
+        int x;
+    }
 
-  @Xxx
-  class XxxxxxxxxxxXxxxxxXx<
-          X extends XxxxxxXxxxxxxxxxxXxxxxxXxxxxx,
-          X extends Xxxxxxx,
-          X extends Xxxxxxx,
-          XX extends Xxxxxxxxx<X>>
-      extends XxxxxxxxXx<X, XX> {
+    @Xxx
+    class XxxxxxxxxxxXxxxxxXx<
+                    X extends XxxxxxXxxxxxxxxxxXxxxxxXxxxxx,
+                    X extends Xxxxxxx,
+                    X extends Xxxxxxx,
+                    XX extends Xxxxxxxxx<X>>
+            extends XxxxxxxxXx<X, XX> {
 
-    int x;
-  }
+        int x;
+    }
 }

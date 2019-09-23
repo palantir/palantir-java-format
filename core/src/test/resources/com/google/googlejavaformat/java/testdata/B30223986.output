@@ -19,21 +19,21 @@
  * @param <T> concrete subclass
  */
 class Test {
-  /**
-   * Field
-   *
-   * <p>Example:
-   *
-   * <pre><code>
-   *   @Annotation("something")
-   *   public void thing() {
-   *   }
-   * </code></pre>
-   *
-   * @param asd
-   */
-  int x() {}
+    /**
+     * Field
+     *
+     * <p>Example:
+     *
+     * <pre><code>
+     *   @Annotation("something")
+     *   public void thing() {
+     *   }
+     * </code></pre>
+     *
+     * @param asd
+     */
+    int x() {}
 
-  /** Inline <code>foo</code>. */
-  int y() {}
+    /** Inline <code>foo</code>. */
+    int y() {}
 }

@@ -1,8 +1,8 @@
 enum E {
-  @A
-  ONE,
-  TWO,
-  @B
-  @C
-  THREE;
+    @A
+    ONE,
+    TWO,
+    @B
+    @C
+    THREE;
 }

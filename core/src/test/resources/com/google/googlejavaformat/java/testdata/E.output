@@ -9,82 +9,81 @@ import com.google.common.collect.Lists;
  */
 @MarkerAnnotation
 class E<T> {
-  // TODO(jdd): Test higher language-level features.
+    // TODO(jdd): Test higher language-level features.
 
-  enum Enum1 {
-    A,
-    B,
-    C,
-    D;
+    enum Enum1 {
+        A,
+        B,
+        C,
+        D;
 
-    Enum1() {}
-  }
+        Enum1() {}
+    }
 
-  @MarkerAnnotation
-  public enum Enum2 {
-    A,
-    B,
-    C,
-    D,
-    ;
+    @MarkerAnnotation
+    public enum Enum2 {
+        A,
+        B,
+        C,
+        D,
+        ;
 
-    Enum2() {}
-  }
+        Enum2() {}
+    }
 
-  enum Enum3 {
-    A(
-        0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0
-            + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0),
-    B(
-        0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0
-            + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 1),
-    C(
-        0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0
-            + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 2),
-    D(
-        0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0
-            + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 3);
+    enum Enum3 {
+        A(
+                0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0
+                        + 0 + 0 + 0 + 0 + 0 + 0 + 0),
+        B(
+                0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0
+                        + 0 + 0 + 0 + 0 + 0 + 0 + 1),
+        C(
+                0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0
+                        + 0 + 0 + 0 + 0 + 0 + 0 + 2),
+        D(
+                0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0
+                        + 0 + 0 + 0 + 0 + 0 + 0 + 3);
 
-    Enum3(int x) {}
-  }
+        Enum3(int x) {}
+    }
 
-  enum Enum4 {
-    A(
-        0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0
-            + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0),
-    B(
-        0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0
-            + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 1),
-    C(
-        0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0
-            + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 2),
-    D(
-        0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0
-            + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 3),
-    ;
+    enum Enum4 {
+        A(
+                0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0
+                        + 0 + 0 + 0 + 0 + 0 + 0 + 0),
+        B(
+                0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0
+                        + 0 + 0 + 0 + 0 + 0 + 0 + 1),
+        C(
+                0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0
+                        + 0 + 0 + 0 + 0 + 0 + 0 + 2),
+        D(
+                0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0
+                        + 0 + 0 + 0 + 0 + 0 + 0 + 3),
+        ;
 
-    Enum4(int x) {}
-  }
+        Enum4(int x) {}
+    }
 
-  int f(int value) {
-    ;
-    ;
-    ;
-    ;
-    ;
-    for (Integer x :
-        ImmutableList.<Integer>of(
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)) {}
-    for (Pair<
-            Pair<Pair<Pair<T, T>, Pair<T, T>>, Pair<Pair<T, T>, Pair<T, T>>>,
-            Pair<Pair<Pair<T, T>, Pair<T, T>>, Pair<Pair<T, T>, Pair<T, T>>>>
-        x :
-            Lists
-                .<Pair<
+    int f(int value) {
+        ;
+        ;
+        ;
+        ;
+        ;
+        for (Integer x :
+                ImmutableList.<Integer>of(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)) {}
+        for (Pair<
                         Pair<Pair<Pair<T, T>, Pair<T, T>>, Pair<Pair<T, T>, Pair<T, T>>>,
-                        Pair<Pair<Pair<T, T>, Pair<T, T>>, Pair<Pair<T, T>, Pair<T, T>>>>>
-                    newArrayList()) {}
-    f(10);
-    return f(20);
-  }
+                        Pair<Pair<Pair<T, T>, Pair<T, T>>, Pair<Pair<T, T>, Pair<T, T>>>>
+                x :
+                        Lists
+                                .<Pair<
+                                                Pair<Pair<Pair<T, T>, Pair<T, T>>, Pair<Pair<T, T>, Pair<T, T>>>,
+                                                Pair<Pair<Pair<T, T>, Pair<T, T>>, Pair<Pair<T, T>, Pair<T, T>>>>>
+                                        newArrayList()) {}
+        f(10);
+        return f(20);
+    }
 }

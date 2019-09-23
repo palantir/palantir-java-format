@@ -1,6 +1,6 @@
 class I202 {
-  {
-    //noinspection CheckResult
-    methodWhoseResultShouldBeChecked();
-  }
+    {
+        //noinspection CheckResult
+        methodWhoseResultShouldBeChecked();
+    }
 }

@@ -1,6 +1,6 @@
 @Deprecated
 module moduletags {
-  requires transitive static moduleA;
+    requires transitive static moduleA;
 
-  exports testpkgmdltags;
+    exports testpkgmdltags;
 }

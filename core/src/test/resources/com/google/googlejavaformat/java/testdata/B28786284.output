@@ -1,5 +1,5 @@
 enum E {
-  ONE,
-  TWO;
-  ;
+    ONE,
+    TWO;
+    ;
 }

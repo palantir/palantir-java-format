@@ -2,55 +2,55 @@ package com.google.googlejavaformat.java.test;
 
 /** JavaDoc comment. */
 public @interface NormalAnnotation {
-  int a();
+    int a();
 
-  int b();
+    int b();
 
-  int c();
+    int c();
 
-  int d();
+    int d();
 
-  int e();
+    int e();
 
-  int f();
+    int f();
 
-  int g();
+    int g();
 
-  int h();
+    int h();
 
-  int i();
+    int i();
 
-  int j();
+    int j();
 
-  int k();
+    int k();
 
-  int l();
+    int l();
 
-  int m();
+    int m();
 
-  int n();
+    int n();
 
-  int o();
+    int o();
 
-  int p();
+    int p();
 
-  int q();
+    int q();
 
-  int r();
+    int r();
 
-  int s();
+    int s();
 
-  int t();
+    int t();
 
-  int u();
+    int u();
 
-  int v();
+    int v();
 
-  int w();
+    int w();
 
-  int x();
+    int x();
 
-  int y();
+    int y();
 
-  int z();
+    int z();
 }

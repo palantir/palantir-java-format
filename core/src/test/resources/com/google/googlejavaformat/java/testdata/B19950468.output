@@ -1,5 +1,5 @@
 class B19950468 {
-  int code() {}
+    int code() {}
 
-  // comment
+    // comment
 }

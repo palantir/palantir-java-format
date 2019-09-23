@@ -1,11 +1,11 @@
 enum TrailingComment {
-  /** foo */
-  FOO,
-  /** bar */
-  BAR;
+    /** foo */
+    FOO,
+    /** bar */
+    BAR;
 
-  /** a */
-  Object a;
-  /** b */
-  Object b;
+    /** a */
+    Object a;
+    /** b */
+    Object b;
 }

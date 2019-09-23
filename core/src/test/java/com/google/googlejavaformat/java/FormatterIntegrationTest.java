@@ -25,15 +25,18 @@ import com.google.common.io.CharStreams;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ResourceInfo;
 import com.google.googlejavaformat.Newlines;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -43,17 +46,20 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class FormatterIntegrationTest {
 
+  private static final Path TEST_DATA_PATH = Paths.get("com/google/googlejavaformat/java/testdata");
+  /** Where to output test outputs when recreating. */
+  private static final Path OUTPUT_TEST_PATH = Paths.get("src/test/resources").resolve(TEST_DATA_PATH);
+
   @Parameters(name = "{index}: {0}")
   public static Iterable<Object[]> data() throws IOException {
-    Path testDataPath = Paths.get("com/google/googlejavaformat/java/testdata");
     ClassLoader classLoader = FormatterIntegrationTest.class.getClassLoader();
     Map<String, String> inputs = new TreeMap<>();
     Map<String, String> outputs = new TreeMap<>();
     for (ResourceInfo resourceInfo : ClassPath.from(classLoader).getResources()) {
       String resourceName = resourceInfo.getResourceName();
       Path resourceNamePath = Paths.get(resourceName);
-      if (resourceNamePath.startsWith(testDataPath)) {
-        Path subPath = testDataPath.relativize(resourceNamePath);
+      if (resourceNamePath.startsWith(TEST_DATA_PATH)) {
+        Path subPath = TEST_DATA_PATH.relativize(resourceNamePath);
         assertEquals("bad testdata file names", 1, subPath.getNameCount());
         String baseName = getNameWithoutExtension(subPath.getFileName().toString());
         String extension = getFileExtension(subPath.getFileName().toString());
@@ -74,12 +80,20 @@ public class FormatterIntegrationTest {
       }
     }
     List<Object[]> testInputs = new ArrayList<>();
-    assertEquals("unmatched inputs and outputs", inputs.size(), outputs.size());
+    if (!isRecreate()) {
+      assertEquals("unmatched inputs and outputs", inputs.size(), outputs.size());
+    }
     for (Map.Entry<String, String> entry : inputs.entrySet()) {
       String fileName = entry.getKey();
       String input = inputs.get(fileName);
-      assertTrue("unmatched input", outputs.containsKey(fileName));
-      String expectedOutput = outputs.get(fileName);
+
+      String expectedOutput;
+      if (isRecreate()) {
+        expectedOutput = null;
+      } else {
+        assertTrue("unmatched input", outputs.containsKey(fileName));
+        expectedOutput = outputs.get(fileName);
+      }
       testInputs.add(new Object[] {fileName, input, expectedOutput});
     }
     return testInputs;
@@ -94,13 +108,17 @@ public class FormatterIntegrationTest {
     this.name = name;
     this.input = input;
     this.expected = expected;
-    this.separator = Newlines.getLineEnding(expected);
+    this.separator = isRecreate() ? null : Newlines.getLineEnding(expected);
   }
 
   @Test
   public void format() {
     try {
       String output = new Formatter().formatSource(input);
+      if (isRecreate()) {
+        writeFormatterOutput(output);
+        return;
+      }
       assertEquals("bad output for " + name, expected, output);
     } catch (FormatterException e) {
       fail(String.format("Formatter crashed on %s: %s", name, e.getMessage()));
@@ -109,6 +127,7 @@ public class FormatterIntegrationTest {
 
   @Test
   public void idempotentLF() {
+    Assume.assumeFalse("Not running when recreating test outputs", isRecreate());
     try {
       String mangled = expected.replace(separator, "\n");
       String output = new Formatter().formatSource(mangled);
@@ -120,6 +139,7 @@ public class FormatterIntegrationTest {
 
   @Test
   public void idempotentCR() throws IOException {
+    Assume.assumeFalse("Not running when recreating test outputs", isRecreate());
     try {
       String mangled = expected.replace(separator, "\r");
       String output = new Formatter().formatSource(mangled);
@@ -131,12 +151,29 @@ public class FormatterIntegrationTest {
 
   @Test
   public void idempotentCRLF() {
+    Assume.assumeFalse("Not running when recreating test outputs", isRecreate());
     try {
       String mangled = expected.replace(separator, "\r\n");
       String output = new Formatter().formatSource(mangled);
       assertEquals("bad output for " + name, mangled, output);
     } catch (FormatterException e) {
       fail(String.format("Formatter crashed on %s: %s", name, e.getMessage()));
+    }
+  }
+
+  private static boolean isRecreate() {
+    return Boolean.getBoolean("recreate");
+  }
+
+  private Path getOutputTestPath() {
+    return OUTPUT_TEST_PATH.resolve(name + ".output");
+  }
+
+  private void writeFormatterOutput(String output) {
+    try (BufferedWriter writer = Files.newBufferedWriter(getOutputTestPath())) {
+      writer.append(output);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
   }
 }

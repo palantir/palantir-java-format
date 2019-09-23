@@ -1,0 +1,9 @@
+public class Foo {
+    public static void main(String[] args) {
+        foo
+                .bar()
+                .thisMethodIsABitLong(argargargargargargargargargargargargargargargargargargargargarg, param -> doStuff
+                        .method1()
+                        .method2(arljhfaldjfhalfjhalfjahflahflahfaljfhadlfjhljsahljhfsaljfhlfajhfljh));
+    }
+}

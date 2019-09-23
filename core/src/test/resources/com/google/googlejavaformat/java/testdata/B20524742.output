@@ -1,5 +1,5 @@
 class Test {
-  {
-    int x;
-  }
+    {
+        int x;
+    }
 }
