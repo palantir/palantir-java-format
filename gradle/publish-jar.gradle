@@ -1,0 +1,55 @@
+// This file is managed by the excavator 'consistent-publish-scripts' check, changes will be overwritten.
+apply plugin: 'com.jfrog.bintray'
+// Intentionally not applying nebula.maven-publish, but most of its constituent plugins,
+// because we do _not_ want nebula.maven-compile-only
+apply plugin: 'maven-publish'
+apply plugin: 'nebula.maven-nebula-publish'
+apply plugin: 'nebula.maven-base-publish'
+apply plugin: 'nebula.maven-developer'
+apply plugin: 'nebula.maven-manifest'
+apply plugin: 'nebula.info-scm'
+apply plugin: 'nebula.maven-scm'
+
+apply plugin: 'nebula.javadoc-jar'
+apply plugin: 'nebula.source-jar'
+
+jar {
+    manifest {
+        attributes("Implementation-Version" : project.version)
+    }
+}
+
+bintray {
+    user = System.env.BINTRAY_USERNAME
+    key = System.env.BINTRAY_PASSWORD
+    publish = true
+    pkg {
+        repo = 'releases'
+        name = 'palantir-java-format'
+        userOrg = 'palantir'
+        licenses = ['Apache-2.0']
+        publications = ['nebula']
+    }
+}
+
+publish.dependsOn bintrayUpload
+bintrayUpload.onlyIf {
+    versionDetails().isCleanTag
+}
+
+// See: https://docs.gradle.org/5.2/userguide/publishing_maven.html#publishing_maven:resolved_dependencies
+// This replaces nebula.maven-resolved-dependencies, which doesn't work with the 'com.gradle.plugin-publish' plugin
+publishing {
+    publications.withType(MavenPublication).configureEach {
+        versionMapping {
+            allVariants {
+                fromResolutionResult()
+            }
+        }
+    }
+}
+
+// Turning off module metadata so that all consumers just use regular POMs
+tasks.withType(GenerateModuleMetadata) {
+    enabled = false
+}

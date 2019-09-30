@@ -1,0 +1,52 @@
+buildscript {
+    repositories {
+        jcenter()
+        gradlePluginPortal()
+        maven { url "http://palantir.bintray.com/releases" }
+    }
+
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
+        classpath 'com.netflix.nebula:nebula-publishing-plugin:13.4.1'
+        classpath 'com.netflix.nebula:gradle-info-plugin:5.0.3'
+        classpath 'com.palantir.baseline:gradle-baseline-java:2.13.0'
+        classpath 'gradle.plugin.org.inferred:gradle-processors:3.1.0'
+    }
+}
+
+plugins {
+    id 'com.palantir.git-version' version '0.12.2'
+}
+
+apply plugin: 'com.palantir.baseline'
+
+version = gitVersion()
+
+allprojects {
+    group = 'com.google.googlejavaformat'
+    version = rootProject.version
+
+    repositories {
+        mavenLocal()
+        jcenter()
+        maven { url 'https://dl.bintray.com/palantir/releases/' }
+    }
+}
+
+subprojects {
+    apply plugin: 'java-library'
+    apply plugin: 'org.inferred.processors'
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    spotless {
+        java {
+            googleJavaFormat()
+        }
+    }
+
+    tasks.withType(Checkstyle) {
+        enabled = false
+    }
+}

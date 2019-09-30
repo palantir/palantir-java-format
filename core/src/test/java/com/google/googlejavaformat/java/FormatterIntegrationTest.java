@@ -48,7 +48,8 @@ public class FormatterIntegrationTest {
 
   private static final Path TEST_DATA_PATH = Paths.get("com/google/googlejavaformat/java/testdata");
   /** Where to output test outputs when recreating. */
-  private static final Path OUTPUT_TEST_PATH = Paths.get("src/test/resources").resolve(TEST_DATA_PATH);
+  private static final Path OUTPUT_TEST_PATH =
+      Paths.get("src/test/resources").resolve(TEST_DATA_PATH);
 
   @Parameters(name = "{index}: {0}")
   public static Iterable<Object[]> data() throws IOException {
@@ -114,7 +115,7 @@ public class FormatterIntegrationTest {
   @Test
   public void format() {
     try {
-      String output = new Formatter().formatSource(input);
+      String output = createFormatter().formatSource(input);
       if (isRecreate()) {
         writeFormatterOutput(output);
         return;
@@ -125,12 +126,17 @@ public class FormatterIntegrationTest {
     }
   }
 
+  private static Formatter createFormatter() {
+    return new Formatter(
+        JavaFormatterOptions.builder().style(JavaFormatterOptions.Style.PALANTIR).build());
+  }
+
   @Test
   public void idempotentLF() {
     Assume.assumeFalse("Not running when recreating test outputs", isRecreate());
     try {
       String mangled = expected.replace(separator, "\n");
-      String output = new Formatter().formatSource(mangled);
+      String output = createFormatter().formatSource(mangled);
       assertEquals("bad output for " + name, mangled, output);
     } catch (FormatterException e) {
       fail(String.format("Formatter crashed on %s: %s", name, e.getMessage()));
@@ -142,7 +148,7 @@ public class FormatterIntegrationTest {
     Assume.assumeFalse("Not running when recreating test outputs", isRecreate());
     try {
       String mangled = expected.replace(separator, "\r");
-      String output = new Formatter().formatSource(mangled);
+      String output = createFormatter().formatSource(mangled);
       assertEquals("bad output for " + name, mangled, output);
     } catch (FormatterException e) {
       fail(String.format("Formatter crashed on %s: %s", name, e.getMessage()));
@@ -154,7 +160,7 @@ public class FormatterIntegrationTest {
     Assume.assumeFalse("Not running when recreating test outputs", isRecreate());
     try {
       String mangled = expected.replace(separator, "\r\n");
-      String output = new Formatter().formatSource(mangled);
+      String output = createFormatter().formatSource(mangled);
       assertEquals("bad output for " + name, mangled, output);
     } catch (FormatterException e) {
       fail(String.format("Formatter crashed on %s: %s", name, e.getMessage()));

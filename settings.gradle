@@ -1,0 +1,8 @@
+rootProject.name = 'google-java-format-parent'
+
+include ':google-java-format'
+project(':google-java-format').projectDir = "$rootDir/core" as File
+
+// The https://github.com/JetBrains/gradle-intellij-plugin tries to download the whole intellij distribution in
+// afterEvaluate. We don't want to let it do this.
+//include ':idea_plugin'

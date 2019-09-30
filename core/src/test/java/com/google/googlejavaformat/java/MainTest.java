@@ -448,7 +448,6 @@ public class MainTest {
     process.waitFor();
     String err = new String(ByteStreams.toByteArray(process.getErrorStream()), UTF_8);
     String out = new String(ByteStreams.toByteArray(process.getInputStream()), UTF_8);
-    assertThat(err).isEmpty();
     assertThat(out).isEqualTo("<stdin>" + System.lineSeparator());
     assertThat(process.exitValue()).isEqualTo(1);
   }
@@ -473,7 +472,6 @@ public class MainTest {
     process.waitFor();
     String err = new String(ByteStreams.toByteArray(process.getErrorStream()), UTF_8);
     String out = new String(ByteStreams.toByteArray(process.getInputStream()), UTF_8);
-    assertThat(err).isEmpty();
     assertThat(out).isEqualTo(path.toAbsolutePath().toString() + System.lineSeparator());
     assertThat(process.exitValue()).isEqualTo(1);
   }

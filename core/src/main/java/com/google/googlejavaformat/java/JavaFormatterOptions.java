@@ -30,20 +30,29 @@ import com.google.errorprone.annotations.Immutable;
 public class JavaFormatterOptions {
 
   public enum Style {
+    /** The default Palantir Java Style configuration. */
+    PALANTIR(2, 120),
+
     /** The default Google Java Style configuration. */
-    GOOGLE(2),
+    GOOGLE(1, 100),
 
     /** The AOSP-compliant configuration. */
-    AOSP(2);
+    AOSP(2, 100);
 
     private final int indentationMultiplier;
+    private final int maxLineLength;
 
-    Style(int indentationMultiplier) {
+    Style(int indentationMultiplier, int maxLineLength) {
       this.indentationMultiplier = indentationMultiplier;
+      this.maxLineLength = maxLineLength;
     }
 
     int indentationMultiplier() {
       return indentationMultiplier;
+    }
+
+    public int maxLineLength() {
+      return maxLineLength;
     }
   }
 
@@ -56,6 +65,10 @@ public class JavaFormatterOptions {
   /** Returns the multiplier for the unit of indent. */
   public int indentationMultiplier() {
     return style.indentationMultiplier();
+  }
+
+  public int maxLineLength() {
+    return style.maxLineLength();
   }
 
   /** Returns the code style. */

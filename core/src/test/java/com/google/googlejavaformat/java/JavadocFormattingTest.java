@@ -1040,23 +1040,10 @@ public final class JavadocFormattingTest {
   @Test
   public void xhtmlParagraphTag() {
     String[] input = {
-      "class Test {",
-      "  /**",
-      "   * hello<p/>world",
-      "   */",
-      "  void f() {}",
-      "",
-      "}",
+      "class Test {", "  /**", "   * hello<p/>world", "   */", "  void f() {}", "", "}",
     };
     String[] expected = {
-      "class Test {",
-      "  /**",
-      "   * hello",
-      "   *",
-      "   * <p>world",
-      "   */",
-      "  void f() {}",
-      "}",
+      "class Test {", "  /**", "   * hello", "   *", "   * <p>world", "   */", "  void f() {}", "}",
     };
     doFormatTest(input, expected);
   }
