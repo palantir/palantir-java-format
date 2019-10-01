@@ -188,6 +188,3 @@ workflows:
       - publish:
           requires: [ unit-test, unit-test-11, check ]
           filters: { tags: { only: /.*/ }, branches: { only: master } }
-notify:
-  webhooks:
-    - url: ***REMOVED***
