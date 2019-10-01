@@ -6,3 +6,14 @@ project(':google-java-format').projectDir = "$rootDir/core" as File
 // The https://github.com/JetBrains/gradle-intellij-plugin tries to download the whole intellij distribution in
 // afterEvaluate. We don't want to let it do this.
 //include ':idea_plugin'
+
+boolean isCiServer = System.getenv().containsKey('CI')
+buildCache {
+    local {
+        enabled = !isCiServer
+    }
+    remote(HttpBuildCache) {
+        url = 'https://***REMOVED***
+        push = isCiServer
+    }
+}
