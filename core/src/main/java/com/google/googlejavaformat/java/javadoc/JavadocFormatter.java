@@ -36,13 +36,17 @@ import java.util.regex.Pattern;
  */
 public final class JavadocFormatter {
 
-  static final int MAX_LINE_LENGTH = 100;
+  private final int maxLineLength;
+
+  public JavadocFormatter(int maxLineLength) {
+    this.maxLineLength = maxLineLength;
+  }
 
   /**
    * Formats the given Javadoc comment, which must start with ∕✱✱ and end with ✱∕. The output will
    * start and end with the same characters.
    */
-  public static String formatJavadoc(String input, int blockIndent) {
+  public String formatJavadoc(String input, int blockIndent) {
     ImmutableList<Token> tokens;
     try {
       tokens = lex(input);
@@ -53,8 +57,8 @@ public final class JavadocFormatter {
     return makeSingleLineIfPossible(blockIndent, result);
   }
 
-  private static String render(List<Token> input, int blockIndent) {
-    JavadocWriter output = new JavadocWriter(blockIndent);
+  private String render(List<Token> input, int blockIndent) {
+    JavadocWriter output = new JavadocWriter(blockIndent, maxLineLength);
     for (Token token : input) {
       switch (token.getType()) {
         case BEGIN_JAVADOC:
@@ -165,8 +169,8 @@ public final class JavadocFormatter {
    * Returns the given string or a one-line version of it (e.g., "∕✱✱ Tests for foos. ✱∕") if it
    * fits on one line.
    */
-  private static String makeSingleLineIfPossible(int blockIndent, String input) {
-    int oneLinerContentLength = MAX_LINE_LENGTH - "/**  */".length() - blockIndent;
+  private String makeSingleLineIfPossible(int blockIndent, String input) {
+    int oneLinerContentLength = maxLineLength - "/**  */".length() - blockIndent;
     Matcher matcher = ONE_CONTENT_LINE_PATTERN.matcher(input);
     if (matcher.matches() && matcher.group(1).isEmpty()) {
       return "/** */";
@@ -175,6 +179,4 @@ public final class JavadocFormatter {
     }
     return input;
   }
-
-  private JavadocFormatter() {}
 }

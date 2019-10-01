@@ -31,10 +31,12 @@ public final class JavaCommentsHelper implements CommentsHelper {
 
   private final String lineSeparator;
   private final JavaFormatterOptions options;
+  private final JavadocFormatter javadocFormatter;
 
   public JavaCommentsHelper(String lineSeparator, JavaFormatterOptions options) {
     this.lineSeparator = lineSeparator;
     this.options = options;
+    this.javadocFormatter = new JavadocFormatter(options.maxLineLength());
   }
 
   @Override
@@ -44,7 +46,7 @@ public final class JavaCommentsHelper implements CommentsHelper {
     }
     String text = tok.getOriginalText();
     if (tok.isJavadocComment()) {
-      text = JavadocFormatter.formatJavadoc(text, column0);
+      text = javadocFormatter.formatJavadoc(text, column0);
     }
     List<String> lines = new ArrayList<>();
     Iterator<String> it = Newlines.lineIterator(text);

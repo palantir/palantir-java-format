@@ -28,7 +28,9 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public final class JavadocFormattingTest {
 
-  private final Formatter formatter = new Formatter();
+  private final Formatter formatter =
+      new Formatter(
+          JavaFormatterOptions.builder().style(JavaFormatterOptions.Style.GOOGLE).build());
 
   @Test
   public void notJavadoc() {

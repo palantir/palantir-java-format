@@ -3,8 +3,8 @@ package com.google.googlejavaformat.java.test;
 import java.util.List;
 
 /**
- * Tests for IfStatements, ImportDeclarations, InfixExpressions, Initializers,
- * InstanceofExpressions, and IntersectionTypes.
+ * Tests for IfStatements, ImportDeclarations, InfixExpressions, Initializers, InstanceofExpressions, and
+ * IntersectionTypes.
  */
 class I {
     interface I0 {}

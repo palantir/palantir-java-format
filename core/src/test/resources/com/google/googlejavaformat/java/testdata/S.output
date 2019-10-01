@@ -1,10 +1,9 @@
 package com.google.googlejavaformat.java.test;
 
 /**
- * Tests for SimpleNames, SimpleTypes, SingleMemberAnnotations, SingleVariableDeclarations,
- * Statements, StringLiterals, SuperConstructorInvocations, SuperFieldAccesses,
- * SuperMethodInvocations, SuperMethodReferences, SwitchCases, SwitchStatements, and
- * SynchronizedStatements.
+ * Tests for SimpleNames, SimpleTypes, SingleMemberAnnotations, SingleVariableDeclarations, Statements, StringLiterals,
+ * SuperConstructorInvocations, SuperFieldAccesses, SuperMethodInvocations, SuperMethodReferences, SwitchCases,
+ * SwitchStatements, and SynchronizedStatements.
  */
 class S {
     // TODO(jdd): Add tests for higher language levels.

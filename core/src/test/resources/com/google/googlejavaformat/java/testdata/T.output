@@ -1,8 +1,8 @@
 package com.google.googlejavaformat.java.test;
 
 /**
- * Tests for ThisExpressions, ThrowStatements, TryStatements, TypeDeclarationStatements,
- * TypeDeclarations, TypeLiterals, TypeMethodReferences, TypeParameters, and Types.
+ * Tests for ThisExpressions, ThrowStatements, TryStatements, TypeDeclarationStatements, TypeDeclarations, TypeLiterals,
+ * TypeMethodReferences, TypeParameters, and Types.
  */
 class T<T1, T2, T3> {
     // TODO(jdd): Add tests for higher language levels.

@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Javadoc follows the line length configured in the [JavaFormatterOptions.Style](internal-github
+  links:
+  - internal-github
