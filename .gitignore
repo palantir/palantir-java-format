@@ -9,6 +9,9 @@
 .apt_generated/
 
 target/
+/build/
+*/build
+*/*/build/
 
 bin/
 out/
