@@ -18,16 +18,7 @@ plugins {
   id "org.jetbrains.intellij" version "0.4.9"
 }
 
-repositories {
-  mavenCentral()
-}
-
-ext {
-  googleJavaFormatVersion = '1.7'
-}
-
 apply plugin: 'org.jetbrains.intellij'
-apply plugin: 'java'
 
 intellij {
   pluginName = "google-java-format"
@@ -37,8 +28,8 @@ intellij {
 
 patchPluginXml {
   pluginDescription = "Formats source code using the google-java-format tool. This version of " +
-                      "the plugin uses version ${googleJavaFormatVersion} of the tool."
-  version = "${googleJavaFormatVersion}.0.2"
+                      "the plugin uses version 1.7 of the tool."
+  version = "1.7.0.2"
   sinceBuild = '173'
   untilBuild = ''
 }
@@ -47,13 +38,11 @@ publishPlugin {
   token = project.ext.properties.jetbrainsPluginRepoToken
 }
 
-sourceSets {
-  main {
-    java.srcDir 'src'
-    resources.srcDir 'resources'
-  }
+dependencies {
+  compile project(':google-java-format')
 }
 
-dependencies {
-  compile "com.google.googlejavaformat:google-java-format:${googleJavaFormatVersion}"
+
+tasks.withType(JavaCompile).configureEach {
+  options.errorprone.errorproneArgs += ['-Xep:StrictUnusedVariable:OFF']
 }

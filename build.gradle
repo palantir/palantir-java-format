@@ -11,6 +11,7 @@ buildscript {
         classpath 'com.netflix.nebula:gradle-info-plugin:5.1.0'
         classpath 'com.palantir.baseline:gradle-baseline-java:2.13.0'
         classpath 'gradle.plugin.org.inferred:gradle-processors:3.1.0'
+        classpath 'com.palantir.gradle.gitversion:gradle-git-version:0.12.2'
     }
 }
 
@@ -18,6 +19,7 @@ plugins {
     id 'com.palantir.git-version' version '0.12.2'
 }
 
+apply plugin: 'com.palantir.git-version'
 apply plugin: 'com.palantir.baseline'
 
 version = gitVersion()

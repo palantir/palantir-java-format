@@ -1,19 +1,57 @@
-.idea/
-*.ims
-*.iml
-
-.classpath
+# Eclipse
+*.class
 .project
+.gradle
+.classpath
+.checkstyle
+.settings
+.node
+/build/
+*/build
+*/*/build/
+examples/*/build/
+extras/*/build/
+bin
 .factorypath
-.settings/
-.apt_generated/
 
-target/
-build/
+# SLSv2
+!*/service/bin
+**/var/log
+**/var/data
 
-bin/
+# Gofigure
+**/var/conf
+**/var/security
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+*.hprof
+
+# Windows git artifact
+fileeditor
+
+# Mac specific files
+.DS_Store
+
+# IntelliJ
+*.iml
+*.ipr
+*.iws
+.idea/
 out/
-eclipse_plugin/lib/
 
-.gradle/
-!.idea/runConfigurations
+# Eclipse/IntelliJ APT
+generated_src/
+generated_testSrc/
+generated/
+
+# Blueprint theme
+__init__.pyc
