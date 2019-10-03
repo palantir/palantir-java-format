@@ -60,7 +60,7 @@ public final class LevelDelimitedFlatValueDocVisitor implements DocVisitor<Strin
       return "";
     }
     StringBuilder builder = new StringBuilder();
-    builder.append("⸨");
+    builder.append("《");
     if (!level.getPlusIndent().equals(Const.ZERO)) {
       builder.append(" +" + level.getPlusIndent().eval());
     }
@@ -79,7 +79,7 @@ public final class LevelDelimitedFlatValueDocVisitor implements DocVisitor<Strin
     indent -= 2;
     builder.append("\n");
     generateIndent(builder);
-    builder.append("⸩");
+    builder.append("》");
     return builder.toString();
   }
 
