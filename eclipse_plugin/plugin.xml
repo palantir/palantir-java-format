@@ -3,8 +3,8 @@
 <plugin>
    <extension point="org.eclipse.jdt.core.javaFormatter">
    <javaFormatter
-         class="com.google.googlejavaformat.java.GoogleJavaFormatter"
-         id="com.google.googlejavaformat.java.GoogleJavaFormatter"
+         class="com.palantir.javaformat.java.PalantirJavaFormatter"
+         id="com.palantir.javaformat.java.PalantirJavaFormatter"
          name="google-java-format">
    </javaFormatter>
    </extension>

@@ -25,13 +25,12 @@
     <version>7</version>
   </parent>
 
-  <groupId>com.google.googlejavaformat</groupId>
-  <artifactId>google-java-format-parent</artifactId>
+  <groupId>com.palantir.javaformat</groupId>
+  <artifactId>palantir-java-format-parent</artifactId>
   <packaging>pom</packaging>
   <version>1.8-SNAPSHOT</version>
 
   <modules>
-    <module>core</module>
     <!-- google-java-format#24
     <module>idea_plugin</module>
     <module>eclipse_plugin</module>
@@ -205,7 +204,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>com.google.googlejavaformat.java.Main</mainClass>
+              <mainClass>com.palantir.javaformat.java.Main</mainClass>
             </manifest>
           </archive>
         </configuration>

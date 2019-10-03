@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: google-java-format
-Bundle-SymbolicName: google-java-format-eclipse-plugin;singleton:=true
+Bundle-Name: palantir-java-format
+Bundle-SymbolicName: palantir-java-format-eclipse-plugin;singleton:=true
 Bundle-Version: 1.6.0
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.eclipse.jdt.core;bundle-version="3.10.0",

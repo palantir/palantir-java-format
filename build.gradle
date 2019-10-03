@@ -25,7 +25,7 @@ apply plugin: 'com.palantir.baseline'
 version = gitVersion()
 
 allprojects {
-    group = 'com.google.googlejavaformat'
+    group = 'com.palantir.javaformat'
     version = rootProject.version
 
     repositories {
