@@ -1,25 +1,14 @@
-<idea-plugin url="https://github.com/google/google-java-format/tree/master/idea_plugin">
-  <id>google-java-format</id>
-  <name>google-java-format</name>
-  <vendor url="https://github.com/google/google-java-format">
-    Google
+<idea-plugin url="https://github.com/palantir/palantir-java-format">
+  <id>palantir-java-format</id>
+  <name>palantir-java-format</name>
+  <vendor url="https://github.com/palantir/palantir-java-format">
+    Palantir
   </vendor>
 
   <!-- Mark it as available on all JetBrains IDEs. It's really only useful in
        IDEA and Android Studio, but there's no way to specify that for some
        reason. It won't crash PyCharm or anything, so whatever. -->
   <depends>com.intellij.modules.lang</depends>
-
-  <change-notes><![CDATA[
-    <dl>
-      <dt>1.7.0.2</dt>
-      <dd>Added support for all IDEs after 2017.3.</dd>
-      <dt>1.7.0.1</dt>
-      <dd>Added support for 2019.1 IDEs.</dd>
-      <dt>1.7.0.0</dt>
-      <dd>Upgraded to google-java-format 1.7.</dd>
-    </dl>
-  ]]></change-notes>
 
   <project-components>
     <component>
@@ -37,8 +26,8 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <projectConfigurable instance="com.google.googlejavaformat.intellij.GoogleJavaFormatConfigurable"
-                         id="google-java-format.settings"
-                         displayName="google-java-format Settings"/>
+                         id="palantir-java-format.settings"
+                         displayName="palantir-java-format Settings"/>
     <projectService serviceImplementation="com.google.googlejavaformat.intellij.GoogleJavaFormatSettings"/>
   </extensions>
 

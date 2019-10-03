@@ -26,7 +26,7 @@ import javax.annotation.Nullable;
 
 @State(
     name = "GoogleJavaFormatSettings",
-    storages = {@Storage("google-java-format.xml")})
+    storages = {@Storage("palantir-java-format.xml")})
 class GoogleJavaFormatSettings implements PersistentStateComponent<GoogleJavaFormatSettings.State> {
 
   private State state = new State();
@@ -79,7 +79,7 @@ class GoogleJavaFormatSettings implements PersistentStateComponent<GoogleJavaFor
   static class State {
 
     private EnabledState enabled = EnabledState.UNKNOWN;
-    public JavaFormatterOptions.Style style = JavaFormatterOptions.Style.GOOGLE;
+    public JavaFormatterOptions.Style style = JavaFormatterOptions.Style.PALANTIR;
 
     // enabled used to be a boolean so we use bean property methods for backwards compatibility
     public void setEnabled(@Nullable String enabledStr) {

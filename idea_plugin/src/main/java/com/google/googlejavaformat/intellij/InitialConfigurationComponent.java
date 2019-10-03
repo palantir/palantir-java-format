@@ -16,47 +16,19 @@
 
 package com.google.googlejavaformat.intellij;
 
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationDisplayType;
-import com.intellij.notification.NotificationGroup;
-import com.intellij.notification.NotificationType;
 import com.intellij.openapi.components.ProjectComponent;
-import com.intellij.openapi.project.Project;
 
 final class InitialConfigurationComponent implements ProjectComponent {
-
-  private static final String NOTIFICATION_TITLE = "Enable google-java-format";
-  private static final NotificationGroup NOTIFICATION_GROUP =
-      new NotificationGroup(NOTIFICATION_TITLE, NotificationDisplayType.STICKY_BALLOON, true);
-
-  private final Project project;
   private final GoogleJavaFormatSettings settings;
 
-  public InitialConfigurationComponent(Project project, GoogleJavaFormatSettings settings) {
-    this.project = project;
+  public InitialConfigurationComponent(GoogleJavaFormatSettings settings) {
     this.settings = settings;
   }
 
   @Override
   public void projectOpened() {
     if (settings.isUninitialized()) {
-      settings.setEnabled(false);
-      displayNewUserNotification();
+      settings.setEnabled(true);
     }
-  }
-
-  private void displayNewUserNotification() {
-    Notification notification =
-        new Notification(
-            NOTIFICATION_GROUP.getDisplayId(),
-            NOTIFICATION_TITLE,
-            "The google-java-format plugin is disabled by default. "
-                + "<a href=\"enable\">Enable for this project</a>.",
-            NotificationType.INFORMATION,
-            (n, e) -> {
-              settings.setEnabled(true);
-              n.expire();
-            });
-    notification.notify(project);
   }
 }

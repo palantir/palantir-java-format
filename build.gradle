@@ -16,7 +16,7 @@ buildscript {
 }
 
 plugins {
-    id 'com.palantir.git-version' version '0.12.2'
+    id "org.jetbrains.intellij" version "0.4.10" apply false
 }
 
 apply plugin: 'com.palantir.git-version'

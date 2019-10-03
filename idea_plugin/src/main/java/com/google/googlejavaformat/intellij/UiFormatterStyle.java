@@ -23,6 +23,7 @@ import java.util.Objects;
 
 /** Configuration options for the formatting style. */
 enum UiFormatterStyle {
+  PALANTIR("Default Palantir Java style", Style.PALANTIR),
   GOOGLE("Default Google Java style", Style.GOOGLE),
   AOSP("Android Open Source Project (AOSP) style", Style.AOSP);
 

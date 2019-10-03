@@ -14,22 +14,19 @@
  * limitations under the License.
  */
 
-plugins {
-  id "org.jetbrains.intellij" version "0.4.9"
-}
-
+apply plugin: 'maven-publish'
 apply plugin: 'org.jetbrains.intellij'
 
 intellij {
-  pluginName = "google-java-format"
+  pluginName = "palantir-java-format"
   updateSinceUntilBuild = true
   version = "191.5849.21"
 }
 
 patchPluginXml {
   pluginDescription = "Formats source code using the google-java-format tool. This version of " +
-                      "the plugin uses version 1.7 of the tool."
-  version = "1.7.0.2"
+                      "the plugin uses version ${project.version} of the tool."
+  version = project.version
   sinceBuild = '173'
   untilBuild = ''
 }
@@ -46,3 +43,20 @@ dependencies {
 tasks.withType(JavaCompile).configureEach {
   options.errorprone.errorproneArgs += ['-Xep:StrictUnusedVariable:OFF']
 }
+
+check.dependsOn buildPlugin, verifyPlugin
+buildPlugin.dependsOn ':google-java-format:jar'
+runIde.dependsOn buildPlugin
+
+buildSearchableOptions.enabled = false
+
+publishing {
+    publications {
+        idea(MavenPublication) {
+            artifact buildPlugin.archivePath, {
+                builtBy buildPlugin
+            }
+        }
+    }
+}
+
