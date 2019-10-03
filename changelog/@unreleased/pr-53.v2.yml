@@ -1,0 +1,36 @@
+type: improvement
+improvement:
+  description: |-
+    Add `Level` visitor that prints out nested levels using indentation.
+
+    Example:
+
+    ```
+    var foo =⸨
+      ⏎( )
+      method⸨
+        (
+        ⏎
+        ⸨
+          arg1,
+          ⏎( )
+          arg2,
+          ⏎( )
+          param ->⸨
+            ⏎( )
+            doSomethingInAVeryLongMethod⸨
+              (
+              ⏎
+              ⸨
+                param
+              ⸩
+              )
+            ⸩
+        ⸩
+        )
+      ⸩
+      ;
+    ⸩
+    ```
+  links:
+  - internal-github

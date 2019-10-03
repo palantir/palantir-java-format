@@ -355,6 +355,19 @@ public abstract class Doc {
       }
     }
 
+    Indent getPlusIndent() {
+      return plusIndent;
+    }
+
+    List<Doc> getDocs() {
+      return docs;
+    }
+
+    /** An indented representation of this level and all nested levels inside it. */
+    String representation() {
+      return new LevelDelimitedFlatValueDocVisitor().visit(this);
+    }
+
     /**
      * Get the width of a sequence of {@link Doc}s.
      *
@@ -557,7 +570,7 @@ public abstract class Doc {
   public static final class Break extends Doc implements Op {
     private final FillMode fillMode;
     private final String flat;
-    private final Indent plusIndent;
+    final Indent plusIndent;
     private final Optional<BreakTag> optTag;
 
     private Break(FillMode fillMode, String flat, Indent plusIndent, Optional<BreakTag> optTag) {
