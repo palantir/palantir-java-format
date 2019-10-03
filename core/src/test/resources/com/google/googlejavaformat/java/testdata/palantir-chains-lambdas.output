@@ -1,10 +1,11 @@
 public class Foo {
     public static void main(String[] args) {
         foo.bar()
-                .thisMethodIsABitLong(
+                .baz(
                         argargargargargargargargargargargargargargargargargargargargarg,
                         param ->
-                                doStuff.method1()
+                                doStuff()
+                                        .method1()
                                         .method2(arljhfaldjfhalfjhalfjahflahflahfaljfhadlfjhljsahljhfsaljfhlfajhfljh));
     }
 }
