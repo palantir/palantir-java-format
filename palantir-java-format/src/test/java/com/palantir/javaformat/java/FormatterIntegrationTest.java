@@ -46,7 +46,7 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class FormatterIntegrationTest {
 
-  private static final Path TEST_DATA_PATH = Paths.get("com/google/googlejavaformat/java/testdata");
+  private static final Path TEST_DATA_PATH = Paths.get("com/palantir/javaformat/java/testdata");
   /** Where to output test outputs when recreating. */
   private static final Path OUTPUT_TEST_PATH =
       Paths.get("src/test/resources").resolve(TEST_DATA_PATH);
