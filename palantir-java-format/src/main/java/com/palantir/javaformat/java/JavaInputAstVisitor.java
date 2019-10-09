@@ -56,6 +56,8 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.PeekingIterator;
 import com.google.common.collect.Streams;
+import com.palantir.javaformat.BreakBehaviour;
+import com.palantir.javaformat.Breakability;
 import com.palantir.javaformat.CloseOp;
 import com.palantir.javaformat.Doc;
 import com.palantir.javaformat.Doc.FillMode;
@@ -445,7 +447,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
   @Override
   public Void visitNewArray(NewArrayTree node, Void unused) {
     if (node.getType() != null) {
-      builder.open(plusFour);
+      builder.open(plusFour, BreakBehaviour.BREAK_THIS_LEVEL, Breakability.BREAK_HERE);
       token("new");
       builder.space();
 
@@ -483,7 +485,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
       }
       token("}", plusTwo);
     } else if ((cols = argumentsAreTabular(expressions)) != -1) {
-      builder.open(plusTwo);
+      builder.open(plusTwo, BreakBehaviour.BREAK_THIS_LEVEL, Breakability.BREAK_HERE);
       token("{");
       builder.forcedBreak();
       boolean first = true;
@@ -527,7 +529,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
       boolean shortItems = hasOnlyShortItems(expressions);
       boolean allowFilledElementsOnOwnLine = shortItems || !inMemberValuePair;
 
-      builder.open(plusTwo);
+      builder.open(plusTwo, BreakBehaviour.BREAK_THIS_LEVEL, Breakability.BREAK_HERE);
       tokenBreakTrailingComment("{", plusTwo);
       boolean hasTrailingComma = hasTrailingToken(builder.getInput(), expressions, ",");
       builder.breakOp(hasTrailingComma ? FillMode.FORCED : FillMode.UNIFIED, "", ZERO);
@@ -666,7 +668,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
   @Override
   public Void visitNewClass(NewClassTree node, Void unused) {
     sync(node);
-    builder.open(ZERO);
+    builder.open(ZERO, BreakBehaviour.PREFER_BREAKING_LAST_INNER_LEVEL, Breakability.BREAK_HERE);
     if (node.getEnclosingExpression() != null) {
       scan(node.getEnclosingExpression(), null);
       builder.breakOp();
@@ -1217,12 +1219,11 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     builder.close();
     builder.space();
     builder.op("->");
-    builder.open(statementBody ? ZERO : plusFour);
-    if (statementBody) {
-      builder.space();
-    } else {
-      builder.breakOp(" ");
-    }
+    builder.open(ZERO, BreakBehaviour.BREAK_THIS_LEVEL, Breakability.BREAK_HERE);
+    // TODO how to not break this if _first line_ of expression is short?
+    //      i.e. only break if the very next token does not fit on this line
+    builder.space();
+
     if (node.getBody().getKind() == Tree.Kind.BLOCK) {
       visitBlock(
           (BlockTree) node.getBody(),
@@ -2627,7 +2628,8 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         scan(getArrayBase(node), null);
         token(".");
       } else {
-        builder.open(plusFour);
+        builder.open(
+            plusFour, BreakBehaviour.PREFER_BREAKING_LAST_INNER_LEVEL, Breakability.BREAK_HERE);
         scan(getArrayBase(node), null);
         builder.breakOp();
         needDot = true;
@@ -2718,7 +2720,12 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     boolean trailingDereferences = items.size() > 1;
     boolean needDot0 = needDot;
     if (!needDot0) {
-      builder.open(plusFour);
+      // Verified `preferBreakIfLastLevel = true` is good here, see B20128760.
+      // This level can come after either:
+      //      * checkArgument(        -- B19950815                (!trailingDereferences)
+      //      * foo.bar()             -- palantir-chains-lambdas  ( trailingDereferences)
+      builder.open(
+          plusFour, BreakBehaviour.PREFER_BREAKING_LAST_INNER_LEVEL, Breakability.CHECK_INNER);
     }
     // don't break after the first element if it is every small, unless the
     // chain starts with another expression
@@ -2801,7 +2808,15 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     // Are there method invocations or field accesses after the prefix?
     boolean trailingDereferences = !prefixes.isEmpty() && getLast(prefixes) < items.size() - 1;
 
-    builder.open(plusFour);
+    builder.open(
+        plusFour,
+        // This can't be PREFER_BREAKING_LAST_INNER_LEVEL unless we have breaks in _this_ level.
+        // That's only every the case if trailingDereferences is true.
+        trailingDereferences
+            ? BreakBehaviour.PREFER_BREAKING_LAST_INNER_LEVEL
+            : BreakBehaviour.BREAK_THIS_LEVEL,
+        Breakability.ONLY_IF_FIRST_LEVEL_FITS);
+
     for (int times = 0; times < prefixes.size(); times++) {
       builder.open(ZERO);
     }
@@ -2914,7 +2929,9 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     expression = getArrayBase(expression);
     switch (expression.getKind()) {
       case METHOD_INVOCATION:
-        builder.open(tyargIndent);
+        // Note: it's fine to BREAK_HERE because we know the first non-Level token will be a
+        // break, added inside `addArguments`.
+        builder.open(tyargIndent, BreakBehaviour.BREAK_THIS_LEVEL, Breakability.BREAK_HERE);
         MethodInvocationTree methodInvocation = (MethodInvocationTree) expression;
         addArguments(methodInvocation.getArguments(), indent);
         builder.close();
@@ -2983,7 +3000,27 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
    * @param plusIndent the extra indent for the arguments
    */
   void addArguments(List<? extends ExpressionTree> arguments, Indent plusIndent) {
-    builder.open(plusIndent);
+    /*
+     PREFER_BREAKING_LAST_INNER_LEVEL here in order to avoid immediately breaking a long
+     invocation that can be one-lined:
+
+     .method(
+              arg1, arg2, param -> {
+                // body
+              });
+
+     This is so that the downstream 'PREFER_BREAKING_LAST_INNER_LEVEL' level made by
+     argList can be attempted without preemptively breaking after the opening bracket '('.
+    */
+    builder.open(
+        plusIndent,
+        // BREAK_THIS_LEVEL would break B20701054 ( `analysis().analyze(⏎` )
+        // However we definitely don't wanna look inside for B18479811
+        // Solution: argList should CHECK_INNER.
+        BreakBehaviour.PREFER_BREAKING_LAST_INNER_LEVEL,
+        // We are at a point where a newline is definitely coming, so we want to give the
+        // opportunity to take it.
+        Breakability.BREAK_HERE);
     token("(");
     if (!arguments.isEmpty()) {
       if (arguments.size() % 2 == 0 && argumentsAreTabular(arguments) == 2) {
@@ -3026,7 +3063,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
   }
 
   private void argList(List<? extends ExpressionTree> arguments) {
-    builder.open(ZERO);
+    builder.open(ZERO, BreakBehaviour.PREFER_BREAKING_LAST_INNER_LEVEL, Breakability.CHECK_INNER);
     boolean first = true;
     FillMode fillMode = hasOnlyShortItems(arguments) ? FillMode.INDEPENDENT : FillMode.UNIFIED;
     for (ExpressionTree argument : arguments) {
@@ -3297,7 +3334,10 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
           initializer.get().accept(this, null);
           builder.close();
         } else {
-          builder.open(Indent.If.make(typeBreak, plusFour, ZERO));
+          builder.open(
+              Indent.If.make(typeBreak, plusFour, ZERO),
+              BreakBehaviour.BREAK_THIS_LEVEL,
+              Breakability.NO_PREFERENCE);
           {
             builder.breakToFill(" ");
             scan(initializer.get(), null);
@@ -3449,7 +3489,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
       if (braces.isYes()) {
         builder.space();
         tokenBreakTrailingComment("{", plusTwo);
-        builder.open(ZERO);
+        builder.open(ZERO, BreakBehaviour.BREAK_THIS_LEVEL, Breakability.BREAK_HERE);
       }
       builder.open(plusTwo);
       boolean first = first0.isYes();

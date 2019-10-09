@@ -6,20 +6,15 @@ class B20128760 {
 
         XxxxxxxxxXxx.<Xxxxxx, Xxxxxx>xxxxxxx()
                 .xxx(XxxxxxxxxXxxXxxx.Xxxxx.XXXXX, "Xxxxx xxxxxxxxx xxxxx")
-                .xxx(
-                        XxxxxxxxxXxxXxxx.Xxxxx.XXXXXxXXXXX,
-                        XxxxXxxxxxxxxx.xxxXxxxxxxxxXxxxxXxxxxXxXxxxxx(Xxxxxxxxxx.xxxXxxxXxxxx(x)))
+                .xxx(XxxxxxxxxXxxXxxx.Xxxxx.XXXXXxXXXXX, XxxxXxxxxxxxxx.xxxXxxxxxxxxXxxxxXxxxxXxXxxxxx(
+                        Xxxxxxxxxx.xxxXxxxXxxxx(x)))
                 .xxxxx();
 
         xxxxxxXxxx(
-                        xxx.xxxXxXxxxxxxx(
-                                        new XxxxxxxxxXxxxxxxx.Xxxxxxx()
-                                                .xxxxXxxxXxx(
-                                                        Xxxxx.xxxXxxxxXxxx(
-                                                                new XxxxXx(
-                                                                        xxxxxxxxx1.xxxXxxxXx().xxxXxxxx()
-                                                                                + xxxxxxxxx2.xxxXxxxXx().xxxXxxxx())))
-                                                .xxxxx())
+                        xxx.xxxXxXxxxxxxx(new XxxxxxxxxXxxxxxxx.Xxxxxxx()
+                                        .xxxxXxxxXxx(Xxxxx.xxxXxxxxXxxx(new XxxxXx(
+                                                xxxxxxxxx1.xxxXxxxXx().xxxXxxxx() + xxxxxxxxx2.xxxXxxxXx().xxxXxxxx())))
+                                        .xxxxx())
                                 .xxxXxxxxxx())
                 .xxxxxxxxXxxxxxx();
 
@@ -28,10 +23,8 @@ class B20128760 {
                                 "XxxxXxxxxxxxXxxxXxxxXxxxxxxxXxxxXxxXxxxxxxXxxxxxxxx",
                                 xxxxxxxxXxxxXxXxxxxxxxXx,
                                 xxxxxxxxXxxxXxxxxXxxxXxXxxxxxxxXx)
-                        .xxxxxxxxXx(
-                                "XxxxxxxxXxxxxxxxxXxx",
-                                xxxxxxxxXxxxxxxxxXxxXx,
-                                XX.xxxxxXx(XX.xxxxx(), XX.xxxxxx(XxxxxxxXxxxxxxxxxxXxxxxxxxx.xxxxx)));
+                        .xxxxxxxxXx("XxxxxxxxXxxxxxxxxXxx", xxxxxxxxXxxxxxxxxXxxXx, XX.xxxxxXx(
+                                XX.xxxxx(), XX.xxxxxx(XxxxxxxXxxxxxxxxxxXxxxxxxxx.xxxxx)));
 
         xxXxxxxxxxXxxxXxxx =
                 (XxxxXxxx)
@@ -46,9 +39,8 @@ class B20128760 {
                         xxxxxxxxxx
                                 .xxxXxxxXxxxxXxxxxxxxxxxXxxxXxxxXxxxxXxxx(XXXxXXXXxXX, XXXXXXxXXXxXXXXxXX, XXXXXxXX)
                                 .xxxxxxxxxxxXxxxXxxxXxxxxx())
-                .xxxxxxxxXxxxxxx(
-                        xxxxXxxxxxxxxxxXxxxXxxxXxxxx(xxxx1Xxxx, Xxxxx.XXxXXX),
-                        xxxxXxxxxxxxxxxXxxxXxxxXxxxx(xxxx2Xxxx, Xxxxx.XXxXXX));
+                .xxxxxxxxXxxxxxx(xxxxXxxxxxxxxxxXxxxXxxxXxxxx(xxxx1Xxxx, Xxxxx.XXxXXX), xxxxXxxxxxxxxxxXxxxXxxxXxxxx(
+                        xxxx2Xxxx, Xxxxx.XXxXXX));
 
         xxxx(xxxx(xxxx(xxxx(xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx))));
 
@@ -80,23 +72,9 @@ class B20128760 {
 
     {
         Stream<ItemKey> itemIdsStream =
-                stream(members)
-                        .flatMap(
-                                m ->
-                                        m.getFieldValues().entrySet().stream()
-                                                .filter(fv -> itemLinkFieldIds.contains(fv.getKey()))
-                                                .flatMap(
-                                                        fv ->
-                                                                FieldDTO.deserializeStringToListOfStrings(fv.getValue())
-                                                                        .stream()
-                                                                        .map(
-                                                                                id ->
-                                                                                        new ItemKey(
-                                                                                                fieldsById
-                                                                                                        .get(
-                                                                                                                fv
-                                                                                                                        .getKey())
-                                                                                                        .getItemTypeId(),
-                                                                                                id))));
+                stream(members).flatMap(m -> m.getFieldValues().entrySet().stream()
+                        .filter(fv -> itemLinkFieldIds.contains(fv.getKey()))
+                        .flatMap(fv -> FieldDTO.deserializeStringToListOfStrings(fv.getValue()).stream()
+                                .map(id -> new ItemKey(fieldsById.get(fv.getKey()).getItemTypeId(), id))));
     }
 }

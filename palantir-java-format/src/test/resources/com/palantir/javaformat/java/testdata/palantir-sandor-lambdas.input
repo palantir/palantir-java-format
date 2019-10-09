@@ -9,5 +9,6 @@ public class Foo {
                                 .map(ds -> StoredDatasetAndBranch.of(ds.getDatasetRid(), ds.getBranchName()))
                                 .collect(Collectors.toList())))
                 .collect(Collectors.toList());
+        int otherVar = 5;
     }
 }

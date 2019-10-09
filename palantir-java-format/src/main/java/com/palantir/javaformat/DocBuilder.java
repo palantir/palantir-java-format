@@ -20,7 +20,9 @@ import java.util.List;
 
 /** A {@code DocBuilder} converts a sequence of {@link Op}s into a {@link Doc}. */
 public final class DocBuilder {
-  private final Doc.Level base = Doc.Level.make(Indent.Const.ZERO);
+  private final Doc.Level base =
+      Doc.Level.make(
+          Indent.Const.ZERO, BreakBehaviour.BREAK_THIS_LEVEL, Breakability.NO_PREFERENCE);
   private final ArrayDeque<Doc.Level> stack = new ArrayDeque<>();
 
   /**
@@ -63,9 +65,12 @@ public final class DocBuilder {
    * Open a new {@link Doc.Level}.
    *
    * @param plusIndent the extra indent for the {@link Doc.Level}
+   * @param breakBehaviour how to decide whether to break this level or not
+   * @param breakabilityIfLastLevel if last level, when to break this rather than parent
    */
-  void open(Indent plusIndent) {
-    Doc.Level level = Doc.Level.make(plusIndent);
+  void open(
+      Indent plusIndent, BreakBehaviour breakBehaviour, Breakability breakabilityIfLastLevel) {
+    Doc.Level level = Doc.Level.make(plusIndent, breakBehaviour, breakabilityIfLastLevel);
     stack.addLast(level);
   }
 

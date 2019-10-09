@@ -54,9 +54,17 @@ public final class LevelDelimitedFlatValueDocVisitor implements DocVisitor<Strin
       return "";
     }
     StringBuilder builder = new StringBuilder();
-    builder.append("《");
+    builder.append("❰");
     if (!level.getPlusIndent().equals(Indent.Const.ZERO)) {
       builder.append(" +" + level.getPlusIndent().eval());
+    }
+    if (level.getBreakBehaviour() != BreakBehaviour.BREAK_THIS_LEVEL) {
+      builder.append(" ");
+      builder.append(level.getBreakBehaviour());
+    }
+    if (level.getBreakabilityIfLastLevel() != Breakability.NO_PREFERENCE) {
+      builder.append(" ifLastLevel=");
+      builder.append(level.getBreakabilityIfLastLevel());
     }
 
     indent += 2;
@@ -73,7 +81,7 @@ public final class LevelDelimitedFlatValueDocVisitor implements DocVisitor<Strin
     indent -= 2;
     builder.append("\n");
     generateIndent(builder);
-    builder.append("》");
+    builder.append("❱");
     return builder.toString();
   }
 

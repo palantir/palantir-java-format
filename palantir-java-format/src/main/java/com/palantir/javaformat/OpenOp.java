@@ -24,28 +24,48 @@ import com.google.common.base.MoreObjects;
  */
 public final class OpenOp implements Op {
   private final Indent plusIndent;
+  private final BreakBehaviour breakBehaviour;
+  private final Breakability breakabilityIfLastLevel;
 
-  private OpenOp(Indent plusIndent) {
+  private OpenOp(
+      Indent plusIndent, BreakBehaviour breakBehaviour, Breakability breakabilityIfLastLevel) {
     this.plusIndent = plusIndent;
+    this.breakBehaviour = breakBehaviour;
+    this.breakabilityIfLastLevel = breakabilityIfLastLevel;
+  }
+
+  /**
+   * Make an ordinary {@code OpenOp}.
+   *
+   * @see #make(Indent, BreakBehaviour, Breakability)
+   */
+  public static Op make(Indent plusIndent) {
+    return new OpenOp(plusIndent, BreakBehaviour.BREAK_THIS_LEVEL, Breakability.NO_PREFERENCE);
   }
 
   /**
    * Make an ordinary {@code OpenOp}.
    *
    * @param plusIndent the indent for breaks at this level
+   * @param breakBehaviour how to decide whether to break this level or not
    * @return the {@code OpenOp}
    */
-  public static Op make(Indent plusIndent) {
-    return new OpenOp(plusIndent);
+  public static Op make(
+      Indent plusIndent, BreakBehaviour breakBehaviour, Breakability breakabilityIfLastLevel) {
+    return new OpenOp(plusIndent, breakBehaviour, breakabilityIfLastLevel);
   }
 
   @Override
   public void add(DocBuilder builder) {
-    builder.open(plusIndent);
+    builder.open(plusIndent, breakBehaviour, breakabilityIfLastLevel);
   }
 
   @Override
   public String toString() {
-    return MoreObjects.toStringHelper(this).add("plusIndent", plusIndent).toString();
+    return MoreObjects.toStringHelper(this)
+        .add("plusIndent", plusIndent)
+        .add("breakBehaviour", breakBehaviour)
+        .add("breakabilityIfLastLevel", breakabilityIfLastLevel)
+        .toString();
   }
 }

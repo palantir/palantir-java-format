@@ -1,0 +1,6 @@
+type: feature
+feature:
+  description: |-
+    Attempt to introduce more information into specific levels, such that early (more outer) breaks are not taken in certain conditions.
+  links:
+  - internal-github
