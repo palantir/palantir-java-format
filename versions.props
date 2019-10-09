@@ -1,0 +1,8 @@
+com.google.guava:guava = 27.0.1-jre
+com.google.errorprone:javac-shaded = 9+181-r4173-1
+com.google.code.findbugs:jsr305 = 3.0.2
+com.google.errorprone:error_prone_annotations = 2.0.8
+junit:junit = 4.12
+com.google.guava:guava-testlib = 27.0.1-jre
+com.google.truth:truth = 0.45
+com.google.testing.compile:compile-testing = 0.15

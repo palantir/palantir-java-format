@@ -58,3 +58,6 @@ publishing {
     }
 }
 
+versionsLock {
+    disableJavaPluginDefaults()
+}
