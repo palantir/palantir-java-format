@@ -29,6 +29,7 @@ import javax.annotation.processing.Messager;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
+import javax.tools.Diagnostic;
 import javax.tools.FileObject;
 import javax.tools.JavaFileManager.Location;
 import javax.tools.JavaFileObject;
@@ -51,20 +52,20 @@ public class FormattingFilerTest {
     Messager messager =
         new Messager() {
           @Override
-          public void printMessage(javax.tools.Diagnostic.Kind kind, CharSequence msg) {
+          public void printMessage(Diagnostic.Kind kind, CharSequence msg) {
             logMessages.add(kind.toString() + ";" + msg);
           }
 
           @Override
-          public void printMessage(javax.tools.Diagnostic.Kind kind, CharSequence msg, Element e) {}
+          public void printMessage(Diagnostic.Kind kind, CharSequence msg, Element e) {}
 
           @Override
           public void printMessage(
-              javax.tools.Diagnostic.Kind kind, CharSequence msg, Element e, AnnotationMirror a) {}
+              Diagnostic.Kind kind, CharSequence msg, Element e, AnnotationMirror a) {}
 
           @Override
           public void printMessage(
-              javax.tools.Diagnostic.Kind kind,
+              Diagnostic.Kind kind,
               CharSequence msg,
               Element e,
               AnnotationMirror a,

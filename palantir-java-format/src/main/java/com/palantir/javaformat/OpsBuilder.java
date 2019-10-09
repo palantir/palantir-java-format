@@ -19,10 +19,15 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
-import com.palantir.javaformat.Doc.Token;
 import com.palantir.javaformat.Indent.Const;
-import com.palantir.javaformat.Input.Tok;
 import com.palantir.javaformat.Output.BreakTag;
+import com.palantir.javaformat.doc.Break;
+import com.palantir.javaformat.doc.Doc;
+import com.palantir.javaformat.doc.DocBuilder;
+import com.palantir.javaformat.doc.FillMode;
+import com.palantir.javaformat.doc.Space;
+import com.palantir.javaformat.doc.Tok;
+import com.palantir.javaformat.doc.Token;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -37,14 +42,14 @@ public final class OpsBuilder {
   public int actualSize(int position, int length) {
     Input.Token startToken = input.getPositionTokenMap().get(position);
     int start = startToken.getTok().getPosition();
-    for (Tok tok : startToken.getToksBefore()) {
+    for (Input.Tok tok : startToken.getToksBefore()) {
       if (tok.isComment()) {
         start = Math.min(start, tok.getPosition());
       }
     }
     Input.Token endToken = input.getPositionTokenMap().get(position + length - 1);
     int end = endToken.getTok().getPosition() + endToken.getTok().length();
-    for (Tok tok : endToken.getToksAfter()) {
+    for (Input.Tok tok : endToken.getToksAfter()) {
       if (tok.isComment()) {
         end = Math.max(end, tok.getPosition() + tok.length());
       }
@@ -57,7 +62,7 @@ public final class OpsBuilder {
     Input.Token startToken = input.getPositionTokenMap().get(position);
     int start = startToken.getTok().getPosition();
     int line0 = input.getLineNumber(start);
-    for (Tok tok : startToken.getToksBefore()) {
+    for (Input.Tok tok : startToken.getToksBefore()) {
       if (line0 != input.getLineNumber(tok.getPosition())) {
         return start;
       }
@@ -322,7 +327,7 @@ public final class OpsBuilder {
        * Generated a "bad" token, which doesn't exist on the input. Drop it, and complain unless
        * (for example) we're guessing at an optional token.
        */
-      if (realOrImaginary.isReal()) {
+      if (realOrImaginary == Token.RealOrImaginary.REAL) {
         throw new FormattingError(
             diagnostic(
                 String.format(
@@ -348,84 +353,84 @@ public final class OpsBuilder {
     }
   }
 
-  /** Emit a {@link Doc.Space}. */
+  /** Emit a {@link Space}. */
   public final void space() {
-    add(Doc.Space.make());
+    add(Space.make());
   }
 
-  /** Emit a {@link Doc.Break}. */
+  /** Emit a {@link Break}. */
   public final void breakOp() {
-    breakOp(Doc.FillMode.UNIFIED, "", ZERO);
+    breakOp(FillMode.UNIFIED, "", ZERO);
   }
 
   /**
-   * Emit a {@link Doc.Break}.
+   * Emit a {@link Break}.
    *
    * @param plusIndent extra indent if taken
    */
   public final void breakOp(Indent plusIndent) {
-    breakOp(Doc.FillMode.UNIFIED, "", plusIndent);
+    breakOp(FillMode.UNIFIED, "", plusIndent);
   }
 
-  /** Emit a filled {@link Doc.Break}. */
+  /** Emit a filled {@link Break}. */
   public final void breakToFill() {
-    breakOp(Doc.FillMode.INDEPENDENT, "", ZERO);
+    breakOp(FillMode.INDEPENDENT, "", ZERO);
   }
 
-  /** Emit a forced {@link Doc.Break}. */
+  /** Emit a forced {@link Break}. */
   public final void forcedBreak() {
-    breakOp(Doc.FillMode.FORCED, "", ZERO);
+    breakOp(FillMode.FORCED, "", ZERO);
   }
 
   /**
-   * Emit a forced {@link Doc.Break}.
+   * Emit a forced {@link Break}.
    *
    * @param plusIndent extra indent if taken
    */
   public final void forcedBreak(Indent plusIndent) {
-    breakOp(Doc.FillMode.FORCED, "", plusIndent);
+    breakOp(FillMode.FORCED, "", plusIndent);
   }
 
   /**
-   * Emit a {@link Doc.Break}, with a specified {@code flat} value (e.g., {@code " "}).
+   * Emit a {@link Break}, with a specified {@code flat} value (e.g., {@code " "}).
    *
-   * @param flat the {@link Doc.Break} when not broken
+   * @param flat the {@link Break} when not broken
    */
   public final void breakOp(String flat) {
-    breakOp(Doc.FillMode.UNIFIED, flat, ZERO);
+    breakOp(FillMode.UNIFIED, flat, ZERO);
   }
 
   /**
-   * Emit a {@link Doc.Break}, with a specified {@code flat} value (e.g., {@code " "}).
+   * Emit a {@link Break}, with a specified {@code flat} value (e.g., {@code " "}).
    *
-   * @param flat the {@link Doc.Break} when not broken
+   * @param flat the {@link Break} when not broken
    */
   public final void breakToFill(String flat) {
-    breakOp(Doc.FillMode.INDEPENDENT, flat, ZERO);
+    breakOp(FillMode.INDEPENDENT, flat, ZERO);
   }
 
   /**
-   * Emit a generic {@link Doc.Break}.
+   * Emit a generic {@link Break}.
    *
-   * @param fillMode the {@link Doc.FillMode}
-   * @param flat the {@link Doc.Break} when not broken
+   * @param fillMode the {@link FillMode}
+   * @param flat the {@link Break} when not broken
    * @param plusIndent extra indent if taken
    */
-  public final void breakOp(Doc.FillMode fillMode, String flat, Indent plusIndent) {
+  public final void breakOp(FillMode fillMode, String flat, Indent plusIndent) {
     breakOp(fillMode, flat, plusIndent, /* optionalTag=  */ Optional.empty());
   }
 
   /**
-   * Emit a generic {@link Doc.Break}.
+   * Emit a generic {@link Break}.
    *
-   * @param fillMode the {@link Doc.FillMode}
-   * @param flat the {@link Doc.Break} when not broken
+   * @param fillMode the {@link FillMode}
+   * @param flat the {@link Break} when not broken
    * @param plusIndent extra indent if taken
    * @param optionalTag an optional tag for remembering whether the break was taken
    */
   public final void breakOp(
-      Doc.FillMode fillMode, String flat, Indent plusIndent, Optional<BreakTag> optionalTag) {
-    add(Doc.Break.make(fillMode, flat, plusIndent, optionalTag));
+      FillMode fillMode, String flat, Indent plusIndent, Optional<BreakTag> optionalTag) {
+    add(Break.make(fillMode, flat, plusIndent, optionalTag));
   }
 
   private int lastPartialFormatBoundary = -1;
@@ -458,7 +463,7 @@ public final class OpsBuilder {
   }
 
   private static int getI(Input.Token token) {
-    for (Tok tok : token.getToksBefore()) {
+    for (Input.Tok tok : token.getToksBefore()) {
       if (tok.getIndex() >= 0) {
         return tok.getIndex();
       }
@@ -466,7 +471,7 @@ public final class OpsBuilder {
     return token.getTok().getIndex();
   }
 
-  private static final Doc.Space SPACE = Doc.Space.make();
+  private static final Space SPACE = Space.make();
 
   /**
    * Build a list of {@link Op}s from the {@code OpsBuilder}.
@@ -496,7 +501,7 @@ public final class OpsBuilder {
         while (k + 1 < opsN && ops.get(k + 1) instanceof CloseOp) {
           ++k;
         }
-        if (tokenOp.realOrImaginary().isReal()) {
+        if (tokenOp.realOrImaginary() == Token.RealOrImaginary.REAL) {
           /*
            * Regular input token. Copy out toksBefore before token, and toksAfter after it. Insert
            * this token's toksBefore at position j.
@@ -505,14 +510,14 @@ public final class OpsBuilder {
           boolean space = false; // Do we need an extra space after a previous "/*" comment?
           boolean lastWasComment = false; // Was the last thing we output a comment?
           boolean allowBlankAfterLastComment = false;
-          for (Tok tokBefore : token.getToksBefore()) {
+          for (Input.Tok tokBefore : token.getToksBefore()) {
             if (tokBefore.isNewline()) {
               newlines++;
             } else if (tokBefore.isComment()) {
               tokOps.put(
                   j,
-                  Doc.Break.make(
-                      tokBefore.isSlashSlashComment() ? Doc.FillMode.FORCED : Doc.FillMode.UNIFIED,
+                  Break.make(
+                      tokBefore.isSlashSlashComment() ? FillMode.FORCED : FillMode.UNIFIED,
                       "",
                       tokenOp.getPlusIndentCommentsBefore()));
               tokOps.putAll(j, makeComment(tokBefore));
@@ -520,7 +525,7 @@ public final class OpsBuilder {
               newlines = 0;
               lastWasComment = true;
               if (tokBefore.isJavadocComment()) {
-                tokOps.put(j, Doc.Break.makeForced());
+                tokOps.put(j, Break.makeForced());
               }
               allowBlankAfterLastComment =
                   tokBefore.isSlashSlashComment()
@@ -532,12 +537,12 @@ public final class OpsBuilder {
             output.blankLine(token.getTok().getIndex(), BlankLineWanted.YES);
           }
           if (lastWasComment && newlines > 0) {
-            tokOps.put(j, Doc.Break.makeForced());
+            tokOps.put(j, Break.makeForced());
           } else if (space) {
             tokOps.put(j, SPACE);
           }
           // Now we've seen the Token; output the toksAfter.
-          for (Tok tokAfter : token.getToksAfter()) {
+          for (Input.Tok tokAfter : token.getToksAfter()) {
             if (tokAfter.isComment()) {
               boolean breakAfter =
                   tokAfter.isJavadocComment()
@@ -546,8 +551,8 @@ public final class OpsBuilder {
               if (breakAfter) {
                 tokOps.put(
                     k + 1,
-                    Doc.Break.make(
-                        Doc.FillMode.FORCED,
+                    Break.make(
+                        FillMode.FORCED,
                         "",
                         tokenOp.breakAndIndentTrailingComment().orElse(Const.ZERO)));
               } else {
@@ -555,7 +560,7 @@ public final class OpsBuilder {
               }
               tokOps.putAll(k + 1, makeComment(tokAfter));
               if (breakAfter) {
-                tokOps.put(k + 1, Doc.Break.make(Doc.FillMode.FORCED, "", ZERO));
+                tokOps.put(k + 1, Break.make(FillMode.FORCED, "", ZERO));
               }
             }
           }
@@ -567,7 +572,7 @@ public final class OpsBuilder {
            */
           int newlines = 0;
           boolean lastWasComment = false;
-          for (Tok tokBefore : token.getToksBefore()) {
+          for (Input.Tok tokBefore : token.getToksBefore()) {
             if (tokBefore.isNewline()) {
               newlines++;
             } else if (tokBefore.isComment()) {
@@ -575,12 +580,12 @@ public final class OpsBuilder {
               lastWasComment = tokBefore.isComment();
             }
             if (lastWasComment && newlines > 0) {
-              tokOps.put(j, Doc.Break.makeForced());
+              tokOps.put(j, Break.makeForced());
             }
-            tokOps.put(j, Doc.Tok.make(tokBefore));
+            tokOps.put(j, Tok.make(tokBefore));
           }
-          for (Tok tokAfter : token.getToksAfter()) {
-            tokOps.put(k + 1, Doc.Tok.make(tokAfter));
+          for (Input.Tok tokAfter : token.getToksAfter()) {
+            tokOps.put(k + 1, Tok.make(tokAfter));
           }
         }
       }
@@ -593,16 +598,16 @@ public final class OpsBuilder {
     boolean afterForcedBreak = false; // Was the last Op a forced break? If so, suppress spaces.
     for (int i = 0; i < opsN; i++) {
       for (Op op : tokOps.get(i)) {
-        if (!(afterForcedBreak && op instanceof Doc.Space)) {
+        if (!(afterForcedBreak && op instanceof Space)) {
           newOps.add(op);
           afterForcedBreak = isForcedBreak(op);
         }
       }
       Op op = ops.get(i);
       if (afterForcedBreak
-          && (op instanceof Doc.Space
-              || (op instanceof Doc.Break
-                  && ((Doc.Break) op).getPlusIndent() == 0
+          && (op instanceof Space
+              || (op instanceof Break
+                  && ((Break) op).evalPlusIndent() == 0
                   && " ".equals(((Doc) op).getFlat())))) {
         continue;
       }
@@ -612,7 +617,7 @@ public final class OpsBuilder {
       }
     }
     for (Op op : tokOps.get(opsN)) {
-      if (!(afterForcedBreak && op instanceof Doc.Space)) {
+      if (!(afterForcedBreak && op instanceof Space)) {
         newOps.add(op);
         afterForcedBreak = isForcedBreak(op);
       }
@@ -621,13 +626,13 @@ public final class OpsBuilder {
   }
 
   private static boolean isForcedBreak(Op op) {
-    return op instanceof Doc.Break && ((Doc.Break) op).isForced();
+    return op instanceof Break && ((Break) op).isForced();
   }
 
-  private static List<Op> makeComment(Tok comment) {
+  private static List<Op> makeComment(Input.Tok comment) {
     return comment.isSlashStarComment()
-        ? ImmutableList.of(Doc.Tok.make(comment))
-        : ImmutableList.of(Doc.Tok.make(comment), Doc.Break.makeForced());
+        ? ImmutableList.of(Tok.make(comment))
+        : ImmutableList.of(Tok.make(comment), Break.makeForced());
   }
 
   @Override

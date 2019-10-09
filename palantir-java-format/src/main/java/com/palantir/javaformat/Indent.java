@@ -16,15 +16,17 @@ package com.palantir.javaformat;
 
 import com.google.common.base.MoreObjects;
 import com.palantir.javaformat.Output.BreakTag;
+import com.palantir.javaformat.doc.Break;
+import com.palantir.javaformat.doc.Doc;
 
 /**
- * An indent for a {@link Doc.Level} or {@link Doc.Break}. The indent is either a constant {@code
- * int}, or a conditional expression whose value depends on whether or not a {@link Doc.Break} has
- * been broken.
+ * An indent for a {@link Doc.Level} or {@link Break}. The indent is either a constant {@code int},
+ * or a conditional expression whose value depends on whether or not a {@link Break} has been
+ * broken.
  */
 public abstract class Indent {
 
-  abstract int eval();
+  public abstract int eval();
 
   /** A constant function, returning a constant indent. */
   public static final class Const extends Indent {
@@ -41,7 +43,7 @@ public abstract class Indent {
     }
 
     @Override
-    int eval() {
+    public int eval() {
       return n;
     }
 
@@ -68,7 +70,7 @@ public abstract class Indent {
     }
 
     @Override
-    int eval() {
+    public int eval() {
       return (condition.wasBreakTaken() ? thenIndent : elseIndent).eval();
     }
 

@@ -14,42 +14,45 @@
  * limitations under the License.
  */
 
-package com.palantir.javaformat;
+package com.palantir.javaformat.doc;
 
 import com.google.common.base.Strings;
+import com.palantir.javaformat.BreakBehaviour;
+import com.palantir.javaformat.Breakability;
+import com.palantir.javaformat.Indent;
 
 public final class LevelDelimitedFlatValueDocVisitor implements DocVisitor<String> {
   int indent = 0;
 
   @Override
-  public String visitSpace(Doc.Space doc) {
+  public String visitSpace(Space doc) {
     return doc.getFlat();
   }
 
   @Override
-  public String visitTok(Doc.Tok doc) {
+  public String visitTok(Tok doc) {
     return doc.getFlat();
   }
 
   @Override
-  public String visitToken(Doc.Token doc) {
+  public String visitToken(Token doc) {
     return doc.getFlat();
   }
 
   @Override
-  public String visitBreak(Doc.Break doc) {
+  public String visitBreak(Break doc) {
     StringBuilder sb =
         new StringBuilder()
             .append("⏎")
             .append(doc.getFlat().isEmpty() ? "" : "(" + doc.getFlat() + ")");
-    if (!doc.plusIndent.equals(Indent.Const.ZERO)) {
-      sb.append(" +" + doc.plusIndent.eval());
+    if (!doc.getPlusIndent().equals(Indent.Const.ZERO)) {
+      sb.append(" +" + doc.evalPlusIndent());
     }
     return sb.toString();
   }
 
   @Override
-  public String visitLevel(Doc.Level level) {
+  public String visitLevel(Level level) {
     if (level.getFlat().isEmpty()) {
       return "";
     }
@@ -75,7 +78,7 @@ public final class LevelDelimitedFlatValueDocVisitor implements DocVisitor<Strin
         builder.append("\n");
         generateIndent(builder);
       }
-      breakNext = doc instanceof Doc.Level || doc instanceof Doc.Break;
+      breakNext = doc instanceof Level || doc instanceof Break;
       builder.append(visit(doc));
     }
     indent -= 2;

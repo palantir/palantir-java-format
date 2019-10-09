@@ -16,11 +16,11 @@ package com.palantir.javaformat.java;
 
 import static com.google.common.collect.Iterables.getLast;
 import static com.google.common.collect.Iterables.getOnlyElement;
-import static com.palantir.javaformat.Doc.FillMode.INDEPENDENT;
-import static com.palantir.javaformat.Doc.FillMode.UNIFIED;
 import static com.palantir.javaformat.Indent.If.make;
 import static com.palantir.javaformat.OpsBuilder.BlankLineWanted.PRESERVE;
 import static com.palantir.javaformat.OpsBuilder.BlankLineWanted.YES;
+import static com.palantir.javaformat.doc.FillMode.INDEPENDENT;
+import static com.palantir.javaformat.doc.FillMode.UNIFIED;
 import static com.palantir.javaformat.java.Trees.getEndPosition;
 import static com.palantir.javaformat.java.Trees.getLength;
 import static com.palantir.javaformat.java.Trees.getMethodName;
@@ -59,8 +59,6 @@ import com.google.common.collect.Streams;
 import com.palantir.javaformat.BreakBehaviour;
 import com.palantir.javaformat.Breakability;
 import com.palantir.javaformat.CloseOp;
-import com.palantir.javaformat.Doc;
-import com.palantir.javaformat.Doc.FillMode;
 import com.palantir.javaformat.FormattingError;
 import com.palantir.javaformat.Indent;
 import com.palantir.javaformat.Input;
@@ -69,6 +67,9 @@ import com.palantir.javaformat.OpenOp;
 import com.palantir.javaformat.OpsBuilder;
 import com.palantir.javaformat.OpsBuilder.BlankLineWanted;
 import com.palantir.javaformat.Output.BreakTag;
+import com.palantir.javaformat.doc.Break;
+import com.palantir.javaformat.doc.FillMode;
+import com.palantir.javaformat.doc.Token;
 import com.palantir.javaformat.java.DimensionHelpers.SortedDims;
 import com.palantir.javaformat.java.DimensionHelpers.TypeWithDims;
 import java.util.ArrayDeque;
@@ -280,18 +281,16 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
   private final Indent.Const plusFour;
 
   private static final ImmutableList<Op> breakList(Optional<BreakTag> breakTag) {
-    return ImmutableList.of(Doc.Break.make(Doc.FillMode.UNIFIED, " ", ZERO, breakTag));
+    return ImmutableList.of(Break.make(FillMode.UNIFIED, " ", ZERO, breakTag));
   }
 
   private static final ImmutableList<Op> breakFillList(Optional<BreakTag> breakTag) {
     return ImmutableList.of(
-        OpenOp.make(ZERO),
-        Doc.Break.make(Doc.FillMode.INDEPENDENT, " ", ZERO, breakTag),
-        CloseOp.make());
+        OpenOp.make(ZERO), Break.make(FillMode.INDEPENDENT, " ", ZERO, breakTag), CloseOp.make());
   }
 
   private static final ImmutableList<Op> forceBreakList(Optional<BreakTag> breakTag) {
-    return ImmutableList.of(Doc.Break.make(FillMode.FORCED, "", Indent.Const.ZERO, breakTag));
+    return ImmutableList.of(Break.make(FillMode.FORCED, "", Indent.Const.ZERO, breakTag));
   }
 
   private static final ImmutableList<Op> EMPTY_LIST = ImmutableList.of();
@@ -1394,7 +1393,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         maybeAddDims(dims);
       }
       if (!first) {
-        builder.breakOp(Doc.FillMode.INDEPENDENT, " ", ZERO, Optional.of(breakBeforeName));
+        builder.breakOp(FillMode.INDEPENDENT, " ", ZERO, Optional.of(breakBeforeName));
       } else {
         first = false;
       }
@@ -1461,7 +1460,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
       token(";");
     } else {
       builder.space();
-      builder.token("{", Doc.Token.RealOrImaginary.REAL, plusTwo, Optional.of(plusTwo));
+      builder.token("{", Token.RealOrImaginary.REAL, plusTwo, Optional.of(plusTwo));
     }
     builder.close();
 
@@ -2893,7 +2892,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
           builder.open(plusFour);
           addTypeArguments(methodInvocation.getTypeArguments(), ZERO);
           // TODO(jdd): Should indent the name -4.
-          builder.breakOp(Doc.FillMode.UNIFIED, "", ZERO, tyargTag);
+          builder.breakOp(FillMode.UNIFIED, "", ZERO, tyargTag);
           builder.close();
         }
         visit(getMethodName(methodInvocation));
@@ -3306,7 +3305,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
           builder.close();
 
           if (type != null) {
-            builder.breakOp(Doc.FillMode.INDEPENDENT, " ", ZERO, Optional.of(typeBreak));
+            builder.breakOp(FillMode.INDEPENDENT, " ", ZERO, Optional.of(typeBreak));
           }
 
           // conditionally ident the name and initializer +4 if the type spans
@@ -3615,36 +3614,36 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
   }
 
   /**
-   * Emit a {@link Doc.Token}.
+   * Emit a {@link Token}.
    *
-   * @param token the {@link String} to wrap in a {@link Doc.Token}
+   * @param token the {@link String} to wrap in a {@link Token}
    */
   final void token(String token) {
     builder.token(
         token,
-        Doc.Token.RealOrImaginary.REAL,
+        Token.RealOrImaginary.REAL,
         ZERO,
         /* breakAndIndentTrailingComment= */ Optional.empty());
   }
 
   /**
-   * Emit a {@link Doc.Token}.
+   * Emit a {@link Token}.
    *
-   * @param token the {@link String} to wrap in a {@link Doc.Token}
+   * @param token the {@link String} to wrap in a {@link Token}
    * @param plusIndentCommentsBefore extra indent for comments before this token
    */
   final void token(String token, Indent plusIndentCommentsBefore) {
     builder.token(
         token,
-        Doc.Token.RealOrImaginary.REAL,
+        Token.RealOrImaginary.REAL,
         plusIndentCommentsBefore,
         /* breakAndIndentTrailingComment= */ Optional.empty());
   }
 
-  /** Emit a {@link Doc.Token}, and breaks and indents trailing javadoc or block comments. */
+  /** Emit a {@link Token}, and breaks and indents trailing javadoc or block comments. */
   final void tokenBreakTrailingComment(String token, Indent breakAndIndentTrailingComment) {
     builder.token(
-        token, Doc.Token.RealOrImaginary.REAL, ZERO, Optional.of(breakAndIndentTrailingComment));
+        token, Token.RealOrImaginary.REAL, ZERO, Optional.of(breakAndIndentTrailingComment));
   }
 
   private void markForPartialFormat() {

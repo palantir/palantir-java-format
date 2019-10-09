@@ -1,6 +1,7 @@
 package com.palantir.javaformat;
 
-import com.palantir.javaformat.Doc.Break;
+import com.palantir.javaformat.doc.Break;
+import com.palantir.javaformat.doc.Doc;
 import com.palantir.javaformat.java.JavaInputAstVisitor;
 
 /**
@@ -17,9 +18,9 @@ public enum Breakability {
   BREAK_HERE,
   /**
    * Delegate to the {@link Breakability} of _this_ level's last inner level. Typically, this will
-   * be true if this level is not immediately followed by a break (see {@link
-   * StartsWithBreakVisitor}). Behaves the same as {@link #NO_PREFERENCE} if this level is not
-   * {@link BreakBehaviour#PREFER_BREAKING_LAST_INNER_LEVEL}.
+   * be true if this level is not immediately followed by a break (see StartsWithBreakVisitor).
+   * Behaves the same as {@link #NO_PREFERENCE} if this level is not {@link
+   * BreakBehaviour#PREFER_BREAKING_LAST_INNER_LEVEL}.
    */
   CHECK_INNER,
   /**

@@ -1,0 +1,74 @@
+/*
+ * (c) Copyright 2019 Palantir Technologies Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.palantir.javaformat.doc;
+
+import com.google.common.base.MoreObjects;
+import com.google.common.collect.Range;
+import com.palantir.javaformat.CommentsHelper;
+import com.palantir.javaformat.Op;
+import com.palantir.javaformat.Output;
+
+/** A Leaf node in a {@link Doc} for a non-breaking space. */
+public final class Space extends Doc implements Op {
+  private static final Space SPACE = new Space();
+
+  private Space() {}
+
+  /**
+   * Factor method for {@code Space}.
+   *
+   * @return the new {@code Space}
+   */
+  public static Space make() {
+    return SPACE;
+  }
+
+  @Override
+  public void add(DocBuilder builder) {
+    builder.add(this);
+  }
+
+  @Override
+  float computeWidth() {
+    return 1.0F;
+  }
+
+  @Override
+  String computeFlat() {
+    return " ";
+  }
+
+  @Override
+  Range<Integer> computeRange() {
+    return Doc.EMPTY_RANGE;
+  }
+
+  @Override
+  public State computeBreaks(CommentsHelper commentsHelper, int maxWidth, State state) {
+    return state.withColumn(state.column + 1);
+  }
+
+  @Override
+  public void write(Output output) {
+    output.append(" ", range());
+  }
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this).toString();
+  }
+}

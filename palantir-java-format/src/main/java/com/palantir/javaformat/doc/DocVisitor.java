@@ -14,31 +14,31 @@
  * limitations under the License.
  */
 
-package com.palantir.javaformat;
+package com.palantir.javaformat.doc;
 
 public interface DocVisitor<T> {
   default T visit(Doc doc) {
-    if (doc instanceof Doc.Level) {
-      return visitLevel((Doc.Level) doc);
-    } else if (doc instanceof Doc.Break) {
-      return visitBreak((Doc.Break) doc);
-    } else if (doc instanceof Doc.Token) {
-      return visitToken((Doc.Token) doc);
-    } else if (doc instanceof Doc.Tok) {
-      return visitTok((Doc.Tok) doc);
-    } else if (doc instanceof Doc.Space) {
-      return visitSpace((Doc.Space) doc);
+    if (doc instanceof Level) {
+      return visitLevel((Level) doc);
+    } else if (doc instanceof Break) {
+      return visitBreak((Break) doc);
+    } else if (doc instanceof Token) {
+      return visitToken((Token) doc);
+    } else if (doc instanceof Tok) {
+      return visitTok((Tok) doc);
+    } else if (doc instanceof Space) {
+      return visitSpace((Space) doc);
     }
     throw new RuntimeException();
   }
 
-  T visitSpace(Doc.Space doc);
+  T visitSpace(Space doc);
 
-  T visitTok(Doc.Tok doc);
+  T visitTok(Tok doc);
 
-  T visitToken(Doc.Token doc);
+  T visitToken(Token doc);
 
-  T visitBreak(Doc.Break doc);
+  T visitBreak(Break doc);
 
-  T visitLevel(Doc.Level doc);
+  T visitLevel(Level doc);
 }

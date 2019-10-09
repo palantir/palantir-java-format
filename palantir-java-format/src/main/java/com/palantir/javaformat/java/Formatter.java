@@ -25,12 +25,13 @@ import com.google.common.collect.TreeRangeSet;
 import com.google.common.io.CharSink;
 import com.google.common.io.CharSource;
 import com.google.errorprone.annotations.Immutable;
-import com.palantir.javaformat.Doc;
-import com.palantir.javaformat.DocBuilder;
 import com.palantir.javaformat.FormattingError;
 import com.palantir.javaformat.Newlines;
 import com.palantir.javaformat.Op;
 import com.palantir.javaformat.OpsBuilder;
+import com.palantir.javaformat.doc.Doc;
+import com.palantir.javaformat.doc.DocBuilder;
+import com.palantir.javaformat.doc.State;
 import java.io.IOError;
 import java.io.IOException;
 import java.net.URI;
@@ -156,8 +157,7 @@ public final class Formatter {
     builder.sync(javaInput.getText().length());
     builder.drain();
     Doc doc = new DocBuilder().withOps(builder.build()).build();
-    doc.computeBreaks(
-        javaOutput.getCommentsHelper(), options.maxLineLength(), new Doc.State(+0, 0));
+    doc.computeBreaks(javaOutput.getCommentsHelper(), options.maxLineLength(), new State(+0, 0));
     doc.write(javaOutput);
     javaOutput.flush();
   }

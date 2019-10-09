@@ -14,6 +14,9 @@
 
 package com.palantir.javaformat;
 
+import com.palantir.javaformat.doc.Doc;
+import com.palantir.javaformat.doc.DocBuilder;
+
 /**
  * An {@code Op} is a member of the sequence of formatting operations emitted by {@link OpsBuilder}
  * and transformed by {@link DocBuilder} into a {@link Doc}. Leaf subclasses of {@link Doc}
