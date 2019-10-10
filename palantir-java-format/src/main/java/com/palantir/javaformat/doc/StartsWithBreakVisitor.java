@@ -18,7 +18,8 @@ package com.palantir.javaformat.doc;
 
 import com.palantir.javaformat.doc.StartsWithBreakVisitor.Result;
 
-class StartsWithBreakVisitor implements DocVisitor<Result> {
+enum StartsWithBreakVisitor implements DocVisitor<Result> {
+  INSTANCE;
 
   enum Result {
     EMPTY,

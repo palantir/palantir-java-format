@@ -21,9 +21,8 @@ public class B20844369 {
                     + // bar
                     1;
 
-    int x = /*foo*/
-            42 + // bar
-                    1;
+    int x = /*foo*/ 42 + // bar
+            1;
 
     int x =
             /*foo*/

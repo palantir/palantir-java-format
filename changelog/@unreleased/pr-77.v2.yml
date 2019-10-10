@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: When assignment initializers are too long, try to inline the initializer prefix if it fits, rather than always breaking.
+  links:
+  - internal-github

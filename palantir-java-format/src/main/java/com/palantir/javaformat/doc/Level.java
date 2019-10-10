@@ -26,12 +26,14 @@ import com.palantir.javaformat.Breakability;
 import com.palantir.javaformat.CommentsHelper;
 import com.palantir.javaformat.Indent;
 import com.palantir.javaformat.Output;
+import com.palantir.javaformat.doc.StartsWithBreakVisitor.Result;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /** A {@code Level} inside a {@link Doc}. */
-final class Level extends Doc {
+public final class Level extends Doc {
   /**
    * How many branches we are allowed to take (i.e how many times we can consider breaking vs not
    * breaking the current level) before we stop branching and always break, which is the
@@ -157,7 +159,69 @@ final class Level extends Doc {
     State broken =
         computeBroken(commentsHelper, maxWidth, state.withIndentIncrementedBy(plusIndent));
 
+    // But undo the break in a special case, if the inner levels didn't fit on one line.
+    // Note: this is currently only used for variable initialisers
+    if (breakBehaviour == BreakBehaviour.BREAK_ONLY_IF_INNER_LEVELS_THEN_FIT_ON_ONE_LINE) {
+      List<Level> innerLevels = this.docs
+          .stream()
+          .filter(doc -> doc instanceof Level)
+          .map(doc -> ((Level) doc))
+          .collect(Collectors.toList());
+
+      boolean anyLevelWasBroken = innerLevels.stream().anyMatch(level -> !level.oneLine);
+
+      boolean prefixFits = false;
+      if (anyLevelWasBroken) {
+        // Find the first level, skipping empty levels (that contain nothing, or are made up
+        // entirely of other empty levels).
+        Level firstLevel = innerLevels.stream()
+                .filter(doc -> StartsWithBreakVisitor.INSTANCE.visit(doc) != Result.EMPTY)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException(
+                    "Levels were broken so expected to find at least a non-empty level"));
+
+        // Add the width of tokens, breaks before the firstLevel. We must always have space for
+        // these.
+        List<Doc> leadingDocs = docs.subList(0, docs.indexOf(firstLevel));
+        float leadingWidth = getWidth(leadingDocs);
+
+        // Potentially add the width of prefixes we want to consider as part of the width that
+        // must fit on the same line, so that we don't accidentally break prefixes when we could
+        // have avoided doing so.
+        leadingWidth += new CountWidthUntilBreakVisitor(maxWidth - state.indent).visit(firstLevel);
+
+        boolean fits = !Float.isInfinite(leadingWidth) && state.column + leadingWidth <= maxWidth;
+
+        if (fits) {
+          prefixFits = true;
+        }
+      }
+
+      // Allow long strings to stay on the same line, expecting that StringWrapper will
+      // reflow them later.
+      if (prefixFits || isSingleString()) {
+        // don't break this level, but preserve indentation
+        broken =
+            tryToLayOutLevelOnOneLine(
+                commentsHelper,
+                maxWidth,
+                state.withNoIndent().withIndentIncrementedBy(plusIndent));
+      }
+    }
+
     return state.updateAfterLevel(broken);
+  }
+
+  /**
+   * Trick to cooperate with StringWrapper. If the value is a single element (e.g. a String), then
+   * allow it to stay on this line, and rely on the StringWrapper to break it accordingly.
+   *
+   * <p>This is to prevent StringWrapperIntegrationTest#idemponent from breaking.
+   */
+  private boolean isSingleString() {
+    return !this.docs.stream().anyMatch(doc -> doc instanceof Level)
+        && this.docs.stream().filter(doc -> doc instanceof Break).count() == 1
+        && getFlat().startsWith(" \"");
   }
 
   private Optional<State> tryBreakLastLevel(
@@ -173,10 +237,7 @@ final class Level extends Doc {
     // See if we can fill in everything but the lastDoc.
     // This is essentially like a small part of computeBreaks.
     List<Doc> leadingDocs = docs.subList(0, docs.size() - 1);
-    float leadingWidth = 0.0F;
-    for (Doc doc : leadingDocs) {
-      leadingWidth += doc.getWidth();
-    }
+    float leadingWidth = getWidth(leadingDocs);
 
     if (state.column + leadingWidth > maxWidth) {
       return Optional.empty();
@@ -245,9 +306,9 @@ final class Level extends Doc {
     return Optional.of(lastLevel.computeBreaks(commentsHelper, maxWidth, state));
   }
 
-  private void assertStartsWithBreakOrEmpty(Doc doc) {
+  private static void assertStartsWithBreakOrEmpty(Doc doc) {
     Preconditions.checkState(
-        new StartsWithBreakVisitor().visit(doc) != StartsWithBreakVisitor.Result.NO,
+        StartsWithBreakVisitor.INSTANCE.visit(doc) != Result.NO,
         "Doc should have started with a break but didn't:\n%s",
         new LevelDelimitedFlatValueDocVisitor().visit(doc));
   }

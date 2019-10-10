@@ -1,0 +1,11 @@
+class T {
+  String s = "one long incredibly"
+      + " unbroken sentence"
+      // comment
+      + " moving from topic to topic"
+      // comment
+      + " so that no-one had a chance"
+      + " to"
+      // comment
+      + " interrupt";
+}

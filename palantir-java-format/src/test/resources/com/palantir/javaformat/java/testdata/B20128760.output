@@ -18,13 +18,12 @@ class B20128760 {
                                 .xxxXxxxxxx())
                 .xxxxxxxxXxxxxxx();
 
-        XXxxxx<Xxxx, XxxxxxxXxxxxxxxxxxXxxxxxxxx> xxxxxxxxxXxxXxxXxXxxxxxxxXx =
-                XX.xxxxXxxXxxx2(
-                                "XxxxXxxxxxxxXxxxXxxxXxxxxxxxXxxxXxxXxxxxxxXxxxxxxxx",
-                                xxxxxxxxXxxxXxXxxxxxxxXx,
-                                xxxxxxxxXxxxXxxxxXxxxXxXxxxxxxxXx)
-                        .xxxxxxxxXx("XxxxxxxxXxxxxxxxxXxx", xxxxxxxxXxxxxxxxxXxxXx, XX.xxxxxXx(
-                                XX.xxxxx(), XX.xxxxxx(XxxxxxxXxxxxxxxxxxXxxxxxxxx.xxxxx)));
+        XXxxxx<Xxxx, XxxxxxxXxxxxxxxxxxXxxxxxxxx> xxxxxxxxxXxxXxxXxXxxxxxxxXx = XX.xxxxXxxXxxx2(
+                        "XxxxXxxxxxxxXxxxXxxxXxxxxxxxXxxxXxxXxxxxxxXxxxxxxxx",
+                        xxxxxxxxXxxxXxXxxxxxxxXx,
+                        xxxxxxxxXxxxXxxxxXxxxXxXxxxxxxxXx)
+                .xxxxxxxxXx("XxxxxxxxXxxxxxxxxXxx", xxxxxxxxXxxxxxxxxXxxXx, XX.xxxxxXx(
+                        XX.xxxxx(), XX.xxxxxx(XxxxxxxXxxxxxxxxxxXxxxxxxxx.xxxxx)));
 
         xxXxxxxxxxXxxxXxxx =
                 (XxxxXxxx)
@@ -71,10 +70,9 @@ class B20128760 {
                     Xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx {}
 
     {
-        Stream<ItemKey> itemIdsStream =
-                stream(members).flatMap(m -> m.getFieldValues().entrySet().stream()
-                        .filter(fv -> itemLinkFieldIds.contains(fv.getKey()))
-                        .flatMap(fv -> FieldDTO.deserializeStringToListOfStrings(fv.getValue()).stream()
-                                .map(id -> new ItemKey(fieldsById.get(fv.getKey()).getItemTypeId(), id))));
+        Stream<ItemKey> itemIdsStream = stream(members).flatMap(m -> m.getFieldValues().entrySet().stream()
+                .filter(fv -> itemLinkFieldIds.contains(fv.getKey()))
+                .flatMap(fv -> FieldDTO.deserializeStringToListOfStrings(fv.getValue()).stream()
+                        .map(id -> new ItemKey(fieldsById.get(fv.getKey()).getItemTypeId(), id))));
     }
 }

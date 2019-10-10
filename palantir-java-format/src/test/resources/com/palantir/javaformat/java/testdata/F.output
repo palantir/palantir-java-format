@@ -13,23 +13,20 @@ class F {
     Pair<Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>, Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>>
             field1 = null;
     Pair<Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>, Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>>
-            field2 =
-                    true
-                            ? true ? true ? null : null : true ? null : null
-                            : true ? true ? null : null : true ? null : null;
+            field2 = true
+                    ? true ? true ? null : null : true ? null : null
+                    : true ? true ? null : null : true ? null : null;
 
     @MarkerAnnotation
     Pair<Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>, Pair<Pair<Integer, Integer>, Pair<Integer, Integer>>>
-            field3 =
-                    true
-                            ? true ? true ? null : null : true ? null : null
-                            : true ? true ? null : null : true ? null : null;
+            field3 = true
+                    ? true ? true ? null : null : true ? null : null
+                    : true ? true ? null : null : true ? null : null;
 
     void f() {
-        for (int i =
-                        0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0
-                                + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0
-                                + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0;
+        for (int i = 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0
+                        + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0
+                        + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0;
                 i
                         < 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0
                                 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0
@@ -37,10 +34,9 @@ class F {
                 i++) {
             f.f.f.f.f.f.f.f.f.f.f.f.f.f.f.f.f.f.f.f.f.f.f.f.f.f.f.f.Ff = null;
         }
-        for (int i =
-                        0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0
-                                + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0
-                                + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0;
+        for (int i = 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0
+                        + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0
+                        + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0;
                 i
                         < 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0
                                 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0

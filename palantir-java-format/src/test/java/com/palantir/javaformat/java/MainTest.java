@@ -519,10 +519,9 @@ public class MainTest {
     };
     String[] expected = {
       "class T {",
-      "  String s =",
-      "      \"one long incredibly unbroken sentence moving from topic to topic so that no one had"
-          + " a\"",
-      "          + \" chance to interrupt\";",
+      "  String s = \"one long incredibly unbroken sentence moving from topic to topic so that no"
+          + " one had\"",
+      "      + \" a chance to interrupt\";",
       "}",
       "",
     };
@@ -547,9 +546,8 @@ public class MainTest {
     };
     String[] expected = {
       "class T {",
-      "  String s =",
-      "      \"one long incredibly unbroken sentence moving from topic to topic so that no one had"
-          + " a chance to interrupt\";",
+      "  String s = \"one long incredibly unbroken sentence moving from topic to topic so that no"
+          + " one had a chance to interrupt\";",
       "}",
       "",
     };

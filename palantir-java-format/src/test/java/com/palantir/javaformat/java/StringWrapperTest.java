@@ -40,9 +40,8 @@ public class StringWrapperTest {
     String output =
         lines(
             "class T {",
-            "  String s =",
-            "      someMethodWithQuiteALongNameThatWillGetUsUpCloseToTheColumnLimit()",
-            "          + \"foo bar foo bar foo bar\";",
+            "  String s = someMethodWithQuiteALongNameThatWillGetUsUpCloseToTheColumnLimit()",
+            "      + \"foo bar foo bar foo bar\";",
             "",
             "  String someMethodWithQuiteALongNameThatWillGetUsUpCloseToTheColumnLimit() {",
             "    return null;",

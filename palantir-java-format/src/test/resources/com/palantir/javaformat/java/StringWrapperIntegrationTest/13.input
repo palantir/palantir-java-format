@@ -1,0 +1,4 @@
+class T {
+  String s =
+      "aaaaaaaaaaaaaaaaaaaaaaaa bbbbbbbbbbbbbbbbbb ccccccccccccccccccccccccccc dddddddddddddddddd";
+}

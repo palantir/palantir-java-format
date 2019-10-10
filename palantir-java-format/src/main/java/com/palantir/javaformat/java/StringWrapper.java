@@ -58,6 +58,7 @@ import org.openjdk.tools.javac.util.Context;
 import org.openjdk.tools.javac.util.Log;
 import org.openjdk.tools.javac.util.Options;
 import org.openjdk.tools.javac.util.Position;
+import org.openjdk.tools.javac.util.Position.LineMap;
 
 /** Wraps string literals that exceed the column limit. */
 public final class StringWrapper {
@@ -147,8 +148,17 @@ public final class StringWrapper {
       // Finds the set of string literals in the concat expression that includes the one that needs
       // to be wrapped.
       List<Tree> flat = flatten(input, unit, path, enclosing, first);
+
+      // Walk up as long as parents are on the same line, in order to find the correct
+      // startColumn.
+      TreePath startingPath = enclosing;
+      while (startingPath.getParentPath() != null && onSameLineAsParent(lineMap, startingPath)) {
+        startingPath = startingPath.getParentPath();
+      }
+
       // Zero-indexed start column
       int startColumn = lineMap.getColumnNumber(getStartPosition(flat.get(0))) - 1;
+      int fistLineCol = lineMap.getColumnNumber(getStartPosition(startingPath.getLeaf())) - 1;
 
       // Handling leaving trailing non-string tokens at the end of the literal,
       // e.g. the trailing `);` in `foo("...");`.
@@ -163,9 +173,15 @@ public final class StringWrapper {
       ImmutableList<String> components = stringComponents(input, unit, flat);
       replacements.put(
           Range.closedOpen(getStartPosition(flat.get(0)), getEndPosition(unit, getLast(flat))),
-          reflow(separator, columnLimit, startColumn, trailing, components, first.get()));
+          reflow(
+              separator, columnLimit, trailing, components, first.get(), startColumn, fistLineCol));
     }
     return replacements;
+  }
+
+  private static boolean onSameLineAsParent(LineMap lineMap, TreePath path) {
+    return lineMap.getLineNumber(getStartPosition(path.getLeaf()))
+        == lineMap.getLineNumber(getStartPosition(path.getParentPath().getLeaf()));
   }
 
   /**
@@ -230,24 +246,26 @@ public final class StringWrapper {
 
   /**
    * Reflows the given source text, trying to split on word boundaries.
-   *
    * @param separator the line separator
    * @param columnLimit the number of columns to wrap at
-   * @param startColumn the column position of the beginning of the original text
    * @param trailing extra space to leave after the last line
    * @param components the text to reflow
    * @param first0 true if the text includes the beginning of its enclosing concat chain, i.e. a
+   * @param textStartColumn the column position of the beginning of the original text
+   * @param firstLineStartColumn the column where the very first line starts (can be less than
+   *                             textStartColumn if text follows variable declaration)
    */
   private static String reflow(
       String separator,
       int columnLimit,
-      int startColumn,
       int trailing,
       ImmutableList<String> components,
-      boolean first0) {
+      boolean first0,
+      int textStartColumn,
+      int firstLineStartColumn) {
     // We have space between the start column and the limit to output the first line.
     // Reserve two spaces for the quotes.
-    int width = columnLimit - startColumn - 2;
+    int width = columnLimit - textStartColumn - 2;
     Deque<String> input = new ArrayDeque<>(components);
     List<String> lines = new ArrayList<>();
     boolean first = first0;
@@ -271,7 +289,14 @@ public final class StringWrapper {
       // add the split line to the output, and process whatever's left
       lines.add(String.join("", line));
       if (first) {
-        width -= 6; // subsequent lines have a four-space continuation indent and a `+ `
+        // Subsequent lines have a four-space continuation indent and a `+ `.
+        width -= 6;
+        // Also, switch to firstLineStartColumn in order to account for the fact that continuations
+        // should get indented from the beginning of the first line.
+        // This is to handle cases like:
+        // String foo = "first component"
+        //     + "rest";
+        width += textStartColumn - firstLineStartColumn;
         first = false;
       }
     }
@@ -279,7 +304,10 @@ public final class StringWrapper {
     return lines.stream()
         .collect(
             joining(
-                "\"" + separator + Strings.repeat(" ", startColumn + (first0 ? 4 : -2)) + "+ \"",
+                "\""
+                    + separator
+                    + Strings.repeat(" ", (first0 ? firstLineStartColumn + 4 : textStartColumn - 2))
+                    + "+ \"",
                 "\"",
                 "\""));
   }

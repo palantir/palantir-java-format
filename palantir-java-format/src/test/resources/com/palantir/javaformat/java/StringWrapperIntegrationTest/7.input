@@ -1,0 +1,3 @@
+class T {
+  String s = "\n\n\none\n\nlong\n\nincredibly\n\nunbroken\n\nsentence\n\nmoving\n\nfrom\n\n topic\n\nto\n\n topic\n\nso\n\nthat\n\nno-one\n\nhad\n\na\n\nchance\n\nto\n\ninterrupt\n\n";
+}

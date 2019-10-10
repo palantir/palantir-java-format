@@ -1,0 +1,5 @@
+class T {
+  String s = "onelongincrediblyunbrokensentencemovingfromtopictotopicsot"
+      + " atnoonehadachancetointerrupt______________________";
+  ;
+}

@@ -21,50 +21,45 @@ class B20701054 {
         ImmutableList<String> x = ImmutableList.builder().add(1).add(2).add(3).add(4).add(5).build();
         ImmutableList<String> x = ImmutableList.builder().add(1).add(2).add(3).add(4).add(5).add(6).build();
 
-        ImmutableList<String> x =
-                new ImmutableList.Builder<>()
-                        .add(xxxxx)
-                        .add(xxxxx)
-                        .add(xxxxx)
-                        .add(xxxxx)
-                        .add(xxxxx)
-                        .add(xxxxx)
-                        .add(xxxxx)
-                        .add(xxxxx)
-                        .add(xxxxx)
-                        .add(xxxxx)
-                        .build();
+        ImmutableList<String> x = new ImmutableList.Builder<>()
+                .add(xxxxx)
+                .add(xxxxx)
+                .add(xxxxx)
+                .add(xxxxx)
+                .add(xxxxx)
+                .add(xxxxx)
+                .add(xxxxx)
+                .add(xxxxx)
+                .add(xxxxx)
+                .add(xxxxx)
+                .build();
 
-        ImmutableList<String> x =
-                ImmutableList.new Builder<>()
-                        .add(xxxxx)
-                        .add(xxxxx)
-                        .add(xxxxx)
-                        .add(xxxxx)
-                        .add(xxxxx)
-                        .add(xxxxx)
-                        .add(xxxxx)
-                        .add(xxxxx)
-                        .add(xxxxx)
-                        .add(xxxxx)
-                        .build();
+        ImmutableList<String> x = ImmutableList.new Builder<>()
+                .add(xxxxx)
+                .add(xxxxx)
+                .add(xxxxx)
+                .add(xxxxx)
+                .add(xxxxx)
+                .add(xxxxx)
+                .add(xxxxx)
+                .add(xxxxx)
+                .add(xxxxx)
+                .add(xxxxx)
+                .build();
 
         System.err.println(xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx);
 
         Class.my.contrived.example.function(
                 veryLongArgumentxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx);
 
-        PTable<Long, List<PageSpeedUrlResult>> latestResults =
-                FJ.joinOneShot2(accountSummaryProvider.get(), results)
-                        .parallelDo("extractPageSpeedUrls", new ExtractPageSpeedUrlsFn(false));
+        PTable<Long, List<PageSpeedUrlResult>> latestResults = FJ.joinOneShot2(accountSummaryProvider.get(), results)
+                .parallelDo("extractPageSpeedUrls", new ExtractPageSpeedUrlsFn(false));
 
-        PTable<Long, Long> adImpressionsByAccount =
-                impressionExtractor.getImpressionBreakdownByAccountId().parallelDo(
-                        "rekeyAdImpressionsByAccountId", new ExtractTotalImpressionsFn());
+        PTable<Long, Long> adImpressionsByAccount = impressionExtractor.getImpressionBreakdownByAccountId().parallelDo(
+                "rekeyAdImpressionsByAccountId", new ExtractTotalImpressionsFn());
 
-        PTable<String, CrawlError> crawlerErrorsByCode =
-                crawlReportSource.read("readCrawlReportTable").parallelDo(
-                        "reKeyErrorsByPropertyCode", new RekeyErrorsByPropertyCodeFn());
+        PTable<String, CrawlError> crawlerErrorsByCode = crawlReportSource.read("readCrawlReportTable").parallelDo(
+                "reKeyErrorsByPropertyCode", new RekeyErrorsByPropertyCodeFn());
 
         if (ImmutableList.builder().add(1).add(2).add(3)) {}
 
@@ -148,13 +143,12 @@ class B20701054 {
                 .zzzzzzz(zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz)
                 .zzzzzzz(zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz);
 
-        int u =
-                edu.oswego.cs.dl.util.concurrent.misc.zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz.ImmutableList
-                        .builder(zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz)
-                        .zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
-                        .zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
-                        .zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
-                        .zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz;
+        int u = edu.oswego.cs.dl.util.concurrent.misc.zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz.ImmutableList
+                .builder(zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz)
+                .zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
+                .zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
+                .zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
+                .zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz;
 
         for (String configured : errorProneOptions().getSeverityMap().keySet()) {}
 

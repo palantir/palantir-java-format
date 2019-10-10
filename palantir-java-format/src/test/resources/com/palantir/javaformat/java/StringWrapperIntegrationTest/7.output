@@ -1,0 +1,21 @@
+class T {
+  String s = "\n\n\n"
+      + "one\n\n"
+      + "long\n\n"
+      + "incredibly\n\n"
+      + "unbroken\n\n"
+      + "sentence\n\n"
+      + "moving\n\n"
+      + "from\n\n"
+      + " topic\n\n"
+      + "to\n\n"
+      + " topic\n\n"
+      + "so\n\n"
+      + "that\n\n"
+      + "no-one\n\n"
+      + "had\n\n"
+      + "a\n\n"
+      + "chance\n\n"
+      + "to\n\n"
+      + "interrupt\n\n";
+}

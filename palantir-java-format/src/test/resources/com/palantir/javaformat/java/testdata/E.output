@@ -77,12 +77,11 @@ class E<T> {
         for (Pair<
                         Pair<Pair<Pair<T, T>, Pair<T, T>>, Pair<Pair<T, T>, Pair<T, T>>>,
                         Pair<Pair<Pair<T, T>, Pair<T, T>>, Pair<Pair<T, T>, Pair<T, T>>>>
-                x :
-                        Lists
-                                .<Pair<
-                                                Pair<Pair<Pair<T, T>, Pair<T, T>>, Pair<Pair<T, T>, Pair<T, T>>>,
-                                                Pair<Pair<Pair<T, T>, Pair<T, T>>, Pair<Pair<T, T>, Pair<T, T>>>>>
-                                        newArrayList()) {}
+                x : Lists
+                        .<Pair<
+                                        Pair<Pair<Pair<T, T>, Pair<T, T>>, Pair<Pair<T, T>, Pair<T, T>>>,
+                                        Pair<Pair<Pair<T, T>, Pair<T, T>>, Pair<Pair<T, T>, Pair<T, T>>>>>
+                                newArrayList()) {}
         f(10);
         return f(20);
     }

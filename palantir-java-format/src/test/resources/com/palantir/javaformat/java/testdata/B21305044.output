@@ -29,23 +29,21 @@ class B21305044 {
     Function f = com.foo.bar.Baz::func;
     Function g = new Baz()::func;
     Function h = Baz::new;
-    Function i =
-            com.foo.bar
-                            .VeryLooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooongBaz
-                    ::new;
+    Function i = com.foo.bar
+                    .VeryLooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooongBaz
+            ::new;
 
     {
         Function f = () -> moderatelyLongResult;
-        Function f =
-                () -> breakableResult
-                        + breakableResult
-                        + breakableResult
-                        + breakableResult
-                        + breakableResult
-                        + breakableResult
-                        + breakableResult
-                        + breakableResult
-                        + breakableResult;
+        Function f = () -> breakableResult
+                + breakableResult
+                + breakableResult
+                + breakableResult
+                + breakableResult
+                + breakableResult
+                + breakableResult
+                + breakableResult
+                + breakableResult;
         Function f = () -> System.err.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
         Function f =
                 (someParam) -> System.err.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");

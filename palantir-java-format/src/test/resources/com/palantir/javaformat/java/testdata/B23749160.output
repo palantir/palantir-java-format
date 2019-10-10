@@ -24,13 +24,12 @@ class B23749160 {
                         anyInt(), anyInt(), anyInt()))
                 .then();
 
-        final List<Integer> XXXXXXXX =
-                ImmutableList.of(
-                        XXXXXXX, //
-                        XXXXXXX, //
-                        XXXXXXX, //
-                        XXXXXXX, //
-                        XXXXXXX //
-                        );
+        final List<Integer> XXXXXXXX = ImmutableList.of(
+                XXXXXXX, //
+                XXXXXXX, //
+                XXXXXXX, //
+                XXXXXXX, //
+                XXXXXXX //
+                );
     }
 }

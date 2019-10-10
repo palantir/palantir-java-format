@@ -3335,7 +3335,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         } else {
           builder.open(
               Indent.If.make(typeBreak, plusFour, ZERO),
-              BreakBehaviour.BREAK_THIS_LEVEL,
+              BreakBehaviour.BREAK_ONLY_IF_INNER_LEVELS_THEN_FIT_ON_ONE_LINE,
               Breakability.NO_PREFERENCE);
           {
             builder.breakToFill(" ");
