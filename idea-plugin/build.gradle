@@ -17,6 +17,8 @@
 apply plugin: 'maven-publish'
 apply plugin: 'org.jetbrains.intellij'
 
+apply from: rootProject.file('gradle/publish-jar.gradle')
+
 intellij {
   pluginName = "palantir-java-format"
   updateSinceUntilBuild = true
@@ -50,9 +52,12 @@ runIde.dependsOn buildPlugin
 
 buildSearchableOptions.enabled = false
 
+// Prevent nebula.maven-publish from trying to publish components.java - we are publishing our own different artifact
+ext."nebulaPublish.maven.jar" = false
+
 publishing {
     publications {
-        idea(MavenPublication) {
+        nebula(MavenPublication) {
             artifact buildPlugin
         }
     }
@@ -61,3 +66,6 @@ publishing {
 versionsLock {
     disableJavaPluginDefaults()
 }
+
+// Javadoc fails if there are no public classes to javadoc, so make it stop complaining.
+tasks.javadoc.failOnError = false
