@@ -52,9 +52,12 @@ runIde.dependsOn buildPlugin
 
 buildSearchableOptions.enabled = false
 
+// Prevent nebula.maven-publish from trying to publish components.java - we are publishing our own different artifact
+ext."nebulaPublish.maven.jar" = false
+
 publishing {
     publications {
-        idea(MavenPublication) {
+        nebula(MavenPublication) {
             artifact buildPlugin
         }
     }
