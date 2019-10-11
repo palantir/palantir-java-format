@@ -1,3 +1,7 @@
+<p align=right>
+<a href=https://autorelease.bots.palantir.build/palantir/palantir-java-format><img src=https://shields.palantir.build/badge/Perform%20an-Autorelease-brightgreen.svg alt=Autorelease></a>
+</p>
+
 # palantir-java-format
 
 `palantir-java-format` is a program that reformats Java source code to comply with
