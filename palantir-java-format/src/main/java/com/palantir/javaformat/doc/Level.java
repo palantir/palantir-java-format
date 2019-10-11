@@ -125,6 +125,8 @@ public final class Level extends Doc {
     float thisWidth = getWidth();
     if (state.column + thisWidth <= maxWidth) {
       oneLine = true;
+      // Fix all breaks in this level, recursively.
+      ClearBreaksVisitor.INSTANCE.visitLevel(this);
       return state.withColumn(state.column + (int) thisWidth);
     }
     oneLine = false;

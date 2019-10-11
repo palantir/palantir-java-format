@@ -35,6 +35,10 @@ public abstract class Output extends InputOutput {
       taken = Optional.of(broken);
     }
 
+    public void reset() {
+      taken = Optional.empty();
+    }
+
     public boolean wasBreakTaken() {
       return taken.orElse(false);
     }

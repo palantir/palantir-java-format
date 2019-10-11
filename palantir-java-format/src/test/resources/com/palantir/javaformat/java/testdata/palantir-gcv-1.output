@@ -1,0 +1,25 @@
+class PalantirGcv1 {
+    public static void main(String[] args) {
+        constraintsProperty.addAll(project.provider(
+                Suppliers.memoize(() -> {
+                            log.debug(
+                                    "Computing publish constraints for {} by resolving {}",
+                                    configuration.get(),
+                                    configurationForFiltering.get());
+                            Set<ModuleIdentifier> modulesToInclude =
+                                    configurationForFiltering
+                                            .get()
+                                            .getIncoming()
+                                            .getResolutionResult()
+                                            .getAllComponents()
+                                            .stream()
+                                            .map(ResolvedComponentResult::getModuleVersion)
+                                            .filter(Objects::nonNull)
+                                            .map(ModuleVersionIdentifier::getModule)
+                                            .collect(Collectors.toSet());
+                            return Collections2.filter(publishConstraints, constraint -> modulesToInclude.contains(
+                                    constraint.getModule()));
+                        })
+                        ::get));
+    }
+}
