@@ -27,77 +27,76 @@ import com.palantir.javaformat.Output;
 
 /** A leaf node in a {@link Doc} for a non-token. */
 public final class Tok extends Doc implements Op {
-  private final Input.Tok tok;
-  String text;
+    private final Input.Tok tok;
+    String text;
 
-  private Tok(Input.Tok tok) {
-    this.tok = tok;
-  }
-
-  /**
-   * Factory method for a {@code Tok}.
-   *
-   * @param tok the {@link Input.Tok} to wrap
-   * @return the new {@code Tok}
-   */
-  public static Tok make(Input.Tok tok) {
-    return new Tok(tok);
-  }
-
-  @Override
-  public void add(DocBuilder builder) {
-    builder.add(this);
-  }
-
-  @Override
-  float computeWidth() {
-    int idx = Newlines.firstBreak(tok.getOriginalText());
-    // only count the first line of multi-line block comments
-    if (tok.isComment()) {
-      if (idx > 0) {
-        return idx;
-      } else if (tok.isSlashSlashComment() && !tok.getOriginalText().startsWith("// ")) {
-        // Account for line comments with missing spaces, see computeFlat.
-        return tok.length() + 1;
-      } else {
-        return tok.length();
-      }
+    private Tok(Input.Tok tok) {
+        this.tok = tok;
     }
-    return idx != -1 ? Float.POSITIVE_INFINITY : (float) tok.length();
-  }
 
-  @Override
-  String computeFlat() {
-    // TODO(cushon): commentsHelper.rewrite doesn't get called for spans that fit in a single
-    // line. That's fine for multi-line comment reflowing, but problematic for adding missing
-    // spaces in line comments.
-    if (tok.isSlashSlashComment() && !tok.getOriginalText().startsWith("// ")) {
-      return "// " + tok.getOriginalText().substring("//".length());
+    /**
+     * Factory method for a {@code Tok}.
+     *
+     * @param tok the {@link Input.Tok} to wrap
+     * @return the new {@code Tok}
+     */
+    public static Tok make(Input.Tok tok) {
+        return new Tok(tok);
     }
-    return tok.getOriginalText();
-  }
 
-  @Override
-  Range<Integer> computeRange() {
-    return Range.singleton(tok.getIndex()).canonical(INTEGERS);
-  }
+    @Override
+    public void add(DocBuilder builder) {
+        builder.add(this);
+    }
 
-  @Override
-  public State computeBreaks(CommentsHelper commentsHelper, int maxWidth, State state) {
-    text = commentsHelper.rewrite(tok, maxWidth, state.column);
-    int firstLineLength = text.length() - Iterators.getLast(Newlines.lineOffsetIterator(text));
-    return state
-        .withColumn(state.column + firstLineLength)
-        .addNewLines(Iterators.size(Newlines.lineOffsetIterator(text)));
-  }
+    @Override
+    float computeWidth() {
+        int idx = Newlines.firstBreak(tok.getOriginalText());
+        // only count the first line of multi-line block comments
+        if (tok.isComment()) {
+            if (idx > 0) {
+                return idx;
+            } else if (tok.isSlashSlashComment() && !tok.getOriginalText().startsWith("// ")) {
+                // Account for line comments with missing spaces, see computeFlat.
+                return tok.length() + 1;
+            } else {
+                return tok.length();
+            }
+        }
+        return idx != -1 ? Float.POSITIVE_INFINITY : (float) tok.length();
+    }
 
-  @Override
-  public void write(Output output) {
-    output.append(text, range());
-  }
+    @Override
+    String computeFlat() {
+        // TODO(cushon): commentsHelper.rewrite doesn't get called for spans that fit in a single
+        // line. That's fine for multi-line comment reflowing, but problematic for adding missing
+        // spaces in line comments.
+        if (tok.isSlashSlashComment() && !tok.getOriginalText().startsWith("// ")) {
+            return "// " + tok.getOriginalText().substring("//".length());
+        }
+        return tok.getOriginalText();
+    }
 
-  @Override
-  public String toString() {
-    return MoreObjects.toStringHelper(this).add("tok", tok).toString();
-  }
+    @Override
+    Range<Integer> computeRange() {
+        return Range.singleton(tok.getIndex()).canonical(INTEGERS);
+    }
+
+    @Override
+    public State computeBreaks(CommentsHelper commentsHelper, int maxWidth, State state) {
+        text = commentsHelper.rewrite(tok, maxWidth, state.column);
+        int firstLineLength = text.length() - Iterators.getLast(Newlines.lineOffsetIterator(text));
+        return state.withColumn(state.column + firstLineLength)
+                .addNewLines(Iterators.size(Newlines.lineOffsetIterator(text)));
+    }
+
+    @Override
+    public void write(Output output) {
+        output.append(text, range());
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this).add("tok", tok).toString();
+    }
 }

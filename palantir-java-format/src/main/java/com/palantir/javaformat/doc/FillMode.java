@@ -16,26 +16,19 @@
 
 package com.palantir.javaformat.doc;
 
-/**
- * Each {@link Break} in a {@link Level} is either {@link FillMode#UNIFIED} or {@link
- * FillMode#INDEPENDENT}.
- */
+/** Each {@link Break} in a {@link Level} is either {@link FillMode#UNIFIED} or {@link FillMode#INDEPENDENT}. */
 public enum FillMode {
-  /**
-   * If a {@link Level} will not fit on one line, all of its {@code UNIFIED} {@link Break}s will be
-   * broken.
-   */
-  UNIFIED,
+    /** If a {@link Level} will not fit on one line, all of its {@code UNIFIED} {@link Break}s will be broken. */
+    UNIFIED,
 
-  /**
-   * If a {@link Level} will not fit on one line, its {@code INDEPENDENT} {@link Break}s will be
-   * broken independently of each other, to fill in the {@link Level}.
-   */
-  INDEPENDENT,
+    /**
+     * If a {@link Level} will not fit on one line, its {@code INDEPENDENT} {@link Break}s will be broken independently
+     * of each other, to fill in the {@link Level}.
+     */
+    INDEPENDENT,
 
-  /**
-   * A {@code FORCED} {@link Break} will always be broken, and a {@link Level} it appears in will
-   * not fit on one line.
-   */
-  FORCED
+    /**
+     * A {@code FORCED} {@link Break} will always be broken, and a {@link Level} it appears in will not fit on one line.
+     */
+    FORCED
 }

@@ -22,73 +22,71 @@ import com.palantir.javaformat.Breakability;
 import com.palantir.javaformat.Indent;
 
 public final class LevelDelimitedFlatValueDocVisitor implements DocVisitor<String> {
-  int indent = 0;
+    int indent = 0;
 
-  @Override
-  public String visitSpace(Space doc) {
-    return doc.getFlat();
-  }
-
-  @Override
-  public String visitTok(Tok doc) {
-    return doc.getFlat();
-  }
-
-  @Override
-  public String visitToken(Token doc) {
-    return doc.getFlat();
-  }
-
-  @Override
-  public String visitBreak(Break doc) {
-    StringBuilder sb =
-        new StringBuilder()
-            .append("⏎")
-            .append(doc.getFlat().isEmpty() ? "" : "(" + doc.getFlat() + ")");
-    if (!doc.getPlusIndent().equals(Indent.Const.ZERO)) {
-      sb.append(" +" + doc.evalPlusIndent());
-    }
-    return sb.toString();
-  }
-
-  @Override
-  public String visitLevel(Level level) {
-    if (level.getFlat().isEmpty()) {
-      return "";
-    }
-    StringBuilder builder = new StringBuilder();
-    builder.append("❰");
-    if (!level.getPlusIndent().equals(Indent.Const.ZERO)) {
-      builder.append(" +" + level.getPlusIndent().eval());
-    }
-    if (level.getBreakBehaviour() != BreakBehaviour.BREAK_THIS_LEVEL) {
-      builder.append(" ");
-      builder.append(level.getBreakBehaviour());
-    }
-    if (level.getBreakabilityIfLastLevel() != Breakability.NO_PREFERENCE) {
-      builder.append(" ifLastLevel=");
-      builder.append(level.getBreakabilityIfLastLevel());
+    @Override
+    public String visitSpace(Space doc) {
+        return doc.getFlat();
     }
 
-    indent += 2;
-    boolean breakNext = true;
+    @Override
+    public String visitTok(Tok doc) {
+        return doc.getFlat();
+    }
 
-    for (Doc doc : level.getDocs()) {
-      if (breakNext) {
+    @Override
+    public String visitToken(Token doc) {
+        return doc.getFlat();
+    }
+
+    @Override
+    public String visitBreak(Break doc) {
+        StringBuilder sb =
+                new StringBuilder().append("⏎").append(doc.getFlat().isEmpty() ? "" : "(" + doc.getFlat() + ")");
+        if (!doc.getPlusIndent().equals(Indent.Const.ZERO)) {
+            sb.append(" +" + doc.evalPlusIndent());
+        }
+        return sb.toString();
+    }
+
+    @Override
+    public String visitLevel(Level level) {
+        if (level.getFlat().isEmpty()) {
+            return "";
+        }
+        StringBuilder builder = new StringBuilder();
+        builder.append("❰");
+        if (!level.getPlusIndent().equals(Indent.Const.ZERO)) {
+            builder.append(" +" + level.getPlusIndent().eval());
+        }
+        if (level.getBreakBehaviour() != BreakBehaviour.BREAK_THIS_LEVEL) {
+            builder.append(" ");
+            builder.append(level.getBreakBehaviour());
+        }
+        if (level.getBreakabilityIfLastLevel() != Breakability.NO_PREFERENCE) {
+            builder.append(" ifLastLevel=");
+            builder.append(level.getBreakabilityIfLastLevel());
+        }
+
+        indent += 2;
+        boolean breakNext = true;
+
+        for (Doc doc : level.getDocs()) {
+            if (breakNext) {
+                builder.append("\n");
+                generateIndent(builder);
+            }
+            breakNext = doc instanceof Level || doc instanceof Break;
+            builder.append(visit(doc));
+        }
+        indent -= 2;
         builder.append("\n");
         generateIndent(builder);
-      }
-      breakNext = doc instanceof Level || doc instanceof Break;
-      builder.append(visit(doc));
+        builder.append("❱");
+        return builder.toString();
     }
-    indent -= 2;
-    builder.append("\n");
-    generateIndent(builder);
-    builder.append("❱");
-    return builder.toString();
-  }
 
-  private void generateIndent(StringBuilder builder) {
-    builder.append(Strings.repeat(" ", indent));
-  }
+    private void generateIndent(StringBuilder builder) {
+        builder.append(Strings.repeat(" ", indent));
+    }
 }

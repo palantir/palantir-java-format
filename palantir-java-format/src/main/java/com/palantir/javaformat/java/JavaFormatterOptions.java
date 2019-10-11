@@ -19,86 +19,85 @@ import com.google.errorprone.annotations.Immutable;
 /**
  * Options for a google-java-format invocation.
  *
- * <p>Like gofmt, the google-java-format CLI exposes <em>no</em> configuration options (aside from
- * {@code --aosp}).
+ * <p>Like gofmt, the google-java-format CLI exposes <em>no</em> configuration options (aside from {@code --aosp}).
  *
- * <p>The goal of google-java-format is to provide consistent formatting, and to free developers
- * from arguments over style choices. It is an explicit non-goal to support developers' individual
- * preferences, and in fact it would work directly against our primary goals.
+ * <p>The goal of google-java-format is to provide consistent formatting, and to free developers from arguments over
+ * style choices. It is an explicit non-goal to support developers' individual preferences, and in fact it would work
+ * directly against our primary goals.
  */
 @Immutable
 public class JavaFormatterOptions {
 
-  public enum Style {
-    /** The default Palantir Java Style configuration. */
-    PALANTIR(2, 120),
+    public enum Style {
+        /** The default Palantir Java Style configuration. */
+        PALANTIR(2, 120),
 
-    /** The default Google Java Style configuration. */
-    GOOGLE(1, 100),
+        /** The default Google Java Style configuration. */
+        GOOGLE(1, 100),
 
-    /** The AOSP-compliant configuration. */
-    AOSP(2, 100);
+        /** The AOSP-compliant configuration. */
+        AOSP(2, 100);
 
-    private final int indentationMultiplier;
-    private final int maxLineLength;
+        private final int indentationMultiplier;
+        private final int maxLineLength;
 
-    Style(int indentationMultiplier, int maxLineLength) {
-      this.indentationMultiplier = indentationMultiplier;
-      this.maxLineLength = maxLineLength;
+        Style(int indentationMultiplier, int maxLineLength) {
+            this.indentationMultiplier = indentationMultiplier;
+            this.maxLineLength = maxLineLength;
+        }
+
+        int indentationMultiplier() {
+            return indentationMultiplier;
+        }
+
+        public int maxLineLength() {
+            return maxLineLength;
+        }
     }
 
-    int indentationMultiplier() {
-      return indentationMultiplier;
+    private final Style style;
+
+    private JavaFormatterOptions(Style style) {
+        this.style = style;
+    }
+
+    /** Returns the multiplier for the unit of indent. */
+    public int indentationMultiplier() {
+        return style.indentationMultiplier();
     }
 
     public int maxLineLength() {
-      return maxLineLength;
-    }
-  }
-
-  private final Style style;
-
-  private JavaFormatterOptions(Style style) {
-    this.style = style;
-  }
-
-  /** Returns the multiplier for the unit of indent. */
-  public int indentationMultiplier() {
-    return style.indentationMultiplier();
-  }
-
-  public int maxLineLength() {
-    return style.maxLineLength();
-  }
-
-  /** Returns the code style. */
-  public Style style() {
-    return style;
-  }
-
-  /** Returns the default formatting options. */
-  public static JavaFormatterOptions defaultOptions() {
-    return builder().build();
-  }
-
-  /** Returns a builder for {@link JavaFormatterOptions}. */
-  public static Builder builder() {
-    return new Builder();
-  }
-
-  /** A builder for {@link JavaFormatterOptions}. */
-  public static class Builder {
-    private Style style = Style.GOOGLE;
-
-    private Builder() {}
-
-    public Builder style(Style style) {
-      this.style = style;
-      return this;
+        return style.maxLineLength();
     }
 
-    public JavaFormatterOptions build() {
-      return new JavaFormatterOptions(style);
+    /** Returns the code style. */
+    public Style style() {
+        return style;
     }
-  }
+
+    /** Returns the default formatting options. */
+    public static JavaFormatterOptions defaultOptions() {
+        return builder().build();
+    }
+
+    /** Returns a builder for {@link JavaFormatterOptions}. */
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    /** A builder for {@link JavaFormatterOptions}. */
+    public static class Builder {
+        private Style style = Style.GOOGLE;
+
+        private Builder() {}
+
+        public Builder style(Style style) {
+            this.style = style;
+            return this;
+        }
+
+        public JavaFormatterOptions build() {
+            return new JavaFormatterOptions(style);
+        }
+    }
 }
