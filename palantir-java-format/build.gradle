@@ -18,6 +18,8 @@ dependencies {
 
     compileOnly 'com.google.auto.service:auto-service'
     annotationProcessor 'com.google.auto.service:auto-service'
+    compileOnly "org.immutables:value::annotations"
+    annotationProcessor "org.immutables:value"
 }
 
 tasks.withType(JavaCompile).configureEach {
