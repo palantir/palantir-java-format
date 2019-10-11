@@ -2,6 +2,7 @@ rootProject.name = 'palantir-java-format-parent'
 
 include ':palantir-java-format'
 include ':idea-plugin'
+include ':gradle-palantir-java-format'
 
 boolean isCiServer = System.getenv().containsKey('CI')
 buildCache {

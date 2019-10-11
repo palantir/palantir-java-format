@@ -24,7 +24,7 @@ import com.intellij.openapi.ui.ComboBox;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
-import com.palantir.javaformat.intellij.GoogleJavaFormatSettings.EnabledState;
+import com.palantir.javaformat.intellij.PalantirJavaFormatSettings.EnabledState;
 import java.awt.Insets;
 import javax.annotation.Nullable;
 import javax.swing.JCheckBox;
@@ -78,7 +78,7 @@ class GoogleJavaFormatConfigurable extends BaseConfigurable implements Searchabl
 
     @Override
     public void apply() throws ConfigurationException {
-        GoogleJavaFormatSettings settings = GoogleJavaFormatSettings.getInstance(project);
+        PalantirJavaFormatSettings settings = PalantirJavaFormatSettings.getInstance(project);
         settings.setEnabled(enable.isSelected() ? EnabledState.ENABLED : getDisabledState());
         settings.setStyle(((UiFormatterStyle) styleComboBox.getSelectedItem()).convert());
     }
@@ -92,14 +92,14 @@ class GoogleJavaFormatConfigurable extends BaseConfigurable implements Searchabl
 
     @Override
     public void reset() {
-        GoogleJavaFormatSettings settings = GoogleJavaFormatSettings.getInstance(project);
+        PalantirJavaFormatSettings settings = PalantirJavaFormatSettings.getInstance(project);
         enable.setSelected(settings.isEnabled());
         styleComboBox.setSelectedItem(UiFormatterStyle.convert(settings.getStyle()));
     }
 
     @Override
     public boolean isModified() {
-        GoogleJavaFormatSettings settings = GoogleJavaFormatSettings.getInstance(project);
+        PalantirJavaFormatSettings settings = PalantirJavaFormatSettings.getInstance(project);
         return enable.isSelected() != settings.isEnabled()
                 || !styleComboBox.getSelectedItem().equals(UiFormatterStyle.convert(settings.getStyle()));
     }

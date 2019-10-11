@@ -20,19 +20,22 @@ import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
+import com.intellij.openapi.components.StoragePathMacros;
 import com.intellij.openapi.project.Project;
 import com.palantir.javaformat.java.JavaFormatterOptions;
+import java.nio.file.Path;
+import java.util.Optional;
 import javax.annotation.Nullable;
 
 @State(
-        name = "GoogleJavaFormatSettings",
-        storages = {@Storage("palantir-java-format.xml")})
-class GoogleJavaFormatSettings implements PersistentStateComponent<GoogleJavaFormatSettings.State> {
+        name = "PalantirJavaFormatSettings",
+        storages = {@Storage(StoragePathMacros.WORKSPACE_FILE)})
+class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJavaFormatSettings.State> {
 
     private State state = new State();
 
-    static GoogleJavaFormatSettings getInstance(Project project) {
-        return ServiceManager.getService(project, GoogleJavaFormatSettings.class);
+    static PalantirJavaFormatSettings getInstance(Project project) {
+        return ServiceManager.getService(project, PalantirJavaFormatSettings.class);
     }
 
     @Nullable
@@ -78,8 +81,10 @@ class GoogleJavaFormatSettings implements PersistentStateComponent<GoogleJavaFor
 
     static class State {
 
-        private EnabledState enabled = EnabledState.UNKNOWN;
+        private EnabledState enabled = EnabledState.ENABLED;
+        private Optional<Path> formatterPath = Optional.empty();
         public JavaFormatterOptions.Style style = JavaFormatterOptions.Style.PALANTIR;
+
 
         // enabled used to be a boolean so we use bean property methods for backwards compatibility
         public void setEnabled(@Nullable String enabledStr) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * (c) Copyright 2019 Palantir Technologies Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,8 @@
  * limitations under the License.
  */
 
-package com.palantir.javaformat.intellij;
+apply plugin: 'java-gradle-plugin'
 
-import com.intellij.openapi.components.ProjectComponent;
-
-final class InitialConfigurationComponent implements ProjectComponent {
-    private final PalantirJavaFormatSettings settings;
-
-    public InitialConfigurationComponent(PalantirJavaFormatSettings settings) {
-        this.settings = settings;
-    }
-
-    @Override
-    public void projectOpened() {
-        if (settings.isUninitialized()) {
-            settings.setEnabled(true);
-        }
-    }
+dependencies {
+    implementation gradleApi()
 }

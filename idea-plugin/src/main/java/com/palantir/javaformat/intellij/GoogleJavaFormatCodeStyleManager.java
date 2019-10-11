@@ -94,7 +94,7 @@ class GoogleJavaFormatCodeStyleManager extends CodeStyleManagerDecorator {
     /** Return whether or not this formatter can handle formatting the given file. */
     private boolean overrideFormatterForFile(PsiFile file) {
         return StdFileTypes.JAVA.equals(file.getFileType())
-                && GoogleJavaFormatSettings.getInstance(getProject()).isEnabled();
+                && PalantirJavaFormatSettings.getInstance(getProject()).isEnabled();
     }
 
     private void formatInternal(PsiFile file, Collection<TextRange> ranges) {
@@ -124,7 +124,7 @@ class GoogleJavaFormatCodeStyleManager extends CodeStyleManagerDecorator {
      * {@link #performReplacements(Document, Map)}.
      */
     private void format(Document document, Collection<TextRange> ranges) {
-        Style style = GoogleJavaFormatSettings.getInstance(getProject()).getStyle();
+        Style style = PalantirJavaFormatSettings.getInstance(getProject()).getStyle();
         Formatter formatter = new Formatter(JavaFormatterOptions.builder().style(style).build());
         performReplacements(document, FormatterUtil.getReplacements(formatter, document.getText(), ranges));
     }

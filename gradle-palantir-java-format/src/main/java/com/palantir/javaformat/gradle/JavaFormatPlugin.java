@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * (c) Copyright 2019 Palantir Technologies Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,14 @@
  * limitations under the License.
  */
 
-package com.palantir.javaformat.intellij;
+package com.palantir.javaformat.gradle;
 
-import com.intellij.openapi.components.ProjectComponent;
+import org.gradle.api.Plugin;
+import org.gradle.api.Project;
 
-final class InitialConfigurationComponent implements ProjectComponent {
-    private final PalantirJavaFormatSettings settings;
-
-    public InitialConfigurationComponent(PalantirJavaFormatSettings settings) {
-        this.settings = settings;
-    }
-
+public class JavaFormatPlugin implements Plugin<Project> {
     @Override
-    public void projectOpened() {
-        if (settings.isUninitialized()) {
-            settings.setEnabled(true);
-        }
+    public void apply(Project project) {
+
     }
 }
