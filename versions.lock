@@ -1,16 +1,18 @@
 # Run ./gradlew --write-locks to regenerate this file
+com.google.auto:auto-common:0.10 (2 constraints: 29219941)
+com.google.auto.service:auto-service:1.0-rc6 (1 constraints: dd05b441)
+com.google.auto.service:auto-service-annotations:1.0-rc6 (1 constraints: 741058a7)
 com.google.code.findbugs:jsr305:3.0.2 (3 constraints: 571ca3f6)
 com.google.errorprone:error_prone_annotations:2.3.3 (4 constraints: b526441f)
 com.google.errorprone:javac-shaded:9+181-r4173-1 (1 constraints: e0067767)
 com.google.guava:failureaccess:1.0.1 (1 constraints: 140ae1b4)
-com.google.guava:guava:27.0.1-jre (5 constraints: dd43767e)
+com.google.guava:guava:27.0.1-jre (6 constraints: 1d55758d)
 com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava (1 constraints: bd17c918)
 com.google.j2objc:j2objc-annotations:1.1 (2 constraints: 8f167910)
 org.checkerframework:checker-qual:2.5.2 (2 constraints: 5917a461)
 org.codehaus.mojo:animal-sniffer-annotations:1.17 (1 constraints: ed09d8aa)
 
 [Test dependencies]
-com.google.auto:auto-common:0.9 (1 constraints: be1116d7)
 com.google.auto.value:auto-value:1.5.3 (1 constraints: 1c121afb)
 com.google.auto.value:auto-value-annotations:1.6.3 (1 constraints: 620a25b9)
 com.google.guava:guava-testlib:27.0.1-jre (1 constraints: aa067c53)

@@ -24,7 +24,7 @@ import org.openjdk.javax.tools.Diagnostic;
 import org.openjdk.javax.tools.JavaFileObject;
 
 /** Checked exception class for formatter errors. */
-public final class FormatterException extends Exception {
+public final class FormatterException extends FormatterExceptionApi {
 
     private ImmutableList<FormatterDiagnostic> diagnostics;
 

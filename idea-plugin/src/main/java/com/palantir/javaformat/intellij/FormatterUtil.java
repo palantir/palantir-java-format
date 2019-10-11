@@ -22,8 +22,8 @@ import com.google.common.collect.BoundType;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Range;
 import com.intellij.openapi.util.TextRange;
-import com.palantir.javaformat.java.Formatter;
-import com.palantir.javaformat.java.FormatterException;
+import com.palantir.javaformat.java.FormatterExceptionApi;
+import com.palantir.javaformat.java.FormatterService;
 import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -32,13 +32,14 @@ final class FormatterUtil {
 
     private FormatterUtil() {}
 
-    static Map<TextRange, String> getReplacements(Formatter formatter, String text, Collection<TextRange> ranges) {
+    static Map<TextRange, String> getReplacements(
+            FormatterService formatter, String text, Collection<TextRange> ranges) {
         try {
             ImmutableMap.Builder<TextRange, String> replacements = ImmutableMap.builder();
             formatter.getFormatReplacements(text, toRanges(ranges)).forEach(replacement -> replacements.put(
                     toTextRange(replacement.getReplaceRange()), replacement.getReplacementString()));
             return replacements.build();
-        } catch (FormatterException e) {
+        } catch (FormatterExceptionApi e) {
             return ImmutableMap.of();
         }
     }

@@ -38,9 +38,9 @@ publishPlugin {
 }
 
 dependencies {
-  compile project(':palantir-java-format')
+  compile project(':palantir-java-format-api')
+  runtimeOnly project(':palantir-java-format')
 }
-
 
 tasks.withType(JavaCompile).configureEach {
   options.errorprone.errorproneArgs += ['-Xep:StrictUnusedVariable:OFF']

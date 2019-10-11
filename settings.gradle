@@ -1,6 +1,7 @@
 rootProject.name = 'palantir-java-format-parent'
 
 include ':palantir-java-format'
+include ':palantir-java-format-api'
 include ':idea-plugin'
 include ':gradle-palantir-java-format'
 

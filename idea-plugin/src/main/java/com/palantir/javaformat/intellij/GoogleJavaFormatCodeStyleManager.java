@@ -30,12 +30,14 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.impl.CheckUtil;
 import com.intellij.util.IncorrectOperationException;
-import com.palantir.javaformat.java.Formatter;
+import com.palantir.javaformat.java.FormatterFactory;
+import com.palantir.javaformat.java.FormatterService;
 import com.palantir.javaformat.java.JavaFormatterOptions;
 import com.palantir.javaformat.java.JavaFormatterOptions.Style;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.ServiceLoader;
 import java.util.TreeMap;
 import org.jetbrains.annotations.NotNull;
 
@@ -125,7 +127,9 @@ class GoogleJavaFormatCodeStyleManager extends CodeStyleManagerDecorator {
      */
     private void format(Document document, Collection<TextRange> ranges) {
         Style style = PalantirJavaFormatSettings.getInstance(getProject()).getStyle();
-        Formatter formatter = new Formatter(JavaFormatterOptions.builder().style(style).build());
+        // TODO(dsanduleac): optionally load from linked jar
+        FormatterFactory factory = ServiceLoader.load(FormatterFactory.class).iterator().next();
+        FormatterService formatter = factory.createFormatter(JavaFormatterOptions.builder().style(style).build());
         performReplacements(document, FormatterUtil.getReplacements(formatter, document.getText(), ranges));
     }
 
