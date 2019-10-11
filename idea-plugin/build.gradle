@@ -47,7 +47,11 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 check.dependsOn buildPlugin, verifyPlugin
+// TODO(dsanduleac): it doesn't bundle palantir-java-format, how to make it do that?
+// see https://github.com/JetBrains/gradle-intellij-plugin/blob/master/src/main/groovy/org/jetbrains/intellij/IntelliJPlugin.groovy
 buildPlugin.dependsOn ':palantir-java-format:jar'
+buildPlugin.dependsOn ':palantir-java-format-api:jar'
+
 runIde.dependsOn buildPlugin
 
 buildSearchableOptions.enabled = false
