@@ -17,28 +17,28 @@
 package com.palantir.javaformat.doc;
 
 public interface DocVisitor<T> {
-  default T visit(Doc doc) {
-    if (doc instanceof Level) {
-      return visitLevel((Level) doc);
-    } else if (doc instanceof Break) {
-      return visitBreak((Break) doc);
-    } else if (doc instanceof Token) {
-      return visitToken((Token) doc);
-    } else if (doc instanceof Tok) {
-      return visitTok((Tok) doc);
-    } else if (doc instanceof Space) {
-      return visitSpace((Space) doc);
+    default T visit(Doc doc) {
+        if (doc instanceof Level) {
+            return visitLevel((Level) doc);
+        } else if (doc instanceof Break) {
+            return visitBreak((Break) doc);
+        } else if (doc instanceof Token) {
+            return visitToken((Token) doc);
+        } else if (doc instanceof Tok) {
+            return visitTok((Tok) doc);
+        } else if (doc instanceof Space) {
+            return visitSpace((Space) doc);
+        }
+        throw new RuntimeException();
     }
-    throw new RuntimeException();
-  }
 
-  T visitSpace(Space doc);
+    T visitSpace(Space doc);
 
-  T visitTok(Tok doc);
+    T visitTok(Tok doc);
 
-  T visitToken(Token doc);
+    T visitToken(Token doc);
 
-  T visitBreak(Break doc);
+    T visitBreak(Break doc);
 
-  T visitLevel(Level doc);
+    T visitLevel(Level doc);
 }

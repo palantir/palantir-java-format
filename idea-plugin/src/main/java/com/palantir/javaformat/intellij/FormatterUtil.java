@@ -30,35 +30,27 @@ import java.util.stream.Collectors;
 
 final class FormatterUtil {
 
-  private FormatterUtil() {}
+    private FormatterUtil() {}
 
-  static Map<TextRange, String> getReplacements(
-      Formatter formatter, String text, Collection<TextRange> ranges) {
-    try {
-      ImmutableMap.Builder<TextRange, String> replacements = ImmutableMap.builder();
-      formatter
-          .getFormatReplacements(text, toRanges(ranges))
-          .forEach(
-              replacement ->
-                  replacements.put(
-                      toTextRange(replacement.getReplaceRange()),
-                      replacement.getReplacementString()));
-      return replacements.build();
-    } catch (FormatterException e) {
-      return ImmutableMap.of();
+    static Map<TextRange, String> getReplacements(Formatter formatter, String text, Collection<TextRange> ranges) {
+        try {
+            ImmutableMap.Builder<TextRange, String> replacements = ImmutableMap.builder();
+            formatter.getFormatReplacements(text, toRanges(ranges)).forEach(replacement -> replacements.put(
+                    toTextRange(replacement.getReplaceRange()), replacement.getReplacementString()));
+            return replacements.build();
+        } catch (FormatterException e) {
+            return ImmutableMap.of();
+        }
     }
-  }
 
-  private static Collection<Range<Integer>> toRanges(Collection<TextRange> textRanges) {
-    return textRanges.stream()
-        .map(textRange -> Range.closedOpen(textRange.getStartOffset(), textRange.getEndOffset()))
-        .collect(Collectors.toList());
-  }
+    private static Collection<Range<Integer>> toRanges(Collection<TextRange> textRanges) {
+        return textRanges.stream()
+                .map(textRange -> Range.closedOpen(textRange.getStartOffset(), textRange.getEndOffset()))
+                .collect(Collectors.toList());
+    }
 
-  private static TextRange toTextRange(Range<Integer> range) {
-    checkState(
-        range.lowerBoundType().equals(BoundType.CLOSED)
-            && range.upperBoundType().equals(BoundType.OPEN));
-    return new TextRange(range.lowerEndpoint(), range.upperEndpoint());
-  }
+    private static TextRange toTextRange(Range<Integer> range) {
+        checkState(range.lowerBoundType().equals(BoundType.CLOSED) && range.upperBoundType().equals(BoundType.OPEN));
+        return new TextRange(range.lowerEndpoint(), range.upperEndpoint());
+    }
 }

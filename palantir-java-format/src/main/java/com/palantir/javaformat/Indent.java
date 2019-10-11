@@ -20,67 +20,66 @@ import com.palantir.javaformat.doc.Break;
 import com.palantir.javaformat.doc.Doc;
 
 /**
- * An indent for a {@link Doc.Level} or {@link Break}. The indent is either a constant {@code int},
- * or a conditional expression whose value depends on whether or not a {@link Break} has been
- * broken.
+ * An indent for a {@link Doc.Level} or {@link Break}. The indent is either a constant {@code int}, or a conditional
+ * expression whose value depends on whether or not a {@link Break} has been broken.
  */
 public abstract class Indent {
 
-  public abstract int eval();
+    public abstract int eval();
 
-  /** A constant function, returning a constant indent. */
-  public static final class Const extends Indent {
-    private final int n;
+    /** A constant function, returning a constant indent. */
+    public static final class Const extends Indent {
+        private final int n;
 
-    public static final Const ZERO = new Const(+0);
+        public static final Const ZERO = new Const(+0);
 
-    private Const(int n) {
-      this.n = n;
+        private Const(int n) {
+            this.n = n;
+        }
+
+        public static Const make(int n, int indentMultiplier) {
+            return new Const(n * indentMultiplier);
+        }
+
+        @Override
+        public int eval() {
+            return n;
+        }
+
+        @Override
+        public String toString() {
+            return MoreObjects.toStringHelper(this).add("n", n).toString();
+        }
     }
 
-    public static Const make(int n, int indentMultiplier) {
-      return new Const(n * indentMultiplier);
-    }
+    /** A conditional function, whose value depends on whether a break was taken. */
+    public static final class If extends Indent {
+        private final BreakTag condition;
+        private final Indent thenIndent;
+        private final Indent elseIndent;
 
-    @Override
-    public int eval() {
-      return n;
-    }
+        private If(BreakTag condition, Indent thenIndent, Indent elseIndent) {
+            this.condition = condition;
+            this.thenIndent = thenIndent;
+            this.elseIndent = elseIndent;
+        }
 
-    @Override
-    public String toString() {
-      return MoreObjects.toStringHelper(this).add("n", n).toString();
-    }
-  }
+        public static If make(BreakTag condition, Indent thenIndent, Indent elseIndent) {
+            return new If(condition, thenIndent, elseIndent);
+        }
 
-  /** A conditional function, whose value depends on whether a break was taken. */
-  public static final class If extends Indent {
-    private final BreakTag condition;
-    private final Indent thenIndent;
-    private final Indent elseIndent;
+        @Override
+        public int eval() {
+            return (condition.wasBreakTaken() ? thenIndent : elseIndent).eval();
+        }
 
-    private If(BreakTag condition, Indent thenIndent, Indent elseIndent) {
-      this.condition = condition;
-      this.thenIndent = thenIndent;
-      this.elseIndent = elseIndent;
+        @Override
+        public String toString() {
+            return MoreObjects.toStringHelper(this)
+                    .add("condition", condition)
+                    .add("thenIndent", thenIndent)
+                    .add("elseIndent", elseIndent)
+                    .toString();
+        }
     }
-
-    public static If make(BreakTag condition, Indent thenIndent, Indent elseIndent) {
-      return new If(condition, thenIndent, elseIndent);
-    }
-
-    @Override
-    public int eval() {
-      return (condition.wasBreakTaken() ? thenIndent : elseIndent).eval();
-    }
-
-    @Override
-    public String toString() {
-      return MoreObjects.toStringHelper(this)
-          .add("condition", condition)
-          .add("thenIndent", thenIndent)
-          .add("elseIndent", elseIndent)
-          .toString();
-    }
-  }
 }

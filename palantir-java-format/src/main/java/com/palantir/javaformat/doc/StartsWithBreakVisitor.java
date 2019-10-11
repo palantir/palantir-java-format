@@ -19,40 +19,37 @@ package com.palantir.javaformat.doc;
 import com.palantir.javaformat.doc.StartsWithBreakVisitor.Result;
 
 enum StartsWithBreakVisitor implements DocVisitor<Result> {
-  INSTANCE;
+    INSTANCE;
 
-  enum Result {
-    EMPTY,
-    NO,
-    YES,
-  }
+    enum Result {
+        EMPTY,
+        NO,
+        YES,
+    }
 
-  @Override
-  public Result visitSpace(Space doc) {
-    return Result.NO;
-  }
+    @Override
+    public Result visitSpace(Space doc) {
+        return Result.NO;
+    }
 
-  @Override
-  public Result visitTok(Tok doc) {
-    return Result.NO;
-  }
+    @Override
+    public Result visitTok(Tok doc) {
+        return Result.NO;
+    }
 
-  @Override
-  public Result visitToken(Token doc) {
-    return Result.NO;
-  }
+    @Override
+    public Result visitToken(Token doc) {
+        return Result.NO;
+    }
 
-  @Override
-  public Result visitBreak(Break doc) {
-    return Result.YES;
-  }
+    @Override
+    public Result visitBreak(Break doc) {
+        return Result.YES;
+    }
 
-  @Override
-  public Result visitLevel(Level doc) {
-    return doc.getDocs().stream()
-        .map(this::visit)
-        .filter(result -> result != Result.EMPTY)
-        .findFirst()
-        .orElse(Result.EMPTY);
-  }
+    @Override
+    public Result visitLevel(Level doc) {
+        return doc.getDocs().stream().map(this::visit).filter(result -> result != Result.EMPTY).findFirst().orElse(
+                Result.EMPTY);
+    }
 }

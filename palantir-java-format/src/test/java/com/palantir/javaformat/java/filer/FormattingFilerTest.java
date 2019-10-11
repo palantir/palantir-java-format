@@ -44,108 +44,89 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public class FormattingFilerTest {
 
-  @Rule public CompilationRule compilationRule = new CompilationRule();
+    @Rule public CompilationRule compilationRule = new CompilationRule();
 
-  @Test
-  public void invalidSyntaxDoesNotThrowError() throws IOException {
-    List<String> logMessages = new ArrayList<>();
-    Messager messager =
-        new Messager() {
-          @Override
-          public void printMessage(Diagnostic.Kind kind, CharSequence msg) {
-            logMessages.add(kind.toString() + ";" + msg);
-          }
+    @Test
+    public void invalidSyntaxDoesNotThrowError() throws IOException {
+        List<String> logMessages = new ArrayList<>();
+        Messager messager = new Messager() {
+            @Override
+            public void printMessage(Diagnostic.Kind kind, CharSequence msg) {
+                logMessages.add(kind.toString() + ";" + msg);
+            }
 
-          @Override
-          public void printMessage(Diagnostic.Kind kind, CharSequence msg, Element e) {}
+            @Override
+            public void printMessage(Diagnostic.Kind kind, CharSequence msg, Element e) {}
 
-          @Override
-          public void printMessage(
-              Diagnostic.Kind kind, CharSequence msg, Element e, AnnotationMirror a) {}
+            @Override
+            public void printMessage(Diagnostic.Kind kind, CharSequence msg, Element e, AnnotationMirror a) {}
 
-          @Override
-          public void printMessage(
-              Diagnostic.Kind kind,
-              CharSequence msg,
-              Element e,
-              AnnotationMirror a,
-              AnnotationValue v) {}
+            @Override
+            public void printMessage(
+                    Diagnostic.Kind kind, CharSequence msg, Element e, AnnotationMirror a, AnnotationValue v) {}
         };
 
-    String file = Joiner.on('\n').join("package foo;", "public class Bar {");
-    FormattingFiler formattingFiler = new FormattingFiler(new FakeFiler(), messager);
-    Writer writer = formattingFiler.createSourceFile("foo.Bar").openWriter();
-    writer.write(file);
-    writer.close();
+        String file = Joiner.on('\n').join("package foo;", "public class Bar {");
+        FormattingFiler formattingFiler = new FormattingFiler(new FakeFiler(), messager);
+        Writer writer = formattingFiler.createSourceFile("foo.Bar").openWriter();
+        writer.write(file);
+        writer.close();
 
-    assertThat(logMessages).containsExactly("NOTE;Error formatting foo.Bar");
-  }
-
-  @Test
-  public void formatsFile() throws IOException {
-    FormattingFiler formattingFiler = new FormattingFiler(new FakeFiler());
-    JavaFileObject sourceFile = formattingFiler.createSourceFile("foo.Bar");
-    try (Writer writer = sourceFile.openWriter()) {
-      writer.write("package foo;class Bar{private String      baz;\n\n\n\n}");
+        assertThat(logMessages).containsExactly("NOTE;Error formatting foo.Bar");
     }
 
-    assertThat(sourceFile.getCharContent(false).toString())
-        .isEqualTo(
-            Joiner.on('\n')
-                .join(
-                    "package foo;",
-                    "",
-                    "class Bar {",
-                    "  private String baz;",
-                    "}",
-                    "")); // trailing newline
-  }
+    @Test
+    public void formatsFile() throws IOException {
+        FormattingFiler formattingFiler = new FormattingFiler(new FakeFiler());
+        JavaFileObject sourceFile = formattingFiler.createSourceFile("foo.Bar");
+        try (Writer writer = sourceFile.openWriter()) {
+            writer.write("package foo;class Bar{private String      baz;\n\n\n\n}");
+        }
 
-  private static class FakeFiler implements Filer {
-    @Override
-    public JavaFileObject createSourceFile(CharSequence name, Element... originatingElements)
-        throws IOException {
-      return new ObservingJavaFileObject(name.toString(), Kind.SOURCE);
+        assertThat(sourceFile.getCharContent(false).toString()).isEqualTo(Joiner.on('\n')
+                .join("package foo;", "", "class Bar {", "  private String baz;", "}", "")); // trailing newline
     }
 
-    @Override
-    public JavaFileObject createClassFile(CharSequence name, Element... originatingElements)
-        throws IOException {
-      return new ObservingJavaFileObject(name.toString(), Kind.CLASS);
+    private static class FakeFiler implements Filer {
+        @Override
+        public JavaFileObject createSourceFile(CharSequence name, Element... originatingElements) throws IOException {
+            return new ObservingJavaFileObject(name.toString(), Kind.SOURCE);
+        }
+
+        @Override
+        public JavaFileObject createClassFile(CharSequence name, Element... originatingElements) throws IOException {
+            return new ObservingJavaFileObject(name.toString(), Kind.CLASS);
+        }
+
+        @Override
+        public FileObject createResource(
+                Location location, CharSequence pkg, CharSequence relativeName, Element... originatingElements)
+                throws IOException {
+            return new ObservingJavaFileObject(pkg.toString() + relativeName, Kind.OTHER);
+        }
+
+        @Override
+        public FileObject getResource(Location location, CharSequence pkg, CharSequence relativeName)
+                throws IOException {
+            return new ObservingJavaFileObject(pkg.toString() + relativeName, Kind.OTHER);
+        }
     }
 
-    @Override
-    public FileObject createResource(
-        Location location,
-        CharSequence pkg,
-        CharSequence relativeName,
-        Element... originatingElements)
-        throws IOException {
-      return new ObservingJavaFileObject(pkg.toString() + relativeName, Kind.OTHER);
-    }
+    private static class ObservingJavaFileObject extends SimpleJavaFileObject {
+        private final StringWriter output = new StringWriter();
 
-    @Override
-    public FileObject getResource(Location location, CharSequence pkg, CharSequence relativeName)
-        throws IOException {
-      return new ObservingJavaFileObject(pkg.toString() + relativeName, Kind.OTHER);
-    }
-  }
+        ObservingJavaFileObject(String name, Kind kind) {
+            super(URI.create(name), kind);
+        }
 
-  private static class ObservingJavaFileObject extends SimpleJavaFileObject {
-    private final StringWriter output = new StringWriter();
+        @Override
+        public Writer openWriter() throws IOException {
+            return output;
+        }
 
-    ObservingJavaFileObject(String name, Kind kind) {
-      super(URI.create(name), kind);
+        @Override
+        public CharSequence getCharContent(boolean ignoreEncodingErrors) throws IOException {
+            return output.toString();
+        }
     }
-
-    @Override
-    public Writer openWriter() throws IOException {
-      return output;
-    }
-
-    @Override
-    public CharSequence getCharContent(boolean ignoreEncodingErrors) throws IOException {
-      return output.toString();
-    }
-  }
 }

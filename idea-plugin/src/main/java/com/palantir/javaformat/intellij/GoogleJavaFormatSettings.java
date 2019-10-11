@@ -25,82 +25,82 @@ import com.palantir.javaformat.java.JavaFormatterOptions;
 import javax.annotation.Nullable;
 
 @State(
-    name = "GoogleJavaFormatSettings",
-    storages = {@Storage("palantir-java-format.xml")})
+        name = "GoogleJavaFormatSettings",
+        storages = {@Storage("palantir-java-format.xml")})
 class GoogleJavaFormatSettings implements PersistentStateComponent<GoogleJavaFormatSettings.State> {
 
-  private State state = new State();
+    private State state = new State();
 
-  static GoogleJavaFormatSettings getInstance(Project project) {
-    return ServiceManager.getService(project, GoogleJavaFormatSettings.class);
-  }
-
-  @Nullable
-  @Override
-  public State getState() {
-    return state;
-  }
-
-  @Override
-  public void loadState(State state) {
-    this.state = state;
-  }
-
-  boolean isEnabled() {
-    return state.enabled.equals(EnabledState.ENABLED);
-  }
-
-  void setEnabled(boolean enabled) {
-    setEnabled(enabled ? EnabledState.ENABLED : EnabledState.DISABLED);
-  }
-
-  void setEnabled(EnabledState enabled) {
-    state.enabled = enabled;
-  }
-
-  boolean isUninitialized() {
-    return state.enabled.equals(EnabledState.UNKNOWN);
-  }
-
-  JavaFormatterOptions.Style getStyle() {
-    return state.style;
-  }
-
-  void setStyle(JavaFormatterOptions.Style style) {
-    state.style = style;
-  }
-
-  enum EnabledState {
-    UNKNOWN,
-    ENABLED,
-    DISABLED;
-  }
-
-  static class State {
-
-    private EnabledState enabled = EnabledState.UNKNOWN;
-    public JavaFormatterOptions.Style style = JavaFormatterOptions.Style.PALANTIR;
-
-    // enabled used to be a boolean so we use bean property methods for backwards compatibility
-    public void setEnabled(@Nullable String enabledStr) {
-      if (enabledStr == null) {
-        enabled = EnabledState.UNKNOWN;
-      } else if (Boolean.valueOf(enabledStr)) {
-        enabled = EnabledState.ENABLED;
-      } else {
-        enabled = EnabledState.DISABLED;
-      }
+    static GoogleJavaFormatSettings getInstance(Project project) {
+        return ServiceManager.getService(project, GoogleJavaFormatSettings.class);
     }
 
-    public String getEnabled() {
-      switch (enabled) {
-        case ENABLED:
-          return "true";
-        case DISABLED:
-          return "false";
-        default:
-          return null;
-      }
+    @Nullable
+    @Override
+    public State getState() {
+        return state;
     }
-  }
+
+    @Override
+    public void loadState(State state) {
+        this.state = state;
+    }
+
+    boolean isEnabled() {
+        return state.enabled.equals(EnabledState.ENABLED);
+    }
+
+    void setEnabled(boolean enabled) {
+        setEnabled(enabled ? EnabledState.ENABLED : EnabledState.DISABLED);
+    }
+
+    void setEnabled(EnabledState enabled) {
+        state.enabled = enabled;
+    }
+
+    boolean isUninitialized() {
+        return state.enabled.equals(EnabledState.UNKNOWN);
+    }
+
+    JavaFormatterOptions.Style getStyle() {
+        return state.style;
+    }
+
+    void setStyle(JavaFormatterOptions.Style style) {
+        state.style = style;
+    }
+
+    enum EnabledState {
+        UNKNOWN,
+        ENABLED,
+        DISABLED;
+    }
+
+    static class State {
+
+        private EnabledState enabled = EnabledState.UNKNOWN;
+        public JavaFormatterOptions.Style style = JavaFormatterOptions.Style.PALANTIR;
+
+        // enabled used to be a boolean so we use bean property methods for backwards compatibility
+        public void setEnabled(@Nullable String enabledStr) {
+            if (enabledStr == null) {
+                enabled = EnabledState.UNKNOWN;
+            } else if (Boolean.valueOf(enabledStr)) {
+                enabled = EnabledState.ENABLED;
+            } else {
+                enabled = EnabledState.DISABLED;
+            }
+        }
+
+        public String getEnabled() {
+            switch (enabled) {
+                case ENABLED:
+                    return "true";
+                case DISABLED:
+                    return "false";
+                default:
+                    return null;
+            }
+        }
+    }
 }

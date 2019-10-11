@@ -23,31 +23,31 @@ import java.util.Objects;
 
 /** Configuration options for the formatting style. */
 enum UiFormatterStyle {
-  PALANTIR("Default Palantir Java style", Style.PALANTIR),
-  GOOGLE("Default Google Java style", Style.GOOGLE),
-  AOSP("Android Open Source Project (AOSP) style", Style.AOSP);
+    PALANTIR("Default Palantir Java style", Style.PALANTIR),
+    GOOGLE("Default Google Java style", Style.GOOGLE),
+    AOSP("Android Open Source Project (AOSP) style", Style.AOSP);
 
-  private final String description;
-  private final JavaFormatterOptions.Style style;
+    private final String description;
+    private final JavaFormatterOptions.Style style;
 
-  UiFormatterStyle(String description, JavaFormatterOptions.Style style) {
-    this.description = description;
-    this.style = style;
-  }
+    UiFormatterStyle(String description, JavaFormatterOptions.Style style) {
+        this.description = description;
+        this.style = style;
+    }
 
-  @Override
-  public String toString() {
-    return description;
-  }
+    @Override
+    public String toString() {
+        return description;
+    }
 
-  public JavaFormatterOptions.Style convert() {
-    return style;
-  }
+    public JavaFormatterOptions.Style convert() {
+        return style;
+    }
 
-  static UiFormatterStyle convert(JavaFormatterOptions.Style style) {
-    return Arrays.stream(UiFormatterStyle.values())
-        .filter(value -> Objects.equals(value.style, style))
-        .findFirst()
-        .get();
-  }
+    static UiFormatterStyle convert(JavaFormatterOptions.Style style) {
+        return Arrays.stream(UiFormatterStyle.values())
+                .filter(value -> Objects.equals(value.style, style))
+                .findFirst()
+                .get();
+    }
 }

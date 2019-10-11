@@ -29,54 +29,53 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class StringWrapperIntegrationTest {
 
-  private static FileBasedTests tests = new FileBasedTests(StringWrapperIntegrationTest.class);
+    private static FileBasedTests tests = new FileBasedTests(StringWrapperIntegrationTest.class);
 
-  @Parameters(name = "{index}: {0}")
-  public static Collection<Object[]> parameters() throws IOException {
-    return tests.paramsAsNameInputOutput();
-  }
-
-  private final Formatter formatter = new Formatter();
-
-  private final String name;
-  private final String input;
-  private final String output;
-
-  public StringWrapperIntegrationTest(String name, String input, String output) {
-    this.name = name;
-    this.input = input;
-    this.output = output;
-  }
-
-  @Test
-  public void test() throws Exception {
-    String actualOutput = StringWrapper.wrap(40, formatter.formatSource(input), formatter);
-    if (isRecreate()) {
-      tests.writeFormatterOutput(name, actualOutput);
-    } else {
-      assertThat(actualOutput).isEqualTo(output);
+    @Parameters(name = "{index}: {0}")
+    public static Collection<Object[]> parameters() throws IOException {
+        return tests.paramsAsNameInputOutput();
     }
-  }
 
-  @Test
-  public void testCR() throws Exception {
-    Assume.assumeFalse("Not running when recreating test outputs", isRecreate());
-    assertThat(StringWrapper.wrap(40, formatter.formatSource(input.replace("\n", "\r")), formatter))
-        .isEqualTo(output.replace("\n", "\r"));
-  }
+    private final Formatter formatter = new Formatter();
 
-  @Test
-  public void testCRLF() throws Exception {
-    Assume.assumeFalse("Not running when recreating test outputs", isRecreate());
-    assertThat(
-            StringWrapper.wrap(40, formatter.formatSource(input.replace("\n", "\r\n")), formatter))
-        .isEqualTo(output.replace("\n", "\r\n"));
-  }
+    private final String name;
+    private final String input;
+    private final String output;
 
-  @Test
-  public void idempotent() throws Exception {
-    Assume.assumeFalse("Not running when recreating test outputs", isRecreate());
-    String wrap = StringWrapper.wrap(40, formatter.formatSource(input), formatter);
-    assertThat(formatter.formatSource(wrap)).isEqualTo(wrap);
-  }
+    public StringWrapperIntegrationTest(String name, String input, String output) {
+        this.name = name;
+        this.input = input;
+        this.output = output;
+    }
+
+    @Test
+    public void test() throws Exception {
+        String actualOutput = StringWrapper.wrap(40, formatter.formatSource(input), formatter);
+        if (isRecreate()) {
+            tests.writeFormatterOutput(name, actualOutput);
+        } else {
+            assertThat(actualOutput).isEqualTo(output);
+        }
+    }
+
+    @Test
+    public void testCR() throws Exception {
+        Assume.assumeFalse("Not running when recreating test outputs", isRecreate());
+        assertThat(StringWrapper.wrap(40, formatter.formatSource(input.replace("\n", "\r")), formatter))
+                .isEqualTo(output.replace("\n", "\r"));
+    }
+
+    @Test
+    public void testCRLF() throws Exception {
+        Assume.assumeFalse("Not running when recreating test outputs", isRecreate());
+        assertThat(StringWrapper.wrap(40, formatter.formatSource(input.replace("\n", "\r\n")), formatter))
+                .isEqualTo(output.replace("\n", "\r\n"));
+    }
+
+    @Test
+    public void idempotent() throws Exception {
+        Assume.assumeFalse("Not running when recreating test outputs", isRecreate());
+        String wrap = StringWrapper.wrap(40, formatter.formatSource(input), formatter);
+        assertThat(formatter.formatSource(wrap)).isEqualTo(wrap);
+    }
 }

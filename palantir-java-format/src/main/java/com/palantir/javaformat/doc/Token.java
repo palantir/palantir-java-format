@@ -27,116 +27,114 @@ import java.util.Optional;
 
 /** A leaf {@link Doc} for a token. */
 public final class Token extends Doc implements Op {
-  /** Is a Token a real token, or imaginary (e.g., a token generated incorrectly, or an EOF)? */
-  public enum RealOrImaginary {
-    REAL,
-    IMAGINARY;
-  }
+    /** Is a Token a real token, or imaginary (e.g., a token generated incorrectly, or an EOF)? */
+    public enum RealOrImaginary {
+        REAL,
+        IMAGINARY;
+    }
 
-  private final Input.Token token;
-  private final RealOrImaginary realOrImaginary;
-  private final Indent plusIndentCommentsBefore;
-  private final Optional<Indent> breakAndIndentTrailingComment;
+    private final Input.Token token;
+    private final RealOrImaginary realOrImaginary;
+    private final Indent plusIndentCommentsBefore;
+    private final Optional<Indent> breakAndIndentTrailingComment;
 
-  private Token(
-      Input.Token token,
-      RealOrImaginary realOrImaginary,
-      Indent plusIndentCommentsBefore,
-      Optional<Indent> breakAndIndentTrailingComment) {
-    this.token = token;
-    this.realOrImaginary = realOrImaginary;
-    this.plusIndentCommentsBefore = plusIndentCommentsBefore;
-    this.breakAndIndentTrailingComment = breakAndIndentTrailingComment;
-  }
+    private Token(
+            Input.Token token,
+            RealOrImaginary realOrImaginary,
+            Indent plusIndentCommentsBefore,
+            Optional<Indent> breakAndIndentTrailingComment) {
+        this.token = token;
+        this.realOrImaginary = realOrImaginary;
+        this.plusIndentCommentsBefore = plusIndentCommentsBefore;
+        this.breakAndIndentTrailingComment = breakAndIndentTrailingComment;
+    }
 
-  /**
-   * How much extra to indent comments before the {@code Token}.
-   *
-   * @return the extra indent
-   */
-  public Indent getPlusIndentCommentsBefore() {
-    return plusIndentCommentsBefore;
-  }
+    /**
+     * How much extra to indent comments before the {@code Token}.
+     *
+     * @return the extra indent
+     */
+    public Indent getPlusIndentCommentsBefore() {
+        return plusIndentCommentsBefore;
+    }
 
-  /** Force a line break and indent trailing javadoc or block comments. */
-  public Optional<Indent> breakAndIndentTrailingComment() {
-    return breakAndIndentTrailingComment;
-  }
+    /** Force a line break and indent trailing javadoc or block comments. */
+    public Optional<Indent> breakAndIndentTrailingComment() {
+        return breakAndIndentTrailingComment;
+    }
 
-  /**
-   * Make a {@code Token}.
-   *
-   * @param token the {@link Input.Token} to wrap
-   * @param realOrImaginary did this {@link Input.Token} appear in the input, or was it generated
-   *     incorrectly?
-   * @param plusIndentCommentsBefore extra {@code plusIndent} for comments just before this token
-   * @return the new {@code Token}
-   */
-  public static Op make(
-      Input.Token token,
-      RealOrImaginary realOrImaginary,
-      Indent plusIndentCommentsBefore,
-      Optional<Indent> breakAndIndentTrailingComment) {
-    return new Token(
-        token, realOrImaginary, plusIndentCommentsBefore, breakAndIndentTrailingComment);
-  }
+    /**
+     * Make a {@code Token}.
+     *
+     * @param token the {@link Input.Token} to wrap
+     * @param realOrImaginary did this {@link Input.Token} appear in the input, or was it generated incorrectly?
+     * @param plusIndentCommentsBefore extra {@code plusIndent} for comments just before this token
+     * @return the new {@code Token}
+     */
+    public static Op make(
+            Input.Token token,
+            RealOrImaginary realOrImaginary,
+            Indent plusIndentCommentsBefore,
+            Optional<Indent> breakAndIndentTrailingComment) {
+        return new Token(token, realOrImaginary, plusIndentCommentsBefore, breakAndIndentTrailingComment);
+    }
 
-  /**
-   * Return the wrapped {@link Input.Token}.
-   *
-   * @return the {@link Input.Token}
-   */
-  public Input.Token getToken() {
-    return token;
-  }
+    /**
+     * Return the wrapped {@link Input.Token}.
+     *
+     * @return the {@link Input.Token}
+     */
+    public Input.Token getToken() {
+        return token;
+    }
 
-  /**
-   * Is the token good? That is, does it match an {@link Input.Token}?
-   *
-   * @return whether the @code Token} is good
-   */
-  public RealOrImaginary realOrImaginary() {
-    return realOrImaginary;
-  }
+    /**
+     * Is the token good? That is, does it match an {@link Input.Token}?
+     *
+     * @return whether the @code Token} is good
+     */
+    public RealOrImaginary realOrImaginary() {
+        return realOrImaginary;
+    }
 
-  @Override
-  public void add(DocBuilder builder) {
-    builder.add(this);
-  }
+    @Override
+    public void add(DocBuilder builder) {
+        builder.add(this);
+    }
 
-  @Override
-  float computeWidth() {
-    return token.getTok().length();
-  }
+    @Override
+    float computeWidth() {
+        return token.getTok().length();
+    }
 
-  @Override
-  String computeFlat() {
-    return token.getTok().getOriginalText();
-  }
+    @Override
+    String computeFlat() {
+        return token.getTok().getOriginalText();
+    }
 
-  @Override
-  Range<Integer> computeRange() {
-    return Range.singleton(token.getTok().getIndex()).canonical(INTEGERS);
-  }
+    @Override
+    Range<Integer> computeRange() {
+        return Range.singleton(token.getTok().getIndex()).canonical(INTEGERS);
+    }
 
-  @Override
-  public State computeBreaks(CommentsHelper commentsHelper, int maxWidth, State state) {
-    String text = token.getTok().getOriginalText();
-    return state.withColumn(state.column + text.length());
-  }
+    @Override
+    public State computeBreaks(CommentsHelper commentsHelper, int maxWidth, State state) {
+        String text = token.getTok().getOriginalText();
+        return state.withColumn(state.column + text.length());
+    }
 
-  @Override
-  public void write(Output output) {
-    String text = token.getTok().getOriginalText();
-    output.append(text, range());
-  }
+    @Override
+    public void write(Output output) {
+        String text = token.getTok().getOriginalText();
+        output.append(text, range());
+    }
 
-  @Override
-  public String toString() {
-    return MoreObjects.toStringHelper(this)
-        .add("token", token)
-        .add("realOrImaginary", realOrImaginary)
-        .add("plusIndentCommentsBefore", plusIndentCommentsBefore)
-        .toString();
-  }
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("token", token)
+                .add("realOrImaginary", realOrImaginary)
+                .add("plusIndentCommentsBefore", plusIndentCommentsBefore)
+                .toString();
+    }
 }

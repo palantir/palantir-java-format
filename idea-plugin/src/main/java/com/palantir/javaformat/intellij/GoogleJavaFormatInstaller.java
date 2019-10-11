@@ -22,39 +22,38 @@ import com.intellij.psi.codeStyle.CodeStyleManager;
 import org.picocontainer.MutablePicoContainer;
 
 /**
- * A component that replaces the default IntelliJ {@link CodeStyleManager} with one that formats via
- * google-java-format.
+ * A component that replaces the default IntelliJ {@link CodeStyleManager} with one that formats via google-java-format.
  */
 final class GoogleJavaFormatInstaller implements ProjectComponent {
 
-  private static final String CODE_STYLE_MANAGER_KEY = CodeStyleManager.class.getName();
+    private static final String CODE_STYLE_MANAGER_KEY = CodeStyleManager.class.getName();
 
-  private final Project project;
+    private final Project project;
 
-  private GoogleJavaFormatInstaller(Project project) {
-    this.project = project;
-  }
-
-  @Override
-  public void projectOpened() {
-    installFormatter(project);
-  }
-
-  private static void installFormatter(Project project) {
-    CodeStyleManager currentManager = CodeStyleManager.getInstance(project);
-
-    if (currentManager instanceof GoogleJavaFormatCodeStyleManager) {
-      currentManager = ((GoogleJavaFormatCodeStyleManager) currentManager).getDelegate();
+    private GoogleJavaFormatInstaller(Project project) {
+        this.project = project;
     }
 
-    setManager(project, new GoogleJavaFormatCodeStyleManager(currentManager));
-  }
-
-  private static void setManager(Project project, CodeStyleManager newManager) {
-    if (newManager != null) {
-      MutablePicoContainer container = (MutablePicoContainer) project.getPicoContainer();
-      container.unregisterComponent(CODE_STYLE_MANAGER_KEY);
-      container.registerComponentInstance(CODE_STYLE_MANAGER_KEY, newManager);
+    @Override
+    public void projectOpened() {
+        installFormatter(project);
     }
-  }
+
+    private static void installFormatter(Project project) {
+        CodeStyleManager currentManager = CodeStyleManager.getInstance(project);
+
+        if (currentManager instanceof GoogleJavaFormatCodeStyleManager) {
+            currentManager = ((GoogleJavaFormatCodeStyleManager) currentManager).getDelegate();
+        }
+
+        setManager(project, new GoogleJavaFormatCodeStyleManager(currentManager));
+    }
+
+    private static void setManager(Project project, CodeStyleManager newManager) {
+        if (newManager != null) {
+            MutablePicoContainer container = (MutablePicoContainer) project.getPicoContainer();
+            container.unregisterComponent(CODE_STYLE_MANAGER_KEY);
+            container.registerComponentInstance(CODE_STYLE_MANAGER_KEY, newManager);
+        }
+    }
 }

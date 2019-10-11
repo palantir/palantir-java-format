@@ -24,51 +24,51 @@ import com.palantir.javaformat.Output;
 
 /** A Leaf node in a {@link Doc} for a non-breaking space. */
 public final class Space extends Doc implements Op {
-  private static final Space SPACE = new Space();
+    private static final Space SPACE = new Space();
 
-  private Space() {}
+    private Space() {}
 
-  /**
-   * Factor method for {@code Space}.
-   *
-   * @return the new {@code Space}
-   */
-  public static Space make() {
-    return SPACE;
-  }
+    /**
+     * Factor method for {@code Space}.
+     *
+     * @return the new {@code Space}
+     */
+    public static Space make() {
+        return SPACE;
+    }
 
-  @Override
-  public void add(DocBuilder builder) {
-    builder.add(this);
-  }
+    @Override
+    public void add(DocBuilder builder) {
+        builder.add(this);
+    }
 
-  @Override
-  float computeWidth() {
-    return 1.0F;
-  }
+    @Override
+    float computeWidth() {
+        return 1.0F;
+    }
 
-  @Override
-  String computeFlat() {
-    return " ";
-  }
+    @Override
+    String computeFlat() {
+        return " ";
+    }
 
-  @Override
-  Range<Integer> computeRange() {
-    return Doc.EMPTY_RANGE;
-  }
+    @Override
+    Range<Integer> computeRange() {
+        return Doc.EMPTY_RANGE;
+    }
 
-  @Override
-  public State computeBreaks(CommentsHelper commentsHelper, int maxWidth, State state) {
-    return state.withColumn(state.column + 1);
-  }
+    @Override
+    public State computeBreaks(CommentsHelper commentsHelper, int maxWidth, State state) {
+        return state.withColumn(state.column + 1);
+    }
 
-  @Override
-  public void write(Output output) {
-    output.append(" ", range());
-  }
+    @Override
+    public void write(Output output) {
+        output.append(" ", range());
+    }
 
-  @Override
-  public String toString() {
-    return MoreObjects.toStringHelper(this).toString();
-  }
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this).toString();
+    }
 }
