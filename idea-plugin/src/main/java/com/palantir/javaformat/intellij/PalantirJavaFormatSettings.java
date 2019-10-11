@@ -20,17 +20,20 @@ import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
-import com.intellij.openapi.components.StoragePathMacros;
 import com.intellij.openapi.project.Project;
 import com.palantir.javaformat.java.JavaFormatterOptions;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 import javax.annotation.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @State(
         name = "PalantirJavaFormatSettings",
         storages = {@Storage(StoragePathMacros.WORKSPACE_FILE)})
 class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJavaFormatSettings.State> {
+    private static final Logger log = LoggerFactory.getLogger(PalantirJavaFormatSettings.class);
 
     private State state = new State();
 
@@ -46,6 +49,7 @@ class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJav
 
     @Override
     public void loadState(State state) {
+        log.info("Loaded new state: {}", state);
         this.state = state;
     }
 
@@ -85,6 +89,13 @@ class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJav
         private Optional<Path> formatterPath = Optional.empty();
         public JavaFormatterOptions.Style style = JavaFormatterOptions.Style.PALANTIR;
 
+        public void setFormatterPath(@Nullable String value) {
+            formatterPath = Optional.ofNullable(value).map(Paths::get);
+        }
+
+        public String getFormatterPath() {
+            return formatterPath.map(Path::toString).orElse(null);
+        }
 
         // enabled used to be a boolean so we use bean property methods for backwards compatibility
         public void setEnabled(@Nullable String enabledStr) {
@@ -106,6 +117,11 @@ class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJav
                 default:
                     return null;
             }
+        }
+
+        @Override
+        public String toString() {
+            return "State{" + "enabled=" + enabled + ", formatterPath=" + formatterPath + ", style=" + style + '}';
         }
     }
 }
