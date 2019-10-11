@@ -1,5 +1,4 @@
 # Excavator auto-updates this file. Please contribute improvements to the central template:
-# internal-github
 # To manually manage the CircleCI configuration for this project, remove the .circleci/template.sh file.
 
 version: 2

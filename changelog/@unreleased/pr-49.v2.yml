@@ -1,5 +1,3 @@
 type: improvement
 improvement:
   description: Publish intellij plugin
-  links:
-  - internal-github

@@ -2,5 +2,3 @@ type: fix
 fix:
   description: Fix sitaution where branching causes Breaks to not be cleared after
     deciding a Level can be `oneLine`.
-  links:
-  - internal-github

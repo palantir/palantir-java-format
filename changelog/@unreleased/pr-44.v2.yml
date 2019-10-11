@@ -1,5 +1,4 @@
 type: fix
 fix:
-  description: Javadoc follows the line length configured in the [JavaFormatterOptions.Style](internal-github
-  links:
-  - internal-github
+  description: Javadoc follows the line length configured in the [JavaFormatterOptions.Style](https://github.com/palantir/palantir-java-format/blob/05df9d3b5c10f2bdd434181b6f046309a1040a37/core/src/main/java/com/google/googlejavaformat/java/JavaFormatterOptions.java#L32-L57).
+
