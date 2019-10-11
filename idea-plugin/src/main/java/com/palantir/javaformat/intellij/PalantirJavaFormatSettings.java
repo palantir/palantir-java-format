@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 
 @State(
         name = "PalantirJavaFormatSettings",
-        storages = {@Storage(StoragePathMacros.WORKSPACE_FILE)})
+        storages = {@Storage("palantir-java-format.xml")})
 class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJavaFormatSettings.State> {
     private static final Logger log = LoggerFactory.getLogger(PalantirJavaFormatSettings.class);
 
