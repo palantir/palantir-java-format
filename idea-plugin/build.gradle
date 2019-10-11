@@ -17,6 +17,8 @@
 apply plugin: 'maven-publish'
 apply plugin: 'org.jetbrains.intellij'
 
+apply from: rootProject.file('gradle/publish-jar.gradle')
+
 intellij {
   pluginName = "palantir-java-format"
   updateSinceUntilBuild = true
