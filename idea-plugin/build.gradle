@@ -47,10 +47,12 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 check.dependsOn buildPlugin, verifyPlugin
-// TODO(dsanduleac): it doesn't bundle palantir-java-format, how to make it do that?
-// see https://github.com/JetBrains/gradle-intellij-plugin/blob/master/src/main/groovy/org/jetbrains/intellij/IntelliJPlugin.groovy
-buildPlugin.dependsOn ':palantir-java-format:jar'
-buildPlugin.dependsOn ':palantir-java-format-api:jar'
+// This task will resolve runtimeClasspath without telling Gradle that it depends on it, therefore dependent jars won't
+// be created beforehand. Therefore, ensure that it knows about it.
+// see https://github.com/JetBrains/gradle-intellij-plugin/blob/master/src/main/groovy/org/jetbrains/intellij/tasks/PrepareSandboxTask.groovy
+tasks.withType(org.jetbrains.intellij.tasks.PrepareSandboxTask) {
+    dependsOn configurations.runtimeClasspath
+}
 
 runIde.dependsOn buildPlugin
 
