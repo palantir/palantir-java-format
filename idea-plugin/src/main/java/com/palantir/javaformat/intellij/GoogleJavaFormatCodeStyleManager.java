@@ -155,12 +155,12 @@ class GoogleJavaFormatCodeStyleManager extends CodeStyleManagerDecorator {
      * {@link #performReplacements(Document, Map)}.
      */
     private void format(Document document, Collection<TextRange> ranges) {
-        Style style = PalantirJavaFormatSettings.getInstance(getProject()).getStyle();
+        PalantirJavaFormatSettings settings = PalantirJavaFormatSettings.getInstance(getProject());
+        Style style = settings.getStyle();
 
         // TODO(dsanduleac): optionally load from linked jar
         IdeaPluginDescriptor plugin = Preconditions.checkNotNull(
-                PluginManager.getPlugin(PluginId.getId(PLUGIN_ID)),
-                "Couldn't find our own plugin: %s", PLUGIN_ID);
+                PluginManager.getPlugin(PluginId.getId(PLUGIN_ID)), "Couldn't find our own plugin: %s", PLUGIN_ID);
         Path implDir = plugin.getPath().toPath().resolve("impl");
         URLClassLoader classLoader = new URLClassLoader(listDirAsUrlsUnchecked(implDir), plugin.getPluginClassLoader());
 

@@ -22,9 +22,10 @@ import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.project.Project;
 import com.palantir.javaformat.java.JavaFormatterOptions;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.net.URI;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,15 +87,24 @@ class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJav
     static class State {
 
         private EnabledState enabled = EnabledState.ENABLED;
-        private Optional<Path> formatterPath = Optional.empty();
+        /**
+         * The paths to jars that provide an alternative implementation of the formatter. If set, this implementation
+         * will be used instead of the bundled version.
+         */
+        private Optional<List<URI>> implementationClassPath = Optional.empty();
+
         public JavaFormatterOptions.Style style = JavaFormatterOptions.Style.PALANTIR;
 
-        public void setFormatterPath(@Nullable String value) {
-            formatterPath = Optional.ofNullable(value).map(Paths::get);
+        public void setImplementationClassPath(@Nullable List<String> value) {
+            implementationClassPath =
+                    Optional.ofNullable(value)
+                            .map(strings -> strings.stream().map(URI::create).collect(Collectors.toList()));
         }
 
-        public String getFormatterPath() {
-            return formatterPath.map(Path::toString).orElse(null);
+        public List<String> getImplementationClassPath() {
+            return implementationClassPath
+                    .map(paths -> paths.stream().map(URI::toString).collect(Collectors.toList()))
+                    .orElse(null);
         }
 
         // enabled used to be a boolean so we use bean property methods for backwards compatibility
@@ -121,7 +131,14 @@ class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJav
 
         @Override
         public String toString() {
-            return "State{" + "enabled=" + enabled + ", formatterPath=" + formatterPath + ", style=" + style + '}';
+            return "State{"
+                    + "enabled="
+                    + enabled
+                    + ", formatterPath="
+                    + implementationClassPath
+                    + ", style="
+                    + style
+                    + '}';
         }
     }
 }
