@@ -56,12 +56,13 @@ class CountWidthUntilBreakVisitor implements DocVisitor<Float> {
 
     @Override
     public Float visitLevel(Level level) {
-        if (level.getBreakabilityIfLastLevel() == Breakability.ONLY_IF_FIRST_LEVEL_FITS
-                // If this prefix wouldn't fit on a new line (within the availableWidth), then don't
-                // consider it at all, because there's no point, it would always be broken.
-                && level.getDocs().get(0).getWidth() <= availableWidth) {
-            // We will incorporate only the length of this prefix, which is the first level.
-            return level.getDocs().get(0).getWidth();
+        if (level.getBreakabilityIfLastLevel() == Breakability.ONLY_IF_FIRST_LEVEL_FITS) {
+            Preconditions.checkState(
+                level.getDocs().get(0) instanceof Level,
+                "Expected that first doc of a ONLY_IF_FIRST_LEVEL_FITS level is also a level:\n%s",
+                level.getDocs().get(0));
+            Level firstDoc = (Level) level.getDocs().get(0);
+            return visitPrefixLevel(firstDoc);
         }
         // Otherwise, try to drill down into the first level that's not empty.
         OptionalInt found = getFirstNonEmptyLevel(level.getDocs());
@@ -70,9 +71,26 @@ class CountWidthUntilBreakVisitor implements DocVisitor<Float> {
         }
         // Otherwise, assert that we encountered a break and move on.
         Preconditions.checkState(
-                StartsWithBreakVisitor.INSTANCE.visit(level) == Result.YES,
-                "Didn't find expected break at the beginning of level.\n%s",
-                level.representation());
+            StartsWithBreakVisitor.INSTANCE.visit(level) == Result.YES,
+            "Didn't find expected break at the beginning of level.\n%s",
+            level.representation());
+        return 0f;
+    }
+
+    public Float visitPrefixLevel(Level level) {
+        // If this prefix wouldn't fit on a new line (within the availableWidth), then don't
+        // consider it at all, because there's no point, it would always be broken.
+        if (level.getWidth() <= availableWidth) {
+            // We will incorporate only the length of this prefix, which is the first level.
+            return level.getWidth();
+        }
+        // Else, drill down as long as we still have a level.
+        Doc firstDoc = level.getDocs().get(0);
+        if (firstDoc instanceof Level) {
+            return visitPrefixLevel((Level) firstDoc);
+        }
+        // Else, we couldn't fit *any* prefix on the hypothetical 2nd line.
+        // In that case, return 0f so that we can try breaking apart this prefix anyway.
         return 0f;
     }
 
