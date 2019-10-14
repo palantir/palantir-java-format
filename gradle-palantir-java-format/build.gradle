@@ -1,5 +1,6 @@
 apply plugin: 'java-gradle-plugin'
 apply plugin: 'groovy'
+apply from: rootProject.file('gradle/publish-jar￿.gradle')
 
 dependencies {
     implementation gradleApi()
