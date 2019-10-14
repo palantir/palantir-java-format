@@ -79,8 +79,8 @@ class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJav
     }
 
     /**
-     * The paths to jars that provide an alternative implementation of the formatter. If set, this implementation
-     * will be used instead of the bundled version.
+     * The paths to jars that provide an alternative implementation of the formatter. If set, this implementation will
+     * be used instead of the bundled version.
      */
     Optional<List<URI>> getImplementationClassPath() {
         return state.implementationClassPath;
