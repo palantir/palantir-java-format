@@ -34,8 +34,11 @@ import java.util.List;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
 /** Tests formatting parts of files. */
+@Execution(ExecutionMode.CONCURRENT)
 @ExtendWith(ParameterizedClass.class)
 public final class PartialFormattingTest {
 

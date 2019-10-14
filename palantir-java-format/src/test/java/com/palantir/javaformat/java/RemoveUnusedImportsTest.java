@@ -22,8 +22,11 @@ import com.google.common.truth.Truth;
 import com.palantir.javaformat.jupiter.ParameterizedClass;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
 /** {@link RemoveUnusedImports}Test */
+@Execution(ExecutionMode.CONCURRENT)
 @ExtendWith(ParameterizedClass.class)
 public class RemoveUnusedImportsTest {
 

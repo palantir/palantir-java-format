@@ -37,9 +37,12 @@ import javax.tools.JavaFileObject.Kind;
 import javax.tools.SimpleJavaFileObject;
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.migrationsupport.rules.EnableRuleMigrationSupport;
 
 /** Tests for {@link FormattingFiler}. */
+@Execution(ExecutionMode.CONCURRENT)
 @EnableRuleMigrationSupport
 public class FormattingFilerTest {
 

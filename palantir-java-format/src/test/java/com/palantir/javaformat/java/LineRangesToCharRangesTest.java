@@ -21,8 +21,11 @@ import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
 /** Tests for {@link Formatter#lineRangesToCharRanges} */
+@Execution(ExecutionMode.CONCURRENT)
 public class LineRangesToCharRangesTest {
 
     @SafeVarargs

@@ -21,7 +21,10 @@ import static com.palantir.javaformat.java.TypeNameClassifier.JavaCaseFormat;
 import com.google.common.base.Splitter;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
+@Execution(ExecutionMode.CONCURRENT)
 public final class TypeNameClassifierTest {
     @Test
     public void caseFormat() throws Exception {

@@ -21,8 +21,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
 /** {@link SnippetFormatter}Test */
+@Execution(ExecutionMode.CONCURRENT)
 public class SnippetFormatterTest {
     @Test
     public void expression() throws FormatterException {

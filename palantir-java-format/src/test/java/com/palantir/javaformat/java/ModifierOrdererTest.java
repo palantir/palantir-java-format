@@ -22,8 +22,11 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Range;
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
 /** {@link ModifierOrderer}Test */
+@Execution(ExecutionMode.CONCURRENT)
 public class ModifierOrdererTest {
 
     @Test

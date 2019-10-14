@@ -21,8 +21,11 @@ import com.google.common.base.Joiner;
 import com.google.common.io.ByteStreams;
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
 /** Tests formatting javadoc. */
+@Execution(ExecutionMode.CONCURRENT)
 public final class JavadocFormattingTest {
 
     private final Formatter formatter =

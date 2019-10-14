@@ -27,8 +27,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
 /** {@link CommandLineOptionsParser}Test */
+@Execution(ExecutionMode.CONCURRENT)
 public class CommandLineOptionsParserTest {
 
     @TempDir public Path testFolder;

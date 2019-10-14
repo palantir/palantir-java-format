@@ -24,8 +24,11 @@ import com.palantir.javaformat.jupiter.ParameterizedClass;
 import java.util.Arrays;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
 /** Tests for import ordering in Google style. */
+@Execution(ExecutionMode.CONCURRENT)
 @ExtendWith(ParameterizedClass.class)
 public class GoogleImportStyleTest {
 

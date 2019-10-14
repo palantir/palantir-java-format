@@ -21,8 +21,11 @@ import com.google.common.base.Splitter;
 import com.palantir.javaformat.jupiter.ParameterizedClass;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
 /** Tests for array dimension handling, especially mixed array notation and type annotations on dimensions. */
+@Execution(ExecutionMode.CONCURRENT)
 @ExtendWith(ParameterizedClass.class)
 public class ArrayDimensionTest {
     @ParameterizedClass.Parameters

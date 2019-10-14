@@ -22,8 +22,11 @@ import java.io.IOException;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
 @ExtendWith(ParameterizedClass.class)
+@Execution(ExecutionMode.CONCURRENT)
 public class StringWrapperIntegrationTest {
 
     private static FileBasedTests tests = new FileBasedTests(StringWrapperIntegrationTest.class);

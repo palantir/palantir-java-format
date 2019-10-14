@@ -18,8 +18,11 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.fail;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
 /** Tests for command-line flags. */
+@Execution(ExecutionMode.CONCURRENT)
 public class CommandLineFlagsTest {
 
     // TODO(eaftan): Disallow passing both -lines and -offset/-length, like clang-format.
