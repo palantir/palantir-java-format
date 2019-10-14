@@ -54,7 +54,11 @@ public class AospImportStyleTest {
             // Capital letter before lowercase
             {
                 {
-                    "package foo;", "", "import android.abC.Bar;", "import android.abc.Bar;", "public class Blim {}",
+                    "package foo;", // force new line
+                    "",
+                    "import android.abC.Bar;",
+                    "import android.abc.Bar;",
+                    "public class Blim {}",
                 },
                 {
                     "package foo;",
@@ -68,7 +72,11 @@ public class AospImportStyleTest {
             // Blank line between "com.android" and "com.anythingelse"
             {
                 {
-                    "package foo;", "", "import com.android.Bar;", "import com.google.Bar;", "public class Blim {}",
+                    "package foo;", // force new line
+                    "",
+                    "import com.android.Bar;",
+                    "import com.google.Bar;",
+                    "public class Blim {}",
                 },
                 {
                     "package foo;",
