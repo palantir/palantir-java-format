@@ -20,12 +20,9 @@ import static com.palantir.javaformat.java.SnippetFormatter.SnippetKind;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import java.util.List;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.jupiter.api.Test;
 
 /** {@link SnippetFormatter}Test */
-@RunWith(JUnit4.class)
 public class SnippetFormatterTest {
     @Test
     public void expression() throws FormatterException {

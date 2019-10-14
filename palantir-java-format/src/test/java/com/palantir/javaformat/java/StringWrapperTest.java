@@ -17,12 +17,8 @@ package com.palantir.javaformat.java;
 import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.base.Joiner;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.jupiter.api.Test;
 
-/** {@link StringWrapper}Test */
-@RunWith(JUnit4.class)
 public class StringWrapperTest {
     @Test
     public void testAwkwardLineEndWrapping() throws Exception {

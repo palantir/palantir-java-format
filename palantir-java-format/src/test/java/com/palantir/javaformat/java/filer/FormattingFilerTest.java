@@ -36,15 +36,15 @@ import javax.tools.JavaFileObject;
 import javax.tools.JavaFileObject.Kind;
 import javax.tools.SimpleJavaFileObject;
 import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.migrationsupport.rules.EnableRuleMigrationSupport;
 
 /** Tests for {@link FormattingFiler}. */
-@RunWith(JUnit4.class)
+@EnableRuleMigrationSupport
 public class FormattingFilerTest {
 
-    @Rule public CompilationRule compilationRule = new CompilationRule();
+    @Rule
+    public CompilationRule compilationRule = new CompilationRule();
 
     @Test
     public void invalidSyntaxDoesNotThrowError() throws IOException {

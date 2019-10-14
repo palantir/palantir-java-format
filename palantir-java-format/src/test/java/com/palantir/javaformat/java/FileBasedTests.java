@@ -17,7 +17,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -40,7 +39,7 @@ public final class FileBasedTests {
         this.fullTestPath = Paths.get("src/test/resources").resolve(resourcePrefix);
     }
 
-    public Collection<Object[]> paramsAsNameInputOutput() throws IOException {
+    public Object[][] paramsAsNameInputOutput() throws IOException {
         ClassLoader classLoader = testClass.getClassLoader();
         Map<String, String> inputs = new TreeMap<>();
         Map<String, String> outputs = new TreeMap<>();
@@ -84,7 +83,7 @@ public final class FileBasedTests {
             }
             testInputs.add(new Object[] {fileName, input, expectedOutput});
         }
-        return testInputs;
+        return testInputs.toArray(new Object[][]{});
     }
 
     public static boolean isRecreate() {

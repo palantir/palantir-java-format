@@ -20,12 +20,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import com.google.common.base.Joiner;
 import com.google.common.io.ByteStreams;
 import java.util.Arrays;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.jupiter.api.Test;
 
 /** Tests formatting javadoc. */
-@RunWith(JUnit4.class)
 public final class JavadocFormattingTest {
 
     private final Formatter formatter =

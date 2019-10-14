@@ -17,12 +17,9 @@ package com.palantir.javaformat.java;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.fail;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.jupiter.api.Test;
 
 /** Tests for command-line flags. */
-@RunWith(JUnit4.class)
 public class CommandLineFlagsTest {
 
     // TODO(eaftan): Disallow passing both -lines and -offset/-length, like clang-format.

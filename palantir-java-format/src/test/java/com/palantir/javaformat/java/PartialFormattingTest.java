@@ -22,6 +22,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ObjectArrays;
 import com.google.common.collect.Range;
+import com.palantir.javaformat.jupiter.ParameterizedClass;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -30,23 +31,21 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.TestTemplate;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 
 /** Tests formatting parts of files. */
-@RunWith(Parameterized.class)
+@ExtendWith(ParameterizedClass.class)
 public final class PartialFormattingTest {
 
-    @Parameters
-    public static Iterable<Object[]> parameters() {
-        return ImmutableList.copyOf(new Object[][] {{"\n"}, {"\r"}, {"\r\n"}});
+    @ParameterizedClass.Parameters
+    public static Object[][] parameters() {
+        return new Object[][] {{"\n"}, {"\r"}, {"\r\n"}};
     }
 
-    @Rule public TemporaryFolder testFolder = new TemporaryFolder();
+    @TempDir
+    public Path testFolder;
 
     private final String newline;
 
@@ -58,7 +57,7 @@ public final class PartialFormattingTest {
         return Joiner.on(newline).join(args);
     }
 
-    @Test
+    @TestTemplate
     public void testGetFormatReplacements0() throws Exception {
         String input = lines(
                 /* line 0 character  0 */ "class Foo{",
@@ -79,7 +78,7 @@ public final class PartialFormattingTest {
         assertThat(output).isEqualTo(expectedOutput);
     }
 
-    @Test
+    @TestTemplate
     public void testGetFormatReplacements1() throws Exception {
         String input = lines(
                 /* line 0 character  0 */ "class Foo{",
@@ -98,7 +97,7 @@ public final class PartialFormattingTest {
         assertThat(output).isEqualTo(expectedOutput);
     }
 
-    @Test
+    @TestTemplate
     public void expandToStatement() throws Exception {
         String input = lines(
                 "class Foo {{",
@@ -119,7 +118,7 @@ public final class PartialFormattingTest {
         assertThat(output).isEqualTo(expectedOutput);
     }
 
-    @Test
+    @TestTemplate
     public void expandToMethodSignature() throws Exception {
         String input = lines(
                 "class Foo {",
@@ -146,7 +145,7 @@ public final class PartialFormattingTest {
         assertThat(output).isEqualTo(expectedOutput);
     }
 
-    @Test
+    @TestTemplate
     public void expandToClassSignature() throws Exception {
         String input = lines(
                 "class",
@@ -173,7 +172,7 @@ public final class PartialFormattingTest {
         assertThat(output).isEqualTo(expectedOutput);
     }
 
-    @Test
+    @TestTemplate
     public void ignoreNeighbouringStatements() throws Exception {
         String input = lines(
                 "class Test {", "int ", " xxx ", " = 1;", "int ", " yyy ", " = 1;", "int ", " zzz ", " = 1;", "}", "");
@@ -184,7 +183,7 @@ public final class PartialFormattingTest {
         assertThat(output).isEqualTo(expectedOutput);
     }
 
-    @Test
+    @TestTemplate
     public void insertLeadingNewlines() throws Exception {
         String input = lines(
                 "class Test { int xxx = 1; int yyy = 1; int zzz = 1; }", //
@@ -199,7 +198,7 @@ public final class PartialFormattingTest {
         assertThat(output).isEqualTo(expectedOutput);
     }
 
-    @Test
+    @TestTemplate
     public void insertLeadingNewlines2() throws Exception {
         String input = lines(
                 "class Test { int xxx = 1;", //
@@ -215,7 +214,7 @@ public final class PartialFormattingTest {
         assertThat(output).isEqualTo(expectedOutput);
     }
 
-    @Test
+    @TestTemplate
     public void insertTrailingNewlines() throws Exception {
         String input = lines(
                 "class Test { int xxx = 1;", //
@@ -229,7 +228,7 @@ public final class PartialFormattingTest {
         assertThat(output).isEqualTo(expectedOutput);
     }
 
-    @Test
+    @TestTemplate
     public void rejoinMethodSignatureLines() throws Exception {
         String input = lines(
                 "class Test { void zzz", //
@@ -243,7 +242,7 @@ public final class PartialFormattingTest {
         assertThat(output).isEqualTo(expectedOutput);
     }
 
-    @Test
+    @TestTemplate
     public void formatTrailingBrace() throws Exception {
         String input = lines(
                 "class Test { void f() { return; } }", //
@@ -258,7 +257,7 @@ public final class PartialFormattingTest {
         assertThat(output).isEqualTo(expectedOutput);
     }
 
-    @Test
+    @TestTemplate
     public void formatTrailingBraceEmptyMethodBody() throws Exception {
         String input = lines(
                 "class Test { void f() {} }", //
@@ -273,7 +272,7 @@ public final class PartialFormattingTest {
         assertThat(output).isEqualTo(expectedOutput);
     }
 
-    @Test
+    @TestTemplate
     public void formatTrailingBraceEmptyClassBody() throws Exception {
         String input = lines(
                 "class Test { int x; }", //
@@ -287,7 +286,7 @@ public final class PartialFormattingTest {
         assertThat(output).isEqualTo(expectedOutput);
     }
 
-    @Test
+    @TestTemplate
     public void formatTrailingBraceEmptyClassBody2() throws Exception {
         String input = lines(
                 "class Test {", //
@@ -301,7 +300,7 @@ public final class PartialFormattingTest {
         assertThat(output).isEqualTo(expectedOutput);
     }
 
-    @Test
+    @TestTemplate
     public void onlyPackage() throws Exception {
         String input = lines(
                 "package", //
@@ -323,7 +322,7 @@ public final class PartialFormattingTest {
         return new Formatter().formatSource(input, ImmutableList.of(Range.closedOpen(characterILo, characterIHi + 1)));
     }
 
-    @Test
+    @TestTemplate
     public void testLength() throws Exception {
         String input = lines(
                 "class Foo{", //
@@ -340,8 +339,7 @@ public final class PartialFormattingTest {
                 "}",
                 "");
 
-        Path tmpdir = testFolder.newFolder().toPath();
-        Path path = tmpdir.resolve("Foo.java");
+        Path path = testFolder.resolve("Foo.java");
         Files.write(path, input.getBytes(StandardCharsets.UTF_8));
 
         StringWriter out = new StringWriter();
@@ -353,7 +351,7 @@ public final class PartialFormattingTest {
         assertThat(out.toString()).isEqualTo(expectedOutput);
     }
 
-    @Test
+    @TestTemplate
     public void testLengthRange() throws Exception {
         String input = lines(
                 "class Foo{", //
@@ -370,8 +368,7 @@ public final class PartialFormattingTest {
                 "}",
                 "");
 
-        Path tmpdir = testFolder.newFolder().toPath();
-        Path path = tmpdir.resolve("Foo.java");
+        Path path = testFolder.resolve("Foo.java");
         Files.write(path, input.getBytes(StandardCharsets.UTF_8));
 
         StringWriter out = new StringWriter();
@@ -383,7 +380,7 @@ public final class PartialFormattingTest {
         assertThat(out.toString()).isEqualTo(expectedOutput);
     }
 
-    @Test
+    @TestTemplate
     public void statementAndComments() throws Exception {
         String input = lines(
                 "public class MyTest {",
@@ -414,8 +411,7 @@ public final class PartialFormattingTest {
                 "",
                 "");
 
-        Path tmpdir = testFolder.newFolder().toPath();
-        Path path = tmpdir.resolve("Foo.java");
+        Path path = testFolder.resolve("Foo.java");
         Files.write(path, input.getBytes(StandardCharsets.UTF_8));
 
         StringWriter out = new StringWriter();
@@ -427,7 +423,7 @@ public final class PartialFormattingTest {
         assertThat(out.toString()).isEqualTo(expectedOutput);
     }
 
-    @Test
+    @TestTemplate
     public void statementAndComments2() throws Exception {
         String input = lines(
                 "public class MyTest {",
@@ -458,8 +454,7 @@ public final class PartialFormattingTest {
                 "",
                 "");
 
-        Path tmpdir = testFolder.newFolder().toPath();
-        Path path = tmpdir.resolve("Foo.java");
+        Path path = testFolder.resolve("Foo.java");
         Files.write(path, input.getBytes(StandardCharsets.UTF_8));
 
         StringWriter out = new StringWriter();
@@ -471,7 +466,7 @@ public final class PartialFormattingTest {
         assertThat(out.toString()).isEqualTo(expectedOutput);
     }
 
-    @Test
+    @TestTemplate
     public void statementAndComments3() throws Exception {
         String input = lines(
                 "public class MyTest {",
@@ -502,8 +497,7 @@ public final class PartialFormattingTest {
                 "",
                 "");
 
-        Path tmpdir = testFolder.newFolder().toPath();
-        Path path = tmpdir.resolve("Foo.java");
+        Path path = testFolder.resolve("Foo.java");
         Files.write(path, input.getBytes(StandardCharsets.UTF_8));
 
         StringWriter out = new StringWriter();
@@ -515,7 +509,7 @@ public final class PartialFormattingTest {
         assertThat(out.toString()).isEqualTo(expectedOutput);
     }
 
-    @Test
+    @TestTemplate
     public void blankAndComment() throws Exception {
         String input = lines(
                 "public class MyTest {",
@@ -572,7 +566,7 @@ public final class PartialFormattingTest {
         assertThat(output).isEqualTo(expectedOutput);
     }
 
-    @Test
+    @TestTemplate
     public void emptyFile() throws Exception {
         new Formatter().formatSource("");
         new Formatter().formatSource(
@@ -582,7 +576,7 @@ public final class PartialFormattingTest {
                 ImmutableList.of(Range.closedOpen(0, 1)));
     }
 
-    @Test
+    @TestTemplate
     public void testGetFormatReplacementRanges() throws Exception {
         String input = lines(
                 /* line 0 character  0 */ "class Foo{",
@@ -604,7 +598,7 @@ public final class PartialFormattingTest {
         assertThat(replacement.getReplaceRange().lowerEndpoint()).isEqualTo(replaceFrom);
     }
 
-    @Test
+    @TestTemplate
     public void noTokensOnLine() throws Exception {
         String input = lines(
                 "    package com.google.googlejavaformat.java;",
@@ -640,8 +634,7 @@ public final class PartialFormattingTest {
                 "  }",
                 "}");
 
-        Path tmpdir = testFolder.newFolder().toPath();
-        Path path = tmpdir.resolve("FormatterException.java");
+        Path path = testFolder.resolve("FormatterException.java");
         Files.write(path, input.getBytes(StandardCharsets.UTF_8));
 
         StringWriter out = new StringWriter();
@@ -654,7 +647,7 @@ public final class PartialFormattingTest {
         assertThat(exitCode).isEqualTo(0);
     }
 
-    @Test
+    @TestTemplate
     public void nestedStatement1() throws Exception {
         String input = lines(
                 "public class MyTest {{",
@@ -691,7 +684,7 @@ public final class PartialFormattingTest {
         assertThat(output).isEqualTo(expectedOutput);
     }
 
-    @Test
+    @TestTemplate
     public void nestedStatement2() throws Exception {
         String input = lines(
                 "public class MyTest {",
@@ -728,7 +721,7 @@ public final class PartialFormattingTest {
         assertThat(output).isEqualTo(expectedOutput);
     }
 
-    @Test
+    @TestTemplate
     public void blankLine() throws Exception {
         String input = lines(
                 "public class MyTest {", //
@@ -743,7 +736,7 @@ public final class PartialFormattingTest {
         testFormatLine(input, expectedOutput, 3);
     }
 
-    @Test
+    @TestTemplate
     public void lineWithIdentifier() throws Exception {
         String input = lines(
                 "public class MyTest {", //
@@ -764,7 +757,7 @@ public final class PartialFormattingTest {
     }
 
     // formatted region expands to include entire comment
-    @Test
+    @TestTemplate
     public void lineInsideComment() throws Exception {
         String input = lines(
                 "public class MyTest {",
@@ -788,7 +781,7 @@ public final class PartialFormattingTest {
         testFormatLine(input, expectedOutput, 3);
     }
 
-    @Test
+    @TestTemplate
     public void testReplacementsSorted() throws Exception {
         String input = lines("class Test {", "int a = 1;", "int b = 2;", "int c = 3;", "int d = 4;", "int e = 5;", "}");
         List<Range<Integer>> ranges = new ArrayList<>();
@@ -808,7 +801,7 @@ public final class PartialFormattingTest {
         assertThat(startPositions).isInStrictOrder();
     }
 
-    @Test
+    @TestTemplate
     public void testReplacementsSorted_DescendingInput() throws Exception {
         String input = lines("class Test {", "int a = 1;", "int b = 2;", "int c = 3;", "int d = 4;", "int e = 5;", "}");
         List<Range<Integer>> ranges = new ArrayList<>();
@@ -829,8 +822,7 @@ public final class PartialFormattingTest {
     }
 
     private void testFormatLine(String input, String expectedOutput, int i) throws Exception {
-        Path tmpdir = testFolder.newFolder().toPath();
-        Path path = tmpdir.resolve("Foo.java");
+        Path path = testFolder.resolve("Foo.java");
         Files.write(path, input.getBytes(UTF_8));
 
         StringWriter out = new StringWriter();
@@ -842,7 +834,7 @@ public final class PartialFormattingTest {
         assertThat(out.toString()).isEqualTo(expectedOutput);
     }
 
-    @Test
+    @TestTemplate
     public void lineWithTrailingComment() throws Exception {
         String input = lines(
                 "class Foo{", //
@@ -855,8 +847,7 @@ public final class PartialFormattingTest {
                 "}",
                 "");
 
-        Path tmpdir = testFolder.newFolder().toPath();
-        Path path = tmpdir.resolve("Foo.java");
+        Path path = testFolder.resolve("Foo.java");
         Files.write(path, input.getBytes(StandardCharsets.UTF_8));
 
         StringWriter out = new StringWriter();
@@ -869,7 +860,7 @@ public final class PartialFormattingTest {
     }
 
     // Nested statements are OK as long as they're nested inside "block-like" constructs.
-    @Test
+    @TestTemplate
     public void nestedStatement_allowPartial() throws Exception {
         String input = lines(
                 "public class MyTest {{",
@@ -901,7 +892,7 @@ public final class PartialFormattingTest {
     }
 
     // regression test for b/b22196513
-    @Test
+    @TestTemplate
     public void noTrailingWhitespace() throws Exception {
         String input = lines(
                 "", //
@@ -931,7 +922,7 @@ public final class PartialFormattingTest {
     }
 
     // regression test for b/b22196513
-    @Test
+    @TestTemplate
     public void trailingNonBreakingWhitespace() throws Exception {
         String input = lines(
                 "", //
@@ -958,7 +949,7 @@ public final class PartialFormattingTest {
         assertEquals("bad output", expected, output);
     }
 
-    @Test
+    @TestTemplate
     public void outOfRangeStartLine() throws Exception {
         String input = lines(
                 "class Foo {", //
@@ -970,8 +961,7 @@ public final class PartialFormattingTest {
                 "}",
                 "");
 
-        Path tmpdir = testFolder.newFolder().toPath();
-        Path path = tmpdir.resolve("Foo.java");
+        Path path = testFolder.resolve("Foo.java");
         Files.write(path, input.getBytes(StandardCharsets.UTF_8));
 
         StringWriter out = new StringWriter();
@@ -983,7 +973,7 @@ public final class PartialFormattingTest {
         assertThat(out.toString()).isEqualTo(expectedOutput);
     }
 
-    @Test
+    @TestTemplate
     public void outOfRangeEndLine() throws Exception {
         String input = lines(
                 "class Foo {", //
@@ -995,8 +985,7 @@ public final class PartialFormattingTest {
                 "}",
                 "");
 
-        Path tmpdir = testFolder.newFolder().toPath();
-        Path path = tmpdir.resolve("Foo.java");
+        Path path = testFolder.resolve("Foo.java");
         Files.write(path, input.getBytes(StandardCharsets.UTF_8));
 
         StringWriter out = new StringWriter();
@@ -1008,7 +997,7 @@ public final class PartialFormattingTest {
         assertThat(out.toString()).isEqualTo(expectedOutput);
     }
 
-    @Test
+    @TestTemplate
     public void testOutOfRangeLines() throws Exception {
         String input = lines(
                 "class Foo {", //
@@ -1018,8 +1007,7 @@ public final class PartialFormattingTest {
                 "class Foo {}", //
                 "");
 
-        Path tmpdir = testFolder.newFolder().toPath();
-        Path path = tmpdir.resolve("Foo.java");
+        Path path = testFolder.resolve("Foo.java");
         Files.write(path, input.getBytes(StandardCharsets.UTF_8));
 
         StringWriter out = new StringWriter();
@@ -1031,7 +1019,7 @@ public final class PartialFormattingTest {
         assertThat(out.toString()).isEqualTo(expectedOutput);
     }
 
-    @Test
+    @TestTemplate
     public void testEmptyFirstLine() throws Exception {
         String input = lines(
                 "", //
@@ -1040,8 +1028,7 @@ public final class PartialFormattingTest {
                 "}",
                 "");
 
-        Path tmpdir = testFolder.newFolder().toPath();
-        Path path = tmpdir.resolve("Foo.java");
+        Path path = testFolder.resolve("Foo.java");
         Files.write(path, input.getBytes(StandardCharsets.UTF_8));
 
         StringWriter out = new StringWriter();
@@ -1052,7 +1039,7 @@ public final class PartialFormattingTest {
         assertThat(main.format(args)).isEqualTo(0);
     }
 
-    @Test
+    @TestTemplate
     public void testEmptyLastLine() throws Exception {
         String input = lines(
                 "class Foo {", //
@@ -1060,8 +1047,7 @@ public final class PartialFormattingTest {
                 "",
                 "");
 
-        Path tmpdir = testFolder.newFolder().toPath();
-        Path path = tmpdir.resolve("Foo.java");
+        Path path = testFolder.resolve("Foo.java");
         Files.write(path, input.getBytes(StandardCharsets.UTF_8));
 
         StringWriter out = new StringWriter();
@@ -1074,7 +1060,7 @@ public final class PartialFormattingTest {
 
     // Regression test for b/22872933
     // Don't extend partial formatting ranges across switch cases.
-    @Test
+    @TestTemplate
     public void switchCase() throws Exception {
         String input = lines(
                 "class Test {",
@@ -1109,7 +1095,7 @@ public final class PartialFormattingTest {
     }
 
     // regression test for b/23349153
-    @Test
+    @TestTemplate
     public void emptyStatement() throws Exception {
         String input = lines(
                 "class Test {{", //
@@ -1127,7 +1113,7 @@ public final class PartialFormattingTest {
         assertThat(output).isEqualTo(expectedOutput);
     }
 
-    @Test
+    @TestTemplate
     public void preserveTrailingWhitespaceAfterNewline() throws Exception {
         String input = lines(
                 "class Test {{", //
@@ -1146,7 +1132,7 @@ public final class PartialFormattingTest {
         assertThat(output).isEqualTo(expectedOutput);
     }
 
-    @Test
+    @TestTemplate
     public void trailingWhitespace() throws Exception {
         String input = lines(
                 "class Test {{", //
@@ -1166,7 +1152,7 @@ public final class PartialFormattingTest {
     }
 
     // Regression test for b/18479811
-    @Test
+    @TestTemplate
     public void onNewline() throws Exception {
 
         String line1 = "for (Integer x : Arrays.asList(1, 2, 3)) {";
@@ -1200,7 +1186,7 @@ public final class PartialFormattingTest {
         }
     }
 
-    @Test
+    @TestTemplate
     public void afterNewline() throws Exception {
 
         String line1 = "for (Integer x : Arrays.asList(1, 2, 3)) {";
@@ -1254,7 +1240,7 @@ public final class PartialFormattingTest {
         }
     }
 
-    @Test
+    @TestTemplate
     public void commentBeforeBadConstructor() throws Exception {
         String[] lines = {
             "class D {", //
@@ -1273,7 +1259,7 @@ public final class PartialFormattingTest {
         assertThat(output).isEqualTo(lines(expected));
     }
 
-    @Test
+    @TestTemplate
     public void partialEnum() throws Exception {
         String[] input = {
             "enum E {", //
@@ -1290,8 +1276,7 @@ public final class PartialFormattingTest {
             "}",
         };
 
-        Path tmpdir = testFolder.newFolder().toPath();
-        Path path = tmpdir.resolve("Foo.java");
+        Path path = testFolder.resolve("Foo.java");
         Files.write(path, lines(input).getBytes(StandardCharsets.UTF_8));
 
         StringWriter out = new StringWriter();
@@ -1303,7 +1288,7 @@ public final class PartialFormattingTest {
         assertThat(out.toString()).isEqualTo(lines(expected));
     }
 
-    @Test
+    @TestTemplate
     public void partialModifierOrder() throws Exception {
         String[] input = {
             "class T {", //
@@ -1320,8 +1305,7 @@ public final class PartialFormattingTest {
             "}",
         };
 
-        Path tmpdir = testFolder.newFolder().toPath();
-        Path path = tmpdir.resolve("Foo.java");
+        Path path = testFolder.resolve("Foo.java");
         Files.write(path, lines(input).getBytes(StandardCharsets.UTF_8));
 
         StringWriter out = new StringWriter();
@@ -1333,7 +1317,7 @@ public final class PartialFormattingTest {
         assertThat(out.toString()).isEqualTo(lines(expected));
     }
 
-    @Test
+    @TestTemplate
     public void endOfLine() throws Exception {
         String[] input = {
             "class foo {",
@@ -1366,8 +1350,7 @@ public final class PartialFormattingTest {
     }
 
     private String formatMain(String input, String... args) throws Exception {
-        Path tmpdir = testFolder.newFolder().toPath();
-        Path path = tmpdir.resolve("Test.java");
+        Path path = testFolder.resolve("Test.java");
         Files.write(path, input.getBytes(StandardCharsets.UTF_8));
 
         StringWriter out = new StringWriter();
@@ -1379,7 +1362,7 @@ public final class PartialFormattingTest {
     }
 
     // formatting the newlinea after a statement is a no-op
-    @Test
+    @TestTemplate
     public void endOfLineStatement() throws Exception {
         String[] input = {
             "class foo {{", //
@@ -1400,7 +1383,7 @@ public final class PartialFormattingTest {
     }
 
     // formatting trailing whitespace at the end of the line doesn't format the line on either side
-    @Test
+    @TestTemplate
     public void endOfLineStatementNewline() throws Exception {
         String[] input = {
             "class foo {{", //
@@ -1414,7 +1397,7 @@ public final class PartialFormattingTest {
                 .isEqualTo(in);
     }
 
-    @Test
+    @TestTemplate
     public void importNewlines() throws Exception {
         String input = lines(
                 "package p;",
@@ -1437,7 +1420,7 @@ public final class PartialFormattingTest {
         assertThat(output).isEqualTo(expectedOutput);
     }
 
-    @Test
+    @TestTemplate
     public void b36458607() throws Exception {
         String input = lines(
                 "// copyright", "", "package p;", "import static c.g.I.c;", "", "/** */", "class Foo {{ c(); }}", "");
@@ -1448,7 +1431,7 @@ public final class PartialFormattingTest {
         assertThat(output).isEqualTo(expectedOutput);
     }
 
-    @Test
+    @TestTemplate
     public void b32159971() throws Exception {
         String input = lines(
                 "", //
@@ -1466,7 +1449,7 @@ public final class PartialFormattingTest {
         assertThat(output).isEqualTo(expectedOutput);
     }
 
-    @Test
+    @TestTemplate
     public void b21668189() throws Exception {
         String input = lines(
                 "class Foo {", //
@@ -1492,8 +1475,7 @@ public final class PartialFormattingTest {
     }
 
     private String runFormatter(String input, String[] args) throws IOException, UsageException {
-        Path tmpdir = testFolder.newFolder().toPath();
-        Path path = tmpdir.resolve("Foo.java");
+        Path path = testFolder.resolve("Foo.java");
         Files.write(path, input.getBytes(StandardCharsets.UTF_8));
 
         StringWriter out = new StringWriter();
@@ -1504,7 +1486,7 @@ public final class PartialFormattingTest {
         return out.toString();
     }
 
-    @Test
+    @TestTemplate
     public void trailing() throws Exception {
         String input = lines(
                 "package foo.bar.baz;",
@@ -1541,7 +1523,7 @@ public final class PartialFormattingTest {
         return Range.closedOpen(idx, idx + needle.length());
     }
 
-    @Test
+    @TestTemplate
     public void importJavadocNewlines() throws Exception {
         String input = lines(
                 "package p;",
@@ -1566,7 +1548,7 @@ public final class PartialFormattingTest {
         assertThat(output).isEqualTo(expectedOutput);
     }
 
-    @Test
+    @TestTemplate
     public void nestedSwitchCase() throws Exception {
         String input = lines(
                 "class Test {",
@@ -1612,7 +1594,7 @@ public final class PartialFormattingTest {
         assertThat(output).isEqualTo(expectedOutput);
     }
 
-    @Test
+    @TestTemplate
     public void b117602702() throws Exception {
         String input = lines(
                 "class Foo {", //

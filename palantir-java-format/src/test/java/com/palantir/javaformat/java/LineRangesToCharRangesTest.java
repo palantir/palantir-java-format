@@ -20,12 +20,9 @@ import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
 import java.util.Set;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.jupiter.api.Test;
 
 /** Tests for {@link Formatter#lineRangesToCharRanges} */
-@RunWith(JUnit4.class)
 public class LineRangesToCharRangesTest {
 
     @SafeVarargs

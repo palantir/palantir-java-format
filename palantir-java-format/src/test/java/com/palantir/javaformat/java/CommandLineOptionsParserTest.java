@@ -25,17 +25,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 /** {@link CommandLineOptionsParser}Test */
-@RunWith(JUnit4.class)
 public class CommandLineOptionsParserTest {
 
-    @Rule public TemporaryFolder testFolder = new TemporaryFolder();
+    @TempDir
+    public Path testFolder;
 
     @Test
     public void defaults() {
@@ -149,9 +146,9 @@ public class CommandLineOptionsParserTest {
 
     @Test
     public void paramsFile() throws IOException {
-        Path outer = testFolder.newFile("outer").toPath();
-        Path exit = testFolder.newFile("exit").toPath();
-        Path nested = testFolder.newFile("nested").toPath();
+        Path outer = Files.createFile(testFolder.resolve("outer"));
+        Path exit = Files.createFile(testFolder.resolve("exit"));
+        Path nested = Files.createFile(testFolder.resolve("nested"));
 
         String[] args = {"--dry-run", "@" + exit, "L", "@" + outer, "Q"};
 

@@ -30,17 +30,12 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
-/** Integration test for google-java-format. */
-@RunWith(JUnit4.class)
 public final class FormatterTest {
 
-    @Rule public TemporaryFolder testFolder = new TemporaryFolder();
+    @TempDir public Path testFolder;
 
     @Test
     public void testFormatAosp() throws Exception {
@@ -58,8 +53,7 @@ public final class FormatterTest {
                 "}",
                 "");
 
-        Path tmpdir = testFolder.newFolder().toPath();
-        Path path = tmpdir.resolve("A.java");
+        Path path = testFolder.resolve("A.java");
         Files.write(path, input.getBytes(StandardCharsets.UTF_8));
 
         StringWriter out = new StringWriter();
@@ -110,8 +104,7 @@ public final class FormatterTest {
         String input = "class Foo{\n" + "void f\n" + "() {\n" + "}\n" + "}\n\n\n\n\n\n";
         String expectedOutput = "class Foo {\n" + "  void f() {}\n" + "}\n";
 
-        Path tmpdir = testFolder.newFolder().toPath();
-        Path path = tmpdir.resolve("Foo.java");
+        Path path = testFolder.resolve("Foo.java");
         Files.write(path, input.getBytes(StandardCharsets.UTF_8));
 
         StringWriter out = new StringWriter();
@@ -127,8 +120,7 @@ public final class FormatterTest {
     public void testFormatLengthOutOfRange() throws Exception {
         String input = "class Foo{}\n";
 
-        Path tmpdir = testFolder.newFolder().toPath();
-        Path path = tmpdir.resolve("Foo.java");
+        Path path = testFolder.resolve("Foo.java");
         Files.write(path, input.getBytes(StandardCharsets.UTF_8));
 
         StringWriter out = new StringWriter();
@@ -282,8 +274,7 @@ public final class FormatterTest {
     }
 
     private void importOrdering(String sortArg, String outputResourceName) throws IOException, UsageException {
-        Path tmpdir = testFolder.newFolder().toPath();
-        Path path = tmpdir.resolve("Foo.java");
+        Path path = testFolder.resolve("Foo.java");
 
         String inputResourceName = "com/palantir/javaformat/java/testimports/A.input";
         String input = getResource(inputResourceName);

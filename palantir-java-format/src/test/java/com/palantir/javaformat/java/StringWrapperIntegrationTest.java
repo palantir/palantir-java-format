@@ -17,22 +17,19 @@ package com.palantir.javaformat.java;
 import static com.google.common.truth.Truth.assertThat;
 import static com.palantir.javaformat.java.FileBasedTests.isRecreate;
 
+import com.palantir.javaformat.jupiter.ParameterizedClass;
 import java.io.IOException;
-import java.util.Collection;
-import org.junit.Assume;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.TestTemplate;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-/** {@link StringWrapper}IntegrationTest */
-@RunWith(Parameterized.class)
+@ExtendWith(ParameterizedClass.class)
 public class StringWrapperIntegrationTest {
 
     private static FileBasedTests tests = new FileBasedTests(StringWrapperIntegrationTest.class);
 
-    @Parameters(name = "{index}: {0}")
-    public static Collection<Object[]> parameters() throws IOException {
+    @ParameterizedClass.Parameters(name = "{index}: {0}")
+    public static Object[][] parameters() throws IOException {
         return tests.paramsAsNameInputOutput();
     }
 
@@ -48,7 +45,7 @@ public class StringWrapperIntegrationTest {
         this.output = output;
     }
 
-    @Test
+    @TestTemplate
     public void test() throws Exception {
         String actualOutput = StringWrapper.wrap(40, formatter.formatSource(input), formatter);
         if (isRecreate()) {
@@ -58,23 +55,23 @@ public class StringWrapperIntegrationTest {
         }
     }
 
-    @Test
+    @TestTemplate
     public void testCR() throws Exception {
-        Assume.assumeFalse("Not running when recreating test outputs", isRecreate());
+        Assumptions.assumeFalse(isRecreate(), "Not running when recreating test outputs");
         assertThat(StringWrapper.wrap(40, formatter.formatSource(input.replace("\n", "\r")), formatter))
                 .isEqualTo(output.replace("\n", "\r"));
     }
 
-    @Test
+    @TestTemplate
     public void testCRLF() throws Exception {
-        Assume.assumeFalse("Not running when recreating test outputs", isRecreate());
+        Assumptions.assumeFalse(isRecreate(), "Not running when recreating test outputs");
         assertThat(StringWrapper.wrap(40, formatter.formatSource(input.replace("\n", "\r\n")), formatter))
                 .isEqualTo(output.replace("\n", "\r\n"));
     }
 
-    @Test
+    @TestTemplate
     public void idempotent() throws Exception {
-        Assume.assumeFalse("Not running when recreating test outputs", isRecreate());
+        Assumptions.assumeFalse(isRecreate(), "Not running when recreating test outputs");
         String wrap = StringWrapper.wrap(40, formatter.formatSource(input), formatter);
         assertThat(formatter.formatSource(wrap)).isEqualTo(wrap);
     }
