@@ -37,9 +37,13 @@ publishPlugin {
   token = project.ext.properties.jetbrainsPluginRepoToken
 }
 
+configurations {
+    impl
+}
+
 dependencies {
   compile project(':palantir-java-format-api')
-  runtimeOnly project(':palantir-java-format')
+  impl project(':palantir-java-format')
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -52,6 +56,10 @@ check.dependsOn buildPlugin, verifyPlugin
 // see https://github.com/JetBrains/gradle-intellij-plugin/blob/master/src/main/groovy/org/jetbrains/intellij/tasks/PrepareSandboxTask.groovy
 tasks.withType(org.jetbrains.intellij.tasks.PrepareSandboxTask) {
     dependsOn configurations.runtimeClasspath
+    // Also pack the impl in its own directory
+    into("${pluginName}/impl") {
+        from configurations.impl.filter { !configurations.runtimeClasspath.contains(it) }
+    }
 }
 
 runIde.dependsOn buildPlugin

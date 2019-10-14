@@ -18,10 +18,14 @@ package com.palantir.javaformat.intellij;
 
 import static java.util.Comparator.comparing;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.intellij.ide.plugins.IdeaPluginDescriptor;
+import com.intellij.ide.plugins.PluginManager;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiDocumentManager;
@@ -34,11 +38,18 @@ import com.palantir.javaformat.java.FormatterFactory;
 import com.palantir.javaformat.java.FormatterService;
 import com.palantir.javaformat.java.JavaFormatterOptions;
 import com.palantir.javaformat.java.JavaFormatterOptions.Style;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ServiceLoader;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -46,6 +57,8 @@ import org.jetbrains.annotations.NotNull;
  * types of files is delegated to IJ's default implementation.
  */
 class GoogleJavaFormatCodeStyleManager extends CodeStyleManagerDecorator {
+
+    private static final String PLUGIN_ID = "palantir-java-format";
 
     public GoogleJavaFormatCodeStyleManager(@NotNull CodeStyleManager original) {
         super(original);
@@ -119,6 +132,22 @@ class GoogleJavaFormatCodeStyleManager extends CodeStyleManagerDecorator {
         format(document, ranges);
     }
 
+    private static URL toUrlUnchecked(Path path) {
+        try {
+            return path.toUri().toURL();
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Couldn't convert local path to URL: " + path.toString(), e);
+        }
+    }
+
+    private static URL[] listDirAsUrlsUnchecked(Path dir) {
+        try (Stream<Path> list = Files.list(dir)) {
+            return list.map(GoogleJavaFormatCodeStyleManager::toUrlUnchecked).toArray(URL[]::new);
+        } catch (IOException e) {
+            throw new RuntimeException("Couldn't list dir: " + dir.toString(), e);
+        }
+    }
+
     /**
      * Format the ranges of the given document.
      *
@@ -127,8 +156,15 @@ class GoogleJavaFormatCodeStyleManager extends CodeStyleManagerDecorator {
      */
     private void format(Document document, Collection<TextRange> ranges) {
         Style style = PalantirJavaFormatSettings.getInstance(getProject()).getStyle();
+
         // TODO(dsanduleac): optionally load from linked jar
-        FormatterFactory factory = ServiceLoader.load(FormatterFactory.class).iterator().next();
+        IdeaPluginDescriptor plugin = Preconditions.checkNotNull(
+                PluginManager.getPlugin(PluginId.getId(PLUGIN_ID)),
+                "Couldn't find our own plugin: %s", PLUGIN_ID);
+        Path implDir = plugin.getPath().toPath().resolve("impl");
+        URLClassLoader classLoader = new URLClassLoader(listDirAsUrlsUnchecked(implDir), plugin.getPluginClassLoader());
+
+        FormatterFactory factory = ServiceLoader.load(FormatterFactory.class, classLoader).iterator().next();
         FormatterService formatter = factory.createFormatter(JavaFormatterOptions.builder().style(style).build());
         performReplacements(document, FormatterUtil.getReplacements(formatter, document.getText(), ranges));
     }
