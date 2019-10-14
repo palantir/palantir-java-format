@@ -16,7 +16,6 @@ buildscript {
         classpath 'com.palantir.gradle.gitversion:gradle-git-version:0.12.2'
         classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:1.12.4'
         classpath 'com.palantir.javaformat:palantir-java-format:0.0.1'
-        classpath "com.github.jengelman.gradle.plugins:shadow:5.1.0"
     }
 }
 

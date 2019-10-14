@@ -1,6 +1,5 @@
 apply plugin: 'application'
 apply from: rootProject.file('gradle/publish-jar.gradle')
-apply plugin: 'com.github.johnrengelman.shadow'
 
 mainClassName = 'com.palantir.javaformat.java.Main'
 
@@ -21,8 +20,4 @@ dependencies {
 
 tasks.withType(JavaCompile).configureEach {
     options.errorprone.errorproneArgs += ['-Xep:StrictUnusedVariable:OFF']
-}
-
-publishing.publications.nebula {
-    artifact shadowJar
 }
