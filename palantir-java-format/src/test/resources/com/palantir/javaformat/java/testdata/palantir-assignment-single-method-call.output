@@ -3,8 +3,7 @@ class Test {
         if (something) {
             if (prefixFits || isSingleString()) {
                 // don't break this level, but preserve indentation
-                broken =
-                        tryToLayOutLevelOnOneLine(
+                broken = tryToLayOutLevelOnOneLine(
                                 commentsHelper, maxWidth, state.withNoIndent().withIndentIncrementedBy(plusIndent));
             }
         }
