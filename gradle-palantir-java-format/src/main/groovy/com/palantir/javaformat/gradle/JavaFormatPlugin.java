@@ -43,6 +43,8 @@ public class JavaFormatPlugin implements Plugin<Project> {
             conf.setDescription("Internal configuration for resolving the palantirJavaFormat implementation");
             conf.setVisible(false);
             conf.setCanBeConsumed(false);
+            // Using addLater instead of afterEvaluate, in order to delay reading the extension until after the user
+            // has configured it.
             conf.getDependencies().addLater(project.provider(() -> {
                 // It's fine if this is null, as we never resolve the configuration in that case.
                 String version = extension.getImplementationVersion().getOrNull();
