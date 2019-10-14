@@ -30,6 +30,7 @@ import org.gradle.plugins.ide.idea.model.IdeaModel;
 public class JavaFormatPlugin implements Plugin<Project> {
 
     private static final String EXTENSION_NAME = "palantirJavaFormat";
+    private static final String IMPLEMENTATION_VERSION = JavaFormatPlugin.class.getPackage().getImplementationVersion();
 
     @Override
     public void apply(Project project) {
@@ -42,27 +43,23 @@ public class JavaFormatPlugin implements Plugin<Project> {
             conf.setCanBeConsumed(false);
             // Using addLater instead of afterEvaluate, in order to delay reading the extension until after the user
             // has configured it.
-            conf.getDependencies().addLater(project.provider(() -> {
-                // It's fine if this is null, as we never resolve the configuration in that case.
-                String version = extension.getImplementationVersion().getOrNull();
+            conf.defaultDependencies(deps -> deps.addLater(project.provider(() -> {
+                String version = Optional.ofNullable(extension.getImplementationVersion().getOrNull())
+                        .orElse(IMPLEMENTATION_VERSION);
+
                 return project.getDependencies().create(ImmutableMap.of(
                         "group", "com.palantir.javaformat",
                         "name", "palantir-java-format",
                         "version", version));
-            }));
+            })));
         });
 
         project.getPluginManager().withPlugin("idea", ideaPlugin -> {
             IdeaModel ideaModel = project.getExtensions().getByType(IdeaModel.class);
             ideaModel.getProject().getIpr().withXml(xmlProvider -> {
                 // this block is lazy
-                Optional<List<URI>> uris = Optional.ofNullable(
-                        extension
-                                .getImplementationVersion()
-                                .map(version -> implConfiguration.getFiles().stream().map(File::toURI).collect(
-                                        Collectors.toList()))
-                                .getOrNull());
-                ConfigureJavaFormatterXml.configure(xmlProvider.asNode(), uris);
+                List<URI> uris = implConfiguration.getFiles().stream().map(File::toURI).collect(Collectors.toList());
+                ConfigureJavaFormatterXml.configure(xmlProvider.asNode(), Optional.of(uris));
             });
         });
     }
