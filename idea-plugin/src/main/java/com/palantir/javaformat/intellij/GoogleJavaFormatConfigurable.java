@@ -160,7 +160,7 @@ class GoogleJavaFormatConfigurable extends BaseConfigurable implements Searchabl
     private void $$$setupUI$$$() {
         createUIComponents();
         panel = new JPanel();
-        panel.setLayout(new GridLayoutManager(4, 2, new Insets(0, 0, 0, 0), -1, -1));
+        panel.setLayout(new GridLayoutManager(5, 2, new Insets(0, 0, 0, 0), -1, -1));
         enable = new JCheckBox();
         enable.setText("Enable palantir-java-format");
         panel.add(enable, new GridConstraints(
@@ -179,7 +179,7 @@ class GoogleJavaFormatConfigurable extends BaseConfigurable implements Searchabl
                 false));
         final Spacer spacer1 = new Spacer();
         panel.add(spacer1, new GridConstraints(
-                3,
+                4,
                 0,
                 1,
                 2,
@@ -223,9 +223,9 @@ class GoogleJavaFormatConfigurable extends BaseConfigurable implements Searchabl
                 1,
                 false));
         final JLabel label2 = new JLabel();
-        label2.setText("Version");
+        label2.setText("Implementation version");
         panel.add(label2, new GridConstraints(
-                2,
+                3,
                 0,
                 1,
                 1,
@@ -241,6 +241,38 @@ class GoogleJavaFormatConfigurable extends BaseConfigurable implements Searchabl
         formatterVersion = new JLabel();
         formatterVersion.setText("what version are we running with?");
         panel.add(formatterVersion, new GridConstraints(
+                3,
+                1,
+                1,
+                1,
+                GridConstraints.ANCHOR_CENTER,
+                GridConstraints.FILL_HORIZONTAL,
+                GridConstraints.SIZEPOLICY_CAN_GROW,
+                GridConstraints.SIZEPOLICY_FIXED,
+                null,
+                null,
+                null,
+                1,
+                false));
+        final JLabel label3 = new JLabel();
+        label3.setText("Plugin version");
+        panel.add(label3, new GridConstraints(
+                2,
+                0,
+                1,
+                1,
+                GridConstraints.ANCHOR_WEST,
+                GridConstraints.FILL_NONE,
+                GridConstraints.SIZEPOLICY_FIXED,
+                GridConstraints.SIZEPOLICY_FIXED,
+                null,
+                null,
+                null,
+                0,
+                false));
+        pluginVersion = new JLabel();
+        pluginVersion.setText("plugin version");
+        panel.add(pluginVersion, new GridConstraints(
                 2,
                 1,
                 1,
@@ -252,7 +284,7 @@ class GoogleJavaFormatConfigurable extends BaseConfigurable implements Searchabl
                 null,
                 null,
                 null,
-                0,
+                1,
                 false));
     }
 
