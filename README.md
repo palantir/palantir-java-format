@@ -21,7 +21,7 @@ We thank everyone who's worked on google-java-format for their good work and for
 
 ### from the command-line
 
-[Download the formatter](https://github.com/palantir/palantir-java-format/releases)
+[Download the formatter](https://github.com/kj kj kj palantir/palantir-java-format/releases)
 and run it with:
 
 ```
