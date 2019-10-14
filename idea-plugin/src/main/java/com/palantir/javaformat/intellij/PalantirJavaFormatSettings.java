@@ -78,6 +78,14 @@ class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJav
         state.style = style;
     }
 
+    /**
+     * The paths to jars that provide an alternative implementation of the formatter. If set, this implementation
+     * will be used instead of the bundled version.
+     */
+    Optional<List<URI>> getImplementationClassPath() {
+        return state.implementationClassPath;
+    }
+
     enum EnabledState {
         UNKNOWN,
         ENABLED,
@@ -87,10 +95,6 @@ class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJav
     static class State {
 
         private EnabledState enabled = EnabledState.ENABLED;
-        /**
-         * The paths to jars that provide an alternative implementation of the formatter. If set, this implementation
-         * will be used instead of the bundled version.
-         */
         private Optional<List<URI>> implementationClassPath = Optional.empty();
 
         public JavaFormatterOptions.Style style = JavaFormatterOptions.Style.PALANTIR;

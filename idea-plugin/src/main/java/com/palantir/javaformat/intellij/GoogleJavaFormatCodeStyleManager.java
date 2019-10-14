@@ -40,6 +40,7 @@ import com.palantir.javaformat.java.JavaFormatterOptions;
 import com.palantir.javaformat.java.JavaFormatterOptions.Style;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
@@ -51,12 +52,15 @@ import java.util.ServiceLoader;
 import java.util.TreeMap;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link CodeStyleManager} implementation which formats .java files with google-java-format. Formatting of all other
  * types of files is delegated to IJ's default implementation.
  */
 class GoogleJavaFormatCodeStyleManager extends CodeStyleManagerDecorator {
+    private static final Logger log = LoggerFactory.getLogger(GoogleJavaFormatCodeStyleManager.class);
 
     private static final String PLUGIN_ID = "palantir-java-format";
 
@@ -132,17 +136,17 @@ class GoogleJavaFormatCodeStyleManager extends CodeStyleManagerDecorator {
         format(document, ranges);
     }
 
-    private static URL toUrlUnchecked(Path path) {
+    private static URL toUrlUnchecked(URI uri) {
         try {
-            return path.toUri().toURL();
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Couldn't convert local path to URL: " + path.toString(), e);
+            return uri.toURL();
+        } catch (IllegalArgumentException | MalformedURLException e) {
+            throw new RuntimeException("Couldn't convert URI to URL: " + uri, e);
         }
     }
 
     private static URL[] listDirAsUrlsUnchecked(Path dir) {
         try (Stream<Path> list = Files.list(dir)) {
-            return list.map(GoogleJavaFormatCodeStyleManager::toUrlUnchecked).toArray(URL[]::new);
+            return list.map(Path::toUri).map(GoogleJavaFormatCodeStyleManager::toUrlUnchecked).toArray(URL[]::new);
         } catch (IOException e) {
             throw new RuntimeException("Couldn't list dir: " + dir.toString(), e);
         }
@@ -158,11 +162,22 @@ class GoogleJavaFormatCodeStyleManager extends CodeStyleManagerDecorator {
         PalantirJavaFormatSettings settings = PalantirJavaFormatSettings.getInstance(getProject());
         Style style = settings.getStyle();
 
-        // TODO(dsanduleac): optionally load from linked jar
         IdeaPluginDescriptor plugin = Preconditions.checkNotNull(
                 PluginManager.getPlugin(PluginId.getId(PLUGIN_ID)), "Couldn't find our own plugin: %s", PLUGIN_ID);
-        Path implDir = plugin.getPath().toPath().resolve("impl");
-        URLClassLoader classLoader = new URLClassLoader(listDirAsUrlsUnchecked(implDir), plugin.getPluginClassLoader());
+
+        URL[] implementationUrls = settings.getImplementationClassPath()
+                .map(implementationUris -> {
+                    log.debug("Using palantir-java-format implementation defined by URIs: {}", implementationUris);
+                    return implementationUris.stream()
+                            .map(GoogleJavaFormatCodeStyleManager::toUrlUnchecked)
+                            .toArray(URL[]::new);
+                })
+                .orElseGet(() -> {
+                    // Load from the jars bundled with the plugin.
+                    Path implDir = plugin.getPath().toPath().resolve("impl");
+                    return listDirAsUrlsUnchecked(implDir);
+                });
+        URLClassLoader classLoader = new URLClassLoader(implementationUrls, plugin.getPluginClassLoader());
 
         FormatterFactory factory = ServiceLoader.load(FormatterFactory.class, classLoader).iterator().next();
         FormatterService formatter = factory.createFormatter(JavaFormatterOptions.builder().style(style).build());
