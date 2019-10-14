@@ -141,8 +141,7 @@ public final class Level extends Doc {
                 if (lastLevelBroken.get().numLines < broken.numLines) {
                     return state.updateAfterLevel(lastLevelBroken.get());
                 }
-                // Must run computeBroken once again, because our last tryBreakLastLevel run modified
-                // mutable state.
+                // Must run computeBroken once again, because our last tryBreakLastLevel run modified mutable state.
                 // Therefore just fall through.
             }
         }
@@ -191,9 +190,8 @@ public final class Level extends Doc {
             // reflow them later.
             if (prefixFits || isSingleString()) {
                 // don't break this level, but preserve indentation
-                broken =
-                        tryToLayOutLevelOnOneLine(
-                                commentsHelper, maxWidth, state.withNoIndent().withIndentIncrementedBy(plusIndent));
+                broken = tryToLayOutLevelOnOneLine(
+                    commentsHelper, maxWidth, state.withNoIndent().withIndentIncrementedBy(plusIndent));
             }
         }
 
