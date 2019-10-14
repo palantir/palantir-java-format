@@ -1,9 +1,18 @@
 public class Foo {
-    static <T> OngoingStubbing<Artifact<T>> stubNotFound(OngoingStubbing<Artifact<T>> ongoingStubbing) {
-        return ongoingStubbing.thenAnswer(
-                (Answer<Artifact<T>>)
-                        invocation -> {
-                            throw new NotFoundException();
-                        });
+    static String foo(Optional<String> optional) {
+        return optional.orElseGet(
+            (String)
+            () -> {
+            throw new NotFoundException();
+        });
+    }
+
+    static String bar(Optional<String> optional) {
+        return optional.orElseGet(
+            (String) () -> "");
+    }
+
+    static String baz(Optional<String> optional) {
+        return optional.orElseGet((String) () -> bar(Optional.of("some thing that is very very very looooooong")).get());
     }
 }
