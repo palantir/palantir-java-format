@@ -16,6 +16,7 @@
 
 package com.palantir.javaformat.gradle;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import java.io.File;
 import java.net.URI;
@@ -34,6 +35,9 @@ public class JavaFormatPlugin implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
+        Preconditions.checkState(
+                project == project.getRootProject(), "May only apply com.palantir.java-format to the root project");
+
         JavaFormatExtension extension =
                 project.getExtensions().create(EXTENSION_NAME, JavaFormatExtension.class, project);
 
