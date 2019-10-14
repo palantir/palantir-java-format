@@ -1,9 +1,7 @@
 public class Foo {
     static <T> OngoingStubbing<Artifact<T>> stubNotFound(OngoingStubbing<Artifact<T>> ongoingStubbing) {
-        return ongoingStubbing.thenAnswer(
-                (Answer<Artifact<T>>)
-                        invocation -> {
-                            throw new NotFoundException();
-                        });
+        return ongoingStubbing.thenAnswer((Answer<Artifact<T>>) invocation -> {
+            throw new NotFoundException();
+        });
     }
 }
