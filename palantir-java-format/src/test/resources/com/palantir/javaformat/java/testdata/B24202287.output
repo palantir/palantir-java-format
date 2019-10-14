@@ -1,7 +1,6 @@
 class B24202287 {
     {
-        this.overflowContactCompositeSupportedRenderers =
-                this.getSharePanelResponse
+        this.overflowContactCompositeSupportedRenderers = this.getSharePanelResponse
                         .contents
                         .unifiedSharePanelRenderer
                         .contents[0]
