@@ -3,7 +3,7 @@ package com.palantir.javaformat.gradle;
 import org.gradle.api.Project;
 import org.gradle.api.provider.Property;
 
-public final class JavaFormatExtension {
+public class JavaFormatExtension {
     private final Property<String> implementationVersion;
 
     public JavaFormatExtension(Project project) {
