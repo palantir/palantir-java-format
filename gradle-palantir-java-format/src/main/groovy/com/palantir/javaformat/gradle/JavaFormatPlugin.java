@@ -48,7 +48,7 @@ public class JavaFormatPlugin implements Plugin<Project> {
                 String version = extension.getImplementationVersion().getOrNull();
                 return project.getDependencies().create(ImmutableMap.of(
                         "group", "com.palantir.javaformat",
-                        "module", "palantir-java-format",
+                        "name", "palantir-java-format",
                         "version", version));
             }));
         });
