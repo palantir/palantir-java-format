@@ -27,9 +27,6 @@ import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.plugins.ide.idea.model.IdeaModel;
 
-/**
- * Plugin to configure the PalantirJavaFormat IDEA plugin based on an optional implementation version of the formatter.
- */
 public class JavaFormatPlugin implements Plugin<Project> {
 
     private static final String EXTENSION_NAME = "palantirJavaFormat";

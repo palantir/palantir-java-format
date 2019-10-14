@@ -15,6 +15,7 @@ gradlePlugin {
         palantirJavaFormat {
             id = 'com.palantir.java-format'
             implementationClass = 'com.palantir.javaformat.gradle.JavaFormatPlugin'
+            description = 'Plugin to configure the PalantirJavaFormat IDEA plugin based on an optional implementation version of the formatter.'
         }
     }
 }
