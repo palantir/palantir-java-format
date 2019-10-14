@@ -7,5 +7,5 @@ import java.util.Collection;
 public interface FormatterService {
 
     ImmutableList<Replacement> getFormatReplacements(String text, Collection<Range<Integer>> toRanges)
-        throws FormatterExceptionApi;
+            throws FormatterExceptionApi;
 }
