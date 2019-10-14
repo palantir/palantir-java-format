@@ -524,7 +524,7 @@ public class GoogleImportStyleTest {
 
         ImmutableList.Builder<Object[]> builder = ImmutableList.builder();
         Arrays.stream(inputsOutputs).forEach(input -> builder.add(ImportOrdererUtils.createRow(input)));
-        return builder.build().toArray(new Object[][]{});
+        return builder.build().toArray(new Object[][] {});
     }
 
     @TestTemplate

@@ -47,23 +47,23 @@ public final class ParameterizedClass implements TestTemplateInvocationContextPr
     private static ExtensionContext.Namespace namespace = ExtensionContext.Namespace.create(ParameterizedClass.class);
 
     /**
-     * Annotation for a method which provides parameters to be injected into the
-     * test class constructor by <code>Parameterized</code>. The method has to
-     * be public and static.
+     * Annotation for a method which provides parameters to be injected into the test class constructor by <code>
+     * Parameterized</code>. The method has to be public and static.
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
     public @interface Parameters {
         /**
-         * Optional pattern to derive the test's name from the parameters. Use
-         * numbers in braces to refer to the parameters or the additional data
-         * as follows:
+         * Optional pattern to derive the test's name from the parameters. Use numbers in braces to refer to the
+         * parameters or the additional data as follows:
+         *
          * <pre>
          * {index} - the current parameter index
          * {0} - the first parameter value
          * {1} - the second parameter value
          * etc...
          * </pre>
+         *
          * <p>
          *
          * @see MessageFormat
@@ -72,24 +72,22 @@ public final class ParameterizedClass implements TestTemplateInvocationContextPr
     }
 
     /**
-     * Annotation for fields of the test class which will be initialized by the
-     * method annotated by <code>Parameters</code>.
-     * By using directly this annotation, the test class constructor isn't needed.
+     * Annotation for fields of the test class which will be initialized by the method annotated by <code>Parameters
+     * </code>. By using directly this annotation, the test class constructor isn't needed.
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
     public @interface Parameter {
         /**
-         * The index of the parameter in the array returned by the method annotated by <code>Parameters</code>.
-         * Index range must start at 0.
+         * The index of the parameter in the array returned by the method annotated by <code>Parameters</code>. Index
+         * range must start at 0.
          */
         int value() default 0;
-
     }
 
     /**
-     * For every method annotated with @TestTemplate, this guy gets called. We can cause the users' @TestTemplate
-     * method to be invoked n times by returning n things.
+     * For every method annotated with @TestTemplate, this guy gets called. We can cause the users' @TestTemplate method
+     * to be invoked n times by returning n things.
      */
     @Override
     public Stream<TestTemplateInvocationContext> provideTestTemplateInvocationContexts(
@@ -101,22 +99,18 @@ public final class ParameterizedClass implements TestTemplateInvocationContextPr
         Object[][] objectArrayArray = invokeUserParametersMethod(parent, parent.getTestClass().get());
         String stringFormatTemplate = findStringFormatTemplate(parent, parent.getTestClass().get());
 
-        return Arrays.stream(objectArrayArray)
-                .map(objectArray -> new TestTemplateInvocationContext() {
-                    @Override
-                    public String getDisplayName(int invocationIndex) {
-                        String replaced =
-                                stringFormatTemplate.replaceAll("\\{index\\}", Integer.toString(invocationIndex));
-                        return MessageFormat.format(replaced, objectArray);
-                    }
+        return Arrays.stream(objectArrayArray).map(objectArray -> new TestTemplateInvocationContext() {
+            @Override
+            public String getDisplayName(int invocationIndex) {
+                String replaced = stringFormatTemplate.replaceAll("\\{index\\}", Integer.toString(invocationIndex));
+                return MessageFormat.format(replaced, objectArray);
+            }
 
-                    @Override
-                    public List<Extension> getAdditionalExtensions() {
-                        return Arrays.asList(
-                                new InjectFields(objectArray),
-                                new InjectConstructorParameters(objectArray));
-                    }
-                });
+            @Override
+            public List<Extension> getAdditionalExtensions() {
+                return Arrays.asList(new InjectFields(objectArray), new InjectConstructorParameters(objectArray));
+            }
+        });
     }
 
     /** Fills in constructor params using values from the @Parameters method. */
@@ -128,18 +122,14 @@ public final class ParameterizedClass implements TestTemplateInvocationContextPr
         }
 
         @Override
-        public boolean supportsParameter(
-                ParameterContext parameterContext,
-                ExtensionContext _extensionContext)
+        public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext _extensionContext)
                 throws ParameterResolutionException {
             return (parameterContext.getDeclaringExecutable() instanceof Constructor)
                     && parameterContext.getIndex() < objectArray.length;
         }
 
         @Override
-        public Object resolveParameter(
-                ParameterContext parameterContext,
-                ExtensionContext _extensionContext)
+        public Object resolveParameter(ParameterContext parameterContext, ExtensionContext _extensionContext)
                 throws ParameterResolutionException {
             return objectArray[parameterContext.getIndex()];
         }
@@ -176,42 +166,34 @@ public final class ParameterizedClass implements TestTemplateInvocationContextPr
     /** Users must provide a public static Object[][] method, and this invokes it *once*, caching the result. */
     private static Object[][] invokeUserParametersMethod(ExtensionContext extensionContext, Class<?> testClass) {
         List<Method> methods = AnnotationUtils.findAnnotatedMethods(
-                testClass,
-                Parameters.class,
-                ReflectionUtils.HierarchyTraversalMode.BOTTOM_UP);
+                testClass, Parameters.class, ReflectionUtils.HierarchyTraversalMode.BOTTOM_UP);
 
         Method userParametersMethod = methods.get(0);
 
-        return extensionContext
-                .getStore(namespace)
-                .getOrComputeIfAbsent(
-                        "invokeUserParametersMethod",
-                        unused -> {
-                            try {
-                                // TODO(dfox): the JUnit4 runner also allowed an Object[] return signature...
-                                return (Object[][]) userParametersMethod.invoke(null);
-                            } catch (InvocationTargetException | IllegalAccessException e) {
-                                throw new TestInstantiationException("barf", e);
-                            }
-                        },
-                        Object[][].class);
+        return extensionContext.getStore(namespace).getOrComputeIfAbsent(
+                "invokeUserParametersMethod",
+                unused -> {
+                    try {
+                        // TODO(dfox): the JUnit4 runner also allowed an Object[] return signature...
+                        return (Object[][]) userParametersMethod.invoke(null);
+                    } catch (InvocationTargetException | IllegalAccessException e) {
+                        throw new TestInstantiationException("barf", e);
+                    }
+                },
+                Object[][].class);
     }
 
     private static String findStringFormatTemplate(ExtensionContext extensionContext, Class<?> testClass) {
-        return extensionContext
-                .getStore(namespace)
-                .getOrComputeIfAbsent(
-                        "findStringFormatTemplate",
-                        unused -> {
-                            List<Method> methods = AnnotationUtils.findAnnotatedMethods(
-                                    testClass,
-                                    Parameters.class,
-                                    ReflectionUtils.HierarchyTraversalMode.BOTTOM_UP);
+        return extensionContext.getStore(namespace).getOrComputeIfAbsent(
+                "findStringFormatTemplate",
+                unused -> {
+                    List<Method> methods = AnnotationUtils.findAnnotatedMethods(
+                            testClass, Parameters.class, ReflectionUtils.HierarchyTraversalMode.BOTTOM_UP);
 
-                            Method method = methods.get(0);
+                    Method method = methods.get(0);
 
-                            return AnnotationUtils.findAnnotation(method, Parameters.class).get().name();
-                        },
-                        String.class);
+                    return AnnotationUtils.findAnnotation(method, Parameters.class).get().name();
+                },
+                String.class);
     }
 }

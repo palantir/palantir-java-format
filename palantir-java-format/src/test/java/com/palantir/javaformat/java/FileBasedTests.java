@@ -83,7 +83,7 @@ public final class FileBasedTests {
             }
             testInputs.add(new Object[] {fileName, input, expectedOutput});
         }
-        return testInputs.toArray(new Object[][]{});
+        return testInputs.toArray(new Object[][] {});
     }
 
     public static boolean isRecreate() {

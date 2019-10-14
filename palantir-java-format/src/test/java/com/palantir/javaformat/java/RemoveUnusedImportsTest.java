@@ -261,7 +261,7 @@ public class RemoveUnusedImportsTest {
             };
             builder.add(parameters);
         }
-        return builder.build().toArray(new Object[][]{});
+        return builder.build().toArray(new Object[][] {});
     }
 
     private final String input;

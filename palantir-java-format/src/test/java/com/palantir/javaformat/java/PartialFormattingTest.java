@@ -44,8 +44,7 @@ public final class PartialFormattingTest {
         return new Object[][] {{"\n"}, {"\r"}, {"\r\n"}};
     }
 
-    @TempDir
-    public Path testFolder;
+    @TempDir public Path testFolder;
 
     private final String newline;
 

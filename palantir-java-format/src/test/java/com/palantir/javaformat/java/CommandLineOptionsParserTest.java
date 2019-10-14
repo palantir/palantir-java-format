@@ -31,8 +31,7 @@ import org.junit.jupiter.api.io.TempDir;
 /** {@link CommandLineOptionsParser}Test */
 public class CommandLineOptionsParserTest {
 
-    @TempDir
-    public Path testFolder;
+    @TempDir public Path testFolder;
 
     @Test
     public void defaults() {

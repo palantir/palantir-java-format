@@ -43,8 +43,7 @@ import org.junit.jupiter.migrationsupport.rules.EnableRuleMigrationSupport;
 @EnableRuleMigrationSupport
 public class FormattingFilerTest {
 
-    @Rule
-    public CompilationRule compilationRule = new CompilationRule();
+    @Rule public CompilationRule compilationRule = new CompilationRule();
 
     @Test
     public void invalidSyntaxDoesNotThrowError() throws IOException {
