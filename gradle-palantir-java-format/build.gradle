@@ -1,5 +1,18 @@
 apply plugin: 'java-gradle-plugin'
+apply plugin: 'groovy'
 
 dependencies {
     implementation gradleApi()
+
+    testImplementation 'com.netflix.nebula:nebula-test'
+}
+
+gradlePlugin {
+    automatedPublishing = false
+    plugins {
+        palantirJavaFormat {
+            id = 'com.palantir.java-format'
+            implementationClass = 'com.palantir.javaformat.gradle.JavaFormatPlugin'
+        }
+    }
 }
