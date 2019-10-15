@@ -20,21 +20,21 @@ apply plugin: 'org.jetbrains.intellij'
 apply from: rootProject.file('gradle/publish-jar.gradle')
 
 intellij {
-  pluginName = "palantir-java-format"
-  updateSinceUntilBuild = true
-  version = "191.5849.21"
+    pluginName = "palantir-java-format"
+    updateSinceUntilBuild = true
+    version = "191.5849.21"
 }
 
 patchPluginXml {
-  pluginDescription = "Formats source code using the palantir-java-format tool. This version of " +
-                      "the plugin uses version ${project.version} of the tool."
-  version = project.version
-  sinceBuild = '173'
-  untilBuild = ''
+    pluginDescription = "Formats source code using the palantir-java-format tool. This version of " +
+                        "the plugin uses version ${project.version} of the tool."
+    version = project.version
+    sinceBuild = '173'
+    untilBuild = ''
 }
 
 publishPlugin {
-  token = project.ext.properties.jetbrainsPluginRepoToken
+    token = project.ext.properties.jetbrainsPluginRepoToken
 }
 
 configurations {
@@ -42,12 +42,12 @@ configurations {
 }
 
 dependencies {
-  compile project(':palantir-java-format-api')
-  impl project(':palantir-java-format')
+    implementation project(':palantir-java-format-api')
+    impl project(':palantir-java-format')
 }
 
 tasks.withType(JavaCompile).configureEach {
-  options.errorprone.errorproneArgs += ['-Xep:StrictUnusedVariable:OFF']
+    options.errorprone.errorproneArgs += ['-Xep:StrictUnusedVariable:OFF']
 }
 
 check.dependsOn buildPlugin, verifyPlugin
