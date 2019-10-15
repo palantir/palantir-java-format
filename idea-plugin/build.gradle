@@ -20,34 +20,53 @@ apply plugin: 'org.jetbrains.intellij'
 apply from: rootProject.file('gradle/publish-jar.gradle')
 
 intellij {
-  pluginName = "palantir-java-format"
-  updateSinceUntilBuild = true
-  version = "191.5849.21"
+    pluginName = "palantir-java-format"
+    updateSinceUntilBuild = true
+    version = "191.5849.21"
 }
 
 patchPluginXml {
-  pluginDescription = "Formats source code using the palantir-java-format tool. This version of " +
-                      "the plugin uses version ${project.version} of the tool."
-  version = project.version
-  sinceBuild = '173'
-  untilBuild = ''
+    pluginDescription = "Formats source code using the palantir-java-format tool."
+    version = project.version
+    sinceBuild = '173' // TODO: test against this version of IntelliJ to ensure no regressions
+    untilBuild = ''
 }
 
-publishPlugin {
-  token = project.ext.properties.jetbrainsPluginRepoToken
+// TODO(dsanduleac): publish to official IntelliJ plugin repository
+// publishPlugin {
+//     token = System.env.JETBRAINS_PLUGIN_REPO_TOKEN
+// }
+
+configurations {
+    formatter {
+        description = 'The default implementation of palantir-java-format, used if the user doesn\'t specify an explicit classpath.'
+    }
 }
 
 dependencies {
-  compile project(':palantir-java-format')
+    implementation project(':palantir-java-format-api')
+    implementation 'com.github.ben-manes.caffeine:caffeine'
+
+    formatter project(':palantir-java-format')
 }
 
-
 tasks.withType(JavaCompile).configureEach {
-  options.errorprone.errorproneArgs += ['-Xep:StrictUnusedVariable:OFF']
+    options.errorprone.errorproneArgs += ['-Xep:StrictUnusedVariable:OFF']
 }
 
 check.dependsOn buildPlugin, verifyPlugin
-buildPlugin.dependsOn ':palantir-java-format:jar'
+// This task will resolve runtimeClasspath without telling Gradle that it depends on it, therefore dependent jars won't
+// be created beforehand. Therefore, ensure that it knows about it.
+// see https://github.com/JetBrains/gradle-intellij-plugin/blob/master/src/main/groovy/org/jetbrains/intellij/tasks/PrepareSandboxTask.groovy
+tasks.withType(org.jetbrains.intellij.tasks.PrepareSandboxTask) {
+    dependsOn configurations.runtimeClasspath
+
+    // Also pack the formatter in its own directory
+    into("${pluginName}/impl") {
+        from configurations.formatter.filter { !configurations.runtimeClasspath.contains(it) }
+    }
+}
+
 runIde.dependsOn buildPlugin
 
 buildSearchableOptions.enabled = false
@@ -64,6 +83,7 @@ publishing {
 }
 
 versionsLock {
+    // 'org.jetbrains.intellij' creates a dependency on *IntelliJ*, which GCV cannot resolve
     disableJavaPluginDefaults()
 }
 

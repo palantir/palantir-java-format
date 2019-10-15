@@ -28,6 +28,7 @@ import com.palantir.javaformat.doc.FillMode;
 import com.palantir.javaformat.doc.Space;
 import com.palantir.javaformat.doc.Tok;
 import com.palantir.javaformat.doc.Token;
+import com.palantir.javaformat.java.FormatterDiagnostic;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

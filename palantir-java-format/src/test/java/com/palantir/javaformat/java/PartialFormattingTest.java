@@ -321,7 +321,8 @@ public final class PartialFormattingTest {
     }
 
     private static String doGetFormatReplacements(String input, int characterILo, int characterIHi) throws Exception {
-        return new Formatter().formatSource(input, ImmutableList.of(Range.closedOpen(characterILo, characterIHi + 1)));
+        return Formatter.create()
+                .formatSource(input, ImmutableList.of(Range.closedOpen(characterILo, characterIHi + 1)));
     }
 
     @TestTemplate
@@ -570,8 +571,8 @@ public final class PartialFormattingTest {
 
     @TestTemplate
     public void emptyFile() throws Exception {
-        new Formatter().formatSource("");
-        new Formatter().formatSource(
+        Formatter.create().formatSource("");
+        Formatter.create().formatSource(
                 lines(
                         "", //
                         ""),
@@ -590,7 +591,7 @@ public final class PartialFormattingTest {
         // Claim to have modified the parentheses.
         int start = input.indexOf("() {");
         ImmutableList<Replacement> ranges =
-                new Formatter().getFormatReplacements(input, ImmutableList.of(Range.closedOpen(start, start + 1)));
+                Formatter.create().getFormatReplacements(input, ImmutableList.of(Range.closedOpen(start, start + 1)));
         assertThat(ranges).hasSize(1);
         Replacement replacement = ranges.get(0);
         assertThat(replacement.getReplacementString()).isEqualTo(lines(
@@ -792,7 +793,7 @@ public final class PartialFormattingTest {
             ranges.add(Range.closedOpen(idx, idx + 1));
         }
 
-        ImmutableList<Replacement> replacements = new Formatter().getFormatReplacements(input, ranges);
+        ImmutableList<Replacement> replacements = Formatter.create().getFormatReplacements(input, ranges);
 
         // expect replacements in ascending order, by start position
         List<Integer> startPositions = new ArrayList<>();
@@ -812,7 +813,7 @@ public final class PartialFormattingTest {
             ranges.add(Range.closedOpen(idx, idx + 1));
         }
 
-        ImmutableList<Replacement> replacements = new Formatter().getFormatReplacements(input, ranges);
+        ImmutableList<Replacement> replacements = Formatter.create().getFormatReplacements(input, ranges);
 
         // expect replacements in ascending order, by start position
         List<Integer> startPositions = new ArrayList<>();
@@ -919,7 +920,7 @@ public final class PartialFormattingTest {
                 "");
         int start = input.indexOf(newline + "}}");
         ImmutableList<Range<Integer>> ranges = ImmutableList.of(Range.closedOpen(start, start + newline.length() + 2));
-        String output = new Formatter().formatSource(input, ranges);
+        String output = Formatter.create().formatSource(input, ranges);
         assertEquals("bad output", expected, output);
     }
 
@@ -947,7 +948,7 @@ public final class PartialFormattingTest {
         int start = input.indexOf(match);
         int end = start + match.length();
         ImmutableList<Range<Integer>> ranges = ImmutableList.of(Range.closedOpen(start, end));
-        String output = new Formatter().formatSource(input, ranges);
+        String output = Formatter.create().formatSource(input, ranges);
         assertEquals("bad output", expected, output);
     }
 
@@ -1174,7 +1175,7 @@ public final class PartialFormattingTest {
 
         for (; length <= line1.length() + newline.length(); length++) {
             Range<Integer> range = Range.closedOpen(startOffset, startOffset + length);
-            String output = new Formatter().formatSource(input, ImmutableList.of(range));
+            String output = Formatter.create().formatSource(input, ImmutableList.of(range));
             assertEquals("bad output", expectedFormatLine1, output);
         }
 
@@ -1183,7 +1184,7 @@ public final class PartialFormattingTest {
 
         for (; length <= line1.length() + line2.length() + 2 * newline.length(); length++) {
             Range<Integer> range = Range.closedOpen(startOffset, startOffset + length);
-            String output = new Formatter().formatSource(input, ImmutableList.of(range));
+            String output = Formatter.create().formatSource(input, ImmutableList.of(range));
             assertEquals("bad output", expectedFormatLine1And2, output);
         }
     }
@@ -1220,7 +1221,7 @@ public final class PartialFormattingTest {
         // formatting a range that touches non-whitespace characters in line2 should format line2
         for (start = nonWhitespaceLine2Start; start > (line2Start - newline.length()); start--) {
             Range<Integer> range = Range.closedOpen(start, nonWhitespaceLine2Start + newline.length());
-            String output = new Formatter().formatSource(input, ImmutableList.of(range));
+            String output = Formatter.create().formatSource(input, ImmutableList.of(range));
             assertThat(output).isEqualTo(expectedFormatLine2);
         }
         // formatting a range that touches whitespace characters between line1 and line2 should
@@ -1229,7 +1230,7 @@ public final class PartialFormattingTest {
         int line1End = input.indexOf(line1) + line1.length();
         for (; start >= line1End; start--) {
             Range<Integer> range = Range.closedOpen(start, line2Start);
-            String output = new Formatter().formatSource(input, ImmutableList.of(range));
+            String output = Formatter.create().formatSource(input, ImmutableList.of(range));
             assertThat(output).isEqualTo(input);
         }
         // formatting a range that touches non-whitespace characters in line1 should format line1
@@ -1237,7 +1238,7 @@ public final class PartialFormattingTest {
         int line1Start = input.indexOf(line1);
         for (; start >= line1Start; start--) {
             Range<Integer> range = Range.closedOpen(start, line2Start);
-            String output = new Formatter().formatSource(input, ImmutableList.of(range));
+            String output = Formatter.create().formatSource(input, ImmutableList.of(range));
             assertThat(output).isEqualTo(expectedFormatLine1);
         }
     }
@@ -1250,7 +1251,7 @@ public final class PartialFormattingTest {
             "  F() {}",
             "}",
         };
-        String output = new Formatter().formatSource(lines(lines));
+        String output = Formatter.create().formatSource(lines(lines));
         String[] expected = {
             "class D {", //
             "  /** */",
@@ -1344,7 +1345,7 @@ public final class PartialFormattingTest {
         int start = in.indexOf(lines(",", "      int ccccccccccccc"));
         assertThat(in.substring(start, start + 1)).isEqualTo(",");
 
-        assertThat(new Formatter().formatSource(in, ImmutableList.of(Range.closedOpen(start, start))))
+        assertThat(Formatter.create().formatSource(in, ImmutableList.of(Range.closedOpen(start, start))))
                 .isEqualTo(lines(expected));
 
         assertThat(formatMain(lines(input), "-offset", String.valueOf(start), "-length", "0"))
@@ -1380,7 +1381,7 @@ public final class PartialFormattingTest {
         };
         String in = lines(input);
         int idx = in.indexOf(';');
-        assertThat(new Formatter().formatSource(in, ImmutableList.of(Range.closedOpen(idx, idx))))
+        assertThat(Formatter.create().formatSource(in, ImmutableList.of(Range.closedOpen(idx, idx))))
                 .isEqualTo(lines(expected));
     }
 
@@ -1395,7 +1396,7 @@ public final class PartialFormattingTest {
         };
         String in = lines(input);
         int idx = in.indexOf(';');
-        assertThat(new Formatter().formatSource(in, ImmutableList.of(Range.closedOpen(idx + 1, idx + 1))))
+        assertThat(Formatter.create().formatSource(in, ImmutableList.of(Range.closedOpen(idx + 1, idx + 1))))
                 .isEqualTo(in);
     }
 
@@ -1516,7 +1517,7 @@ public final class PartialFormattingTest {
                 "    int e = 7 +4;",
                 "  }",
                 "}");
-        String actual = new Formatter().formatSource(input, ImmutableList.of(rangeOf(input, "int c = 7 +4")));
+        String actual = Formatter.create().formatSource(input, ImmutableList.of(rangeOf(input, "int c = 7 +4")));
         assertThat(actual).isEqualTo(expected);
     }
 

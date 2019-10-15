@@ -37,7 +37,7 @@ class FormatFileCallable implements Callable<String> {
             return fixImports(input);
         }
 
-        Formatter formatter = new Formatter(options);
+        Formatter formatter = Formatter.createFormatter(options);
         String formatted = formatter.formatSource(input, characterRanges(input).asRanges());
         formatted = fixImports(formatted);
         if (parameters.reflowLongStrings()) {

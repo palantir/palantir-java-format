@@ -1,0 +1,22 @@
+apply plugin: 'java-gradle-plugin'
+apply plugin: 'groovy'
+apply from: rootProject.file('gradle/publish-jar.gradle')
+
+dependencies {
+    implementation gradleApi()
+    implementation 'com.google.guava:guava'
+    implementation 'gradle.plugin.org.jetbrains.gradle.plugin.idea-ext:gradle-idea-ext'
+
+    testImplementation 'com.netflix.nebula:nebula-test'
+}
+
+gradlePlugin {
+    automatedPublishing = false
+    plugins {
+        palantirJavaFormat {
+            id = 'com.palantir.java-format'
+            implementationClass = 'com.palantir.javaformat.gradle.JavaFormatPlugin'
+            description = 'Plugin to configure the PalantirJavaFormat IDEA plugin based on an optional implementation version of the formatter.'
+        }
+    }
+}

@@ -222,7 +222,7 @@ public class MainTest {
         };
 
         // pre-check expectation with local formatter instance
-        String optimized = new Formatter().formatSourceAndFixImports(joiner.join(input));
+        String optimized = Formatter.create().formatSourceAndFixImports(joiner.join(input));
         assertThat(optimized).isEqualTo(joiner.join(expected));
 
         InputStream in = new ByteArrayInputStream(joiner.join(input).getBytes(UTF_8));

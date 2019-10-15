@@ -87,6 +87,7 @@ public class JavaFormatterOptions {
 
     /** A builder for {@link JavaFormatterOptions}. */
     public static class Builder {
+        // default is still GOOGLE just because lots of hand-rolled tests rely on this behaviour
         private Style style = Style.GOOGLE;
 
         private Builder() {}

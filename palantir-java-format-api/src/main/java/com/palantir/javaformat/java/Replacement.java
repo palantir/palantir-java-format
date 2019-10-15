@@ -20,11 +20,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.Range;
 import java.util.Objects;
 
-/**
- * Represents a range in the original source and replacement text for that range.
- *
- * <p>google-java-format doesn't depend on AutoValue, to allow AutoValue to depend on google-java-format.
- */
+/** Data class representing a range in the original source and replacement text for that range. */
 public final class Replacement {
 
     public static Replacement create(int startPosition, int endPosition, String replaceWith) {

@@ -19,9 +19,9 @@ package com.palantir.javaformat.intellij;
 import com.intellij.openapi.components.ProjectComponent;
 
 final class InitialConfigurationComponent implements ProjectComponent {
-    private final GoogleJavaFormatSettings settings;
+    private final PalantirJavaFormatSettings settings;
 
-    public InitialConfigurationComponent(GoogleJavaFormatSettings settings) {
+    public InitialConfigurationComponent(PalantirJavaFormatSettings settings) {
         this.settings = settings;
     }
 

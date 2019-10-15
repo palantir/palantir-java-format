@@ -66,7 +66,8 @@ public class FormatterIntegrationTest {
     }
 
     private static Formatter createFormatter() {
-        return new Formatter(JavaFormatterOptions.builder().style(JavaFormatterOptions.Style.PALANTIR).build());
+        return Formatter.createFormatter(
+                JavaFormatterOptions.builder().style(JavaFormatterOptions.Style.PALANTIR).build());
     }
 
     @TestTemplate
