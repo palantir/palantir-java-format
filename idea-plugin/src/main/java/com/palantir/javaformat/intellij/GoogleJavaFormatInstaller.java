@@ -42,11 +42,11 @@ final class GoogleJavaFormatInstaller implements ProjectComponent {
     private static void installFormatter(Project project) {
         CodeStyleManager currentManager = CodeStyleManager.getInstance(project);
 
-        if (currentManager instanceof GoogleJavaFormatCodeStyleManager) {
-            currentManager = ((GoogleJavaFormatCodeStyleManager) currentManager).getDelegate();
+        if (currentManager instanceof PalantirCodeStyleManager) {
+            currentManager = ((PalantirCodeStyleManager) currentManager).getDelegate();
         }
 
-        setManager(project, new GoogleJavaFormatCodeStyleManager(currentManager));
+        setManager(project, new PalantirCodeStyleManager(currentManager));
     }
 
     private static void setManager(Project project, CodeStyleManager newManager) {

@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableMap;
 import java.io.File;
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;

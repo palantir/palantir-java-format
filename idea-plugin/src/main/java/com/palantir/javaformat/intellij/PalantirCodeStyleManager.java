@@ -61,19 +61,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link CodeStyleManager} implementation which formats .java files with google-java-format. Formatting of all other
- * types of files is delegated to IJ's default implementation.
+ * A {@link CodeStyleManager} implementation which formats .java files with palantir-java-format. Formatting of all
+ * other types of files is delegated to IJ's default implementation.
  */
-class GoogleJavaFormatCodeStyleManager extends CodeStyleManagerDecorator {
-    private static final Logger log = LoggerFactory.getLogger(GoogleJavaFormatCodeStyleManager.class);
+class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
+    private static final Logger log = LoggerFactory.getLogger(PalantirCodeStyleManager.class);
     private static final String PLUGIN_ID = "palantir-java-format";
     private static final IdeaPluginDescriptor PLUGIN = Preconditions.checkNotNull(
             PluginManager.getPlugin(PluginId.getId(PLUGIN_ID)), "Couldn't find our own plugin: %s", PLUGIN_ID);
 
     private final LoadingCache<Optional<List<URI>>, FormatterFactory> implementationCache =
-            Caffeine.newBuilder().maximumSize(1).build(GoogleJavaFormatCodeStyleManager::computeFactory);
+            Caffeine.newBuilder().maximumSize(1).build(PalantirCodeStyleManager::computeFactory);
 
-    public GoogleJavaFormatCodeStyleManager(@NotNull CodeStyleManager original) {
+    public PalantirCodeStyleManager(@NotNull CodeStyleManager original) {
         super(original);
     }
 
@@ -155,7 +155,7 @@ class GoogleJavaFormatCodeStyleManager extends CodeStyleManagerDecorator {
 
     private static URL[] listDirAsUrlsUnchecked(Path dir) {
         try (Stream<Path> list = Files.list(dir)) {
-            return list.map(Path::toUri).map(GoogleJavaFormatCodeStyleManager::toUrlUnchecked).toArray(URL[]::new);
+            return list.map(Path::toUri).map(PalantirCodeStyleManager::toUrlUnchecked).toArray(URL[]::new);
         } catch (IOException e) {
             throw new RuntimeException("Couldn't list dir: " + dir.toString(), e);
         }
@@ -180,7 +180,7 @@ class GoogleJavaFormatCodeStyleManager extends CodeStyleManagerDecorator {
         URL[] implementationUrls = implementationClassPath
                 .map(implementationUris -> {
                     log.debug("Using palantir-java-format implementation defined by URIs: {}", implementationUris);
-                    return implementationUris.stream().map(GoogleJavaFormatCodeStyleManager::toUrlUnchecked).toArray(
+                    return implementationUris.stream().map(PalantirCodeStyleManager::toUrlUnchecked).toArray(
                             URL[]::new);
                 })
                 .orElseGet(() -> {

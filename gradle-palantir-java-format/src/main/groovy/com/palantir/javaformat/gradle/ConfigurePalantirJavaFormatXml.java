@@ -12,7 +12,6 @@ import java.io.PrintWriter;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.xml.parsers.ParserConfigurationException;
 import org.gradle.api.DefaultTask;
