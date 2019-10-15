@@ -131,7 +131,7 @@ class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJav
 
         @Override
         public String toString() {
-            return "State{"
+            return "PalantirJavaFormatSettings{"
                     + "enabled="
                     + enabled
                     + ", formatterPath="

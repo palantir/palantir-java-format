@@ -26,16 +26,16 @@ intellij {
 }
 
 patchPluginXml {
-    pluginDescription = "Formats source code using the palantir-java-format tool. This version of " +
-                        "the plugin uses version ${project.version} of the tool."
+    pluginDescription = "Formats source code using the palantir-java-format tool."
     version = project.version
-    sinceBuild = '173'
+    sinceBuild = '173' // TODO: test against this version of IntelliJ to ensure no regressions
     untilBuild = ''
 }
 
-publishPlugin {
-    token = project.ext.properties.jetbrainsPluginRepoToken
-}
+// TODO(dsanduleac): publish to official IntelliJ plugin repository
+// publishPlugin {
+//     token = System.env.JETBRAINS_PLUGIN_REPO_TOKEN
+// }
 
 configurations {
     formatter {
