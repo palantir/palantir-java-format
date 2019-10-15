@@ -18,7 +18,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.provider.Property;
-import org.gradle.api.tasks.InputFiles;
+import org.gradle.api.tasks.Classpath;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.PathSensitive;
 import org.gradle.api.tasks.PathSensitivity;
@@ -28,7 +28,7 @@ import org.xml.sax.SAXException;
 public class ConfigurePalantirJavaFormatXml extends DefaultTask {
     private final Property<Configuration> implConfiguration = getProject().getObjects().property(Configuration.class);
 
-    @InputFiles
+    @Classpath
     Property<Configuration> getImplConfiguration() {
         return implConfiguration;
     }
