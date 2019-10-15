@@ -8,7 +8,7 @@ import java.util.Collection;
  * A stable facade for palantir-java-format. The implementation must be ServiceLoaded, to ensure its classpath remains
  * isolated.
  */
-public interface FormatterService { 
+public interface FormatterService {
 
     /**
      * Emit a list of {@link Replacement}s to convert from input to formatted output.
