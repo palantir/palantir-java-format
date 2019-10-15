@@ -20,6 +20,7 @@ import static java.util.Comparator.comparing;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
 import com.intellij.openapi.application.ApplicationManager;
@@ -178,7 +179,7 @@ class GoogleJavaFormatCodeStyleManager extends CodeStyleManagerDecorator {
                 });
         URLClassLoader classLoader = new URLClassLoader(implementationUrls, plugin.getPluginClassLoader());
 
-        FormatterFactory factory = ServiceLoader.load(FormatterFactory.class, classLoader).iterator().next();
+        FormatterFactory factory = Iterables.getOnlyElement(ServiceLoader.load(FormatterFactory.class, classLoader));
         FormatterService formatter = factory.createFormatter(JavaFormatterOptions.builder().style(style).build());
         performReplacements(document, FormatterUtil.getReplacements(formatter, document.getText(), ranges));
     }

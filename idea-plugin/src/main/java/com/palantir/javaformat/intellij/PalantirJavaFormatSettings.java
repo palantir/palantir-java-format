@@ -27,14 +27,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @State(
         name = "PalantirJavaFormatSettings",
         storages = {@Storage("palantir-java-format.xml")})
 class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJavaFormatSettings.State> {
-    private static final Logger log = LoggerFactory.getLogger(PalantirJavaFormatSettings.class);
 
     private State state = new State();
 
@@ -50,7 +47,6 @@ class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJav
 
     @Override
     public void loadState(State state) {
-        log.info("Loaded new state: {}", state);
         this.state = state;
     }
 
