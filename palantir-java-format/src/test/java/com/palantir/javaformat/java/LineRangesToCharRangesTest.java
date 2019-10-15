@@ -20,12 +20,12 @@ import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
 import java.util.Set;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
 /** Tests for {@link Formatter#lineRangesToCharRanges} */
-@RunWith(JUnit4.class)
+@Execution(ExecutionMode.CONCURRENT)
 public class LineRangesToCharRangesTest {
 
     @SafeVarargs
