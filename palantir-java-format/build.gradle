@@ -9,10 +9,12 @@ dependencies {
     api project(':palantir-java-format-api')
     api 'com.google.guava:guava'
     implementation 'com.google.errorprone:javac-shaded'
-    testCompile 'junit:junit'
+
     testCompile 'com.google.guava:guava-testlib'
     testCompile 'com.google.truth:truth'
     testCompile 'com.google.testing.compile:compile-testing'
+    testImplementation 'org.junit.jupiter:junit-jupiter-migrationsupport'
+    testImplementation 'org.junit.jupiter:junit-jupiter'
 
     compileOnly 'com.google.auto.service:auto-service'
     annotationProcessor 'com.google.auto.service:auto-service'
@@ -21,3 +23,7 @@ dependencies {
 tasks.withType(JavaCompile).configureEach {
     options.errorprone.errorproneArgs += ['-Xep:StrictUnusedVariable:OFF']
 }
+
+// false positives due to org.junit.runners.* in the test cases
+tasks.checkJUnitDependencies.enabled = false
+

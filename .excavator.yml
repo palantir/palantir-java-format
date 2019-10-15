@@ -1,0 +1,9 @@
+# Excavator auto-updates this file. Please contribute improvements to the central template.
+
+auto-label:
+  names:
+    versions-props/upgrade-all: [ "merge when ready" ]
+    circleci/manage-circleci: [ "merge when ready" ]
+  tags:
+    roomba: [ "merge when ready" ]
+    automerge: [ "merge when ready" ]

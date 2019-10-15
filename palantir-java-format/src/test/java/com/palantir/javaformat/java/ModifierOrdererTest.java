@@ -21,12 +21,12 @@ import static com.google.common.truth.Truth.assertThat;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Range;
 import java.util.Arrays;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
 /** {@link ModifierOrderer}Test */
-@RunWith(JUnit4.class)
+@Execution(ExecutionMode.CONCURRENT)
 public class ModifierOrdererTest {
 
     @Test
