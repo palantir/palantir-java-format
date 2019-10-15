@@ -16,13 +16,17 @@
 
 package com.palantir.javaformat.intellij;
 
+import static com.google.common.base.Preconditions.checkState;
 import static java.util.Comparator.comparing;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.BoundType;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Range;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
 import com.intellij.openapi.application.ApplicationManager;
@@ -37,6 +41,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.impl.CheckUtil;
 import com.intellij.util.IncorrectOperationException;
+import com.palantir.javaformat.java.FormatterExceptionApi;
 import com.palantir.javaformat.java.FormatterService;
 import com.palantir.javaformat.java.JavaFormatterOptions;
 import java.io.IOException;
@@ -53,6 +58,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -74,6 +80,31 @@ class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
 
     public PalantirCodeStyleManager(@NotNull CodeStyleManager original) {
         super(original);
+    }
+
+    static Map<TextRange, String> getReplacements(
+            FormatterService formatter, JavaFormatterOptions options, String text, Collection<TextRange> ranges) {
+        try {
+            ImmutableMap.Builder<TextRange, String> replacements = ImmutableMap.builder();
+            formatter.getFormatReplacements(options, text, toRanges(ranges)).forEach(replacement -> {
+                replacements.put(toTextRange(replacement.getReplaceRange()), replacement.getReplacementString());
+            });
+            return replacements.build();
+        } catch (FormatterExceptionApi e) {
+            log.debug("Formatter failed, no replacements", e);
+            return ImmutableMap.of();
+        }
+    }
+
+    private static Collection<Range<Integer>> toRanges(Collection<TextRange> textRanges) {
+        return textRanges.stream()
+                .map(textRange -> Range.closedOpen(textRange.getStartOffset(), textRange.getEndOffset()))
+                .collect(Collectors.toList());
+    }
+
+    private static TextRange toTextRange(Range<Integer> range) {
+        checkState(range.lowerBoundType().equals(BoundType.CLOSED) && range.upperBoundType().equals(BoundType.OPEN));
+        return new TextRange(range.lowerEndpoint(), range.upperEndpoint());
     }
 
     @Override
@@ -172,7 +203,7 @@ class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
 
         JavaFormatterOptions options = JavaFormatterOptions.builder().style(settings.getStyle()).build();
 
-        performReplacements(document, FormatterUtil.getReplacements(formatter, options, document.getText(), ranges));
+        performReplacements(document, getReplacements(formatter, options, document.getText(), ranges));
     }
 
     private static FormatterService createFormatter(Optional<List<URI>> implementationClassPath) {
