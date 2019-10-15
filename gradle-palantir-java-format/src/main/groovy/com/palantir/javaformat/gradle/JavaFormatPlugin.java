@@ -26,7 +26,9 @@ import java.util.stream.Collectors;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.plugins.ide.idea.model.IdeaModel;
+import org.jetbrains.gradle.ext.TaskTriggersConfig;
 
 public class JavaFormatPlugin implements Plugin<Project> {
 
@@ -59,12 +61,31 @@ public class JavaFormatPlugin implements Plugin<Project> {
         });
 
         project.getPluginManager().withPlugin("idea", ideaPlugin -> {
-            IdeaModel ideaModel = project.getExtensions().getByType(IdeaModel.class);
-            ideaModel.getProject().getIpr().withXml(xmlProvider -> {
-                // this block is lazy
-                List<URI> uris = implConfiguration.getFiles().stream().map(File::toURI).collect(Collectors.toList());
-                ConfigureJavaFormatterXml.configure(xmlProvider.asNode(), Optional.of(uris));
-            });
+            configureLegacyIdea(project, implConfiguration);
+            configureIntelliJImport(project, implConfiguration);
         });
+    }
+
+    private static void configureLegacyIdea(Project project, Configuration implConfiguration) {
+        IdeaModel ideaModel = project.getExtensions().getByType(IdeaModel.class);
+        ideaModel.getProject().getIpr().withXml(xmlProvider -> {
+            // this block is lazy
+            List<URI> uris = implConfiguration.getFiles().stream().map(File::toURI).collect(Collectors.toList());
+            ConfigureJavaFormatterXml.configure(xmlProvider.asNode(), Optional.of(uris));
+        });
+    }
+
+    private static void configureIntelliJImport(Project project, Configuration implConfiguration) {
+        project.getPluginManager().apply("org.jetbrains.gradle.plugin.idea-ext");
+
+        ConfigurePalantirJavaFormatXml fixPalantirJavaFormatXmlTask = project.getTasks()
+                .create("fixPalantirJavaFormatXml", ConfigurePalantirJavaFormatXml.class, task -> {
+                    task.getImplConfiguration().set(implConfiguration);
+                });
+
+        ExtensionAware ideaProject = (ExtensionAware) project.getExtensions().getByType(IdeaModel.class).getProject();
+        ExtensionAware settings = (ExtensionAware) ideaProject.getExtensions().getByName("settings");
+        TaskTriggersConfig taskTriggers = settings.getExtensions().getByType(TaskTriggersConfig.class);
+        taskTriggers.afterSync(fixPalantirJavaFormatXmlTask);
     }
 }

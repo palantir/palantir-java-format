@@ -5,6 +5,7 @@ apply from: rootProject.file('gradle/publish-jar.gradle')
 dependencies {
     implementation gradleApi()
     implementation 'com.google.guava:guava'
+    implementation 'gradle.plugin.org.jetbrains.gradle.plugin.idea-ext:gradle-idea-ext'
 
     testImplementation 'com.netflix.nebula:nebula-test'
 }

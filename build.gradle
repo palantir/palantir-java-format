@@ -37,6 +37,7 @@ allprojects {
         mavenLocal()
         jcenter()
         maven { url 'https://dl.bintray.com/palantir/releases/' }
+        gradlePluginPortal()
     }
 }
 
