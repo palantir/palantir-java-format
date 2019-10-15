@@ -33,7 +33,6 @@ import org.jetbrains.gradle.ext.TaskTriggersConfig;
 public class JavaFormatPlugin implements Plugin<Project> {
 
     private static final String EXTENSION_NAME = "palantirJavaFormat";
-    private static final String IMPLEMENTATION_VERSION = JavaFormatPlugin.class.getPackage().getImplementationVersion();
 
     @Override
     public void apply(Project project) {
@@ -50,8 +49,7 @@ public class JavaFormatPlugin implements Plugin<Project> {
             // Using addLater instead of afterEvaluate, in order to delay reading the extension until after the user
             // has configured it.
             conf.defaultDependencies(deps -> deps.addLater(project.provider(() -> {
-                String version = Optional.ofNullable(extension.getImplementationVersion().getOrNull())
-                        .orElse(IMPLEMENTATION_VERSION);
+                String version = extension.getImplementationVersion().get();
 
                 return project.getDependencies().create(ImmutableMap.of(
                         "group", "com.palantir.javaformat",
