@@ -84,7 +84,7 @@ import org.openjdk.tools.javac.util.Options;
  * Oct. 1980, pp. 465–483.
  */
 @Immutable
-public final class Formatter implements FormatterService {
+public final class Formatter {
 
     static final Range<Integer> EMPTY_RANGE = Range.closedOpen(-1, -1);
 

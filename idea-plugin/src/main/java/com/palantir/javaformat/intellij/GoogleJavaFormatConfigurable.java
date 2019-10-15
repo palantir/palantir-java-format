@@ -25,7 +25,7 @@ import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 import com.palantir.javaformat.intellij.PalantirJavaFormatSettings.EnabledState;
-import com.palantir.javaformat.java.FormatterFactory;
+import com.palantir.javaformat.java.FormatterService;
 import java.awt.Insets;
 import java.io.IOException;
 import java.net.URI;
@@ -115,7 +115,7 @@ class GoogleJavaFormatConfigurable extends BaseConfigurable implements Searchabl
                             try {
                                 JarFile jar = new JarFile(uri.getPath());
                                 // Identify the implementation jar by the service it produces.
-                                if (jar.getEntry("META-INF/services/" + FormatterFactory.class.getName()) != null) {
+                                if (jar.getEntry("META-INF/services/" + FormatterService.class.getName()) != null) {
                                     String implementationVersion =
                                             jar.getManifest().getMainAttributes().getValue("Implementation-Version");
                                     return Stream.of(implementationVersion);

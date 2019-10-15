@@ -321,7 +321,8 @@ public final class PartialFormattingTest {
     }
 
     private static String doGetFormatReplacements(String input, int characterILo, int characterIHi) throws Exception {
-        return Formatter.create().formatSource(input, ImmutableList.of(Range.closedOpen(characterILo, characterIHi + 1)));
+        return Formatter.create()
+                .formatSource(input, ImmutableList.of(Range.closedOpen(characterILo, characterIHi + 1)));
     }
 
     @TestTemplate
