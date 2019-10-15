@@ -146,7 +146,7 @@ public final class Formatter {
         Iterable<Diagnostic<? extends JavaFileObject>> errorDiagnostics =
                 Iterables.filter(diagnostics.getDiagnostics(), Formatter::errorDiagnostic);
         if (!Iterables.isEmpty(errorDiagnostics)) {
-            throw FormatterException.fromJavacDiagnostics(errorDiagnostics);
+            throw FormatterExceptions.fromJavacDiagnostics(errorDiagnostics);
         }
         OpsBuilder builder = new OpsBuilder(javaInput, javaOutput);
         // Output the compilation unit.
