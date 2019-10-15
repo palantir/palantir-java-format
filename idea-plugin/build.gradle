@@ -43,6 +43,7 @@ configurations {
 
 dependencies {
     implementation project(':palantir-java-format-api')
+    implementation 'com.github.ben-manes.caffeine:caffeine'
     impl project(':palantir-java-format')
 }
 

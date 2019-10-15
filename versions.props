@@ -1,4 +1,5 @@
 gradle.plugin.org.jetbrains.gradle.plugin.idea-ext:gradle-idea-ext = 0.5
+com.github.ben-manes.caffeine:caffeine = 2.8.0
 com.google.guava:guava = 27.0.1-jre
 com.google.errorprone:javac-shaded = 9+181-r4173-1
 com.google.code.findbugs:jsr305 = 3.0.2

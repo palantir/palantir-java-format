@@ -18,6 +18,8 @@ package com.palantir.javaformat.intellij;
 
 import static java.util.Comparator.comparing;
 
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -47,8 +49,10 @@ import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.TreeMap;
 import java.util.stream.Stream;
@@ -62,8 +66,12 @@ import org.slf4j.LoggerFactory;
  */
 class GoogleJavaFormatCodeStyleManager extends CodeStyleManagerDecorator {
     private static final Logger log = LoggerFactory.getLogger(GoogleJavaFormatCodeStyleManager.class);
-
     private static final String PLUGIN_ID = "palantir-java-format";
+    private static final IdeaPluginDescriptor PLUGIN = Preconditions.checkNotNull(
+            PluginManager.getPlugin(PluginId.getId(PLUGIN_ID)), "Couldn't find our own plugin: %s", PLUGIN_ID);
+
+    private final LoadingCache<Optional<List<URI>>, FormatterFactory> implementationCache =
+            Caffeine.newBuilder().maximumSize(1).build(GoogleJavaFormatCodeStyleManager::computeFactory);
 
     public GoogleJavaFormatCodeStyleManager(@NotNull CodeStyleManager original) {
         super(original);
@@ -161,12 +169,15 @@ class GoogleJavaFormatCodeStyleManager extends CodeStyleManagerDecorator {
      */
     private void format(Document document, Collection<TextRange> ranges) {
         PalantirJavaFormatSettings settings = PalantirJavaFormatSettings.getInstance(getProject());
+        FormatterFactory factory = implementationCache.get(settings.getImplementationClassPath());
+
         Style style = settings.getStyle();
+        FormatterService formatter = factory.createFormatter(JavaFormatterOptions.builder().style(style).build());
+        performReplacements(document, FormatterUtil.getReplacements(formatter, document.getText(), ranges));
+    }
 
-        IdeaPluginDescriptor plugin = Preconditions.checkNotNull(
-                PluginManager.getPlugin(PluginId.getId(PLUGIN_ID)), "Couldn't find our own plugin: %s", PLUGIN_ID);
-
-        URL[] implementationUrls = settings.getImplementationClassPath()
+    private static FormatterFactory computeFactory(Optional<List<URI>> implementationClassPath) {
+        URL[] implementationUrls = implementationClassPath
                 .map(implementationUris -> {
                     log.debug("Using palantir-java-format implementation defined by URIs: {}", implementationUris);
                     return implementationUris.stream().map(GoogleJavaFormatCodeStyleManager::toUrlUnchecked).toArray(
@@ -174,14 +185,12 @@ class GoogleJavaFormatCodeStyleManager extends CodeStyleManagerDecorator {
                 })
                 .orElseGet(() -> {
                     // Load from the jars bundled with the plugin.
-                    Path implDir = plugin.getPath().toPath().resolve("impl");
+                    Path implDir = PLUGIN.getPath().toPath().resolve("impl");
+                    log.debug("Using palantir-java-format implementation bundled with plugin: {}", implDir);
                     return listDirAsUrlsUnchecked(implDir);
                 });
-        URLClassLoader classLoader = new URLClassLoader(implementationUrls, plugin.getPluginClassLoader());
-
-        FormatterFactory factory = Iterables.getOnlyElement(ServiceLoader.load(FormatterFactory.class, classLoader));
-        FormatterService formatter = factory.createFormatter(JavaFormatterOptions.builder().style(style).build());
-        performReplacements(document, FormatterUtil.getReplacements(formatter, document.getText(), ranges));
+        ClassLoader classLoader = new URLClassLoader(implementationUrls, PLUGIN.getPluginClassLoader());
+        return Iterables.getOnlyElement(ServiceLoader.load(FormatterFactory.class, classLoader));
     }
 
     private void performReplacements(final Document document, final Map<TextRange, String> replacements) {
