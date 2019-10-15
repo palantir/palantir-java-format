@@ -69,7 +69,7 @@ public class JavaFormatPlugin implements Plugin<Project> {
         ideaModel.getProject().getIpr().withXml(xmlProvider -> {
             // this block is lazy
             List<URI> uris = implConfiguration.getFiles().stream().map(File::toURI).collect(Collectors.toList());
-            ConfigureJavaFormatterXml.configure(xmlProvider.asNode(), Optional.of(uris));
+            ConfigureJavaFormatterXml.configure(xmlProvider.asNode(), uris);
         });
     }
 

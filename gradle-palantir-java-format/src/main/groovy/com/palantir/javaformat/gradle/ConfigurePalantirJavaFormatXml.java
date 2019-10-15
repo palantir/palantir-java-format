@@ -53,7 +53,7 @@ public class ConfigurePalantirJavaFormatXml extends DefaultTask {
         } else {
             rootNode = new Node(null, "project", ImmutableMap.of("version", "4"));
         }
-        ConfigureJavaFormatterXml.configure(rootNode, Optional.of(uris));
+        ConfigureJavaFormatterXml.configure(rootNode, uris);
         try (BufferedWriter writer = Files.newWriter(configurationFile, Charset.defaultCharset());
                 PrintWriter printWriter = new PrintWriter(writer)) {
             XmlNodePrinter nodePrinter = new XmlNodePrinter(printWriter);

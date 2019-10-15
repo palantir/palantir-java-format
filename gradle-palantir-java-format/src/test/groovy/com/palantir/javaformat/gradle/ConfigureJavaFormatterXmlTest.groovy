@@ -38,7 +38,7 @@ class ConfigureJavaFormatterXmlTest extends Specification {
         def node = new XmlParser().parseText(MISSING_ENTIRE_BLOCK)
 
         when:
-        ConfigureJavaFormatterXml.configure(node, Optional.of(['foo', 'bar'].collect { URI.create(it) }))
+        ConfigureJavaFormatterXml.configure(node, ['foo', 'bar'].collect { URI.create(it) })
 
         then:
         def values = node
@@ -54,7 +54,7 @@ class ConfigureJavaFormatterXmlTest extends Specification {
         def node = new XmlParser().parseText(MISSING_CLASS_PATH)
 
         when:
-        ConfigureJavaFormatterXml.configure(node, Optional.of(['foo', 'bar'].collect { URI.create(it) }))
+        ConfigureJavaFormatterXml.configure(node, ['foo', 'bar'].collect { URI.create(it) })
 
         then:
         def values = node
@@ -66,25 +66,11 @@ class ConfigureJavaFormatterXmlTest extends Specification {
         values.collect { it.toString() } == ['foo', 'bar']
     }
 
-    void testConfigure_existingClassPath_cleared() {
-        def node = new XmlParser().parseText(EXISTING_CLASS_PATH)
-
-        when:
-        ConfigureJavaFormatterXml.configure(node, Optional.empty())
-
-        then:
-        def implementationClassPath = node
-                .component.find { it.@name == 'PalantirJavaFormatSettings' }
-                .option.find { it.@name == 'implementationClassPath' }
-
-        implementationClassPath == null
-    }
-
     void testConfigure_existingClassPath_modified() {
         def node = new XmlParser().parseText(EXISTING_CLASS_PATH)
 
         when:
-        ConfigureJavaFormatterXml.configure(node, Optional.of(['foo', 'bar'].collect { URI.create(it) }))
+        ConfigureJavaFormatterXml.configure(node, ['foo', 'bar'].collect { URI.create(it) })
 
         then:
         def values = node
