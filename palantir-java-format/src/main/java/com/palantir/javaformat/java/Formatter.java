@@ -90,13 +90,17 @@ public final class Formatter implements FormatterService {
 
     private final JavaFormatterOptions options;
 
-    /** A new Formatter instance with default options. */
-    public Formatter() {
-        this(JavaFormatterOptions.defaultOptions());
+    private Formatter(JavaFormatterOptions options) {
+        this.options = options;
     }
 
-    public Formatter(JavaFormatterOptions options) {
-        this.options = options;
+    /** A new Formatter instance with default options. */
+    public static Formatter create() {
+        return new Formatter(JavaFormatterOptions.defaultOptions());
+    }
+
+    public static Formatter createFormatter(JavaFormatterOptions options) {
+        return new Formatter(options);
     }
 
     /**

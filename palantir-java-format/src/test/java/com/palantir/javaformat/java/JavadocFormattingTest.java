@@ -29,7 +29,7 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 public final class JavadocFormattingTest {
 
     private final Formatter formatter =
-            new Formatter(JavaFormatterOptions.builder().style(JavaFormatterOptions.Style.GOOGLE).build());
+            Formatter.createFormatter(JavaFormatterOptions.builder().style(JavaFormatterOptions.Style.GOOGLE).build());
 
     @Test
     public void notJavadoc() {

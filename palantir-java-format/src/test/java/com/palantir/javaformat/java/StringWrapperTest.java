@@ -45,7 +45,7 @@ public class StringWrapperTest {
                 "  }",
                 "}");
 
-        assertThat(StringWrapper.wrap(100, input, new Formatter())).isEqualTo(output);
+        assertThat(StringWrapper.wrap(100, input, Formatter.create())).isEqualTo(output);
     }
 
     private static String lines(String... line) {

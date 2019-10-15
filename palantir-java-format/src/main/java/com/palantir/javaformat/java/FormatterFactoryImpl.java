@@ -6,6 +6,6 @@ import com.google.auto.service.AutoService;
 public final class FormatterFactoryImpl implements FormatterFactory {
     @Override
     public FormatterService createFormatter(JavaFormatterOptions options) {
-        return new Formatter(options);
+        return Formatter.createFormatter(options);
     }
 }

@@ -37,7 +37,7 @@ public class StringWrapperIntegrationTest {
         return tests.paramsAsNameInputOutput();
     }
 
-    private final Formatter formatter = new Formatter();
+    private final Formatter formatter = Formatter.create();
 
     private final String name;
     private final String input;

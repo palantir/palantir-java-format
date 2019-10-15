@@ -89,7 +89,7 @@ public class ArrayDimensionTest {
     @TestTemplate
     public void format() throws Exception {
         String source = "class T {" + input + "}";
-        String formatted = new Formatter().formatSource(source);
+        String formatted = Formatter.create().formatSource(source);
         String statement = formatted.substring("class T {".length(), formatted.length() - "}\n".length());
         // ignore line breaks after declaration-style annotations
         statement = Joiner.on(' ').join(Splitter.on('\n').omitEmptyStrings().trimResults().split(statement));

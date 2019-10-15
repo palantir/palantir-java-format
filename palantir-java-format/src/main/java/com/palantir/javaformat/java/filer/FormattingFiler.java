@@ -31,7 +31,7 @@ public final class FormattingFiler implements Filer {
 
     private final Filer delegate;
     // TODO(ronshapiro): consider allowing users to create their own Formatter instance
-    private final Formatter formatter = new Formatter();
+    private final Formatter formatter = Formatter.create();
     private final Messager messager;
 
     /** @param delegate filer to decorate */
