@@ -42,7 +42,7 @@ import javax.swing.JPanel;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
-class GoogleJavaFormatConfigurable extends BaseConfigurable implements SearchableConfigurable {
+class PalantirJavaFormatConfigurable extends BaseConfigurable implements SearchableConfigurable {
 
     private final Project project;
     private JPanel panel;
@@ -51,7 +51,7 @@ class GoogleJavaFormatConfigurable extends BaseConfigurable implements Searchabl
     private JLabel formatterVersion;
     private JLabel pluginVersion;
 
-    public GoogleJavaFormatConfigurable(Project project) {
+    public PalantirJavaFormatConfigurable(Project project) {
         this.project = project;
     }
 
@@ -104,7 +104,7 @@ class GoogleJavaFormatConfigurable extends BaseConfigurable implements Searchabl
         PalantirJavaFormatSettings settings = PalantirJavaFormatSettings.getInstance(project);
         enable.setSelected(settings.isEnabled());
         styleComboBox.setSelectedItem(UiFormatterStyle.convert(settings.getStyle()));
-        pluginVersion.setText(GoogleJavaFormatConfigurable.class.getPackage().getImplementationVersion());
+        pluginVersion.setText(PalantirJavaFormatConfigurable.class.getPackage().getImplementationVersion());
         formatterVersion.setText(computeFormatterVersion(settings.getImplementationClassPath()));
     }
 
@@ -127,7 +127,7 @@ class GoogleJavaFormatConfigurable extends BaseConfigurable implements Searchabl
                         })
                         .findFirst()
                         .orElseThrow(() -> new RuntimeException("Couldn't find implementation JAR")))
-                .orElseGet(() -> GoogleJavaFormatConfigurable.class.getPackage().getImplementationVersion());
+                .orElseGet(() -> PalantirJavaFormatConfigurable.class.getPackage().getImplementationVersion());
     }
 
     @Override

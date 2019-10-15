@@ -25,7 +25,7 @@
   </project-components>
 
   <extensions defaultExtensionNs="com.intellij">
-    <projectConfigurable instance="com.palantir.javaformat.intellij.GoogleJavaFormatConfigurable"
+    <projectConfigurable instance="com.palantir.javaformat.intellij.PalantirJavaFormatConfigurable"
                          id="palantir-java-format.settings"
                          displayName="palantir-java-format Settings"/>
     <projectService serviceImplementation="com.palantir.javaformat.intellij.PalantirJavaFormatSettings"/>
