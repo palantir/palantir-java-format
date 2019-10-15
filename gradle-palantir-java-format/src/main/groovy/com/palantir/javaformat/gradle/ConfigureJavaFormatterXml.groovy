@@ -3,6 +3,9 @@ package com.palantir.javaformat.gradle
 class ConfigureJavaFormatterXml {
     static void configure(Node rootNode, List<URI> uris) {
         def settings = matchOrCreateChild(rootNode, 'component', [name: 'PalantirJavaFormatSettings'])
+        // enable
+        matchOrCreateChild(settings, 'option', [name: 'enabled']).attributes().put('value', 'true')
+        // configure classpath
         def classPath = matchOrCreateChild(settings, 'option', [name: 'implementationClassPath'])
         def listItems = matchOrCreateChild(classPath, 'list')
         listItems.children().clear()

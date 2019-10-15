@@ -8,6 +8,7 @@ class ConfigureJavaFormatterXmlTest extends Specification {
     private static final String EXISTING_CLASS_PATH = """
             <root>
                 <component name="PalantirJavaFormatSettings">
+                    <option name="enabled" value="true"/>
                     <option name="implementationClassPath">
                       <list>
                         <option value="foo" />
@@ -34,6 +35,7 @@ class ConfigureJavaFormatterXmlTest extends Specification {
     public static final String EXPECTED = """\
         <root>
           <component name="PalantirJavaFormatSettings">
+            <option name="enabled" value="true"/>
             <option name="implementationClassPath">
               <list>
                 <option value="foo"/>
@@ -65,6 +67,7 @@ class ConfigureJavaFormatterXmlTest extends Specification {
         <root>
           <component name="PalantirJavaFormatSettings">
             <option name="style" value="PALANTIR"/>
+            <option name="enabled" value="true"/>
             <option name="implementationClassPath">
               <list>
                 <option value="foo"/>
