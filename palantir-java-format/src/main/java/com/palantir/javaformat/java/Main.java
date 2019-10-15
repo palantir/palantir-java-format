@@ -95,6 +95,7 @@ public final class Main {
             throw new UsageException();
         }
 
+        // TODO(someone): update this to always use Style.PALANTIR
         JavaFormatterOptions options =
                 JavaFormatterOptions.builder().style(parameters.aosp() ? Style.AOSP : Style.GOOGLE).build();
 
