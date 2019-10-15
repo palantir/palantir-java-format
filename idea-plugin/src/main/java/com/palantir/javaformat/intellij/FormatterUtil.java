@@ -27,19 +27,22 @@ import com.palantir.javaformat.java.FormatterService;
 import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 final class FormatterUtil {
-
-    private FormatterUtil() {}
+    private static final Logger log = LoggerFactory.getLogger(FormatterUtil.class);
 
     static Map<TextRange, String> getReplacements(
             FormatterService formatter, String text, Collection<TextRange> ranges) {
         try {
             ImmutableMap.Builder<TextRange, String> replacements = ImmutableMap.builder();
-            formatter.getFormatReplacements(text, toRanges(ranges)).forEach(replacement -> replacements.put(
-                    toTextRange(replacement.getReplaceRange()), replacement.getReplacementString()));
+            formatter.getFormatReplacements(text, toRanges(ranges)).forEach(replacement -> {
+                replacements.put(toTextRange(replacement.getReplaceRange()), replacement.getReplacementString());
+            });
             return replacements.build();
         } catch (FormatterExceptionApi e) {
+            log.debug("Formatter failed, no replacements", e);
             return ImmutableMap.of();
         }
     }
@@ -54,4 +57,6 @@ final class FormatterUtil {
         checkState(range.lowerBoundType().equals(BoundType.CLOSED) && range.upperBoundType().equals(BoundType.OPEN));
         return new TextRange(range.lowerEndpoint(), range.upperEndpoint());
     }
+
+    private FormatterUtil() {}
 }
