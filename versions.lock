@@ -8,6 +8,7 @@ com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava (1 c
 com.google.j2objc:j2objc-annotations:1.1 (2 constraints: 8f167910)
 org.checkerframework:checker-qual:2.5.2 (2 constraints: 5917a461)
 org.codehaus.mojo:animal-sniffer-annotations:1.17 (1 constraints: ed09d8aa)
+org.immutables:value:2.7.5 (1 constraints: 10050f36)
 
 [Test dependencies]
 com.google.auto:auto-common:0.9 (1 constraints: be1116d7)
