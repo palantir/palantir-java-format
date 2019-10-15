@@ -161,7 +161,7 @@ public final class OpsBuilder {
         } else if (op instanceof CloseOp) {
             depth--;
             if (depth < 0) {
-                throw new AssertionError();
+                throw new IllegalStateException();
             }
         }
         ops.add(op);

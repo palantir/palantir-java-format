@@ -14,18 +14,16 @@
 
 package com.palantir.javaformat.java;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.collect.Range;
+import com.palantir.logsafe.Preconditions;
 import java.util.Objects;
 
 /** Data class representing a range in the original source and replacement text for that range. */
 public final class Replacement {
 
     public static Replacement create(int startPosition, int endPosition, String replaceWith) {
-        checkArgument(startPosition >= 0, "startPosition must be non-negative");
-        checkArgument(startPosition <= endPosition, "startPosition cannot be after endPosition");
+        Preconditions.checkArgument(startPosition >= 0, "startPosition must be non-negative");
+        Preconditions.checkArgument(startPosition <= endPosition, "startPosition cannot be after endPosition");
         return new Replacement(Range.closedOpen(startPosition, endPosition), replaceWith);
     }
 
@@ -33,8 +31,8 @@ public final class Replacement {
     private final String replacementString;
 
     private Replacement(Range<Integer> replaceRange, String replacementString) {
-        this.replaceRange = checkNotNull(replaceRange, "Null replaceRange");
-        this.replacementString = checkNotNull(replacementString, "Null replacementString");
+        this.replaceRange = Preconditions.checkNotNull(replaceRange, "Null replaceRange");
+        this.replacementString = Preconditions.checkNotNull(replacementString, "Null replacementString");
     }
 
     /** The range of characters in the original source to replace. */

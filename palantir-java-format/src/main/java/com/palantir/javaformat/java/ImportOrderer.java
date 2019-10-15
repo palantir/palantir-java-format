@@ -19,7 +19,6 @@ import static com.palantir.javaformat.java.JavaFormatterOptions.Style;
 import static com.palantir.javaformat.java.JavaInput.buildToks;
 
 import com.google.common.base.CharMatcher;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -357,7 +356,7 @@ public class ImportOrderer {
 
     // Produces the sorted output based on the imports we have scanned.
     private String reorderedImportsString(ImmutableSortedSet<Import> imports) {
-        Preconditions.checkArgument(!imports.isEmpty(), "imports");
+        com.palantir.logsafe.Preconditions.checkArgument(!imports.isEmpty(), "imports");
 
         // Pretend that the first import was preceded by another import of the same kind, so we don't
         // insert a newline there.
@@ -402,7 +401,7 @@ public class ImportOrderer {
         // At the start of each iteration of this loop, i points to an identifier.
         // On exit from the loop, i points to a token after an identifier or after *.
         while (true) {
-            Preconditions.checkState(isIdentifierToken(i));
+            com.palantir.logsafe.Preconditions.checkState(isIdentifierToken(i));
             imported.append(tokenAt(i));
             i++;
             if (!tokenAt(i).equals(".")) {

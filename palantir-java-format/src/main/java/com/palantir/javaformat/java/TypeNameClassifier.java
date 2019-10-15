@@ -43,7 +43,7 @@ public final class TypeNameClassifier {
                     case UPPER_CAMEL:
                         return TyParseState.TYPE;
                 }
-                throw new AssertionError();
+                throw new IllegalStateException();
             }
         },
 
@@ -59,7 +59,7 @@ public final class TypeNameClassifier {
                     case UPPER_CAMEL:
                         return TyParseState.TYPE;
                 }
-                throw new AssertionError();
+                throw new IllegalStateException();
             }
         },
 
@@ -92,7 +92,7 @@ public final class TypeNameClassifier {
                     case UPPER_CAMEL:
                         return TyParseState.TYPE;
                 }
-                throw new AssertionError();
+                throw new IllegalStateException();
             }
         };
 

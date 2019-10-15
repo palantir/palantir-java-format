@@ -27,6 +27,7 @@ import com.palantir.javaformat.CommentsHelper;
 import com.palantir.javaformat.Indent;
 import com.palantir.javaformat.Output;
 import com.palantir.javaformat.doc.StartsWithBreakVisitor.Result;
+import com.palantir.logsafe.exceptions.SafeIllegalStateException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -167,7 +168,7 @@ public final class Level extends Doc {
                 Level firstLevel = innerLevels.stream()
                         .filter(doc -> StartsWithBreakVisitor.INSTANCE.visit(doc) != Result.EMPTY)
                         .findFirst()
-                        .orElseThrow(() -> new IllegalStateException(
+                        .orElseThrow(() -> new SafeIllegalStateException(
                                 "Levels were broken so expected to find at least a non-empty level"));
 
                 // Add the width of tokens, breaks before the firstLevel. We must always have space for
@@ -239,7 +240,7 @@ public final class Level extends Doc {
         splitByBreaks(leadingDocs, splits, breaks);
 
         state = tryToLayOutLevelOnOneLine(commentsHelper, maxWidth, state);
-        Preconditions.checkState(
+        com.palantir.logsafe.Preconditions.checkState(
                 !state.mustBreak, "We messed up, it wants to break a bunch of splits that shouldn't be broken");
 
         // manually add the last level to the last split

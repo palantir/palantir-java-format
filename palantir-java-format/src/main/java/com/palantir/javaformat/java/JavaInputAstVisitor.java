@@ -53,6 +53,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.PeekingIterator;
 import com.google.common.collect.Streams;
@@ -72,6 +73,7 @@ import com.palantir.javaformat.doc.FillMode;
 import com.palantir.javaformat.doc.Token;
 import com.palantir.javaformat.java.DimensionHelpers.SortedDims;
 import com.palantir.javaformat.java.DimensionHelpers.TypeWithDims;
+import com.palantir.logsafe.exceptions.SafeIllegalStateException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -483,7 +485,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             token("{");
             builder.forcedBreak();
             boolean first = true;
-            for (Iterable<? extends ExpressionTree> row : Iterables.partition(expressions, cols)) {
+            for (Iterable<? extends ExpressionTree> row : Lists.partition(expressions, cols)) {
                 if (!first) {
                     builder.forcedBreak();
                 }
@@ -1953,7 +1955,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
 
     @Override
     public Void visitUnionType(UnionTypeTree node, Void unused) {
-        throw new IllegalStateException("expected manual descent into union types");
+        throw new SafeIllegalStateException("expected manual descent into union types");
     }
 
     @Override
@@ -2101,7 +2103,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
 
     @Override
     public Void visitModifiers(ModifiersTree node, Void unused) {
-        throw new IllegalStateException("expected manual descent into modifiers");
+        throw new SafeIllegalStateException("expected manual descent into modifiers");
     }
 
     /** Output combined modifiers and annotations and returns the trailing break. */
@@ -2188,7 +2190,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
 
     @Override
     public Void visitCatch(CatchTree node, Void unused) {
-        throw new IllegalStateException("expected manual descent into catch trees");
+        throw new SafeIllegalStateException("expected manual descent into catch trees");
     }
 
     /** Helper method for {@link CatchTree}s. */

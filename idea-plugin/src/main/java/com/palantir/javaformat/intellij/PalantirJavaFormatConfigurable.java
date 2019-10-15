@@ -26,6 +26,7 @@ import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 import com.palantir.javaformat.intellij.PalantirJavaFormatSettings.EnabledState;
 import com.palantir.javaformat.java.FormatterService;
+import com.palantir.logsafe.exceptions.SafeRuntimeException;
 import java.awt.Insets;
 import java.io.IOException;
 import java.net.URI;
@@ -125,7 +126,7 @@ class PalantirJavaFormatConfigurable extends BaseConfigurable implements Searcha
                     }
                 })
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Couldn't find implementation JAR"));
+                .orElseThrow(() -> new SafeRuntimeException("Couldn't find implementation JAR"));
     }
 
     @Override

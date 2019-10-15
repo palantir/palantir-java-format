@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
+import com.palantir.logsafe.exceptions.SafeIllegalArgumentException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -97,7 +98,7 @@ public class SnippetFormatter {
         }
         if (includeComments) {
             if (kind != SnippetKind.COMPILATION_UNIT) {
-                throw new IllegalArgumentException("comment formatting is only supported for compilation units");
+                throw new SafeIllegalArgumentException("comment formatting is only supported for compilation units");
             }
             return formatter.getFormatReplacements(source, ranges);
         }

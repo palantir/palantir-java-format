@@ -15,7 +15,6 @@
 package com.palantir.javaformat.java.javadoc;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Verify.verify;
 import static com.google.common.collect.Iterators.peekingIterator;
 import static com.palantir.javaformat.java.javadoc.Token.Type.BEGIN_JAVADOC;
@@ -54,6 +53,7 @@ import com.google.common.base.CharMatcher;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.PeekingIterator;
 import com.palantir.javaformat.java.javadoc.Token.Type;
+import com.palantir.logsafe.Preconditions;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -100,7 +100,7 @@ final class JavadocLexer {
     private boolean somethingSinceNewline;
 
     private JavadocLexer(CharStream input) {
-        this.input = checkNotNull(input);
+        this.input = Preconditions.checkNotNull(input);
     }
 
     private ImmutableList<Token> generateTokens() throws LexException {
@@ -235,7 +235,7 @@ final class JavadocLexer {
         } else if (input.tryConsumeRegex(LITERAL_PATTERN)) {
             return LITERAL;
         }
-        throw new AssertionError();
+        throw new IllegalStateException();
     }
 
     private boolean preserveExistingFormatting() {

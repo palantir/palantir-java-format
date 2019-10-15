@@ -138,7 +138,7 @@ public final class JavadocFormatter {
                     throw new AssertionError(token.getType());
             }
         }
-        throw new AssertionError();
+        throw new IllegalStateException();
     }
 
     /*

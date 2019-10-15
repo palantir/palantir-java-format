@@ -14,7 +14,6 @@
 
 package com.palantir.javaformat.java;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Iterables.getLast;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -33,6 +32,7 @@ import com.google.common.collect.TreeRangeSet;
 import com.palantir.javaformat.Input;
 import com.palantir.javaformat.Newlines;
 import com.palantir.javaformat.java.JavacTokens.RawTok;
+import com.palantir.logsafe.Preconditions;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -260,7 +260,7 @@ public final class JavaInput extends Input {
      * @throws FormatterException if the input cannot be parsed
      */
     public JavaInput(String text) throws FormatterException {
-        this.text = checkNotNull(text);
+        this.text = Preconditions.checkNotNull(text);
         setLines(ImmutableList.copyOf(Newlines.lineIterator(text)));
         ImmutableList<Tok> toks = buildToks(text);
         positionToColumnMap = makePositionToColumnMap(toks);

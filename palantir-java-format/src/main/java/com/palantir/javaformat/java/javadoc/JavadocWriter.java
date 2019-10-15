@@ -14,7 +14,6 @@
 
 package com.palantir.javaformat.java.javadoc;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Sets.immutableEnumSet;
 import static com.palantir.javaformat.java.javadoc.JavadocWriter.AutoIndent.AUTO_INDENT;
 import static com.palantir.javaformat.java.javadoc.JavadocWriter.AutoIndent.NO_AUTO_INDENT;
@@ -30,6 +29,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
 import com.palantir.javaformat.java.javadoc.Token.Type;
+import com.palantir.logsafe.Preconditions;
 
 /**
  * Stateful object that accepts "requests" and "writes," producing formatted Javadoc.
@@ -74,7 +74,7 @@ final class JavadocWriter {
 
     void requestMoeBeginStripComment(Token token) {
         // We queue this up so that we can put it after any requested whitespace.
-        requestedMoeBeginStripComment = checkNotNull(token);
+        requestedMoeBeginStripComment = Preconditions.checkNotNull(token);
     }
 
     void writeBeginJavadoc() {

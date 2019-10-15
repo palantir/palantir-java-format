@@ -16,8 +16,7 @@
 
 package com.palantir.javaformat.java;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.palantir.logsafe.Preconditions;
 
 /** An error that prevented formatting from succeeding. */
 public class FormatterDiagnostic {
@@ -30,9 +29,9 @@ public class FormatterDiagnostic {
     }
 
     public static FormatterDiagnostic create(int lineNumber, int column, String message) {
-        checkArgument(lineNumber >= 0);
-        checkArgument(column >= 0);
-        checkNotNull(message);
+        Preconditions.checkArgument(lineNumber >= 0);
+        Preconditions.checkArgument(column >= 0);
+        Preconditions.checkNotNull(message);
         return new FormatterDiagnostic(lineNumber, column, message);
     }
 
@@ -60,6 +59,7 @@ public class FormatterDiagnostic {
         return message;
     }
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         if (lineNumber >= 0) {

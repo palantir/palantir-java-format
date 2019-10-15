@@ -16,7 +16,6 @@
 
 package com.palantir.javaformat.intellij;
 
-import static com.google.common.base.Preconditions.checkState;
 import static java.util.Comparator.comparing;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -103,7 +102,8 @@ class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
     }
 
     private static TextRange toTextRange(Range<Integer> range) {
-        checkState(range.lowerBoundType().equals(BoundType.CLOSED) && range.upperBoundType().equals(BoundType.OPEN));
+        com.palantir.logsafe.Preconditions.checkState(
+                range.lowerBoundType().equals(BoundType.CLOSED) && range.upperBoundType().equals(BoundType.OPEN));
         return new TextRange(range.lowerEndpoint(), range.upperEndpoint());
     }
 

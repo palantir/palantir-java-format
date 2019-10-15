@@ -14,9 +14,7 @@
 
 package com.palantir.javaformat.java.javadoc;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
+import com.palantir.logsafe.Preconditions;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,7 +29,7 @@ final class CharStream {
     int toConsume;
 
     CharStream(String input) {
-        this.remaining = checkNotNull(input);
+        this.remaining = Preconditions.checkNotNull(input);
     }
 
     boolean tryConsume(String expected) {
@@ -50,7 +48,7 @@ final class CharStream {
         if (!matcher.find()) {
             return false;
         }
-        checkArgument(matcher.start() == 0);
+        Preconditions.checkArgument(matcher.start() == 0);
         toConsume = matcher.end();
         return true;
     }

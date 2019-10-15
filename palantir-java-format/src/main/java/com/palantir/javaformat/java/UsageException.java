@@ -14,9 +14,8 @@
 
 package com.palantir.javaformat.java;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.base.Joiner;
+import com.palantir.logsafe.Preconditions;
 
 /** Checked exception class for formatter command-line usage errors. */
 final class UsageException extends Exception {
@@ -79,7 +78,7 @@ final class UsageException extends Exception {
     }
 
     UsageException(String message) {
-        super(buildMessage(checkNotNull(message)));
+        super(buildMessage(Preconditions.checkNotNull(message)));
     }
 
     private static String buildMessage(String message) {
