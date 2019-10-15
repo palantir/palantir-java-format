@@ -43,7 +43,7 @@ a single format.*
 ### IntelliJ, Android Studio, and other JetBrains IDEs
 
 A
-[palantir-java-format IntelliJ plugin](https://plugins.jetbrains.com/plugin/8527)
+[palantir-java-format IntelliJ plugin](https://plugins.jetbrains.com/plugin/13180)
 is available from the plugin repository. To install it, go to your IDE's
 settings and select the `Plugins` category. Click the `Marketplace` tab, search
 for the `palantir-java-format` plugin, and click the `Install` button.

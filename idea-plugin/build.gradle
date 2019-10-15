@@ -32,10 +32,14 @@ patchPluginXml {
     untilBuild = ''
 }
 
-// TODO(dsanduleac): publish to official IntelliJ plugin repository
-// publishPlugin {
-//     token = System.env.JETBRAINS_PLUGIN_REPO_TOKEN
-// }
+publishPlugin {
+    token = System.env.JETBRAINS_PLUGIN_REPO_TOKEN
+    if (!versionDetails().isCleanTag) {
+        channels 'eap'
+    }
+}
+
+tasks.publish.dependsOn publishPlugin
 
 configurations {
     formatter {

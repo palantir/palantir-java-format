@@ -1,0 +1,6 @@
+type: improvement
+improvement:
+  description: We are now publishing the intellij plugin to the plugin portal. See
+    https://plugins.jetbrains.com/plugin/13180-palantir-java-format
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/24
