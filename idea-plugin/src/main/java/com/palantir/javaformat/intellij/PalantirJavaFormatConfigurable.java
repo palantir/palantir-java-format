@@ -30,7 +30,6 @@ import java.awt.Insets;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 import java.util.jar.JarFile;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
@@ -105,29 +104,28 @@ class PalantirJavaFormatConfigurable extends BaseConfigurable implements Searcha
         enable.setSelected(settings.isEnabled());
         styleComboBox.setSelectedItem(UiFormatterStyle.convert(settings.getStyle()));
         pluginVersion.setText(PalantirJavaFormatConfigurable.class.getPackage().getImplementationVersion());
-        formatterVersion.setText(computeFormatterVersion(settings.getImplementationClassPath()));
+        formatterVersion.setText(
+                settings.getImplementationClassPath().map(this::computeFormatterVersion).orElse("(bundled)"));
     }
 
-    private String computeFormatterVersion(Optional<List<URI>> implementationClassPath) {
-        return implementationClassPath
-                .map(uris -> uris.stream()
-                        .flatMap(uri -> {
-                            try {
-                                JarFile jar = new JarFile(uri.getPath());
-                                // Identify the implementation jar by the service it produces.
-                                if (jar.getEntry("META-INF/services/" + FormatterService.class.getName()) != null) {
-                                    String implementationVersion =
-                                            jar.getManifest().getMainAttributes().getValue("Implementation-Version");
-                                    return Stream.of(implementationVersion);
-                                }
-                                return Stream.empty();
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                        })
-                        .findFirst()
-                        .orElseThrow(() -> new RuntimeException("Couldn't find implementation JAR")))
-                .orElseGet(() -> PalantirJavaFormatConfigurable.class.getPackage().getImplementationVersion());
+    private String computeFormatterVersion(List<URI> implementationClassPath) {
+        return implementationClassPath.stream()
+                .flatMap(uri -> {
+                    try {
+                        JarFile jar = new JarFile(uri.getPath());
+                        // Identify the implementation jar by the service it produces.
+                        if (jar.getEntry("META-INF/services/" + FormatterService.class.getName()) != null) {
+                            String implementationVersion =
+                                    jar.getManifest().getMainAttributes().getValue("Implementation-Version");
+                            return Stream.of(implementationVersion);
+                        }
+                        return Stream.empty();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Couldn't find implementation JAR"));
     }
 
     @Override

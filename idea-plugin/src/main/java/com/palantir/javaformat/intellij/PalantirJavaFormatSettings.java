@@ -90,7 +90,7 @@ class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJav
 
     static class State {
 
-        private EnabledState enabled = EnabledState.ENABLED;
+        private EnabledState enabled = EnabledState.UNKNOWN;
         private Optional<List<URI>> implementationClassPath = Optional.empty();
 
         public JavaFormatterOptions.Style style = JavaFormatterOptions.Style.PALANTIR;

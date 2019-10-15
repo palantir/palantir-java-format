@@ -28,7 +28,7 @@ final class InitialConfigurationComponent implements ProjectComponent {
     @Override
     public void projectOpened() {
         if (settings.isUninitialized()) {
-            settings.setEnabled(true);
+            settings.setEnabled(false);
         }
     }
 }
