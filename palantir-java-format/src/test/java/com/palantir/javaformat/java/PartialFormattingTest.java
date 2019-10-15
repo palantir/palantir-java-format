@@ -43,8 +43,8 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 public final class PartialFormattingTest {
 
     @ParameterizedClass.Parameters
-    public static Object[][] parameters() {
-        return new Object[][] {{"\n"}, {"\r"}, {"\r\n"}};
+    public static List<Object[]> parameters() {
+        return ImmutableList.copyOf(new Object[][] {{"\n"}, {"\r"}, {"\r\n"}});
     }
 
     @TempDir public Path testFolder;

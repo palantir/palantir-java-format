@@ -19,6 +19,7 @@ import static com.palantir.javaformat.java.FileBasedTests.isRecreate;
 
 import com.palantir.javaformat.jupiter.ParameterizedClass;
 import java.io.IOException;
+import java.util.List;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,7 +33,7 @@ public class StringWrapperIntegrationTest {
     private static FileBasedTests tests = new FileBasedTests(StringWrapperIntegrationTest.class);
 
     @ParameterizedClass.Parameters(name = "{index}: {0}")
-    public static Object[][] parameters() throws IOException {
+    public static List<Object[]> parameters() throws IOException {
         return tests.paramsAsNameInputOutput();
     }
 

@@ -25,7 +25,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
@@ -40,8 +42,6 @@ import org.junit.jupiter.api.extension.TestTemplateInvocationContext;
 import org.junit.jupiter.api.extension.TestTemplateInvocationContextProvider;
 import org.junit.platform.commons.util.AnnotationUtils;
 import org.junit.platform.commons.util.ReflectionUtils;
-
-// Copied from junit5-extensions
 
 public final class ParameterizedClass implements TestTemplateInvocationContextProvider {
     private static ExtensionContext.Namespace namespace = ExtensionContext.Namespace.create(ParameterizedClass.class);
@@ -96,10 +96,10 @@ public final class ParameterizedClass implements TestTemplateInvocationContextPr
         // we cache the result of our @Parameters in the 'parent' so it can be reused by other @TestTemplate methods
         ExtensionContext parent = extensionContext.getParent().get();
 
-        Object[][] objectArrayArray = invokeUserParametersMethod(parent, parent.getTestClass().get());
+        List<Object[]> objectArrayArray = invokeUserParametersMethod(parent, parent.getTestClass().get());
         String stringFormatTemplate = findStringFormatTemplate(parent, parent.getTestClass().get());
 
-        return Arrays.stream(objectArrayArray).map(objectArray -> new TestTemplateInvocationContext() {
+        return objectArrayArray.stream().map(objectArray -> new TestTemplateInvocationContext() {
             @Override
             public String getDisplayName(int invocationIndex) {
                 String replaced = stringFormatTemplate.replaceAll("\\{index\\}", Integer.toString(invocationIndex));
@@ -164,23 +164,38 @@ public final class ParameterizedClass implements TestTemplateInvocationContextPr
     }
 
     /** Users must provide a public static Object[][] method, and this invokes it *once*, caching the result. */
-    private static Object[][] invokeUserParametersMethod(ExtensionContext extensionContext, Class<?> testClass) {
+    private static List<Object[]> invokeUserParametersMethod(ExtensionContext extensionContext, Class<?> testClass) {
         List<Method> methods = AnnotationUtils.findAnnotatedMethods(
                 testClass, Parameters.class, ReflectionUtils.HierarchyTraversalMode.BOTTOM_UP);
 
         Method userParametersMethod = methods.get(0);
 
         return extensionContext.getStore(namespace).getOrComputeIfAbsent(
-                "invokeUserParametersMethod",
-                unused -> {
-                    try {
-                        // TODO(dfox): the JUnit4 runner also allowed an Object[] return signature...
-                        return (Object[][]) userParametersMethod.invoke(null);
-                    } catch (InvocationTargetException | IllegalAccessException e) {
-                        throw new TestInstantiationException("barf", e);
-                    }
-                },
-                Object[][].class);
+                "invokeUserParametersMethod", unused -> allParameters(userParametersMethod), List.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<Object> allParameters(Method method) {
+        try {
+            Object parameters = method.invoke(null);
+            if (parameters instanceof List) {
+                return (List<Object>) parameters;
+            } else if (parameters instanceof Collection) {
+                return new ArrayList<>((Collection<Object>) parameters);
+            } else if (parameters instanceof Iterable) {
+                List<Object> result = new ArrayList<>();
+                for (Object entry : (Iterable<Object>) parameters) {
+                    result.add(entry);
+                }
+                return result;
+            } else if (parameters instanceof Object[]) {
+                return Arrays.asList((Object[]) parameters);
+            } else {
+                throw new TestInstantiationException("Invalid return type. Must be iterable of arrays");
+            }
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            throw new TestInstantiationException("barf", e);
+        }
     }
 
     private static String findStringFormatTemplate(ExtensionContext extensionContext, Class<?> testClass) {

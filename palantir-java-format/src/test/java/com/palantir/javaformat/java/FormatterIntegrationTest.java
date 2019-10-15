@@ -21,6 +21,7 @@ import static org.junit.Assert.fail;
 import com.palantir.javaformat.Newlines;
 import com.palantir.javaformat.jupiter.ParameterizedClass;
 import java.io.IOException;
+import java.util.List;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,7 +35,7 @@ public class FormatterIntegrationTest {
     private static FileBasedTests tests = new FileBasedTests(FormatterIntegrationTest.class, "testdata");
 
     @ParameterizedClass.Parameters(name = "{index}: {0}")
-    public static Object[][] data() throws IOException {
+    public static List<Object[]> data() throws IOException {
         return tests.paramsAsNameInputOutput();
     }
 

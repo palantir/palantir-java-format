@@ -20,6 +20,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.truth.Truth;
 import com.palantir.javaformat.jupiter.ParameterizedClass;
+import java.util.List;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.Execution;
@@ -31,7 +32,7 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 public class RemoveUnusedImportsTest {
 
     @ParameterizedClass.Parameters(name = "{index}: {0}")
-    public static Object[][] parameters() {
+    public static List<Object[]> parameters() {
         String[][][] inputsOutputs = {
             {
                 {
@@ -264,7 +265,7 @@ public class RemoveUnusedImportsTest {
             };
             builder.add(parameters);
         }
-        return builder.build().toArray(new Object[][] {});
+        return builder.build();
     }
 
     private final String input;

@@ -22,6 +22,7 @@ import static com.google.common.truth.Truth.assertWithMessage;
 import com.google.common.collect.ImmutableList;
 import com.palantir.javaformat.jupiter.ParameterizedClass;
 import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.Execution;
@@ -41,7 +42,7 @@ public class GoogleImportStyleTest {
     }
 
     @ParameterizedClass.Parameters(name = "{index}: {0}")
-    public static Object[][] parameters() {
+    public static List<Object[]> parameters() {
         // Inputs are provided as three-dimensional arrays. Each element of the outer array is a test
         // case. It consists of two arrays of lines. The first array of lines is the test input, and
         // the second one is the expected output. If the second array has a single element starting
@@ -527,7 +528,7 @@ public class GoogleImportStyleTest {
 
         ImmutableList.Builder<Object[]> builder = ImmutableList.builder();
         Arrays.stream(inputsOutputs).forEach(input -> builder.add(ImportOrdererUtils.createRow(input)));
-        return builder.build().toArray(new Object[][] {});
+        return builder.build();
     }
 
     @TestTemplate

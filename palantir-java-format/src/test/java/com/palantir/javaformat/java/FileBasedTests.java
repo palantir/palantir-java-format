@@ -42,7 +42,7 @@ public final class FileBasedTests {
         this.fullTestPath = Paths.get("src/test/resources").resolve(resourcePrefix);
     }
 
-    public Object[][] paramsAsNameInputOutput() throws IOException {
+    public List<Object[]> paramsAsNameInputOutput() throws IOException {
         ClassLoader classLoader = testClass.getClassLoader();
         Map<String, String> inputs = new TreeMap<>();
         Map<String, String> outputs = new TreeMap<>();
@@ -86,7 +86,7 @@ public final class FileBasedTests {
             }
             testInputs.add(new Object[] {fileName, input, expectedOutput});
         }
-        return testInputs.toArray(new Object[][] {});
+        return testInputs;
     }
 
     public static boolean isRecreate() {

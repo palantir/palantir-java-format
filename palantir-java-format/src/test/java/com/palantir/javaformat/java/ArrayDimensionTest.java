@@ -18,7 +18,9 @@ import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
 import com.palantir.javaformat.jupiter.ParameterizedClass;
+import java.util.Arrays;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.Execution;
@@ -29,52 +31,53 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 @ExtendWith(ParameterizedClass.class)
 public class ArrayDimensionTest {
     @ParameterizedClass.Parameters
-    public static Object[][] parameters() {
-        return new Object[][] {
+    public static Iterable<Object[]> parameters() {
+        String[] inputs = {
             // mixed array notation multi-variable declarations
-            new String[] {"int a[], b @B [], c @B [][] @C [];"},
-            new String[] {"int a @A [], b @B [], c @B [] @C [];"},
-            new String[] {"int a[] @A [], b @B [], c @B [] @C [];"},
-            new String[] {"int a, b @B [], c @B [] @C [];"},
-            new String[] {"int @A [] a, b @B [], c @B [] @C [];"},
-            new String[] {"int @A [] a = {}, b @B [] = {{}}, c @B [] @C [] = {{{}}};"},
+            "int a[], b @B [], c @B [][] @C [];",
+            "int a @A [], b @B [], c @B [] @C [];",
+            "int a[] @A [], b @B [], c @B [] @C [];",
+            "int a, b @B [], c @B [] @C [];",
+            "int @A [] a, b @B [], c @B [] @C [];",
+            "int @A [] a = {}, b @B [] = {{}}, c @B [] @C [] = {{{}}};",
             // mixed array notation methods
-            new String[] {"int[][][][][] argh()[] @A @B [] @C @D [][] {}"},
-            new String[] {"int[][] @T [] @U [] @V @W [][][] argh() @A @B [] @C @D [] {}"},
-            new String[] {"int e1() @A [] {}"},
-            new String[] {"int f1()[] @A [] {}"},
-            new String[] {"int g1() @A [] @B [] {}"},
-            new String[] {"int h1() @A @B [] @C @B [] {}"},
-            new String[] {"int[] e2() @A [] {}"},
-            new String[] {"int @X [] f2()[] @A [] {}"},
-            new String[] {"int[] g2() @A [] @B [] {}"},
-            new String[] {"int @X [] h2() @A @B [] @C @B [] {}"},
-            new String[] {"@X int[] e3() @A [] {}"},
-            new String[] {"@X int @Y [] f3()[] @A [] {}"},
-            new String[] {"@X int @Y [] g3() @A [] @B [] {}"},
-            new String[] {"@X int[] h3() @A @B [] @C @B [] {}"},
+            "int[][][][][] argh()[] @A @B [] @C @D [][] {}",
+            "int[][] @T [] @U [] @V @W [][][] argh() @A @B [] @C @D [] {}",
+            "int e1() @A [] {}",
+            "int f1()[] @A [] {}",
+            "int g1() @A [] @B [] {}",
+            "int h1() @A @B [] @C @B [] {}",
+            "int[] e2() @A [] {}",
+            "int @X [] f2()[] @A [] {}",
+            "int[] g2() @A [] @B [] {}",
+            "int @X [] h2() @A @B [] @C @B [] {}",
+            "@X int[] e3() @A [] {}",
+            "@X int @Y [] f3()[] @A [] {}",
+            "@X int @Y [] g3() @A [] @B [] {}",
+            "@X int[] h3() @A @B [] @C @B [] {}",
             // mixed array notation single-variable declarations
-            new String[] {"int[] e2() @A [] {}"},
-            new String[] {"int @I [] f2()[] @A [] {}"},
-            new String[] {"int[] @J [] g2() @A [] @B [] {}"},
-            new String[] {"int @I [] @J [] h2() @A @B [] @C @B [] {}"},
-            new String[] {"int a1[];"},
-            new String[] {"int b1 @A [];"},
-            new String[] {"int c1[] @A [];"},
-            new String[] {"int d1 @A [] @B [];"},
-            new String[] {"int[] a2[];"},
-            new String[] {"int @A [] b2 @B [];"},
-            new String[] {"int[] c2[] @A [];"},
-            new String[] {"int @A [] d2 @B [] @C [];"},
+            "int[] e2() @A [] {}",
+            "int @I [] f2()[] @A [] {}",
+            "int[] @J [] g2() @A [] @B [] {}",
+            "int @I [] @J [] h2() @A @B [] @C @B [] {}",
+            "int a1[];",
+            "int b1 @A [];",
+            "int c1[] @A [];",
+            "int d1 @A [] @B [];",
+            "int[] a2[];",
+            "int @A [] b2 @B [];",
+            "int[] c2[] @A [];",
+            "int @A [] d2 @B [] @C [];",
             // array dimension expressions
-            new String[] {"int[][] a0 = new @A int[0];"},
-            new String[] {"int[][] a1 = new int @A [0] @B [];"},
-            new String[] {"int[][] a2 = new int[0] @A [] @B [];"},
-            new String[] {"int[][] a4 = new int[0] @A [][] @B [];"},
+            "int[][] a0 = new @A int[0];",
+            "int[][] a1 = new int @A [0] @B [];",
+            "int[][] a2 = new int[0] @A [] @B [];",
+            "int[][] a4 = new int[0] @A [][] @B [];",
             // nested array type uses
-            new String[] {"List<int @A [] @B []> xs;"},
-            new String[] {"List<int[] @A [][] @B []> xs;"},
+            "List<int @A [] @B []> xs;",
+            "List<int[] @A [][] @B []> xs;",
         };
+        return Iterables.transform(Arrays.asList(inputs), input -> new Object[] {input});
     }
 
     private final String input;
