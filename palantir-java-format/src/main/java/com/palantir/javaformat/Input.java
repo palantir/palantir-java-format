@@ -18,6 +18,7 @@ import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableRangeMap;
+import com.palantir.javaformat.java.FormatterDiagnostic;
 
 /** An input to the formatter. */
 public abstract class Input extends InputOutput {

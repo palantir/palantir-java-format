@@ -10,8 +10,7 @@ public final class FormatterServiceImpl implements FormatterService {
 
     @Override
     public ImmutableList<Replacement> getFormatReplacements(
-            JavaFormatterOptions options, String text, Collection<Range<Integer>> toRanges)
-            throws FormatterExceptionApi {
+            JavaFormatterOptions options, String text, Collection<Range<Integer>> toRanges) throws FormatterException {
 
         return Formatter.createFormatter(options).getFormatReplacements(text, toRanges);
     }

@@ -19,7 +19,6 @@ package com.palantir.javaformat.java;
 import static java.util.Locale.ENGLISH;
 
 import com.google.common.collect.Iterables;
-import com.palantir.javaformat.FormatterDiagnostic;
 import org.openjdk.javax.tools.Diagnostic;
 import org.openjdk.javax.tools.JavaFileObject;
 

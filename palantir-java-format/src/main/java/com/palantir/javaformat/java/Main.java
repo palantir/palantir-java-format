@@ -17,7 +17,6 @@ package com.palantir.javaformat.java;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.common.io.ByteStreams;
-import com.palantir.javaformat.FormatterDiagnostic;
 import com.palantir.javaformat.java.JavaFormatterOptions.Style;
 import java.io.IOError;
 import java.io.IOException;

@@ -41,7 +41,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.impl.CheckUtil;
 import com.intellij.util.IncorrectOperationException;
-import com.palantir.javaformat.java.FormatterExceptionApi;
+import com.palantir.javaformat.java.FormatterException;
 import com.palantir.javaformat.java.FormatterService;
 import com.palantir.javaformat.java.JavaFormatterOptions;
 import java.io.IOException;
@@ -90,7 +90,7 @@ class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
                 replacements.put(toTextRange(replacement.getReplaceRange()), replacement.getReplacementString());
             });
             return replacements.build();
-        } catch (FormatterExceptionApi e) {
+        } catch (FormatterException e) {
             log.debug("Formatter failed, no replacements", e);
             return ImmutableMap.of();
         }
