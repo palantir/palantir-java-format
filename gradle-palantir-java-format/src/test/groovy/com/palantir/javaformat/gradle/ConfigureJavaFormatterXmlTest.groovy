@@ -28,10 +28,20 @@ class ConfigureJavaFormatterXmlTest extends Specification {
 
     private static final String MISSING_ENTIRE_BLOCK = """
             <root>
-                <component name="PalantirJavaFormatSettings">
-                    <option name="style" value="PALANTIR"/>
-                </component>
             </root>
+        """.stripIndent()
+
+    public static final String EXPECTED = """\
+        <root>
+          <component name="PalantirJavaFormatSettings">
+            <option name="implementationClassPath">
+              <list>
+                <option value="foo"/>
+                <option value="bar"/>
+              </list>
+            </option>
+          </component>
+        </root>
         """.stripIndent()
 
     void testConfigure_missingEntireBlock_added() {
@@ -41,13 +51,7 @@ class ConfigureJavaFormatterXmlTest extends Specification {
         ConfigureJavaFormatterXml.configure(node, ['foo', 'bar'].collect { URI.create(it) })
 
         then:
-        def values = node
-                .component.find { it.@name == 'PalantirJavaFormatSettings' }
-                .option.find { it.@name == 'implementationClassPath' }
-                .list
-                .option
-                .@value
-        values.collect { it.toString() } == ['foo', 'bar']
+        xmlToString(node) == EXPECTED
     }
 
     void testConfigure_missingClassPath_added() {
@@ -57,13 +61,19 @@ class ConfigureJavaFormatterXmlTest extends Specification {
         ConfigureJavaFormatterXml.configure(node, ['foo', 'bar'].collect { URI.create(it) })
 
         then:
-        def values = node
-                .component.find { it.@name == 'PalantirJavaFormatSettings' }
-                .option.find { it.@name == 'implementationClassPath' }
-                .list
-                .option
-                .@value
-        values.collect { it.toString() } == ['foo', 'bar']
+        xmlToString(node) == """\
+        <root>
+          <component name="PalantirJavaFormatSettings">
+            <option name="style" value="PALANTIR"/>
+            <option name="implementationClassPath">
+              <list>
+                <option value="foo"/>
+                <option value="bar"/>
+              </list>
+            </option>
+          </component>
+        </root>
+        """.stripIndent()
     }
 
     void testConfigure_existingClassPath_modified() {
@@ -73,12 +83,14 @@ class ConfigureJavaFormatterXmlTest extends Specification {
         ConfigureJavaFormatterXml.configure(node, ['foo', 'bar'].collect { URI.create(it) })
 
         then:
-        def values = node
-                .component.find { it.@name == 'PalantirJavaFormatSettings' }
-                .option.find { it.@name == 'implementationClassPath' }
-                .list
-                .option
-                .@value
-        values.collect { it.toString() } == ['foo', 'bar']
+        xmlToString(node) == EXPECTED
+    }
+
+    static String xmlToString(Node node) {
+        StringWriter sw = new StringWriter();
+        XmlNodePrinter nodePrinter = new XmlNodePrinter(new PrintWriter(sw));
+        nodePrinter.setPreserveWhitespace(true);
+        nodePrinter.print(node);
+        return sw.toString()
     }
 }

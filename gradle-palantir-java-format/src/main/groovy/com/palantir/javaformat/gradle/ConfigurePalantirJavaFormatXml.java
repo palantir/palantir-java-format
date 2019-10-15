@@ -41,7 +41,6 @@ public class ConfigurePalantirJavaFormatXml extends DefaultTask {
 
     @TaskAction
     public void run() {
-        List<URI> uris = implConfiguration.get().getFiles().stream().map(File::toURI).collect(Collectors.toList());
         File configurationFile = getOutputFile();
         Node rootNode;
         if (configurationFile.isFile()) {
@@ -53,7 +52,10 @@ public class ConfigurePalantirJavaFormatXml extends DefaultTask {
         } else {
             rootNode = new Node(null, "project", ImmutableMap.of("version", "4"));
         }
+
+        List<URI> uris = implConfiguration.get().getFiles().stream().map(File::toURI).collect(Collectors.toList());
         ConfigureJavaFormatterXml.configure(rootNode, uris);
+
         try (BufferedWriter writer = Files.newWriter(configurationFile, Charset.defaultCharset());
                 PrintWriter printWriter = new PrintWriter(writer)) {
             XmlNodePrinter nodePrinter = new XmlNodePrinter(printWriter);
