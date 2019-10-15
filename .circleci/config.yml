@@ -148,7 +148,7 @@ jobs:
       - restore_cache: { key: 'gradle-wrapper-v2-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
       - restore_cache: { key: 'publish-gradle-cache-v2-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
       - deploy:
-          command: ./gradlew --parallel --stacktrace --continue publishPlugin
+          command: ./gradlew --parallel --stacktrace --continue publish
       - save_cache:
           key: 'publish-gradle-cache-v2-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}'
           paths: [ ~/.gradle/caches ]
@@ -187,4 +187,4 @@ workflows:
 
       - publish:
           requires: [ unit-test, unit-test-11, check ]
-          filters: { tags: { only: /.*/ }, branches: { only: ds/publish-intellij } }
+          filters: { tags: { only: /.*/ }, branches: { only: develop } }
