@@ -127,7 +127,7 @@ class PalantirJavaFormatConfigurable extends BaseConfigurable implements Searcha
                         })
                         .findFirst()
                         .orElseThrow(() -> new RuntimeException("Couldn't find implementation JAR")))
-                .orElseGet(() -> PalantirJavaFormatConfigurable.class.getPackage().getImplementationVersion());
+                .orElse("bundled");
     }
 
     @Override
