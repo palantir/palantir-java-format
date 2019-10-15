@@ -38,13 +38,16 @@ publishPlugin {
 }
 
 configurations {
-    impl
+    formatter {
+        description = 'The default implementation of palantir-java-format, used if the user doesn\'t specify an explicit classpath.'
+    }
 }
 
 dependencies {
     implementation project(':palantir-java-format-api')
     implementation 'com.github.ben-manes.caffeine:caffeine'
-    impl project(':palantir-java-format')
+
+    formatter project(':palantir-java-format')
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -57,9 +60,10 @@ check.dependsOn buildPlugin, verifyPlugin
 // see https://github.com/JetBrains/gradle-intellij-plugin/blob/master/src/main/groovy/org/jetbrains/intellij/tasks/PrepareSandboxTask.groovy
 tasks.withType(org.jetbrains.intellij.tasks.PrepareSandboxTask) {
     dependsOn configurations.runtimeClasspath
-    // Also pack the impl in its own directory
+
+    // Also pack the formatter in its own directory
     into("${pluginName}/impl") {
-        from configurations.impl.filter { !configurations.runtimeClasspath.contains(it) }
+        from configurations.formatter.filter { !configurations.runtimeClasspath.contains(it) }
     }
 }
 
@@ -79,6 +83,7 @@ publishing {
 }
 
 versionsLock {
+    // 'org.jetbrains.intellij' creates a dependency on *IntelliJ*, which GCV cannot resolve
     disableJavaPluginDefaults()
 }
 
