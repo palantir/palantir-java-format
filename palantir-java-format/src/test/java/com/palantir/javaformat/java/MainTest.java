@@ -35,17 +35,15 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.EnumSet;
 import java.util.Locale;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
-/** Tests for {@link Main}. */
-@RunWith(JUnit4.class)
+@Execution(ExecutionMode.CONCURRENT)
 public class MainTest {
 
-    @Rule public TemporaryFolder testFolder = new TemporaryFolder();
+    @TempDir public Path testFolder;
 
     // PrintWriter instances used below are hard-coded to use system-default line separator.
     private final Joiner joiner = Joiner.on(System.lineSeparator());
@@ -87,7 +85,7 @@ public class MainTest {
 
     @Test
     public void preserveOriginalFile() throws Exception {
-        Path path = testFolder.newFile("Test.java").toPath();
+        Path path = Files.createFile(testFolder.resolve("Test.java"));
         Files.write(path, "class Test {}\n".getBytes(UTF_8));
         try {
             Files.setPosixFilePermissions(path, EnumSet.of(PosixFilePermission.OWNER_READ));
@@ -224,7 +222,7 @@ public class MainTest {
         };
 
         // pre-check expectation with local formatter instance
-        String optimized = new Formatter().formatSourceAndFixImports(joiner.join(input));
+        String optimized = Formatter.create().formatSourceAndFixImports(joiner.join(input));
         assertThat(optimized).isEqualTo(joiner.join(expected));
 
         InputStream in = new ByteArrayInputStream(joiner.join(input).getBytes(UTF_8));
@@ -344,9 +342,9 @@ public class MainTest {
 
     @Test
     public void dryRunFiles() throws Exception {
-        Path a = testFolder.newFile("A.java").toPath();
-        Path b = testFolder.newFile("B.java").toPath();
-        Path c = testFolder.newFile("C.java").toPath();
+        Path a = Files.createFile(testFolder.resolve("A.java"));
+        Path b = Files.createFile(testFolder.resolve("B.java"));
+        Path c = Files.createFile(testFolder.resolve("C.java"));
         Files.write(a, "class A {}\n".getBytes(UTF_8));
         Files.write(b, "class B {\n}\n".getBytes(UTF_8));
         Files.write(c, "class C {\n}\n".getBytes(UTF_8));
@@ -372,10 +370,10 @@ public class MainTest {
 
     @Test
     public void keepGoingWhenFilesDontExist() throws Exception {
-        Path a = testFolder.newFile("A.java").toPath();
-        Path b = testFolder.newFile("B.java").toPath();
-        File cFile = testFolder.newFile("C.java");
-        Path c = cFile.toPath();
+        Path a = Files.createFile(testFolder.resolve("A.java"));
+        Path b = Files.createFile(testFolder.resolve("B.java"));
+        Path c = Files.createFile(testFolder.resolve("C.java"));
+        File cFile = c.toFile();
         cFile.delete();
 
         Files.write(a, "class A{}\n".getBytes(UTF_8));
@@ -400,7 +398,7 @@ public class MainTest {
 
     @Test
     public void exitIfChangedStdin() throws Exception {
-        Path path = testFolder.newFile("Test.java").toPath();
+        Path path = Files.createFile(testFolder.resolve("Test.java"));
         Files.write(path, "class Test {\n}\n".getBytes(UTF_8));
         Process process = new ProcessBuilder(ImmutableList.of(
                         Paths.get(System.getProperty("java.home")).resolve("bin/java").toString(),
@@ -423,7 +421,7 @@ public class MainTest {
 
     @Test
     public void exitIfChangedFiles() throws Exception {
-        Path path = testFolder.newFile("Test.java").toPath();
+        Path path = Files.createFile(testFolder.resolve("Test.java"));
         Files.write(path, "class Test {\n}\n".getBytes(UTF_8));
         Process process = new ProcessBuilder(ImmutableList.of(
                         Paths.get(System.getProperty("java.home")).resolve("bin/java").toString(),

@@ -19,17 +19,20 @@ import static com.google.common.truth.Truth.assertThat;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.truth.Truth;
-import java.util.Collection;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import com.palantir.javaformat.jupiter.ParameterizedClass;
+import java.util.List;
+import org.junit.jupiter.api.TestTemplate;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
 /** {@link RemoveUnusedImports}Test */
-@RunWith(Parameterized.class)
+@Execution(ExecutionMode.CONCURRENT)
+@ExtendWith(ParameterizedClass.class)
 public class RemoveUnusedImportsTest {
-    @Parameters(name = "{index}: {0}")
-    public static Collection<Object[]> parameters() {
+
+    @ParameterizedClass.Parameters(name = "{index}: {0}")
+    public static List<Object[]> parameters() {
         String[][][] inputsOutputs = {
             {
                 {
@@ -273,7 +276,7 @@ public class RemoveUnusedImportsTest {
         this.expected = expected;
     }
 
-    @Test
+    @TestTemplate
     public void removeUnused() throws FormatterException {
         Truth.assertThat(RemoveUnusedImports.removeUnusedImports(input)).isEqualTo(expected);
     }

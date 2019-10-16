@@ -30,6 +30,7 @@ import com.palantir.javaformat.doc.StartsWithBreakVisitor.Result;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /** A {@code Level} inside a {@link Doc}. */
@@ -39,6 +40,8 @@ public final class Level extends Doc {
      * level) before we stop branching and always break, which is the google-java-format default behaviour.
      */
     private static final int MAX_BRANCHING_COEFFICIENT = 7;
+
+    private static final Collector<Level, ?, Optional<Level>> GET_LAST_COLLECTOR = Collectors.reducing((u, v) -> v);
 
     private final Indent plusIndent; // The extra indent following breaks.
     private final BreakBehaviour breakBehaviour; // Where to break when we can't fit on one line.
@@ -161,25 +164,26 @@ public final class Level extends Doc {
 
             boolean prefixFits = false;
             if (anyLevelWasBroken) {
-                // Find the first level, skipping empty levels (that contain nothing, or are made up
+                // Find the last level, skipping empty levels (that contain nothing, or are made up
                 // entirely of other empty levels).
-                // TODO find first level immediately following a direct break!
-                //  (there might be other levels before that)
-                Level firstLevel = innerLevels.stream()
+
+                // Last level because there might be other in-between levels after the initial break like `new int[]
+                // {`, and we want to skip those.
+                Level lastLevel = innerLevels.stream()
                         .filter(doc -> StartsWithBreakVisitor.INSTANCE.visit(doc) != Result.EMPTY)
-                        .findFirst()
+                        .collect(GET_LAST_COLLECTOR)
                         .orElseThrow(() -> new IllegalStateException(
                                 "Levels were broken so expected to find at least a non-empty level"));
 
-                // Add the width of tokens, breaks before the firstLevel. We must always have space for
+                // Add the width of tokens, breaks before the lastLevel. We must always have space for
                 // these.
-                List<Doc> leadingDocs = docs.subList(0, docs.indexOf(firstLevel));
+                List<Doc> leadingDocs = docs.subList(0, docs.indexOf(lastLevel));
                 float leadingWidth = getWidth(leadingDocs);
 
                 // Potentially add the width of prefixes we want to consider as part of the width that
                 // must fit on the same line, so that we don't accidentally break prefixes when we could
                 // have avoided doing so.
-                leadingWidth += new CountWidthUntilBreakVisitor(maxWidth - state.indent).visit(firstLevel);
+                leadingWidth += new CountWidthUntilBreakVisitor(maxWidth - state.indent).visit(lastLevel);
 
                 boolean fits = !Float.isInfinite(leadingWidth) && state.column + leadingWidth <= maxWidth;
 

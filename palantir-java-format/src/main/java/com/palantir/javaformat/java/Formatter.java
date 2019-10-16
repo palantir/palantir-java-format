@@ -90,13 +90,17 @@ public final class Formatter {
 
     private final JavaFormatterOptions options;
 
-    /** A new Formatter instance with default options. */
-    public Formatter() {
-        this(JavaFormatterOptions.defaultOptions());
+    private Formatter(JavaFormatterOptions options) {
+        this.options = options;
     }
 
-    public Formatter(JavaFormatterOptions options) {
-        this.options = options;
+    /** A new Formatter instance with default options. */
+    public static Formatter create() {
+        return new Formatter(JavaFormatterOptions.defaultOptions());
+    }
+
+    public static Formatter createFormatter(JavaFormatterOptions options) {
+        return new Formatter(options);
     }
 
     /**
@@ -142,7 +146,7 @@ public final class Formatter {
         Iterable<Diagnostic<? extends JavaFileObject>> errorDiagnostics =
                 Iterables.filter(diagnostics.getDiagnostics(), Formatter::errorDiagnostic);
         if (!Iterables.isEmpty(errorDiagnostics)) {
-            throw FormatterException.fromJavacDiagnostics(errorDiagnostics);
+            throw FormatterExceptions.fromJavacDiagnostics(errorDiagnostics);
         }
         OpsBuilder builder = new OpsBuilder(javaInput, javaOutput);
         // Output the compilation unit.

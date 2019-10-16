@@ -1,0 +1,6 @@
+apply plugin: 'java-library'
+apply from: rootProject.file('gradle/publish-jar.gradle')
+
+dependencies {
+    api 'com.google.guava:guava'
+}

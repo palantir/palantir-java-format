@@ -1,3 +1,7 @@
+<p align="right">
+<a href="https://autorelease.general.dmz.palantir.tech/palantir/palantir-java-format"><img src="https://img.shields.io/badge/Perform%20an-Autorelease-success.svg" alt="Autorelease"></a>
+</p>
+
 # palantir-java-format
 
 `palantir-java-format` is a program that reformats Java source code to comply with
@@ -39,7 +43,7 @@ a single format.*
 ### IntelliJ, Android Studio, and other JetBrains IDEs
 
 A
-[palantir-java-format IntelliJ plugin](https://plugins.jetbrains.com/plugin/8527)
+[palantir-java-format IntelliJ plugin](https://plugins.jetbrains.com/plugin/13180)
 is available from the plugin repository. To install it, go to your IDE's
 settings and select the `Plugins` category. Click the `Marketplace` tab, search
 for the `palantir-java-format` plugin, and click the `Install` button.

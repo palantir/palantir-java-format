@@ -406,7 +406,7 @@ public final class StringWrapper {
                 Iterables.filter(diagnostics.getDiagnostics(), Formatter::errorDiagnostic);
         if (!Iterables.isEmpty(errorDiagnostics)) {
             // error handling is done during formatting
-            throw FormatterException.fromJavacDiagnostics(errorDiagnostics);
+            throw FormatterExceptions.fromJavacDiagnostics(errorDiagnostics);
         }
         return unit;
     }

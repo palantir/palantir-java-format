@@ -22,17 +22,21 @@ import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.project.Project;
 import com.palantir.javaformat.java.JavaFormatterOptions;
+import java.net.URI;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 @State(
-        name = "GoogleJavaFormatSettings",
+        name = "PalantirJavaFormatSettings",
         storages = {@Storage("palantir-java-format.xml")})
-class GoogleJavaFormatSettings implements PersistentStateComponent<GoogleJavaFormatSettings.State> {
+class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJavaFormatSettings.State> {
 
     private State state = new State();
 
-    static GoogleJavaFormatSettings getInstance(Project project) {
-        return ServiceManager.getService(project, GoogleJavaFormatSettings.class);
+    static PalantirJavaFormatSettings getInstance(Project project) {
+        return ServiceManager.getService(project, PalantirJavaFormatSettings.class);
     }
 
     @Nullable
@@ -70,6 +74,14 @@ class GoogleJavaFormatSettings implements PersistentStateComponent<GoogleJavaFor
         state.style = style;
     }
 
+    /**
+     * The paths to jars that provide an alternative implementation of the formatter. If set, this implementation will
+     * be used instead of the bundled version.
+     */
+    Optional<List<URI>> getImplementationClassPath() {
+        return state.implementationClassPath;
+    }
+
     enum EnabledState {
         UNKNOWN,
         ENABLED,
@@ -79,7 +91,21 @@ class GoogleJavaFormatSettings implements PersistentStateComponent<GoogleJavaFor
     static class State {
 
         private EnabledState enabled = EnabledState.UNKNOWN;
+        private Optional<List<URI>> implementationClassPath = Optional.empty();
+
         public JavaFormatterOptions.Style style = JavaFormatterOptions.Style.PALANTIR;
+
+        public void setImplementationClassPath(@Nullable List<String> value) {
+            implementationClassPath =
+                    Optional.ofNullable(value)
+                            .map(strings -> strings.stream().map(URI::create).collect(Collectors.toList()));
+        }
+
+        public List<String> getImplementationClassPath() {
+            return implementationClassPath
+                    .map(paths -> paths.stream().map(URI::toString).collect(Collectors.toList()))
+                    .orElse(null);
+        }
 
         // enabled used to be a boolean so we use bean property methods for backwards compatibility
         public void setEnabled(@Nullable String enabledStr) {
@@ -101,6 +127,18 @@ class GoogleJavaFormatSettings implements PersistentStateComponent<GoogleJavaFor
                 default:
                     return null;
             }
+        }
+
+        @Override
+        public String toString() {
+            return "PalantirJavaFormatSettings{"
+                    + "enabled="
+                    + enabled
+                    + ", formatterPath="
+                    + implementationClassPath
+                    + ", style="
+                    + style
+                    + '}';
         }
     }
 }

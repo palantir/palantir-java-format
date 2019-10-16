@@ -19,16 +19,18 @@ import static com.google.common.truth.Truth.assertThat;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
+import com.palantir.javaformat.jupiter.ParameterizedClass;
 import java.util.Arrays;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.TestTemplate;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
 /** Tests for array dimension handling, especially mixed array notation and type annotations on dimensions. */
-@RunWith(Parameterized.class)
+@Execution(ExecutionMode.CONCURRENT)
+@ExtendWith(ParameterizedClass.class)
 public class ArrayDimensionTest {
-    @Parameters
+    @ParameterizedClass.Parameters
     public static Iterable<Object[]> parameters() {
         String[] inputs = {
             // mixed array notation multi-variable declarations
@@ -84,10 +86,10 @@ public class ArrayDimensionTest {
         this.input = input;
     }
 
-    @Test
+    @TestTemplate
     public void format() throws Exception {
         String source = "class T {" + input + "}";
-        String formatted = new Formatter().formatSource(source);
+        String formatted = Formatter.create().formatSource(source);
         String statement = formatted.substring("class T {".length(), formatted.length() - "}\n".length());
         // ignore line breaks after declaration-style annotations
         statement = Joiner.on(' ').join(Splitter.on('\n').omitEmptyStrings().trimResults().split(statement));

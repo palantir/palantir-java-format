@@ -17,7 +17,6 @@ package com.palantir.javaformat.java;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.common.io.ByteStreams;
-import com.palantir.javaformat.FormatterDiagnostic;
 import com.palantir.javaformat.java.JavaFormatterOptions.Style;
 import java.io.IOError;
 import java.io.IOException;
@@ -95,6 +94,7 @@ public final class Main {
             throw new UsageException();
         }
 
+        // TODO(someone): update this to always use Style.PALANTIR
         JavaFormatterOptions options =
                 JavaFormatterOptions.builder().style(parameters.aosp() ? Style.AOSP : Style.GOOGLE).build();
 

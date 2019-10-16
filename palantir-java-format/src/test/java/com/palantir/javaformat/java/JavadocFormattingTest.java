@@ -20,16 +20,16 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import com.google.common.base.Joiner;
 import com.google.common.io.ByteStreams;
 import java.util.Arrays;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
 /** Tests formatting javadoc. */
-@RunWith(JUnit4.class)
+@Execution(ExecutionMode.CONCURRENT)
 public final class JavadocFormattingTest {
 
     private final Formatter formatter =
-            new Formatter(JavaFormatterOptions.builder().style(JavaFormatterOptions.Style.GOOGLE).build());
+            Formatter.createFormatter(JavaFormatterOptions.builder().style(JavaFormatterOptions.Style.GOOGLE).build());
 
     @Test
     public void notJavadoc() {

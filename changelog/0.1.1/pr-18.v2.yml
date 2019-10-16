@@ -1,0 +1,7 @@
+type: improvement
+improvement:
+  description: IntelliJ plugin can be automatically configured with a custom version
+    of the formatter, by applying `com.palantir.java-format` in gradle and setting
+    the `palantirJavaFormat.implementationVersion`.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/18

@@ -20,12 +20,11 @@ import static com.palantir.javaformat.java.TypeNameClassifier.JavaCaseFormat;
 
 import com.google.common.base.Splitter;
 import java.util.Optional;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
-/** {@link TypeNameClassifier}Test */
-@RunWith(JUnit4.class)
+@Execution(ExecutionMode.CONCURRENT)
 public final class TypeNameClassifierTest {
     @Test
     public void caseFormat() throws Exception {

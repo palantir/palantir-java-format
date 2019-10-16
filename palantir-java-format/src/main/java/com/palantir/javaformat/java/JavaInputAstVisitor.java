@@ -654,7 +654,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     @Override
     public Void visitTypeCast(TypeCastTree node, Void unused) {
         sync(node);
-        builder.open(plusFour);
+        builder.open(plusFour, BreakBehaviour.PREFER_BREAKING_LAST_INNER_LEVEL, Breakability.BREAK_HERE);
         token("(");
         scan(node.getType(), null);
         token(")");

@@ -1,0 +1,6 @@
+type: fix
+fix:
+  description: IntelliJ plugin not enabled by default, instead it is turned on when
+    using the gradle plugin.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/22

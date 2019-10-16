@@ -19,21 +19,23 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import com.palantir.javaformat.Newlines;
+import com.palantir.javaformat.jupiter.ParameterizedClass;
 import java.io.IOException;
-import org.junit.Assume;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
+import java.util.List;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.TestTemplate;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
-/** Integration test for google-java-format. */
-@RunWith(Parameterized.class)
+@ExtendWith(ParameterizedClass.class)
+@Execution(ExecutionMode.CONCURRENT)
 public class FormatterIntegrationTest {
 
     private static FileBasedTests tests = new FileBasedTests(FormatterIntegrationTest.class, "testdata");
 
-    @Parameters(name = "{index}: {0}")
-    public static Iterable<Object[]> data() throws IOException {
+    @ParameterizedClass.Parameters(name = "{index}: {0}")
+    public static List<Object[]> data() throws IOException {
         return tests.paramsAsNameInputOutput();
     }
 
@@ -49,7 +51,7 @@ public class FormatterIntegrationTest {
         this.separator = isRecreate() ? null : Newlines.getLineEnding(expected);
     }
 
-    @Test
+    @TestTemplate
     public void format() {
         try {
             String output = createFormatter().formatSource(input);
@@ -64,12 +66,13 @@ public class FormatterIntegrationTest {
     }
 
     private static Formatter createFormatter() {
-        return new Formatter(JavaFormatterOptions.builder().style(JavaFormatterOptions.Style.PALANTIR).build());
+        return Formatter.createFormatter(
+                JavaFormatterOptions.builder().style(JavaFormatterOptions.Style.PALANTIR).build());
     }
 
-    @Test
+    @TestTemplate
     public void idempotentLF() {
-        Assume.assumeFalse("Not running when recreating test outputs", isRecreate());
+        Assumptions.assumeFalse(isRecreate(), "Not running when recreating test outputs");
         try {
             String mangled = expected.replace(separator, "\n");
             String output = createFormatter().formatSource(mangled);
@@ -79,9 +82,9 @@ public class FormatterIntegrationTest {
         }
     }
 
-    @Test
+    @TestTemplate
     public void idempotentCR() {
-        Assume.assumeFalse("Not running when recreating test outputs", isRecreate());
+        Assumptions.assumeFalse(isRecreate(), "Not running when recreating test outputs");
         try {
             String mangled = expected.replace(separator, "\r");
             String output = createFormatter().formatSource(mangled);
@@ -91,9 +94,9 @@ public class FormatterIntegrationTest {
         }
     }
 
-    @Test
+    @TestTemplate
     public void idempotentCRLF() {
-        Assume.assumeFalse("Not running when recreating test outputs", isRecreate());
+        Assumptions.assumeFalse(isRecreate(), "Not running when recreating test outputs");
         try {
             String mangled = expected.replace(separator, "\r\n");
             String output = createFormatter().formatSource(mangled);

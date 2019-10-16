@@ -24,8 +24,14 @@ import com.intellij.openapi.ui.ComboBox;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
-import com.palantir.javaformat.intellij.GoogleJavaFormatSettings.EnabledState;
+import com.palantir.javaformat.intellij.PalantirJavaFormatSettings.EnabledState;
+import com.palantir.javaformat.java.FormatterService;
 import java.awt.Insets;
+import java.io.IOException;
+import java.net.URI;
+import java.util.List;
+import java.util.jar.JarFile;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -35,14 +41,16 @@ import javax.swing.JPanel;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
-class GoogleJavaFormatConfigurable extends BaseConfigurable implements SearchableConfigurable {
+class PalantirJavaFormatConfigurable extends BaseConfigurable implements SearchableConfigurable {
 
     private final Project project;
     private JPanel panel;
     private JCheckBox enable;
     private JComboBox styleComboBox;
+    private JLabel formatterVersion;
+    private JLabel pluginVersion;
 
-    public GoogleJavaFormatConfigurable(Project project) {
+    public PalantirJavaFormatConfigurable(Project project) {
         this.project = project;
     }
 
@@ -78,7 +86,7 @@ class GoogleJavaFormatConfigurable extends BaseConfigurable implements Searchabl
 
     @Override
     public void apply() throws ConfigurationException {
-        GoogleJavaFormatSettings settings = GoogleJavaFormatSettings.getInstance(project);
+        PalantirJavaFormatSettings settings = PalantirJavaFormatSettings.getInstance(project);
         settings.setEnabled(enable.isSelected() ? EnabledState.ENABLED : getDisabledState());
         settings.setStyle(((UiFormatterStyle) styleComboBox.getSelectedItem()).convert());
     }
@@ -92,14 +100,37 @@ class GoogleJavaFormatConfigurable extends BaseConfigurable implements Searchabl
 
     @Override
     public void reset() {
-        GoogleJavaFormatSettings settings = GoogleJavaFormatSettings.getInstance(project);
+        PalantirJavaFormatSettings settings = PalantirJavaFormatSettings.getInstance(project);
         enable.setSelected(settings.isEnabled());
         styleComboBox.setSelectedItem(UiFormatterStyle.convert(settings.getStyle()));
+        pluginVersion.setText(PalantirJavaFormatConfigurable.class.getPackage().getImplementationVersion());
+        formatterVersion.setText(
+                settings.getImplementationClassPath().map(this::computeFormatterVersion).orElse("(bundled)"));
+    }
+
+    private String computeFormatterVersion(List<URI> implementationClassPath) {
+        return implementationClassPath.stream()
+                .flatMap(uri -> {
+                    try {
+                        JarFile jar = new JarFile(uri.getPath());
+                        // Identify the implementation jar by the service it produces.
+                        if (jar.getEntry("META-INF/services/" + FormatterService.class.getName()) != null) {
+                            String implementationVersion =
+                                    jar.getManifest().getMainAttributes().getValue("Implementation-Version");
+                            return Stream.of(implementationVersion);
+                        }
+                        return Stream.empty();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Couldn't find implementation JAR"));
     }
 
     @Override
     public boolean isModified() {
-        GoogleJavaFormatSettings settings = GoogleJavaFormatSettings.getInstance(project);
+        PalantirJavaFormatSettings settings = PalantirJavaFormatSettings.getInstance(project);
         return enable.isSelected() != settings.isEnabled()
                 || !styleComboBox.getSelectedItem().equals(UiFormatterStyle.convert(settings.getStyle()));
     }
@@ -127,7 +158,7 @@ class GoogleJavaFormatConfigurable extends BaseConfigurable implements Searchabl
     private void $$$setupUI$$$() {
         createUIComponents();
         panel = new JPanel();
-        panel.setLayout(new GridLayoutManager(3, 2, new Insets(0, 0, 0, 0), -1, -1));
+        panel.setLayout(new GridLayoutManager(5, 2, new Insets(0, 0, 0, 0), -1, -1));
         enable = new JCheckBox();
         enable.setText("Enable palantir-java-format");
         panel.add(enable, new GridConstraints(
@@ -146,7 +177,7 @@ class GoogleJavaFormatConfigurable extends BaseConfigurable implements Searchabl
                 false));
         final Spacer spacer1 = new Spacer();
         panel.add(spacer1, new GridConstraints(
-                2,
+                4,
                 0,
                 1,
                 2,
@@ -183,6 +214,70 @@ class GoogleJavaFormatConfigurable extends BaseConfigurable implements Searchabl
                 GridConstraints.ANCHOR_WEST,
                 GridConstraints.FILL_HORIZONTAL,
                 GridConstraints.SIZEPOLICY_CAN_GROW,
+                GridConstraints.SIZEPOLICY_FIXED,
+                null,
+                null,
+                null,
+                1,
+                false));
+        final JLabel label2 = new JLabel();
+        label2.setText("Implementation version");
+        panel.add(label2, new GridConstraints(
+                3,
+                0,
+                1,
+                1,
+                GridConstraints.ANCHOR_WEST,
+                GridConstraints.FILL_NONE,
+                GridConstraints.SIZEPOLICY_FIXED,
+                GridConstraints.SIZEPOLICY_FIXED,
+                null,
+                null,
+                null,
+                0,
+                false));
+        formatterVersion = new JLabel();
+        formatterVersion.setText("what version are we running with?");
+        panel.add(formatterVersion, new GridConstraints(
+                3,
+                1,
+                1,
+                1,
+                GridConstraints.ANCHOR_CENTER,
+                GridConstraints.FILL_HORIZONTAL,
+                GridConstraints.SIZEPOLICY_CAN_GROW,
+                GridConstraints.SIZEPOLICY_FIXED,
+                null,
+                null,
+                null,
+                1,
+                false));
+        final JLabel label3 = new JLabel();
+        label3.setText("Plugin version");
+        panel.add(label3, new GridConstraints(
+                2,
+                0,
+                1,
+                1,
+                GridConstraints.ANCHOR_WEST,
+                GridConstraints.FILL_NONE,
+                GridConstraints.SIZEPOLICY_FIXED,
+                GridConstraints.SIZEPOLICY_FIXED,
+                null,
+                null,
+                null,
+                0,
+                false));
+        pluginVersion = new JLabel();
+        pluginVersion.setText("plugin version");
+        panel.add(pluginVersion, new GridConstraints(
+                2,
+                1,
+                1,
+                1,
+                GridConstraints.ANCHOR_WEST,
+                GridConstraints.FILL_NONE,
+                GridConstraints.SIZEPOLICY_FIXED,
                 GridConstraints.SIZEPOLICY_FIXED,
                 null,
                 null,

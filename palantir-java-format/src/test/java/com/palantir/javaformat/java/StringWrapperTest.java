@@ -17,12 +17,11 @@ package com.palantir.javaformat.java;
 import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.base.Joiner;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
-/** {@link StringWrapper}Test */
-@RunWith(JUnit4.class)
+@Execution(ExecutionMode.CONCURRENT)
 public class StringWrapperTest {
     @Test
     public void testAwkwardLineEndWrapping() throws Exception {
@@ -46,7 +45,7 @@ public class StringWrapperTest {
                 "  }",
                 "}");
 
-        assertThat(StringWrapper.wrap(100, input, new Formatter())).isEqualTo(output);
+        assertThat(StringWrapper.wrap(100, input, Formatter.create())).isEqualTo(output);
     }
 
     private static String lines(String... line) {

@@ -27,28 +27,26 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
-/** Tests for error reporting. */
-@RunWith(JUnit4.class)
+@Execution(ExecutionMode.CONCURRENT)
 public class DiagnosticTest {
-    @Rule public TemporaryFolder testFolder = new TemporaryFolder();
+    @TempDir public Path testFolder;
 
     private Locale backupLocale;
 
-    @Before
+    @BeforeEach
     public void setUpLocale() throws Exception {
         backupLocale = Locale.getDefault();
         Locale.setDefault(Locale.ROOT);
     }
 
-    @After
+    @AfterEach
     public void restoreLocale() throws Exception {
         Locale.setDefault(backupLocale);
     }
@@ -72,8 +70,7 @@ public class DiagnosticTest {
         StringWriter stderr = new StringWriter();
         Main main = new Main(new PrintWriter(stdout, true), new PrintWriter(stderr, true), System.in);
 
-        Path tmpdir = testFolder.newFolder().toPath();
-        Path path = tmpdir.resolve("InvalidSyntax.java");
+        Path path = testFolder.resolve("InvalidSyntax.java");
         Files.write(path, input.getBytes(UTF_8));
 
         int result = main.format(path.toString());
@@ -90,8 +87,7 @@ public class DiagnosticTest {
         StringWriter stderr = new StringWriter();
         Main main = new Main(new PrintWriter(stdout, true), new PrintWriter(stderr, true), System.in);
 
-        Path tmpdir = testFolder.newFolder().toPath();
-        Path path = tmpdir.resolve("InvalidSyntax.java");
+        Path path = testFolder.resolve("InvalidSyntax.java");
         Files.write(path, input.getBytes(UTF_8));
 
         int result = main.format(path.toString());
@@ -109,11 +105,10 @@ public class DiagnosticTest {
         StringWriter stderr = new StringWriter();
         Main main = new Main(new PrintWriter(stdout, true), new PrintWriter(stderr, true), System.in);
 
-        Path tmpdir = testFolder.newFolder().toPath();
-        Path pathOne = tmpdir.resolve("One.java");
+        Path pathOne = testFolder.resolve("One.java");
         Files.write(pathOne, one.getBytes(UTF_8));
 
-        Path pathTwo = tmpdir.resolve("Two.java");
+        Path pathTwo = testFolder.resolve("Two.java");
         Files.write(pathTwo, two.getBytes(UTF_8));
 
         int result = main.format(pathOne.toString(), pathTwo.toString());
@@ -131,11 +126,10 @@ public class DiagnosticTest {
         StringWriter stderr = new StringWriter();
         Main main = new Main(new PrintWriter(stdout, true), new PrintWriter(stderr, true), System.in);
 
-        Path tmpdir = testFolder.newFolder().toPath();
-        Path pathOne = tmpdir.resolve("One.java");
+        Path pathOne = testFolder.resolve("One.java");
         Files.write(pathOne, one.getBytes(UTF_8));
 
-        Path pathTwo = tmpdir.resolve("Two.java");
+        Path pathTwo = testFolder.resolve("Two.java");
         Files.write(pathTwo, two.getBytes(UTF_8));
 
         int result = main.format("-i", pathOne.toString(), pathTwo.toString());
@@ -151,8 +145,7 @@ public class DiagnosticTest {
     public void parseError2() throws FormatterException, IOException, UsageException {
         String input = "class Foo { void f() {\n g() } }";
 
-        Path tmpdir = testFolder.newFolder().toPath();
-        Path path = tmpdir.resolve("A.java");
+        Path path = testFolder.resolve("A.java");
         Files.write(path, input.getBytes(StandardCharsets.UTF_8));
 
         StringWriter out = new StringWriter();
@@ -185,8 +178,7 @@ public class DiagnosticTest {
     public void lexError2() throws FormatterException, IOException, UsageException {
         String input = "class Foo { void f() {\n g('foo'); } }";
 
-        Path tmpdir = testFolder.newFolder().toPath();
-        Path path = tmpdir.resolve("A.java");
+        Path path = testFolder.resolve("A.java");
         Files.write(path, input.getBytes(StandardCharsets.UTF_8));
 
         StringWriter out = new StringWriter();

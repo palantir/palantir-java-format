@@ -6,16 +6,24 @@ mainClassName = 'com.palantir.javaformat.java.Main'
 description = 'Google Java Format'
 
 dependencies {
-    compile 'com.google.guava:guava'
-    compile 'com.google.errorprone:javac-shaded'
-    compile 'com.google.code.findbugs:jsr305'
-    compile 'com.google.errorprone:error_prone_annotations'
-    testCompile 'junit:junit'
+    api project(':palantir-java-format-api')
+    api 'com.google.guava:guava'
+    implementation 'com.google.errorprone:javac-shaded'
+
     testCompile 'com.google.guava:guava-testlib'
     testCompile 'com.google.truth:truth'
     testCompile 'com.google.testing.compile:compile-testing'
+    testImplementation 'org.junit.jupiter:junit-jupiter-migrationsupport'
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    compileOnly 'com.google.auto.service:auto-service'
+    annotationProcessor 'com.google.auto.service:auto-service'
 }
 
 tasks.withType(JavaCompile).configureEach {
     options.errorprone.errorproneArgs += ['-Xep:StrictUnusedVariable:OFF']
 }
+
+// false positives due to org.junit.runners.* in the test cases
+tasks.checkJUnitDependencies.enabled = false
+

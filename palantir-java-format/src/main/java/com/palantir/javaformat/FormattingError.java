@@ -16,6 +16,7 @@ package com.palantir.javaformat;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import com.palantir.javaformat.java.FormatterDiagnostic;
 
 /** An unchecked formatting error. */
 public class FormattingError extends Error {
