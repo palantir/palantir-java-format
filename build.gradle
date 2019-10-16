@@ -34,9 +34,9 @@ allprojects {
     version = rootProject.version
 
     repositories {
-        mavenLocal()
         jcenter()
         maven { url 'https://dl.bintray.com/palantir/releases/' }
+        mavenLocal()
     }
 }
 
