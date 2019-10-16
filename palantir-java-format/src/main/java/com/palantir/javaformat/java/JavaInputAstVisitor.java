@@ -1173,7 +1173,8 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         sync(node);
         boolean statementBody = node.getBodyKind() == LambdaExpressionTree.BodyKind.STATEMENT;
         boolean parens = builder.peekToken().equals(Optional.of("("));
-        builder.open(parens ? plusFour : ZERO);
+        builder.open(
+                parens ? plusFour : ZERO, BreakBehaviour.PREFER_BREAKING_LAST_INNER_LEVEL, Breakability.CHECK_INNER);
         if (parens) {
             token("(");
         }
@@ -2854,7 +2855,8 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             case METHOD_INVOCATION:
                 // Note: it's fine to BREAK_HERE because we know the first non-Level token will be a
                 // break, added inside `addArguments`.
-                builder.open(tyargIndent, BreakBehaviour.BREAK_THIS_LEVEL, Breakability.CHECK_INNER);
+                // TODO setting PREFER_BREAKING_LAST_INNER_LEVEL here is not good, leads to too large indents!
+                builder.open(tyargIndent, BreakBehaviour.PREFER_BREAKING_LAST_INNER_LEVEL, Breakability.CHECK_INNER);
                 MethodInvocationTree methodInvocation = (MethodInvocationTree) expression;
                 addArguments(methodInvocation.getArguments(), indent);
                 builder.close();
