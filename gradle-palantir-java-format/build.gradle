@@ -20,3 +20,9 @@ gradlePlugin {
         }
     }
 }
+
+idea {
+    module {
+        sourceDirs += sourceSets.main.groovy.srcDirs
+    }
+}
