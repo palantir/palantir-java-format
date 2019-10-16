@@ -165,16 +165,18 @@ public final class Level extends Doc {
 
             boolean prefixFits = false;
             if (anyLevelWasBroken) {
-                // Find the first level, skipping empty levels (that contain nothing, or are made up
+                // Find the last level, skipping empty levels (that contain nothing, or are made up
                 // entirely of other empty levels).
-                // TODO find first level after direct break!!
+
+                // Last level because there might be other in-between levels after the initial break like `new int[]
+                // {`, and we want to skip those.
                 Level lastLevel = innerLevels.stream()
                         .filter(doc -> StartsWithBreakVisitor.INSTANCE.visit(doc) != Result.EMPTY)
                         .collect(GET_LAST_COLLECTOR)
                         .orElseThrow(() -> new IllegalStateException(
                                 "Levels were broken so expected to find at least a non-empty level"));
 
-                // Add the width of tokens, breaks before the firstLevel. We must always have space for
+                // Add the width of tokens, breaks before the lastLevel. We must always have space for
                 // these.
                 List<Doc> leadingDocs = docs.subList(0, docs.indexOf(lastLevel));
                 float leadingWidth = getWidth(leadingDocs);
