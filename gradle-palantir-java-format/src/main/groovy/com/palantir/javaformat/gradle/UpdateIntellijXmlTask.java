@@ -21,8 +21,13 @@ import org.xml.sax.SAXException;
 
 public abstract class UpdateIntellijXmlTask extends DefaultTask {
     private final Property<File> xmlFile = getProject().getObjects().property(File.class);
+    static final String INTELLIJ_TASK_GROUP = "intellij";
 
     protected abstract void configure(Node rootNode);
+
+    public UpdateIntellijXmlTask() {
+        setGroup(INTELLIJ_TASK_GROUP);
+    }
 
     @PathSensitive(PathSensitivity.RELATIVE)
     @OutputFile

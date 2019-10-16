@@ -24,8 +24,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.Task;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.plugins.ExtensionAware;
+import org.gradle.api.provider.Provider;
 import org.gradle.plugins.ide.idea.model.IdeaModel;
 import org.jetbrains.gradle.ext.TaskTriggersConfig;
 
@@ -76,17 +78,23 @@ public class JavaFormatPlugin implements Plugin<Project> {
     private static void configureIntelliJImport(Project project, Configuration implConfiguration) {
         project.getPluginManager().apply("org.jetbrains.gradle.plugin.idea-ext");
 
-        ConfigurePalantirJavaFormatXml configurePalantirJavaFormatXmlTask = project.getTasks()
-                .create("configurePalantirJavaFormatXml", ConfigurePalantirJavaFormatXml.class, task -> {
+        Provider<? extends Task> configurePalantirJavaFormatXmlTask = project.getTasks()
+                .register("configurePalantirJavaFormatXml", ConfigurePalantirJavaFormatXml.class, task -> {
                     task.getImplConfiguration().set(implConfiguration);
                 });
 
-        ConfigureExternalDependenciesXml configureExternalDependenciesXmlTask =
-                project.getTasks().create("configureExternalDependenciesXml", ConfigureExternalDependenciesXml.class);
+        Provider<? extends Task> configureExternalDependenciesXmlTask =
+                project.getTasks().register("configureExternalDependenciesXml", ConfigureExternalDependenciesXml.class);
+
+        Task palantirJavaFormatIntellij = project.getTasks().create("palantirJavaFormatIntellij", task -> {
+            task.setDescription("Configure IntelliJ directory-based repository after importing");
+            task.setGroup(UpdateIntellijXmlTask.INTELLIJ_TASK_GROUP);
+            task.dependsOn(configurePalantirJavaFormatXmlTask, configureExternalDependenciesXmlTask);
+        });
 
         ExtensionAware ideaProject = (ExtensionAware) project.getExtensions().getByType(IdeaModel.class).getProject();
         ExtensionAware settings = (ExtensionAware) ideaProject.getExtensions().getByName("settings");
         TaskTriggersConfig taskTriggers = settings.getExtensions().getByType(TaskTriggersConfig.class);
-        taskTriggers.beforeSync(configurePalantirJavaFormatXmlTask, configureExternalDependenciesXmlTask);
+        taskTriggers.beforeSync(palantirJavaFormatIntellij);
     }
 }
