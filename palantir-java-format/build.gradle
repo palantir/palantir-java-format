@@ -14,9 +14,6 @@ dependencies {
     testCompile 'com.google.guava:guava-testlib'
     testCompile 'com.google.truth:truth'
     testCompile 'com.google.testing.compile:compile-testing'
-
-    annotationProcessor "org.immutables:value"
-    compileOnly "org.immutables:value::annotations"
 }
 
 tasks.withType(JavaCompile).configureEach {
