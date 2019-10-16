@@ -1,7 +1,7 @@
 class B20128760 {
     void f() {
         x = xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx(
-                        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx);
+                xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx);
 
         XxxxxxxxxXxx.<Xxxxxx, Xxxxxx>xxxxxxx()
                 .xxx(XxxxxxxxxXxxXxxx.Xxxxx.XXXXX, "Xxxxx xxxxxxxxx xxxxx")
@@ -25,12 +25,12 @@ class B20128760 {
                         XX.xxxxx(), XX.xxxxxx(XxxxxxxXxxxxxxxxxxXxxxxxxxx.xxxxx)));
 
         xxXxxxxxxxXxxxXxxx = (XxxxXxxx)
-                        xxxxxxxxXxxxxxxxxx
-                                .xxx()
-                                .xxxxxXxxxxxx
-                                .xxxXxxxxxxx(xxxxxxxxXxxxxxxxxx.xxx().xxxxXxxxx.xxxXxxxxxxXxxx() - 1)
-                                .xxxXxxx()
-                                .xxxxXxxxXxXx(X.xx.xxxxxxxxxxxxxxxxxxxxxxxxxxx);
+                xxxxxxxxXxxxxxxxxx
+                        .xxx()
+                        .xxxxxXxxxxxx
+                        .xxxXxxxxxxx(xxxxxxxxXxxxxxxxxx.xxx().xxxxXxxxx.xxxXxxxxxxXxxx() - 1)
+                        .xxxXxxx()
+                        .xxxxXxxxXxXx(X.xx.xxxxxxxxxxxxxxxxxxxxxxxxxxx);
 
         xxxxxxXxxx(
                         xxxxxxxxxx
