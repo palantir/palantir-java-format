@@ -22,7 +22,7 @@ public class ConfigurePalantirJavaFormatXml extends UpdateIntellijXmlTask {
     }
 
     @Override
-    protected void configure(Node rootNode) {
+    protected final void configure(Node rootNode) {
         List<URI> uris = implConfiguration.get().getFiles().stream().map(File::toURI).collect(Collectors.toList());
         ConfigureJavaFormatterXml.configureJavaFormat(rootNode, uris);
     }

@@ -8,7 +8,7 @@ public class ConfigureExternalDependenciesXml extends UpdateIntellijXmlTask {
     }
 
     @Override
-    protected void configure(Node rootNode) {
+    protected final void configure(Node rootNode) {
         ConfigureJavaFormatterXml.configureExternalDependencies(rootNode);
     }
 }
