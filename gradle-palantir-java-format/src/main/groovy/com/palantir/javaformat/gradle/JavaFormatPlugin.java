@@ -68,21 +68,25 @@ public class JavaFormatPlugin implements Plugin<Project> {
         ideaModel.getProject().getIpr().withXml(xmlProvider -> {
             // this block is lazy
             List<URI> uris = implConfiguration.getFiles().stream().map(File::toURI).collect(Collectors.toList());
-            ConfigureJavaFormatterXml.configure(xmlProvider.asNode(), uris);
+            ConfigureJavaFormatterXml.configureJavaFormat(xmlProvider.asNode(), uris);
+            ConfigureJavaFormatterXml.configureExternalDependencies(xmlProvider.asNode());
         });
     }
 
     private static void configureIntelliJImport(Project project, Configuration implConfiguration) {
         project.getPluginManager().apply("org.jetbrains.gradle.plugin.idea-ext");
 
-        ConfigurePalantirJavaFormatXml fixPalantirJavaFormatXmlTask = project.getTasks()
-                .create("fixPalantirJavaFormatXml", ConfigurePalantirJavaFormatXml.class, task -> {
+        ConfigurePalantirJavaFormatXml configurePalantirJavaFormatXmlTask = project.getTasks()
+                .create("configurePalantirJavaFormatXml", ConfigurePalantirJavaFormatXml.class, task -> {
                     task.getImplConfiguration().set(implConfiguration);
                 });
+
+        ConfigureExternalDependenciesXml configureExternalDependenciesXmlTask =
+                project.getTasks().create("configureExternalDependenciesXml", ConfigureExternalDependenciesXml.class);
 
         ExtensionAware ideaProject = (ExtensionAware) project.getExtensions().getByType(IdeaModel.class).getProject();
         ExtensionAware settings = (ExtensionAware) ideaProject.getExtensions().getByName("settings");
         TaskTriggersConfig taskTriggers = settings.getExtensions().getByType(TaskTriggersConfig.class);
-        taskTriggers.afterSync(fixPalantirJavaFormatXmlTask);
+        taskTriggers.beforeSync(configurePalantirJavaFormatXmlTask, configureExternalDependenciesXmlTask);
     }
 }

@@ -1,7 +1,7 @@
 package com.palantir.javaformat.gradle
 
 class ConfigureJavaFormatterXml {
-    static void configure(Node rootNode, List<URI> uris) {
+    static void configureJavaFormat(Node rootNode, List<URI> uris) {
         def settings = matchOrCreateChild(rootNode, 'component', [name: 'PalantirJavaFormatSettings'])
         // enable
         matchOrCreateChild(settings, 'option', [name: 'enabled']).attributes().put('value', 'true')
@@ -12,6 +12,9 @@ class ConfigureJavaFormatterXml {
         uris.forEach { URI uri ->
             listItems.appendNode('option', [value: uri])
         }
+    }
+
+    static void configureExternalDependencies(Node rootNode) {
         def externalDependencies = matchOrCreateChild(rootNode, 'component', [name: 'ExternalDependencies'])
         matchOrCreateChild(externalDependencies, 'plugin', [id: 'palantir-java-format'])
     }
