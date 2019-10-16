@@ -163,6 +163,8 @@ public final class Level extends Doc {
             if (anyLevelWasBroken) {
                 // Find the first level, skipping empty levels (that contain nothing, or are made up
                 // entirely of other empty levels).
+                // TODO find first level immediately following a direct break!
+                //  (there might be other levels before that)
                 Level firstLevel = innerLevels.stream()
                         .filter(doc -> StartsWithBreakVisitor.INSTANCE.visit(doc) != Result.EMPTY)
                         .findFirst()
