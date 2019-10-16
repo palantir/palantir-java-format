@@ -602,7 +602,10 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     @Override
     public Void visitAssignment(AssignmentTree node, Void unused) {
         sync(node);
-        builder.open(plusFour);
+        builder.open(
+                plusFour,
+                BreakBehaviour.BREAK_ONLY_IF_INNER_LEVELS_THEN_FIT_ON_ONE_LINE_IGNORING_INDENT,
+                Breakability.NO_PREFERENCE);
         scan(node.getVariable(), null);
         builder.space();
         splitToken(operatorName(node));
@@ -621,7 +624,10 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     @Override
     public Void visitCompoundAssignment(CompoundAssignmentTree node, Void unused) {
         sync(node);
-        builder.open(plusFour);
+        builder.open(
+                plusFour,
+                BreakBehaviour.BREAK_ONLY_IF_INNER_LEVELS_THEN_FIT_ON_ONE_LINE_IGNORING_INDENT,
+                Breakability.NO_PREFERENCE);
         scan(node.getVariable(), null);
         builder.space();
         splitToken(operatorName(node));

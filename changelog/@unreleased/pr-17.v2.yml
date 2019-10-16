@@ -1,0 +1,6 @@
+type: improvement
+improvement:
+  description: "Inline prefix of initializer for variable and field assignments too,
+    not just declarations."
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/17
