@@ -2854,7 +2854,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             case METHOD_INVOCATION:
                 // Note: it's fine to BREAK_HERE because we know the first non-Level token will be a
                 // break, added inside `addArguments`.
-                builder.open(tyargIndent, BreakBehaviour.BREAK_THIS_LEVEL, Breakability.BREAK_HERE);
+                builder.open(tyargIndent, BreakBehaviour.BREAK_THIS_LEVEL, Breakability.CHECK_INNER);
                 MethodInvocationTree methodInvocation = (MethodInvocationTree) expression;
                 addArguments(methodInvocation.getArguments(), indent);
                 builder.close();
@@ -2942,7 +2942,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 BreakBehaviour.PREFER_BREAKING_LAST_INNER_LEVEL,
                 // We are at a point where a newline is definitely coming, so we want to give the
                 // opportunity to take it.
-                Breakability.BREAK_HERE);
+                Breakability.CHECK_INNER);
         token("(");
         if (!arguments.isEmpty()) {
             if (arguments.size() % 2 == 0 && argumentsAreTabular(arguments) == 2) {
