@@ -40,6 +40,7 @@ public final class Level extends Doc {
      * level) before we stop branching and always break, which is the google-java-format default behaviour.
      */
     private static final int MAX_BRANCHING_COEFFICIENT = 7;
+
     private static final Collector<Level, ?, Optional<Level>> GET_LAST_COLLECTOR = Collectors.reducing((u, v) -> v);
 
     private final Indent plusIndent; // The extra indent following breaks.
@@ -154,7 +155,7 @@ public final class Level extends Doc {
 
         // But undo the break in a special case, if the inner levels didn't fit on one line.
         // Note: this is currently only used for variable initialisers
-        if (breakBehaviour == BreakBehaviour.BREAK_ONLY_IF_INNER_LEVELS_THEN_FIT_ON_ONE_LINE) {
+        if (breakBehaviour.isBreakOnlyIfInnerLevelsThenFitOnOneLine()) {
             List<Level> innerLevels = this.docs.stream()
                     .filter(doc -> doc instanceof Level)
                     .map(doc -> ((Level) doc))
@@ -193,10 +194,11 @@ public final class Level extends Doc {
             // Allow long strings to stay on the same line, expecting that StringWrapper will
             // reflow them later.
             if (prefixFits || isSingleString()) {
-                // don't break this level, but preserve indentation
-                broken =
-                        tryToLayOutLevelOnOneLine(
-                                commentsHelper, maxWidth, state.withNoIndent().withIndentIncrementedBy(plusIndent));
+                State newState = state.withNoIndent();
+                if (breakBehaviour == BreakBehaviour.BREAK_ONLY_IF_INNER_LEVELS_THEN_FIT_ON_ONE_LINE) {
+                    newState = newState.withIndentIncrementedBy(plusIndent);
+                }
+                broken = tryToLayOutLevelOnOneLine(commentsHelper, maxWidth, newState);
             }
         }
 
