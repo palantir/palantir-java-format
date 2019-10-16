@@ -22,6 +22,8 @@ import org.xml.sax.SAXException;
 public abstract class UpdateIntellijXmlTask extends DefaultTask {
     private final Property<File> xmlFile = getProject().getObjects().property(File.class);
 
+    protected abstract void configure(Node rootNode);
+
     @PathSensitive(PathSensitivity.RELATIVE)
     @OutputFile
     protected final Property<File> getXmlFile() {
@@ -53,6 +55,4 @@ public abstract class UpdateIntellijXmlTask extends DefaultTask {
             throw new RuntimeException("Failed to write back to configuration file: " + configurationFile, e);
         }
     }
-
-    protected abstract void configure(Node rootNode);
 }
