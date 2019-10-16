@@ -12,6 +12,8 @@ class ConfigureJavaFormatterXml {
         uris.forEach { URI uri ->
             listItems.appendNode('option', [value: uri])
         }
+        def externalDependencies = matchOrCreateChild(rootNode, 'component', [name: 'ExternalDependencies'])
+        matchOrCreateChild(externalDependencies, 'plugin', [id: 'palantir-java-format'])
     }
 
     private static Node matchOrCreateChild(Node base, String name, Map attributes = [:], Map defaults = [:]) {
