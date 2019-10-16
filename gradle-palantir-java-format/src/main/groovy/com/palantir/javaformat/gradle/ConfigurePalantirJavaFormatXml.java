@@ -18,7 +18,7 @@ public class ConfigurePalantirJavaFormatXml extends UpdateIntellijXmlTask {
     }
 
     public ConfigurePalantirJavaFormatXml() {
-        getOutputFile().set(getProject().file(".idea/palantir-java-format.xml"));
+        getXmlFile().set(getProject().file(".idea/palantir-java-format.xml"));
     }
 
     @Override

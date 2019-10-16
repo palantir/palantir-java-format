@@ -4,7 +4,7 @@ import groovy.util.Node;
 
 public class ConfigureExternalDependenciesXml extends UpdateIntellijXmlTask {
     public ConfigureExternalDependenciesXml() {
-        getOutputFile().set(getProject().file(".idea/externalDependencies.xml"));
+        getXmlFile().set(getProject().file(".idea/externalDependencies.xml"));
     }
 
     @Override

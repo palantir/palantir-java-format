@@ -3,6 +3,7 @@ import com.palantir.javaformat.java.*
 buildscript {
     repositories {
         maven { url "https://palantir.bintray.com/releases" }
+        mavenLocal()
         jcenter()
         gradlePluginPortal()
     }

@@ -20,17 +20,17 @@ import org.gradle.api.tasks.TaskAction;
 import org.xml.sax.SAXException;
 
 public abstract class UpdateIntellijXmlTask extends DefaultTask {
-    private final Property<File> outputFile = getProject().getObjects().property(File.class);
+    private final Property<File> xmlFile = getProject().getObjects().property(File.class);
 
     @PathSensitive(PathSensitivity.RELATIVE)
     @OutputFile
-    protected final Property<File> getOutputFile() {
-        return outputFile;
+    protected final Property<File> getXmlFile() {
+        return xmlFile;
     }
 
     @TaskAction
     public final void run() {
-        File configurationFile = getOutputFile().get();
+        File configurationFile = getXmlFile().get();
         Node rootNode;
         if (configurationFile.isFile()) {
             try {
