@@ -44,8 +44,9 @@ public final class LevelDelimitedFlatValueDocVisitor implements DocVisitor<Strin
         StringBuilder sb =
                 new StringBuilder().append("⏎").append(doc.getFlat().isEmpty() ? "" : "(" + doc.getFlat() + ")");
         if (!doc.getPlusIndent().equals(Indent.Const.ZERO)) {
-            sb.append(" +" + doc.evalPlusIndent());
+            sb.append(" +").append(doc.evalPlusIndent());
         }
+        doc.getOptTag().ifPresent(optTag -> sb.append(" (").append(optTag).append(")"));
         return sb.toString();
     }
 
@@ -58,6 +59,9 @@ public final class LevelDelimitedFlatValueDocVisitor implements DocVisitor<Strin
         builder.append("❰");
         if (!level.getPlusIndent().equals(Indent.Const.ZERO)) {
             builder.append(" +" + level.getPlusIndent().eval());
+            if (level.getPlusIndent() instanceof Indent.If) {
+                builder.append(" (").append(level.getPlusIndent()).append(")");
+            }
         }
         if (level.getBreakBehaviour() != BreakBehaviour.BREAK_THIS_LEVEL) {
             builder.append(" ");

@@ -130,6 +130,11 @@ public final class Break extends Doc implements Op {
         optTag.ifPresent(BreakTag::reset);
     }
 
+    /** For use only by {@link LevelDelimitedFlatValueDocVisitor}. */
+    public Optional<BreakTag> getOptTag() {
+        return optTag;
+    }
+
     public State computeBreaks(State state, boolean broken) {
         if (optTag.isPresent()) {
             optTag.get().recordBroken(broken);

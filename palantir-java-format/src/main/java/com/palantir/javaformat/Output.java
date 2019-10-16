@@ -42,6 +42,11 @@ public abstract class Output extends InputOutput {
         public boolean wasBreakTaken() {
             return taken.orElse(false);
         }
+
+        @Override
+        public String toString() {
+            return "BreakTag@" + Integer.toHexString(hashCode());
+        }
     }
 
     /**
