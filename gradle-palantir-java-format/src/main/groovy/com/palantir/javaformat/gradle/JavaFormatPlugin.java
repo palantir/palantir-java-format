@@ -83,13 +83,13 @@ public class JavaFormatPlugin implements Plugin<Project> {
                     task.getImplConfiguration().set(implConfiguration);
                 });
 
-        Provider<? extends Task> configureExternalDependenciesXmlTask =
-                project.getTasks().register("configureExternalDependenciesXml", ConfigureExternalDependenciesXml.class);
+        Provider<? extends Task> configurePalantirJavaFormatPluginDependencyXml = project.getTasks()
+                .register("configurePalantirJavaFormatPluginDependencyXml", ConfigureExternalDependenciesXml.class);
 
         Task palantirJavaFormatIntellij = project.getTasks().create("palantirJavaFormatIntellij", task -> {
             task.setDescription("Configure IntelliJ directory-based repository after importing");
             task.setGroup(UpdateIntellijXmlTask.INTELLIJ_TASK_GROUP);
-            task.dependsOn(configurePalantirJavaFormatXmlTask, configureExternalDependenciesXmlTask);
+            task.dependsOn(configurePalantirJavaFormatXmlTask, configurePalantirJavaFormatPluginDependencyXml);
         });
 
         ExtensionAware ideaProject = (ExtensionAware) project.getExtensions().getByType(IdeaModel.class).getProject();
