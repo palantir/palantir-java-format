@@ -1,0 +1,6 @@
+type: fix
+fix:
+  description: Make `Formatter.formatSourceAndFixImports` work with the PALANTIR style.
+    This can now be used to format a whole file including reflowing strings.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/29
