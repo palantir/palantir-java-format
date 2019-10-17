@@ -2854,10 +2854,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             case METHOD_INVOCATION:
                 // Note: it's fine to BREAK_HERE because we know the first non-Level token will be a
                 // break, added inside `addArguments`.
-                builder.open(
-                        tyargIndent,
-                        BreakBehaviour.BREAK_ONLY_IF_INNER_LEVELS_THEN_FIT_ON_ONE_LINE,
-                        Breakability.BREAK_HERE);
+                builder.open(tyargIndent, BreakBehaviour.BREAK_THIS_LEVEL, Breakability.BREAK_HERE);
                 MethodInvocationTree methodInvocation = (MethodInvocationTree) expression;
                 addArguments(methodInvocation.getArguments(), indent);
                 builder.close();
