@@ -22,6 +22,7 @@ import com.google.common.base.CharMatcher;
 import com.google.common.base.Strings;
 import com.google.common.base.Verify;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Range;
 import com.google.common.collect.TreeRangeMap;
@@ -81,6 +82,14 @@ public final class StringWrapper {
 
         String result = applyReplacements(input, replacements);
 
+        // Format again, because broken strings might now fit on the first line in case of assignments
+        String secondPass = formatter.formatSource(result, rangesAfterAppliedReplacements(replacements));
+
+        if (!secondPass.equals(result)) {
+            replacements = getReflowReplacements(columnLimit, secondPass);
+            result = applyReplacements(secondPass, replacements);
+        }
+
         {
             // We really don't want bugs in this pass to change the behaviour of programs we're
             // formatting, so check that the pretty-printed AST is the same before and after reformatting.
@@ -96,6 +105,28 @@ public final class StringWrapper {
         }
 
         return result;
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private static ImmutableSet<Range<Integer>> rangesAfterAppliedReplacements(
+            TreeRangeMap<Integer, String> replacements) {
+        // TreeRangeSet?
+        ImmutableSet.Builder<Range<Integer>> outputRanges = ImmutableSet.builder();
+        replacements.asMapOfRanges().entrySet().stream().reduce(
+                0,
+                (offset, entry) -> {
+                    Range<Integer> range = entry.getKey();
+                    int lower = range.lowerEndpoint() + offset;
+                    int upper = lower + entry.getValue().length();
+                    outputRanges.add(Range.closedOpen(lower, upper));
+                    int originalLength = range.upperEndpoint() - range.lowerEndpoint();
+                    int newLength = upper - lower;
+                    return offset + newLength - originalLength;
+                },
+                (o1, o2) -> {
+                    throw new RuntimeException("Not parallel");
+                });
+        return outputRanges.build();
     }
 
     private static TreeRangeMap<Integer, String> getReflowReplacements(int columnLimit, final String input)
@@ -412,8 +443,7 @@ public final class StringWrapper {
     }
 
     /** Applies replacements to the given string. */
-    private static String applyReplacements(String javaInput, TreeRangeMap<Integer, String> replacementMap)
-            throws FormatterException {
+    private static String applyReplacements(String javaInput, TreeRangeMap<Integer, String> replacementMap) {
         // process in descending order so the replacement ranges aren't perturbed if any replacements
         // differ in size from the input
         Map<Range<Integer>, String> ranges = replacementMap.asDescendingMapOfRanges();

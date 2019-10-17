@@ -195,7 +195,7 @@ public final class Level extends Doc {
 
             // Allow long strings to stay on the same line, expecting that StringWrapper will
             // reflow them later.
-            if (prefixFits || isSingleString()) {
+            if (prefixFits) {
                 State newState = state.withNoIndent();
                 if (breakBehaviour == BreakBehaviour.BREAK_ONLY_IF_INNER_LEVELS_THEN_FIT_ON_ONE_LINE) {
                     newState = newState.withIndentIncrementedBy(plusIndent);
@@ -205,18 +205,6 @@ public final class Level extends Doc {
         }
 
         return state.updateAfterLevel(broken);
-    }
-
-    /**
-     * Trick to cooperate with StringWrapper. If the value is a single element (e.g. a String), then allow it to stay on
-     * this line, and rely on the StringWrapper to break it accordingly.
-     *
-     * <p>This is to prevent StringWrapperIntegrationTest#idemponent from breaking.
-     */
-    private boolean isSingleString() {
-        return !this.docs.stream().anyMatch(doc -> doc instanceof Level)
-                && this.docs.stream().filter(doc -> doc instanceof Break).count() == 1
-                && getFlat().startsWith(" \"");
     }
 
     private Optional<State> tryBreakLastLevel(

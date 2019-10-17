@@ -1,3 +1,4 @@
 class T {
-  String s = "onelongincrediblyunbrokensentencemovingfromtopictotopicsothatnoonehadachancetointerrupt_____________________)_";
+  String s =
+      "onelongincrediblyunbrokensentencemovingfromtopictotopicsothatnoonehadachancetointerrupt_____________________)_";
 }
