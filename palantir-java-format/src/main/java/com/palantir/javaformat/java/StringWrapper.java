@@ -62,11 +62,12 @@ import org.openjdk.tools.javac.util.Position.LineMap;
 
 /** Wraps string literals that exceed the column limit. */
 public final class StringWrapper {
-    /** Reflows string literals in the given Java source code that extend past the given column limit. */
-    static String wrap(final int columnLimit, String input, Formatter formatter) throws FormatterException {
+
+    static TreeRangeMap<Integer, String> wrapGettingReplacements(
+            final int columnLimit, String input, Formatter formatter) throws FormatterException {
         if (!longLines(columnLimit, input)) {
             // fast path
-            return input;
+            return TreeRangeMap.create();
         }
 
         TreeRangeMap<Integer, String> replacements = getReflowReplacements(columnLimit, input);
@@ -77,6 +78,18 @@ public final class StringWrapper {
             // the updated input.
             input = firstPass;
             replacements = getReflowReplacements(columnLimit, input);
+        }
+
+        return replacements;
+    }
+
+    /** Reflows string literals in the given Java source code that extend past the given column limit. */
+    static String wrap(final int columnLimit, String input, Formatter formatter) throws FormatterException {
+        TreeRangeMap<Integer, String> replacements = wrapGettingReplacements(
+                columnLimit, input, formatter);
+        if (replacements.asMapOfRanges().isEmpty()) {
+            // fast path
+            return input;
         }
 
         String result = applyReplacements(input, replacements);
