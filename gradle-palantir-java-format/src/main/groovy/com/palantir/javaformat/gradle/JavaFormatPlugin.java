@@ -24,8 +24,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.Task;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.plugins.ExtensionAware;
+import org.gradle.api.provider.Provider;
 import org.gradle.plugins.ide.idea.model.IdeaModel;
 import org.jetbrains.gradle.ext.TaskTriggersConfig;
 
@@ -68,21 +70,31 @@ public class JavaFormatPlugin implements Plugin<Project> {
         ideaModel.getProject().getIpr().withXml(xmlProvider -> {
             // this block is lazy
             List<URI> uris = implConfiguration.getFiles().stream().map(File::toURI).collect(Collectors.toList());
-            ConfigureJavaFormatterXml.configure(xmlProvider.asNode(), uris);
+            ConfigureJavaFormatterXml.configureJavaFormat(xmlProvider.asNode(), uris);
+            ConfigureJavaFormatterXml.configureExternalDependencies(xmlProvider.asNode());
         });
     }
 
     private static void configureIntelliJImport(Project project, Configuration implConfiguration) {
         project.getPluginManager().apply("org.jetbrains.gradle.plugin.idea-ext");
 
-        ConfigurePalantirJavaFormatXml fixPalantirJavaFormatXmlTask = project.getTasks()
-                .create("fixPalantirJavaFormatXml", ConfigurePalantirJavaFormatXml.class, task -> {
+        Provider<? extends Task> configurePalantirJavaFormatXmlTask = project.getTasks()
+                .register("configurePalantirJavaFormatXml", ConfigurePalantirJavaFormatXml.class, task -> {
                     task.getImplConfiguration().set(implConfiguration);
                 });
+
+        Provider<? extends Task> configurePalantirJavaFormatPluginDependencyXml = project.getTasks()
+                .register("configurePalantirJavaFormatPluginDependencyXml", ConfigureExternalDependenciesXml.class);
+
+        Task palantirJavaFormatIntellij = project.getTasks().create("palantirJavaFormatIntellij", task -> {
+            task.setDescription("Configure IntelliJ directory-based repository after importing");
+            task.setGroup(UpdateIntellijXmlTask.INTELLIJ_TASK_GROUP);
+            task.dependsOn(configurePalantirJavaFormatXmlTask, configurePalantirJavaFormatPluginDependencyXml);
+        });
 
         ExtensionAware ideaProject = (ExtensionAware) project.getExtensions().getByType(IdeaModel.class).getProject();
         ExtensionAware settings = (ExtensionAware) ideaProject.getExtensions().getByName("settings");
         TaskTriggersConfig taskTriggers = settings.getExtensions().getByType(TaskTriggersConfig.class);
-        taskTriggers.afterSync(fixPalantirJavaFormatXmlTask);
+        taskTriggers.beforeSync(palantirJavaFormatIntellij);
     }
 }

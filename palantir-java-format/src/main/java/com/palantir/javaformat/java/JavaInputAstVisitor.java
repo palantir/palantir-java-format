@@ -53,6 +53,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.PeekingIterator;
 import com.google.common.collect.Streams;
@@ -483,7 +484,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             token("{");
             builder.forcedBreak();
             boolean first = true;
-            for (Iterable<? extends ExpressionTree> row : Iterables.partition(expressions, cols)) {
+            for (Iterable<? extends ExpressionTree> row : Lists.partition(expressions, cols)) {
                 if (!first) {
                     builder.forcedBreak();
                 }
@@ -1110,7 +1111,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         List<String> operators = new ArrayList<>();
         walkInfix(precedence(node), node, operands, operators);
         FillMode fillMode = hasOnlyShortItems(operands) ? INDEPENDENT : UNIFIED;
-        builder.open(plusFour);
+        builder.open(plusFour, BreakBehaviour.BREAK_THIS_LEVEL, Breakability.BREAK_HERE);
         scan(operands.get(0), null);
         int operatorsN = operators.size();
         for (int i = 0; i < operatorsN; i++) {

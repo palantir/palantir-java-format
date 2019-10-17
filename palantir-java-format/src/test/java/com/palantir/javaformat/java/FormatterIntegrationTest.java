@@ -16,7 +16,6 @@ package com.palantir.javaformat.java;
 
 import static com.palantir.javaformat.java.FileBasedTests.isRecreate;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 import com.palantir.javaformat.Newlines;
 import com.palantir.javaformat.jupiter.ParameterizedClass;
@@ -61,7 +60,7 @@ public class FormatterIntegrationTest {
             }
             assertEquals("bad output for " + name, expected, output);
         } catch (FormatterException e) {
-            fail(String.format("Formatter crashed on %s: %s", name, e.getMessage()));
+            throw new RuntimeException(String.format("Formatter crashed on %s", name), e);
         }
     }
 
@@ -78,7 +77,7 @@ public class FormatterIntegrationTest {
             String output = createFormatter().formatSource(mangled);
             assertEquals("bad output for " + name, mangled, output);
         } catch (FormatterException e) {
-            fail(String.format("Formatter crashed on %s: %s", name, e.getMessage()));
+            throw new RuntimeException(String.format("Formatter crashed on %s", name), e);
         }
     }
 
@@ -90,7 +89,7 @@ public class FormatterIntegrationTest {
             String output = createFormatter().formatSource(mangled);
             assertEquals("bad output for " + name, mangled, output);
         } catch (FormatterException e) {
-            fail(String.format("Formatter crashed on %s: %s", name, e.getMessage()));
+            throw new RuntimeException(String.format("Formatter crashed on %s", name), e);
         }
     }
 
@@ -102,7 +101,7 @@ public class FormatterIntegrationTest {
             String output = createFormatter().formatSource(mangled);
             assertEquals("bad output for " + name, mangled, output);
         } catch (FormatterException e) {
-            fail(String.format("Formatter crashed on %s: %s", name, e.getMessage()));
+            throw new RuntimeException(String.format("Formatter crashed on %s", name), e);
         }
     }
 }
