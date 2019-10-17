@@ -17,7 +17,7 @@ package com.palantir.javaformat.java;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static com.palantir.javaformat.java.JavaFormatterOptions.Style;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.fail;
 
 import com.google.common.base.Joiner;
 import com.google.common.io.CharStreams;
@@ -386,7 +386,7 @@ public final class FormatterTest {
     public void throwsFormatterException() throws Exception {
         try {
             Formatter.create().formatSourceAndFixImports("package foo; public class {");
-            fail();
+            fail("fail");
         } catch (FormatterException expected) {
         }
     }

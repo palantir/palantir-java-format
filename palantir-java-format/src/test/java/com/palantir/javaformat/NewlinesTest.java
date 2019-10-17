@@ -15,7 +15,7 @@
 package com.palantir.javaformat;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.fail;
 
 import com.google.common.collect.ImmutableList;
 import java.util.Iterator;
@@ -56,7 +56,7 @@ public class NewlinesTest {
         it.next();
         try {
             it.next();
-            fail();
+            fail("fail");
         } catch (NoSuchElementException e) {
             // expected
         }
@@ -66,7 +66,7 @@ public class NewlinesTest {
         it.next();
         try {
             it.next();
-            fail();
+            fail("fail");
         } catch (NoSuchElementException e) {
             // expected
         }
@@ -79,7 +79,7 @@ public class NewlinesTest {
         it.next();
         try {
             it.next();
-            fail();
+            fail("fail");
         } catch (NoSuchElementException e) {
             // expected
         }
@@ -89,7 +89,7 @@ public class NewlinesTest {
         it.next();
         try {
             it.next();
-            fail();
+            fail("fail");
         } catch (NoSuchElementException e) {
             // expected
         }

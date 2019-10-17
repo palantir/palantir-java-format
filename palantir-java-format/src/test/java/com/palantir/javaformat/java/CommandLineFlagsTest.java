@@ -15,7 +15,7 @@
 package com.palantir.javaformat.java;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.fail;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
@@ -31,14 +31,14 @@ public class CommandLineFlagsTest {
     public void formatInPlaceRequiresAtLeastOneFile() throws UsageException {
         try {
             Main.processArgs("-i");
-            fail();
+            fail("fail");
         } catch (UsageException e) {
             // expected
         }
 
         try {
             Main.processArgs("-i", "-");
-            fail();
+            fail("fail");
         } catch (UsageException e) {
             // expected
         }
@@ -53,14 +53,14 @@ public class CommandLineFlagsTest {
 
         try {
             Main.processArgs("-lines", "10");
-            fail();
+            fail("fail");
         } catch (UsageException e) {
             // expected
         }
 
         try {
             Main.processArgs("-lines", "10", "Foo.java", "Bar.java");
-            fail();
+            fail("fail");
         } catch (UsageException e) {
             // expected
         }
@@ -69,14 +69,14 @@ public class CommandLineFlagsTest {
 
         try {
             Main.processArgs("-offset", "10", "-length", "10");
-            fail();
+            fail("fail");
         } catch (UsageException e) {
             // expected
         }
 
         try {
             Main.processArgs("-offset", "10", "-length", "10", "Foo.java", "Bar.java");
-            fail();
+            fail("fail");
         } catch (UsageException e) {
             // expected
         }
@@ -90,14 +90,14 @@ public class CommandLineFlagsTest {
 
         try {
             Main.processArgs("-offset", "10", "-length", "20", "-offset", "50", "Foo.java");
-            fail();
+            fail("fail");
         } catch (UsageException e) {
             // expected
         }
 
         try {
             Main.processArgs("-offset", "10", "-length", "20", "-length", "50", "Foo.java");
-            fail();
+            fail("fail");
         } catch (UsageException e) {
             // expected
         }
@@ -111,14 +111,14 @@ public class CommandLineFlagsTest {
 
         try {
             Main.processArgs();
-            fail();
+            fail("fail");
         } catch (UsageException e) {
             // expected
         }
 
         try {
             Main.processArgs("-aosp");
-            fail();
+            fail("fail");
         } catch (UsageException e) {
             // expected
         }
@@ -128,7 +128,7 @@ public class CommandLineFlagsTest {
     public void stdinAndFiles() {
         try {
             Main.processArgs("-", "A.java");
-            fail();
+            fail("fail");
         } catch (UsageException e) {
             assertThat(e).hasMessageThat().contains("cannot format from standard input and files simultaneously");
         }
@@ -138,7 +138,7 @@ public class CommandLineFlagsTest {
     public void inPlaceStdin() {
         try {
             Main.processArgs("-i", "-");
-            fail();
+            fail("fail");
         } catch (UsageException e) {
             assertThat(e).hasMessageThat().contains("in-place formatting was requested but no files were provided");
         }
@@ -148,7 +148,7 @@ public class CommandLineFlagsTest {
     public void inPlaceDryRun() {
         try {
             Main.processArgs("-i", "-n", "A.java");
-            fail();
+            fail("fail");
         } catch (UsageException e) {
             assertThat(e).hasMessageThat().contains("cannot use --dry-run and --in-place at the same time");
         }
@@ -158,7 +158,7 @@ public class CommandLineFlagsTest {
     public void assumeFileNameOnlyWorksWithStdin() {
         try {
             Main.processArgs("--assume-filename=Foo.java", "Foo.java");
-            fail();
+            fail("fail");
         } catch (UsageException e) {
             assertThat(e).hasMessageThat().contains(
                     "--assume-filename is only supported when formatting standard input");

@@ -3,8 +3,7 @@ package com.palantir.javaformat.java;
 import static com.google.common.io.Files.getFileExtension;
 import static com.google.common.io.Files.getNameWithoutExtension;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.io.CharStreams;
 import com.google.common.reflect.ClassPath;
@@ -51,7 +50,7 @@ public final class FileBasedTests {
             Path resourceNamePath = Paths.get(resourceName);
             if (resourceNamePath.startsWith(resourcePrefix)) {
                 Path subPath = resourcePrefix.relativize(resourceNamePath);
-                assertEquals("bad testdata file names", 1, subPath.getNameCount());
+                assertThat(subPath.getNameCount()).describedAs("bad testdata file names").isEqualTo(1);
                 String baseName = getNameWithoutExtension(subPath.getFileName().toString());
                 String extension = getFileExtension(subPath.getFileName().toString());
                 String contents;
@@ -71,7 +70,7 @@ public final class FileBasedTests {
         }
         List<Object[]> testInputs = new ArrayList<>();
         if (!isRecreate()) {
-            assertEquals("unmatched inputs and outputs", inputs.size(), outputs.size());
+            assertThat(outputs.size()).describedAs("unmatched inputs and outputs").isEqualTo(inputs.size());
         }
         for (Map.Entry<String, String> entry : inputs.entrySet()) {
             String fileName = entry.getKey();
@@ -81,7 +80,7 @@ public final class FileBasedTests {
             if (isRecreate()) {
                 expectedOutput = null;
             } else {
-                assertTrue("unmatched input", outputs.containsKey(fileName));
+                assertThat(outputs.containsKey(fileName)).describedAs("unmatched input").isTrue();
                 expectedOutput = outputs.get(fileName);
             }
             testInputs.add(new Object[] {fileName, input, expectedOutput});
