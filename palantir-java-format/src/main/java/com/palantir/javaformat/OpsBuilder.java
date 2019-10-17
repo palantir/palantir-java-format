@@ -161,7 +161,7 @@ public final class OpsBuilder {
         } else if (op instanceof CloseOp) {
             depth--;
             if (depth < 0) {
-                throw new AssertionError();
+                throw new IllegalStateException();
             }
         }
         ops.add(op);
@@ -508,9 +508,8 @@ public final class OpsBuilder {
                             if (tokBefore.isJavadocComment()) {
                                 tokOps.put(j, Break.makeForced());
                             }
-                            allowBlankAfterLastComment =
-                                    tokBefore.isSlashSlashComment()
-                                            || (tokBefore.isSlashStarComment() && !tokBefore.isJavadocComment());
+                            allowBlankAfterLastComment = tokBefore.isSlashSlashComment()
+                                    || (tokBefore.isSlashStarComment() && !tokBefore.isJavadocComment());
                         }
                     }
                     if (allowBlankAfterLastComment && newlines > 1) {

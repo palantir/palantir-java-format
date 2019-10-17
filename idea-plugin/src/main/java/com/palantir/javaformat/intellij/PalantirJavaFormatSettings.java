@@ -96,9 +96,8 @@ class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJav
         public JavaFormatterOptions.Style style = JavaFormatterOptions.Style.PALANTIR;
 
         public void setImplementationClassPath(@Nullable List<String> value) {
-            implementationClassPath =
-                    Optional.ofNullable(value)
-                            .map(strings -> strings.stream().map(URI::create).collect(Collectors.toList()));
+            implementationClassPath = Optional.ofNullable(value)
+                    .map(strings -> strings.stream().map(URI::create).collect(Collectors.toList()));
         }
 
         public List<String> getImplementationClassPath() {

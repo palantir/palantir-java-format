@@ -105,7 +105,7 @@ class Trees {
                     break;
             }
         }
-        throw new AssertionError();
+        throw new IllegalStateException();
     }
 
     /** Skips a single parenthesized tree. */

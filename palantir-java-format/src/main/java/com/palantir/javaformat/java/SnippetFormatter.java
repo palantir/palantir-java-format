@@ -105,10 +105,8 @@ public class SnippetFormatter {
         ranges = offsetRanges(ranges, wrapper.offset);
 
         String replacement = formatter.formatSource(wrapper.contents.toString(), ranges);
-        replacement =
-                replacement.substring(
-                        wrapper.offset,
-                        replacement.length() - (wrapper.contents.length() - wrapper.offset - source.length()));
+        replacement = replacement.substring(
+                wrapper.offset, replacement.length() - (wrapper.contents.length() - wrapper.offset - source.length()));
 
         return toReplacements(source, replacement).stream().filter(r -> rangeSet.encloses(r.getReplaceRange())).collect(
                 toImmutableList());

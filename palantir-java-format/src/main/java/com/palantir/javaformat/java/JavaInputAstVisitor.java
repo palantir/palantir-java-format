@@ -53,6 +53,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.PeekingIterator;
 import com.google.common.collect.Streams;
@@ -483,7 +484,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             token("{");
             builder.forcedBreak();
             boolean first = true;
-            for (Iterable<? extends ExpressionTree> row : Iterables.partition(expressions, cols)) {
+            for (Iterable<? extends ExpressionTree> row : Lists.partition(expressions, cols)) {
                 if (!first) {
                     builder.forcedBreak();
                 }

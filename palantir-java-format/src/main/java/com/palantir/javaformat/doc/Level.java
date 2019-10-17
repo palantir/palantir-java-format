@@ -356,15 +356,13 @@ public final class Level extends Doc {
             state = state.withBrokenLevel();
         }
 
-        state =
-                computeBreakAndSplit(
-                        commentsHelper, maxWidth, state, /* optBreakDoc= */ Optional.empty(), splits.get(0));
+        state = computeBreakAndSplit(
+                commentsHelper, maxWidth, state, /* optBreakDoc= */ Optional.empty(), splits.get(0));
 
         // Handle following breaks and split.
         for (int i = 0; i < breaks.size(); i++) {
-            state =
-                    computeBreakAndSplit(
-                            commentsHelper, maxWidth, state, Optional.of(breaks.get(i)), splits.get(i + 1));
+            state = computeBreakAndSplit(
+                    commentsHelper, maxWidth, state, Optional.of(breaks.get(i)), splits.get(i + 1));
         }
         return state;
     }
