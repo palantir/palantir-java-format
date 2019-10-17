@@ -60,6 +60,7 @@ public class FormatterDiagnostic {
         return message;
     }
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         if (lineNumber >= 0) {

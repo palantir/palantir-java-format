@@ -235,7 +235,7 @@ final class JavadocLexer {
         } else if (input.tryConsumeRegex(LITERAL_PATTERN)) {
             return LITERAL;
         }
-        throw new AssertionError();
+        throw new IllegalStateException();
     }
 
     private boolean preserveExistingFormatting() {

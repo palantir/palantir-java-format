@@ -18,7 +18,7 @@ import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.palantir.javaformat.jupiter.ParameterizedClass;
 import java.util.Arrays;
 import org.junit.jupiter.api.TestTemplate;
@@ -77,7 +77,7 @@ public class ArrayDimensionTest {
             "List<int @A [] @B []> xs;",
             "List<int[] @A [][] @B []> xs;",
         };
-        return Iterables.transform(Arrays.asList(inputs), input -> new Object[] {input});
+        return Lists.transform(Arrays.asList(inputs), input -> new Object[] {input});
     }
 
     private final String input;
