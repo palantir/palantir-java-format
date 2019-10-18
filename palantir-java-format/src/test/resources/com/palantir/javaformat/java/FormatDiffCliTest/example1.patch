@@ -1,0 +1,20 @@
+diff --git a/build.gradle b/build.gradle
+index 1b1b970..2150904 100644
+--- a/build.gradle
++++ b/build.gradle
+@@ -25 +25 @@ buildscript {
+-        classpath 'com.palantir.gradle.revapi:gradle-revapi:1.0.5'
++        classpath 'com.palantir.gradle.revapi:gradle-revapi:1.0.6'
+@@ -30 +30 @@ buildscript {
+-        classpath 'com.palantir.baseline:gradle-baseline-java:2.19.0'
++        classpath 'com.palantir.baseline:gradle-baseline-java:2.24.0'
+diff --git a/tracing/src/test/java/com/palantir/tracing/TracersTest.java b/tracing/src/test/java/com/palantir/tracing/TracersTest.java
+index 7341ef6..723d4ba 100644
+--- a/tracing/src/test/java/com/palantir/tracing/TracersTest.java
++++ b/tracing/src/test/java/com/palantir/tracing/TracersTest.java
+@@ -660 +660 @@ public final class TracersTest {
+-            assertThat(trace).hasSize(0);
++            assertThat(trace).isEmpty();
+@@ -676 +676 @@ public final class TracersTest {
+-            assertThat(trace).hasSize(0);
++            assertThat(trace).isEmpty();

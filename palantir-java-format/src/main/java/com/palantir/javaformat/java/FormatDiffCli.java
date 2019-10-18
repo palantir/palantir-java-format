@@ -18,10 +18,12 @@ package com.palantir.javaformat.java;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
+import com.google.common.collect.Streams;
 import com.google.common.collect.TreeRangeSet;
 import com.google.common.io.ByteStreams;
 import java.io.ByteArrayOutputStream;
@@ -29,10 +31,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 public final class FormatDiffCli {
     // each section in the git diff output starts like this
@@ -46,33 +50,26 @@ public final class FormatDiffCli {
             Pattern.compile("^@@.*\\+(?<startLineOneIndexed>\\d+)(,(?<numLines>\\d+))?", Pattern.MULTILINE);
 
     public static void main(String[] _args) throws IOException, InterruptedException {
-        formatFiles(Paths.get("."), Formatter.createFormatter(
-                JavaFormatterOptions.builder().style(JavaFormatterOptions.Style.PALANTIR).build()));
+        Formatter formatter = Formatter.createFormatter(
+                JavaFormatterOptions.builder().style(JavaFormatterOptions.Style.PALANTIR).build());
+        Path cwd = Paths.get(".");
+
+        String gitOutput = gitDiff(cwd);
+        parseGitDiffOutput(gitOutput).forEach(diff -> format(cwd, formatter, diff));
     }
 
-    static void formatFiles(Path cwd, Formatter formatter) throws IOException, InterruptedException {
-        String gitOutput = gitDiff(cwd);
-
-        Splitter.on(SEPARATOR).omitEmptyStrings().splitToList(gitOutput).forEach(singleFileDiff -> {
+    /** Parses the filenames and edited ranges out of `git diff -U0`. */
+    @VisibleForTesting
+    static Stream<SingleFileDiff> parseGitDiffOutput(String gitOutput) {
+        return Streams.stream(Splitter.on(SEPARATOR).omitEmptyStrings().split(gitOutput)).flatMap(singleFileDiff -> {
             Matcher filenameMatcher = FILENAME.matcher(singleFileDiff);
             if (!filenameMatcher.find()) {
                 System.err.println("Failed to find filename");
-                return;
+                return Stream.empty();
             }
+            Path path = Paths.get(filenameMatcher.group("filename"));
 
-            Path path = cwd.resolve(Paths.get(filenameMatcher.group("filename")));
-            if (!Files.exists(path)) {
-                System.err.println("Skipping non-existent file " + path);
-                return; // i.e. a deleted file
-            }
-            String input;
-            try {
-                input = new String(Files.readAllBytes(path), UTF_8);
-            } catch (IOException e) {
-                System.err.println("Failed to read file " + path);
-                e.printStackTrace(System.err);
-                return;
-            }
+            // TODO(dfox): only filter files ending in .java? or allow a regex to be passed in?
 
             RangeSet<Integer> lineRanges = TreeRangeSet.create();
             Matcher hunk = HUNK.matcher(singleFileDiff);
@@ -82,19 +79,37 @@ public final class FormatDiffCli {
                 Range<Integer> rangeZeroIndexed = Range.closedOpen(firstLineOfHunk, firstLineOfHunk + hunkLength);
                 lineRanges.add(rangeZeroIndexed);
             }
-            RangeSet<Integer> charRanges = Formatter.lineRangesToCharRanges(input, lineRanges);
 
-            // TODO(dfox): only filter files ending in .java? or allow a regex to be passed in?
-
-            try {
-                System.err.println("Formatting " + path + charRanges);
-                String output = formatter.formatSource(input, charRanges.asRanges());
-                Files.write(path, output.getBytes(UTF_8));
-            } catch (IOException | FormatterException e) {
-                System.err.println("Failed to format file " + path);
-                e.printStackTrace(System.err);
-            }
+            return Stream.of(new SingleFileDiff(path, lineRanges));
         });
+    }
+
+    private static void format(Path cwd, Formatter formatter, SingleFileDiff diff) {
+        Path path = cwd.resolve(diff.path);
+        if (!Files.exists(path)) {
+            System.err.println("Skipping non-existent file " + path);
+            return;
+        }
+
+        String input;
+        try {
+            input = new String(Files.readAllBytes(diff.path), UTF_8);
+        } catch (IOException e) {
+            System.err.println("Failed to read file " + diff.path);
+            e.printStackTrace(System.err);
+            return;
+        }
+
+        RangeSet<Integer> charRanges = Formatter.lineRangesToCharRanges(input, diff.lineRanges);
+
+        try {
+            System.err.println("Formatting " + diff.path);
+            String output = formatter.formatSource(input, charRanges.asRanges());
+            Files.write(diff.path, output.getBytes(UTF_8));
+        } catch (IOException | FormatterException e) {
+            System.err.println("Failed to format file " + diff.path);
+            e.printStackTrace(System.err);
+        }
     }
 
     private static String gitDiff(Path cwd) throws IOException, InterruptedException {
@@ -105,5 +120,21 @@ public final class FormatDiffCli {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ByteStreams.copy(process.getInputStream(), baos);
         return new String(baos.toByteArray(), UTF_8);
+    }
+
+    // TODO(dfox): replace this with immutables
+    public static class SingleFileDiff {
+        private final Path path;
+        private final RangeSet<Integer> lineRanges; // zero-indexed
+
+        public SingleFileDiff(Path path, RangeSet<Integer> lineRanges) {
+            this.path = path;
+            this.lineRanges = lineRanges;
+        }
+
+        @Override
+        public String toString() {
+            return "SingleFileDiff{path=" + path + ", lineRanges=" + lineRanges + '}';
+        }
     }
 }
