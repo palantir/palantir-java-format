@@ -1,0 +1,7 @@
+type: fix
+fix:
+  description: Reflow long strings more thoroughly, taking into account that once
+    a string is broken, its first chunk might fit on the starting line and thus it
+    needs to be reflowed again.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/35

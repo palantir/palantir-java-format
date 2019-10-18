@@ -32,7 +32,7 @@ public class StringWrapperIntegrationTest {
 
     private static FileBasedTests tests = new FileBasedTests(StringWrapperIntegrationTest.class);
 
-    @ParameterizedClass.Parameters(name = "{index}: {0}")
+    @ParameterizedClass.Parameters(name = "{0}")
     public static List<Object[]> parameters() throws IOException {
         return tests.paramsAsNameInputOutput();
     }
