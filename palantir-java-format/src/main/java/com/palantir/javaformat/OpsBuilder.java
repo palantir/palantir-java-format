@@ -19,6 +19,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
+import com.google.errorprone.annotations.CompileTimeConstant;
 import com.palantir.javaformat.Indent.Const;
 import com.palantir.javaformat.Output.BreakTag;
 import com.palantir.javaformat.doc.Break;
@@ -257,6 +258,16 @@ public final class OpsBuilder {
      */
     public final void open(Indent plusIndent) {
         add(OpenOp.make(plusIndent));
+    }
+
+    /**
+     * Open a new level by emitting an {@link OpenOp}.
+     *
+     * @param name a representative name for this lambda
+     * @param plusIndent the extra indent for the new level
+     */
+    public final void open(@CompileTimeConstant String name, Indent plusIndent) {
+        add(OpenOp.builder().plusIndent(plusIndent).name(name).build());
     }
 
     /**
