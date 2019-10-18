@@ -611,7 +611,6 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 .plusIndent(plusFour)
                 .breakBehaviour(BreakBehaviour.BREAK_ONLY_IF_INNER_LEVELS_THEN_FIT_ON_ONE_LINE)
                 .keepIndentWhenInlined(false)
-                .breakabilityIfLastLevel(Breakability.NO_PREFERENCE)
                 .build());
         scan(node.getVariable(), null);
         builder.space();
@@ -635,7 +634,6 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 .plusIndent(plusFour)
                 .breakBehaviour(BreakBehaviour.BREAK_ONLY_IF_INNER_LEVELS_THEN_FIT_ON_ONE_LINE)
                 .keepIndentWhenInlined(false)
-                .breakabilityIfLastLevel(Breakability.NO_PREFERENCE)
                 .build());
         scan(node.getVariable(), null);
         builder.space();
