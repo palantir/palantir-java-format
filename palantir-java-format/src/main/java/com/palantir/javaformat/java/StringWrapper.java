@@ -36,6 +36,7 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 import org.openjdk.javax.tools.Diagnostic;
@@ -110,22 +111,20 @@ public final class StringWrapper {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     private static ImmutableSet<Range<Integer>> rangesAfterAppliedReplacements(
             TreeRangeMap<Integer, String> replacements) {
-        // TreeRangeSet?
         ImmutableSet.Builder<Range<Integer>> outputRanges = ImmutableSet.builder();
-        replacements.asMapOfRanges().entrySet().stream().reduce(
-                0,
-                (offset, entry) -> {
-                    Range<Integer> range = entry.getKey();
-                    int lower = range.lowerEndpoint() + offset;
-                    int upper = lower + entry.getValue().length();
-                    outputRanges.add(Range.closedOpen(lower, upper));
-                    int originalLength = range.upperEndpoint() - range.lowerEndpoint();
-                    int newLength = upper - lower;
-                    return offset + newLength - originalLength;
-                },
-                (o1, o2) -> {
-                    throw new RuntimeException("Not parallel");
-                });
+        int offset = 0;
+        for (Entry<Range<Integer>, String> entry : replacements.asMapOfRanges().entrySet()) {
+            Range<Integer> range = entry.getKey();
+            String replacement = entry.getValue();
+
+            int lower = offset + range.lowerEndpoint();
+            int upper = lower + replacement.length();
+            outputRanges.add(Range.closedOpen(lower, upper));
+
+            int originalLength = range.upperEndpoint() - range.lowerEndpoint();
+            int newLength = upper - lower;
+            offset += newLength - originalLength;
+        }
         return outputRanges.build();
     }
 
