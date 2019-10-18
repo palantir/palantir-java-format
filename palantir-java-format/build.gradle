@@ -29,3 +29,8 @@ tasks.withType(JavaCompile).configureEach {
 // false positives due to org.junit.runners.* in the test cases
 tasks.checkJUnitDependencies.enabled = false
 
+tasks.test {
+    // Run all classes and tests in parallel
+    // https://junit.org/junit5/docs/current/user-guide/#writing-tests-parallel-execution
+    systemProperty 'junit.jupiter.execution.parallel.mode.default', 'concurrent'
+}
