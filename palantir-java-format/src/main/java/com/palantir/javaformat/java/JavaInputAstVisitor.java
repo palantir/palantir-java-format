@@ -1182,8 +1182,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         sync(node);
         boolean statementBody = node.getBodyKind() == LambdaExpressionTree.BodyKind.STATEMENT;
         boolean parens = builder.peekToken().equals(Optional.of("("));
-        builder.open(
-                parens ? plusFour : ZERO, BreakBehaviour.PREFER_BREAKING_LAST_INNER_LEVEL, Breakability.CHECK_INNER);
+        builder.open(parens ? plusFour : ZERO);
         if (parens) {
             token("(");
         }
