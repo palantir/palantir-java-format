@@ -24,11 +24,12 @@ import com.palantir.javaformat.Op;
 import com.palantir.javaformat.OpsBuilder;
 import java.util.ArrayDeque;
 import java.util.List;
+import java.util.Optional;
 
 /** A {@code DocBuilder} converts a sequence of {@link Op}s into a {@link Doc}. */
 public final class DocBuilder {
-    private final Level base =
-            Level.make(Indent.Const.ZERO, BreakBehaviour.BREAK_THIS_LEVEL, Breakability.NO_PREFERENCE);
+    private final Level base = Level.make(
+            Indent.Const.ZERO, BreakBehaviour.BREAK_THIS_LEVEL, Breakability.NO_PREFERENCE, true, Optional.of("root"));
     private final ArrayDeque<Level> stack = new ArrayDeque<>();
 
     /**
@@ -68,13 +69,19 @@ public final class DocBuilder {
 
     /**
      * Open a new {@link Level}.
-     *
-     * @param plusIndent the extra indent for the {@link Level}
+     *  @param plusIndent the extra indent for the {@link Level}
      * @param breakBehaviour how to decide whether to break this level or not
      * @param breakabilityIfLastLevel if last level, when to break this rather than parent
+     * @param keepIndentWhenInlined
+     * @param name
      */
-    public void open(Indent plusIndent, BreakBehaviour breakBehaviour, Breakability breakabilityIfLastLevel) {
-        Level level = Level.make(plusIndent, breakBehaviour, breakabilityIfLastLevel);
+    public void open(
+        Indent plusIndent,
+        BreakBehaviour breakBehaviour,
+        Breakability breakabilityIfLastLevel,
+        boolean keepIndentWhenInlined,
+        Optional<String> name) {
+        Level level = Level.make(plusIndent, breakBehaviour, breakabilityIfLastLevel, keepIndentWhenInlined, name);
         stack.addLast(level);
     }
 

@@ -46,6 +46,8 @@ public final class Level extends Doc {
     private final Indent plusIndent; // The extra indent following breaks.
     private final BreakBehaviour breakBehaviour; // Where to break when we can't fit on one line.
     private final Breakability breakabilityIfLastLevel; // If last level, when to break this rather than parent.
+    private final boolean keepIndentWhenInlined;
+    private final Optional<String> name;
     private final List<Doc> docs = new ArrayList<>(); // The elements of the level.
 
     // State that needs to be preserved between calculating breaks and
@@ -61,10 +63,17 @@ public final class Level extends Doc {
     /** {@link Break}s between {@link Doc}s in the current {@link Level}. */
     List<Break> breaks = new ArrayList<>();
 
-    private Level(Indent plusIndent, BreakBehaviour breakBehaviour, Breakability breakabilityIfLastLevel) {
+    private Level(
+        Indent plusIndent,
+        BreakBehaviour breakBehaviour,
+        Breakability breakabilityIfLastLevel,
+        boolean keepIndentWhenInlined,
+        Optional<String> name) {
         this.plusIndent = plusIndent;
         this.breakBehaviour = breakBehaviour;
         this.breakabilityIfLastLevel = breakabilityIfLastLevel;
+        this.keepIndentWhenInlined = keepIndentWhenInlined;
+        this.name = name;
     }
 
     /**
@@ -73,10 +82,17 @@ public final class Level extends Doc {
      * @param plusIndent the extra indent inside the {@code Level}
      * @param breakBehaviour whether to attempt breaking only the last inner level first, instead of this level
      * @param breakabilityIfLastLevel if last level, when to break this rather than parent
+     * @param keepIndentWhenInlined
+     * @param name
      * @return the new {@code Level}
      */
-    static Level make(Indent plusIndent, BreakBehaviour breakBehaviour, Breakability breakabilityIfLastLevel) {
-        return new Level(plusIndent, breakBehaviour, breakabilityIfLastLevel);
+    static Level make(
+        Indent plusIndent,
+        BreakBehaviour breakBehaviour,
+        Breakability breakabilityIfLastLevel,
+        boolean keepIndentWhenInlined,
+        Optional<String> name) {
+        return new Level(plusIndent, breakBehaviour, breakabilityIfLastLevel, keepIndentWhenInlined, name);
     }
 
     /**
@@ -155,7 +171,7 @@ public final class Level extends Doc {
 
         // But undo the break in a special case, if the inner levels didn't fit on one line.
         // Note: this is currently only used for variable initialisers
-        if (breakBehaviour.isBreakOnlyIfInnerLevelsThenFitOnOneLine()) {
+        if (breakBehaviour == BreakBehaviour.BREAK_ONLY_IF_INNER_LEVELS_THEN_FIT_ON_ONE_LINE) {
             List<Level> innerLevels = this.docs.stream()
                     .filter(doc -> doc instanceof Level)
                     .map(doc -> ((Level) doc))
@@ -197,7 +213,7 @@ public final class Level extends Doc {
             // reflow them later.
             if (prefixFits || isSingleString()) {
                 State newState = state.withNoIndent();
-                if (breakBehaviour == BreakBehaviour.BREAK_ONLY_IF_INNER_LEVELS_THEN_FIT_ON_ONE_LINE) {
+                if (keepIndentWhenInlined) {
                     newState = newState.withIndentIncrementedBy(plusIndent);
                 }
                 broken = tryToLayOutLevelOnOneLine(commentsHelper, maxWidth, newState);

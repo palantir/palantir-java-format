@@ -40,8 +40,9 @@ public abstract class OpenOp implements Op {
         return Breakability.NO_PREFERENCE;
     }
 
+    /** Whether to keep this level's {@link #plusIndent()} when the level's breaks are not taken. */
     @Default
-    public boolean keepIndentIfNested() {
+    public boolean keepIndentWhenInlined() {
         return true;
     }
 
@@ -73,7 +74,7 @@ public abstract class OpenOp implements Op {
 
     @Override
     public void add(DocBuilder builder) {
-        builder.open(plusIndent(), breakBehaviour(), breakabilityIfLastLevel());
+        builder.open(plusIndent(), breakBehaviour(), breakabilityIfLastLevel(), keepIndentWhenInlined(), name());
     }
 
     public static Builder builder() {

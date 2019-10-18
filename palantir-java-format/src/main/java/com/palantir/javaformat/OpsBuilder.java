@@ -267,7 +267,15 @@ public final class OpsBuilder {
      * @param breakabilityIfLastLevel if last level, when to break this rather than parent
      */
     public final void open(Indent plusIndent, BreakBehaviour breakBehaviour, Breakability breakabilityIfLastLevel) {
-        add(OpenOp.make(plusIndent, breakBehaviour, breakabilityIfLastLevel));
+        add(OpenOp.builder()
+                .plusIndent(plusIndent)
+                .breakBehaviour(breakBehaviour)
+                .breakabilityIfLastLevel(breakabilityIfLastLevel)
+                .build());
+    }
+
+    public final void open(OpenOp openOp) {
+        add(openOp);
     }
 
     /** Close the current level, by emitting a {@link CloseOp}. */
