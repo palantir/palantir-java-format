@@ -2674,7 +2674,13 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             // This level can come after either:
             //      * checkArgument(        -- B19950815                (!trailingDereferences)
             //      * foo.bar()             -- palantir-chains-lambdas  ( trailingDereferences)
-            builder.open(plusFour, BreakBehaviour.PREFER_BREAKING_LAST_INNER_LEVEL, Breakability.CHECK_INNER);
+            builder.open(OpenOp.builder()
+                    .name("visitRegularDot")
+                    .plusIndent(plusFour)
+                    .breakBehaviour(BreakBehaviour.PREFER_BREAKING_LAST_INNER_LEVEL)
+                    .breakabilityIfLastLevel(Breakability.CHECK_INNER)
+                    .keepIndentWhenInlined(false)
+                    .build());
         }
         // don't break after the first element if it is every small, unless the
         // chain starts with another expression
@@ -2751,17 +2757,20 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         // Are there method invocations or field accesses after the prefix?
         boolean trailingDereferences = !prefixes.isEmpty() && getLast(prefixes) < items.size() - 1;
 
-        builder.open(
-                plusFour,
+        builder.open(OpenOp.builder()
+                .name("visitDotWithPrefix")
+                .plusIndent(plusFour)
                 // This can't be PREFER_BREAKING_LAST_INNER_LEVEL unless we have breaks in _this_ level.
                 // That's only every the case if trailingDereferences is true.
-                trailingDereferences
-                        ? BreakBehaviour.PREFER_BREAKING_LAST_INNER_LEVEL
-                        : BreakBehaviour.BREAK_THIS_LEVEL,
-                Breakability.ONLY_IF_FIRST_LEVEL_FITS);
+                .breakBehaviour(
+                        trailingDereferences
+                                ? BreakBehaviour.PREFER_BREAKING_LAST_INNER_LEVEL
+                                : BreakBehaviour.BREAK_THIS_LEVEL)
+                .breakabilityIfLastLevel(Breakability.ONLY_IF_FIRST_LEVEL_FITS)
+                .build());
 
         for (int times = 0; times < prefixes.size(); times++) {
-            builder.open(ZERO);
+            builder.open("prefix " + times, ZERO);
         }
 
         Deque<Integer> unconsumedPrefixes = new ArrayDeque<>(ImmutableSortedSet.copyOf(prefixes));
