@@ -3009,7 +3009,12 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     }
 
     private void argList(List<? extends ExpressionTree> arguments) {
-        builder.open(ZERO, BreakBehaviour.PREFER_BREAKING_LAST_INNER_LEVEL, Breakability.CHECK_INNER);
+        builder.open(OpenOp.builder()
+                .name("argList")
+                .plusIndent(ZERO)
+                .breakBehaviour(BreakBehaviour.PREFER_BREAKING_LAST_INNER_LEVEL)
+                .breakabilityIfLastLevel(Breakability.CHECK_INNER)
+                .build());
         boolean first = true;
         FillMode fillMode = hasOnlyShortItems(arguments) ? FillMode.INDEPENDENT : FillMode.UNIFIED;
         for (ExpressionTree argument : arguments) {
