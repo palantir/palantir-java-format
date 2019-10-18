@@ -287,8 +287,7 @@ public final class Level extends Doc {
             }
 
             // We want to keep _lastLevel_'s indent, it is an _intermediate_ level.
-            // TODO hax
-            if (lastLevel.plusIndent instanceof Indent.If) {
+            if (keepIndentWhenInlined) {
                 state = state.withIndentIncrementedBy(lastLevel.getPlusIndent());
             }
 

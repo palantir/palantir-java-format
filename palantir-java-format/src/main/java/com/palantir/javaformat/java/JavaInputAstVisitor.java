@@ -2862,10 +2862,15 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         expression = getArrayBase(expression);
         switch (expression.getKind()) {
             case METHOD_INVOCATION:
-                // Note: it's fine to BREAK_HERE because we know the first non-Level token will be a
-                // break, added inside `addArguments`.
-                // TODO setting PREFER_BREAKING_LAST_INNER_LEVEL here is not good, leads to too large indents!
-                builder.open(tyargIndent, BreakBehaviour.PREFER_BREAKING_LAST_INNER_LEVEL, Breakability.CHECK_INNER);
+                // Note: we don't BREAK_HERE because we want to make sure that the last argument is actually
+                // breakable in a way we prefer.
+                builder.open(OpenOp.builder()
+                        .plusIndent(tyargIndent)
+                        .breakBehaviour(BreakBehaviour.PREFER_BREAKING_LAST_INNER_LEVEL)
+                        .keepIndentWhenInlined(false)
+                        .breakabilityIfLastLevel(Breakability.CHECK_INNER)
+                        .name("dotExpressionArgsAndParen")
+                        .build());
                 MethodInvocationTree methodInvocation = (MethodInvocationTree) expression;
                 addArguments(methodInvocation.getArguments(), indent);
                 builder.close();
