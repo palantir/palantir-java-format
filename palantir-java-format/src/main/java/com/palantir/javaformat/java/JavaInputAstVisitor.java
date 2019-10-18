@@ -2873,7 +2873,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 builder.open(OpenOp.builder()
                         .plusIndent(tyargIndent)
                         .breakBehaviour(BreakBehaviour.PREFER_BREAKING_LAST_INNER_LEVEL)
-                        .keepIndentWhenInlined(false)
+                        .keepIndentWhenInlined(true)
                         .breakabilityIfLastLevel(Breakability.CHECK_INNER)
                         .name("dotExpressionArgsAndParen")
                         .build());
@@ -2955,16 +2955,18 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
 
          This is so that the downstream 'PREFER_BREAKING_LAST_INNER_LEVEL' level made by
          argList can be attempted without preemptively breaking after the opening bracket '('.
+
+         BREAK_THIS_LEVEL would break B20701054 ( `analysis().analyze(⏎` )
+         However we definitely don't wanna look inside for B18479811
+         Solution: argList should CHECK_INNER.
         */
-        builder.open(
-                plusIndent,
-                // BREAK_THIS_LEVEL would break B20701054 ( `analysis().analyze(⏎` )
-                // However we definitely don't wanna look inside for B18479811
-                // Solution: argList should CHECK_INNER.
-                BreakBehaviour.PREFER_BREAKING_LAST_INNER_LEVEL,
-                // We are at a point where a newline is definitely coming, so we want to give the
-                // opportunity to take it.
-                Breakability.CHECK_INNER);
+        builder.open(OpenOp.builder()
+                .name("addArguments")
+                .plusIndent(plusIndent)
+                .breakBehaviour(BreakBehaviour.PREFER_BREAKING_LAST_INNER_LEVEL)
+                .breakabilityIfLastLevel(Breakability.CHECK_INNER)
+                .keepIndentWhenInlined(false) // IMPORTANT!
+                .build());
         token("(");
         if (!arguments.isEmpty()) {
             if (arguments.size() % 2 == 0 && argumentsAreTabular(arguments) == 2) {
