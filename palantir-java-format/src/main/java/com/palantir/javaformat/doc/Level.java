@@ -451,6 +451,10 @@ public final class Level extends Doc {
         return breakabilityIfLastLevel;
     }
 
+    public Optional<String> getName() {
+        return name;
+    }
+
     /** An indented representation of this level and all nested levels inside it. */
     String representation() {
         return new LevelDelimitedFlatValueDocVisitor().visit(this);
@@ -477,9 +481,11 @@ public final class Level extends Doc {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
+                .add("name", name)
                 .add("plusIndent", plusIndent)
                 .add("breakBehaviour", breakBehaviour)
-                .add("preferBreakIfLastLevel", breakabilityIfLastLevel)
+                .add("breakabilityIfLastLevel", breakabilityIfLastLevel)
+                .add("keepIndentWhenInlined", keepIndentWhenInlined)
                 .add("docs", docs)
                 .toString();
     }
