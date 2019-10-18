@@ -480,6 +480,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             }
             token("}", plusTwo);
         } else if ((cols = argumentsAreTabular(expressions)) != -1) {
+            builder.open(ZERO, BreakBehaviour.BREAK_THIS_LEVEL, Breakability.BREAK_HERE);
             builder.open(plusTwo, BreakBehaviour.BREAK_THIS_LEVEL, Breakability.BREAK_HERE);
             token("{");
             builder.forcedBreak();
@@ -502,9 +503,10 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 builder.close();
                 first = false;
             }
-            builder.breakOp(minusTwo);
             builder.close();
+            builder.breakOp();
             token("}", plusTwo);
+            builder.close();
         } else {
             // Special-case the formatting of array initializers inside annotations
             // to more eagerly use a one-per-line layout.
@@ -524,6 +526,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             boolean shortItems = hasOnlyShortItems(expressions);
             boolean allowFilledElementsOnOwnLine = shortItems || !inMemberValuePair;
 
+            builder.open(ZERO, BreakBehaviour.BREAK_THIS_LEVEL, Breakability.BREAK_HERE);
             builder.open(plusTwo, BreakBehaviour.BREAK_THIS_LEVEL, Breakability.BREAK_HERE);
             tokenBreakTrailingComment("{", plusTwo);
             boolean hasTrailingComma = hasTrailingToken(builder.getInput(), expressions, ",");
@@ -545,9 +548,10 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             if (allowFilledElementsOnOwnLine) {
                 builder.close();
             }
-            builder.breakOp(minusTwo);
             builder.close();
+            builder.breakOp();
             token("}", plusTwo);
+            builder.close();
         }
         return false;
     }
