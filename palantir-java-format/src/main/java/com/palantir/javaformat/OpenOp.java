@@ -14,11 +14,13 @@
 
 package com.palantir.javaformat;
 
+import com.google.common.base.Preconditions;
 import com.palantir.javaformat.doc.Doc;
 import com.palantir.javaformat.doc.DocBuilder;
 import com.palantir.javaformat.doc.Level;
 import java.util.Optional;
 import org.immutables.value.Value;
+import org.immutables.value.Value.Check;
 import org.immutables.value.Value.Default;
 
 /**
@@ -40,13 +42,33 @@ public abstract class OpenOp implements Op {
         return Breakability.NO_PREFERENCE;
     }
 
-    /** Whether to keep this level's {@link #plusIndent()} when the level's breaks are not taken. */
+    /**
+     * Whether to keep this level's {@link #plusIndent()} when the level's breaks are not taken.
+     *
+     * <p>A helpful default is provided when this field is applicable.
+     */
     @Default
-    public boolean keepIndentWhenInlined() {
-        return true;
+    public Optional<Boolean> keepIndentWhenInlined() {
+        if (canUseKeepIndentWhenInlined()) {
+            return Optional.of(true);
+        }
+        return Optional.empty();
     }
 
     public abstract Optional<String> name();
+
+    @Check
+    protected void check() {
+        Preconditions.checkState(
+                keepIndentWhenInlined().isPresent() == canUseKeepIndentWhenInlined(),
+                "keepIndentWhenInlined is meaningless for this breakBehaviour / breakabilityIfLastLevel: %s",
+                this);
+    }
+
+    private boolean canUseKeepIndentWhenInlined() {
+        return breakBehaviour() == BreakBehaviour.BREAK_ONLY_IF_INNER_LEVELS_THEN_FIT_ON_ONE_LINE
+                || breakabilityIfLastLevel() == Breakability.CHECK_INNER;
+    }
 
     /**
      * Make an ordinary {@code OpenOp}.
@@ -81,5 +103,10 @@ public abstract class OpenOp implements Op {
         return new Builder();
     }
 
-    public static class Builder extends ImmutableOpenOp.Builder {}
+    public static class Builder extends ImmutableOpenOp.Builder {
+        public Builder keepIndentWhenInlined(boolean value) {
+            keepIndentWhenInlined(Optional.of(value));
+            return this;
+        }
+    }
 }

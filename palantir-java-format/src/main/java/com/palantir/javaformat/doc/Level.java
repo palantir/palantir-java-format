@@ -46,7 +46,7 @@ public final class Level extends Doc {
     private final Indent plusIndent; // The extra indent following breaks.
     private final BreakBehaviour breakBehaviour; // Where to break when we can't fit on one line.
     private final Breakability breakabilityIfLastLevel; // If last level, when to break this rather than parent.
-    private final boolean keepIndentWhenInlined;
+    private final Optional<Boolean> keepIndentWhenInlined;
     private final Optional<String> name;
     private final List<Doc> docs = new ArrayList<>(); // The elements of the level.
 
@@ -67,7 +67,7 @@ public final class Level extends Doc {
             Indent plusIndent,
             BreakBehaviour breakBehaviour,
             Breakability breakabilityIfLastLevel,
-            boolean keepIndentWhenInlined,
+            Optional<Boolean> keepIndentWhenInlined,
             Optional<String> name) {
         this.plusIndent = plusIndent;
         this.breakBehaviour = breakBehaviour;
@@ -90,7 +90,7 @@ public final class Level extends Doc {
             Indent plusIndent,
             BreakBehaviour breakBehaviour,
             Breakability breakabilityIfLastLevel,
-            boolean keepIndentWhenInlined,
+            Optional<Boolean> keepIndentWhenInlined,
             Optional<String> name) {
         return new Level(plusIndent, breakBehaviour, breakabilityIfLastLevel, keepIndentWhenInlined, name);
     }
@@ -213,7 +213,7 @@ public final class Level extends Doc {
             // reflow them later.
             if (prefixFits || isSingleString()) {
                 State newState = state.withNoIndent();
-                if (keepIndentWhenInlined) {
+                if (isKeepIndentWhenInlined()) {
                     newState = newState.withIndentIncrementedBy(plusIndent);
                 }
                 broken = tryToLayOutLevelOnOneLine(commentsHelper, maxWidth, newState);
@@ -221,6 +221,11 @@ public final class Level extends Doc {
         }
 
         return state.updateAfterLevel(broken);
+    }
+
+    private boolean isKeepIndentWhenInlined() {
+        return keepIndentWhenInlined.orElseThrow(() -> new IllegalStateException(
+                String.format("Level expected keepIndentWhenInlined to be set but was absent:\n%s", representation())));
     }
 
     /**
@@ -287,7 +292,7 @@ public final class Level extends Doc {
             }
 
             // We want to keep _lastLevel_'s indent, it is an _intermediate_ level.
-            if (keepIndentWhenInlined) {
+            if (lastLevel.isKeepIndentWhenInlined()) {
                 state = state.withIndentIncrementedBy(lastLevel.getPlusIndent());
             }
 

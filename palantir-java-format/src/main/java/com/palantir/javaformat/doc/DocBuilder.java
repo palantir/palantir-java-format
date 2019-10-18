@@ -29,7 +29,11 @@ import java.util.Optional;
 /** A {@code DocBuilder} converts a sequence of {@link Op}s into a {@link Doc}. */
 public final class DocBuilder {
     private final Level base = Level.make(
-            Indent.Const.ZERO, BreakBehaviour.BREAK_THIS_LEVEL, Breakability.NO_PREFERENCE, true, Optional.of("root"));
+            Indent.Const.ZERO,
+            BreakBehaviour.BREAK_THIS_LEVEL,
+            Breakability.NO_PREFERENCE,
+            Optional.empty(),
+            Optional.of("root"));
     private final ArrayDeque<Level> stack = new ArrayDeque<>();
 
     /**
@@ -80,7 +84,7 @@ public final class DocBuilder {
             Indent plusIndent,
             BreakBehaviour breakBehaviour,
             Breakability breakabilityIfLastLevel,
-            boolean keepIndentWhenInlined,
+            Optional<Boolean> keepIndentWhenInlined,
             Optional<String> name) {
         Level level = Level.make(plusIndent, breakBehaviour, breakabilityIfLastLevel, keepIndentWhenInlined, name);
         stack.addLast(level);

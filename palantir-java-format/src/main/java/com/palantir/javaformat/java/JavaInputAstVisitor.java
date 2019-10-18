@@ -1205,8 +1205,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 .name("lambda body")
                 .plusIndent(statementBody ? ZERO : plusFour)
                 .breakBehaviour(BreakBehaviour.PREFER_BREAKING_LAST_INNER_LEVEL)
-                .breakabilityIfLastLevel(Breakability.BREAK_HERE) // TODO really?
-                .keepIndentWhenInlined(false)
+                .breakabilityIfLastLevel(Breakability.BREAK_HERE)
                 .build());
         if (statementBody) {
             builder.space();
