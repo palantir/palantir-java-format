@@ -1201,10 +1201,18 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         builder.close();
         builder.space();
         builder.op("->");
-        builder.open(ZERO, BreakBehaviour.BREAK_THIS_LEVEL, Breakability.BREAK_HERE);
-        // TODO how to not break this if _first line_ of expression is short?
-        //      i.e. only break if the very next token does not fit on this line
-        builder.space();
+        builder.open(OpenOp.builder()
+                .name("lambda body")
+                .plusIndent(statementBody ? ZERO : plusFour)
+                .breakBehaviour(BreakBehaviour.PREFER_BREAKING_LAST_INNER_LEVEL)
+                .breakabilityIfLastLevel(Breakability.BREAK_HERE) // TODO really?
+                .keepIndentWhenInlined(false)
+                .build());
+        if (statementBody) {
+            builder.space();
+        } else {
+            builder.breakOp(" ");
+        }
 
         if (node.getBody().getKind() == Tree.Kind.BLOCK) {
             visitBlock(

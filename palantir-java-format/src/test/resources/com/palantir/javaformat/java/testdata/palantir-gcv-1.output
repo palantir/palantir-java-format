@@ -17,8 +17,8 @@ class PalantirGcv1 {
                                             .filter(Objects::nonNull)
                                             .map(ModuleVersionIdentifier::getModule)
                                             .collect(Collectors.toSet());
-                            return Collections2.filter(publishConstraints, constraint -> modulesToInclude.contains(
-                                    constraint.getModule()));
+                            return Collections2.filter(publishConstraints, constraint ->
+                                    modulesToInclude.contains(constraint.getModule()));
                         })
                         ::get));
     }
