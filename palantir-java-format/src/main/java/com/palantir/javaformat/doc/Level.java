@@ -64,11 +64,11 @@ public final class Level extends Doc {
     List<Break> breaks = new ArrayList<>();
 
     private Level(
-        Indent plusIndent,
-        BreakBehaviour breakBehaviour,
-        Breakability breakabilityIfLastLevel,
-        boolean keepIndentWhenInlined,
-        Optional<String> name) {
+            Indent plusIndent,
+            BreakBehaviour breakBehaviour,
+            Breakability breakabilityIfLastLevel,
+            boolean keepIndentWhenInlined,
+            Optional<String> name) {
         this.plusIndent = plusIndent;
         this.breakBehaviour = breakBehaviour;
         this.breakabilityIfLastLevel = breakabilityIfLastLevel;
@@ -87,11 +87,11 @@ public final class Level extends Doc {
      * @return the new {@code Level}
      */
     static Level make(
-        Indent plusIndent,
-        BreakBehaviour breakBehaviour,
-        Breakability breakabilityIfLastLevel,
-        boolean keepIndentWhenInlined,
-        Optional<String> name) {
+            Indent plusIndent,
+            BreakBehaviour breakBehaviour,
+            Breakability breakabilityIfLastLevel,
+            boolean keepIndentWhenInlined,
+            Optional<String> name) {
         return new Level(plusIndent, breakBehaviour, breakabilityIfLastLevel, keepIndentWhenInlined, name);
     }
 

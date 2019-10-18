@@ -69,18 +69,19 @@ public final class DocBuilder {
 
     /**
      * Open a new {@link Level}.
-     *  @param plusIndent the extra indent for the {@link Level}
+     *
+     * @param plusIndent the extra indent for the {@link Level}
      * @param breakBehaviour how to decide whether to break this level or not
      * @param breakabilityIfLastLevel if last level, when to break this rather than parent
      * @param keepIndentWhenInlined
      * @param name
      */
     public void open(
-        Indent plusIndent,
-        BreakBehaviour breakBehaviour,
-        Breakability breakabilityIfLastLevel,
-        boolean keepIndentWhenInlined,
-        Optional<String> name) {
+            Indent plusIndent,
+            BreakBehaviour breakBehaviour,
+            Breakability breakabilityIfLastLevel,
+            boolean keepIndentWhenInlined,
+            Optional<String> name) {
         Level level = Level.make(plusIndent, breakBehaviour, breakabilityIfLastLevel, keepIndentWhenInlined, name);
         stack.addLast(level);
     }
