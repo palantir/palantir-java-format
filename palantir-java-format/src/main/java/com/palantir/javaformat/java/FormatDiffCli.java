@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -55,7 +54,11 @@ public final class FormatDiffCli {
         Path cwd = Paths.get(".");
 
         String gitOutput = gitDiff(cwd);
-        parseGitDiffOutput(gitOutput).forEach(diff -> format(cwd, formatter, diff));
+        parseGitDiffOutput(gitOutput)
+                .filter(diff -> diff.path.toString().endsWith(".java"))
+                .map(diff -> new SingleFileDiff(cwd.resolve(diff.path), diff.lineRanges))
+                .filter(diff -> Files.exists(diff.path))
+                .forEach(diff -> format(formatter, diff));
     }
 
     /** Parses the filenames and edited ranges out of `git diff -U0`. */
@@ -68,8 +71,6 @@ public final class FormatDiffCli {
                 return Stream.empty();
             }
             Path path = Paths.get(filenameMatcher.group("filename"));
-
-            // TODO(dfox): only filter files ending in .java? or allow a regex to be passed in?
 
             RangeSet<Integer> lineRanges = TreeRangeSet.create();
             Matcher hunk = HUNK.matcher(singleFileDiff);
@@ -84,13 +85,7 @@ public final class FormatDiffCli {
         });
     }
 
-    private static void format(Path cwd, Formatter formatter, SingleFileDiff diff) {
-        Path path = cwd.resolve(diff.path);
-        if (!Files.exists(path)) {
-            System.err.println("Skipping non-existent file " + path);
-            return;
-        }
-
+    private static void format(Formatter formatter, SingleFileDiff diff) {
         String input;
         try {
             input = new String(Files.readAllBytes(diff.path), UTF_8);
