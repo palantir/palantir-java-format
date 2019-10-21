@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: Prefer inlining method references after whatever expression they follow.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/44
