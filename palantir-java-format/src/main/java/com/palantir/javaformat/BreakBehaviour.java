@@ -2,30 +2,35 @@ package com.palantir.javaformat;
 
 import com.palantir.javaformat.doc.Doc;
 import com.palantir.javaformat.doc.Level;
+import org.derive4j.ArgOption;
+import org.derive4j.Data;
 
-/** How to decide where to break when a level can't fit on a single line. */
-public enum BreakBehaviour {
-    /** Always break this level. */
-    BREAK_THIS_LEVEL,
-    /** If the last level is breakable, prefer breaking it if it will keep the rest of this level on line line. */
-    PREFER_BREAKING_LAST_INNER_LEVEL,
-    /**
-     * Break if by doing so all inner levels then fit on a single line. However, don't break if we can fit in the {@link
-     * Doc docs} up to the first break (which might be nested inside the next doc if it's a {@link Level}), in order to
-     * prevent exceeding the maxLength accidentally.
-     *
-     * <p>Whether we decide to break or not, the indent of this level is still followed.
-     */
-    BREAK_ONLY_IF_INNER_LEVELS_THEN_FIT_ON_ONE_LINE,
-    /**
-     * Same as {@link #BREAK_ONLY_IF_INNER_LEVELS_THEN_FIT_ON_ONE_LINE}, but always ignoring this level's indent if we
-     * decide not to break it.
-     */
-    BREAK_ONLY_IF_INNER_LEVELS_THEN_FIT_ON_ONE_LINE_IGNORING_INDENT,
-    ;
+@Data(arguments = ArgOption.checkedNotNull)
+public abstract class BreakBehaviour {
+    public interface Cases<R> {
 
-    public boolean isBreakOnlyIfInnerLevelsThenFitOnOneLine() {
-        return this == BREAK_ONLY_IF_INNER_LEVELS_THEN_FIT_ON_ONE_LINE
-                || this == BREAK_ONLY_IF_INNER_LEVELS_THEN_FIT_ON_ONE_LINE_IGNORING_INDENT;
+        R breakThisLevel();
+
+        /**
+         * If the last level is breakable, prefer breaking it if it will keep the rest of this level on line line.
+         *
+         * @param keepIndentWhenInlined whether to keep this level's indent when inlined as a recursive level (when
+         *     reached via a previous `preferBreakingLastInnerLevel` whose breakability was {@link
+         *     LastLevelBreakability#CHECK_INNER})
+         */
+        R preferBreakingLastInnerLevel(boolean keepIndentWhenInlined);
+
+        /**
+         * Break if by doing so all inner levels then fit on a single line. However, don't break if we can fit in the
+         * {@link Doc docs} up to the first break (which might be nested inside the next doc if it's a {@link Level}),
+         * in order to prevent exceeding the maxLength accidentally.
+         */
+        R breakOnlyIfInnerLevelsThenFitOnOneLine(boolean keepIndentWhenInlined);
     }
+
+    public abstract <R> R match(Cases<R> cases);
+
+    /** For {@link com.palantir.javaformat.doc.LevelDelimitedFlatValueDocVisitor}. */
+    @Override
+    public abstract String toString();
 }

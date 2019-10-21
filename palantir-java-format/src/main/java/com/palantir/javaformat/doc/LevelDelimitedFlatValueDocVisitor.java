@@ -17,9 +17,9 @@
 package com.palantir.javaformat.doc;
 
 import com.google.common.base.Strings;
-import com.palantir.javaformat.BreakBehaviour;
-import com.palantir.javaformat.Breakability;
+import com.palantir.javaformat.BreakBehaviours;
 import com.palantir.javaformat.Indent;
+import com.palantir.javaformat.LastLevelBreakability;
 
 public final class LevelDelimitedFlatValueDocVisitor implements DocVisitor<String> {
     int indent = 0;
@@ -56,14 +56,16 @@ public final class LevelDelimitedFlatValueDocVisitor implements DocVisitor<Strin
         }
         StringBuilder builder = new StringBuilder();
         builder.append("❰");
+        level.getDebugName().ifPresent(name -> builder.append(" \"" + name + "\""));
         if (!level.getPlusIndent().equals(Indent.Const.ZERO)) {
             builder.append(" +" + level.getPlusIndent().eval());
         }
-        if (level.getBreakBehaviour() != BreakBehaviour.BREAK_THIS_LEVEL) {
+        BreakBehaviours.caseOf(level.getBreakBehaviour()).breakThisLevel_(null).otherwise(() -> {
             builder.append(" ");
             builder.append(level.getBreakBehaviour());
-        }
-        if (level.getBreakabilityIfLastLevel() != Breakability.NO_PREFERENCE) {
+            return null;
+        });
+        if (level.getBreakabilityIfLastLevel() != LastLevelBreakability.NO_PREFERENCE) {
             builder.append(" ifLastLevel=");
             builder.append(level.getBreakabilityIfLastLevel());
         }

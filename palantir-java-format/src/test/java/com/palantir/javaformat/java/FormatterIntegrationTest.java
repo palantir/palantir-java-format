@@ -33,7 +33,7 @@ public class FormatterIntegrationTest {
 
     private static FileBasedTests tests = new FileBasedTests(FormatterIntegrationTest.class, "testdata");
 
-    @ParameterizedClass.Parameters(name = "{index}: {0}")
+    @ParameterizedClass.Parameters(name = "{0}")
     public static List<Object[]> data() throws IOException {
         return tests.paramsAsNameInputOutput();
     }

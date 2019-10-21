@@ -55,11 +55,13 @@ class B20701054 {
         PTable<Long, List<PageSpeedUrlResult>> latestResults = FJ.joinOneShot2(accountSummaryProvider.get(), results)
                 .parallelDo("extractPageSpeedUrls", new ExtractPageSpeedUrlsFn(false));
 
-        PTable<Long, Long> adImpressionsByAccount = impressionExtractor.getImpressionBreakdownByAccountId().parallelDo(
-                "rekeyAdImpressionsByAccountId", new ExtractTotalImpressionsFn());
+        PTable<Long, Long> adImpressionsByAccount = impressionExtractor
+                .getImpressionBreakdownByAccountId()
+                .parallelDo("rekeyAdImpressionsByAccountId", new ExtractTotalImpressionsFn());
 
-        PTable<String, CrawlError> crawlerErrorsByCode = crawlReportSource.read("readCrawlReportTable").parallelDo(
-                "reKeyErrorsByPropertyCode", new RekeyErrorsByPropertyCodeFn());
+        PTable<String, CrawlError> crawlerErrorsByCode = crawlReportSource
+                .read("readCrawlReportTable")
+                .parallelDo("reKeyErrorsByPropertyCode", new RekeyErrorsByPropertyCodeFn());
 
         if (ImmutableList.builder().add(1).add(2).add(3)) {}
 
@@ -81,8 +83,9 @@ class B20701054 {
 
         (test ? xxx : yyy).zzz(xxx);
 
-        (test ? xxx : yyy).zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz(
-                xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx);
+        (test ? xxx : yyy)
+                .zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz(
+                        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx);
 
         (test
                         ? xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
