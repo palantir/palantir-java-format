@@ -36,8 +36,8 @@ public abstract class OpenOp implements Op {
     }
 
     @Default
-    public Breakability breakabilityIfLastLevel() {
-        return Breakability.NO_PREFERENCE;
+    public LastLevelBreakability breakabilityIfLastLevel() {
+        return LastLevelBreakability.NO_PREFERENCE;
     }
 
     public abstract Optional<String> name();
@@ -45,7 +45,7 @@ public abstract class OpenOp implements Op {
     /**
      * Make an ordinary {@code OpenOp}.
      *
-     * @see #make(Indent, BreakBehaviour, Breakability)
+     * @see #make(Indent, BreakBehaviour, LastLevelBreakability)
      */
     public static Op make(Indent plusIndent) {
         return builder().plusIndent(plusIndent).build();
@@ -54,11 +54,14 @@ public abstract class OpenOp implements Op {
     /**
      * Make an ordinary {@code OpenOp}.
      *
-     * @param plusIndent the indent for breaks at this level
+     * @param plusIndent     the indent for breaks at this level
      * @param breakBehaviour how to decide whether to break this level or not
      * @return the {@code OpenOp}
      */
-    public static Op make(Indent plusIndent, BreakBehaviour breakBehaviour, Breakability breakabilityIfLastLevel) {
+    public static Op make(
+            Indent plusIndent,
+            BreakBehaviour breakBehaviour,
+            LastLevelBreakability breakabilityIfLastLevel) {
         return builder()
                 .plusIndent(plusIndent)
                 .breakBehaviour(breakBehaviour)

@@ -19,8 +19,8 @@ package com.palantir.javaformat.doc;
 import com.google.common.base.MoreObjects;
 import com.palantir.javaformat.BreakBehaviour;
 import com.palantir.javaformat.BreakBehaviours;
-import com.palantir.javaformat.Breakability;
 import com.palantir.javaformat.Indent;
+import com.palantir.javaformat.LastLevelBreakability;
 import com.palantir.javaformat.Op;
 import com.palantir.javaformat.OpsBuilder;
 import java.util.ArrayDeque;
@@ -29,8 +29,10 @@ import java.util.Optional;
 
 /** A {@code DocBuilder} converts a sequence of {@link Op}s into a {@link Doc}. */
 public final class DocBuilder {
-    private final Level base = Level.make(
-            Indent.Const.ZERO, BreakBehaviours.breakThisLevel(), Breakability.NO_PREFERENCE, Optional.of("root"));
+    private final Level base = Level.make(Indent.Const.ZERO,
+            BreakBehaviours.breakThisLevel(),
+            LastLevelBreakability.NO_PREFERENCE,
+            Optional.of("root"));
     private final ArrayDeque<Level> stack = new ArrayDeque<>();
 
     /**
@@ -78,7 +80,7 @@ public final class DocBuilder {
     public void open(
             Indent plusIndent,
             BreakBehaviour breakBehaviour,
-            Breakability breakabilityIfLastLevel,
+            LastLevelBreakability breakabilityIfLastLevel,
             Optional<String> name) {
         Level level = Level.make(plusIndent, breakBehaviour, breakabilityIfLastLevel, name);
         stack.addLast(level);

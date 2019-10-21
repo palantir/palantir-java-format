@@ -8,8 +8,10 @@ import com.palantir.javaformat.java.JavaInputAstVisitor;
  * How to decide whether to break the last inner level ("this level") of a parent level with {@link
  * BreakBehaviour.Cases#preferBreakingLastInnerLevel}.
  */
-public enum Breakability {
-    /** Default behaviour - it cannot be broken. */
+public enum LastLevelBreakability {
+    /**
+     * Default behaviour - it cannot be broken.
+     */
     NO_PREFERENCE,
     /**
      * Unconditionally allow breaking this level. This should only be used when you know that the first non-Level {@link
@@ -17,7 +19,8 @@ public enum Breakability {
      */
     BREAK_HERE,
     /**
-     * Delegate to the {@link Breakability} of _this_ level's last inner level. Typically, this will be true if this
+     * Delegate to the {@link LastLevelBreakability} of _this_ level's last inner level. Typically, this will be true
+      * if this
      * level is not immediately followed by a break (see StartsWithBreakVisitor). Behaves the same as {@link
      * #NO_PREFERENCE} if this level is not {@link BreakBehaviour.Cases#preferBreakingLastInnerLevel}.
      */

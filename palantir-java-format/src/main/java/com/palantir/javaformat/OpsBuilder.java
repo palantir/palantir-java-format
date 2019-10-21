@@ -272,12 +272,16 @@ public final class OpsBuilder {
     /**
      * Open a new level by emitting an {@link OpenOp}.
      *
-     * @param plusIndent the extra indent for the new level
-     * @param breakBehaviour how to decide whether to break this level or not
+     * @param plusIndent              the extra indent for the new level
+     * @param breakBehaviour          how to decide whether to break this level or not
      * @param breakabilityIfLastLevel if last level, when to break this rather than parent
      */
-    public final void open(Indent plusIndent, BreakBehaviour breakBehaviour, Breakability breakabilityIfLastLevel) {
-        add(OpenOp.builder()
+    public final void open(
+            Indent plusIndent,
+            BreakBehaviour breakBehaviour,
+            LastLevelBreakability breakabilityIfLastLevel) {
+        add(OpenOp
+                .builder()
                 .plusIndent(plusIndent)
                 .breakBehaviour(breakBehaviour)
                 .breakabilityIfLastLevel(breakabilityIfLastLevel)

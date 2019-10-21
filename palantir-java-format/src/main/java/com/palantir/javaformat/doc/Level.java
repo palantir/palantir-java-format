@@ -23,9 +23,9 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Range;
 import com.palantir.javaformat.BreakBehaviour;
 import com.palantir.javaformat.BreakBehaviours;
-import com.palantir.javaformat.Breakability;
 import com.palantir.javaformat.CommentsHelper;
 import com.palantir.javaformat.Indent;
+import com.palantir.javaformat.LastLevelBreakability;
 import com.palantir.javaformat.Output;
 import com.palantir.javaformat.doc.StartsWithBreakVisitor.Result;
 import java.util.ArrayList;
@@ -46,7 +46,8 @@ public final class Level extends Doc {
 
     private final Indent plusIndent; // The extra indent following breaks.
     private final BreakBehaviour breakBehaviour; // Where to break when we can't fit on one line.
-    private final Breakability breakabilityIfLastLevel; // If last level, when to break this rather than parent.
+    private final LastLevelBreakability breakabilityIfLastLevel;
+            // If last level, when to break this rather than parent.
     private final Optional<String> name;
     private final List<Doc> docs = new ArrayList<>(); // The elements of the level.
 
@@ -66,7 +67,7 @@ public final class Level extends Doc {
     private Level(
             Indent plusIndent,
             BreakBehaviour breakBehaviour,
-            Breakability breakabilityIfLastLevel,
+            LastLevelBreakability breakabilityIfLastLevel,
             Optional<String> name) {
         this.plusIndent = plusIndent;
         this.breakBehaviour = breakBehaviour;
@@ -86,7 +87,7 @@ public final class Level extends Doc {
     static Level make(
             Indent plusIndent,
             BreakBehaviour breakBehaviour,
-            Breakability breakabilityIfLastLevel,
+            LastLevelBreakability breakabilityIfLastLevel,
             Optional<String> name) {
         return new Level(plusIndent, breakBehaviour, breakabilityIfLastLevel, name);
     }
@@ -257,7 +258,7 @@ public final class Level extends Doc {
         }
         Level lastLevel = ((Level) getLast(docs));
         // Only split levels that have declared they want to be split in this way.
-        if (lastLevel.breakabilityIfLastLevel == Breakability.NO_PREFERENCE) {
+        if (lastLevel.breakabilityIfLastLevel == LastLevelBreakability.NO_PREFERENCE) {
             return Optional.empty();
         }
         // See if we can fill in everything but the lastDoc.
@@ -294,9 +295,10 @@ public final class Level extends Doc {
         //  * the lastLevel wants to be split, i.e. has Breakability.BREAK_HERE, then we continue
         //  * the lastLevel indicates we should check inside it for a potential split candidate.
         //    In this case, recurse rather than go into computeBreaks.
-        if (lastLevel.breakabilityIfLastLevel == Breakability.CHECK_INNER) {
+        if (lastLevel.breakabilityIfLastLevel == LastLevelBreakability.CHECK_INNER) {
             // Try to fit the entire inner prefix if it's that kind of level.
-            Optional<Optional<State>> couldBreakRecursively = BreakBehaviours.caseOf(lastLevel.breakBehaviour)
+            Optional<Optional<State>> couldBreakRecursively = BreakBehaviours
+                    .caseOf(lastLevel.breakBehaviour)
                     .preferBreakingLastInnerLevel(keepIndentWhenInlined -> {
                         State state2 = state1;
                         if (keepIndentWhenInlined) {
@@ -310,7 +312,7 @@ public final class Level extends Doc {
                 return couldBreakRecursively.get();
             }
 
-        } else if (lastLevel.breakabilityIfLastLevel == Breakability.ONLY_IF_FIRST_LEVEL_FITS) {
+        } else if (lastLevel.breakabilityIfLastLevel == LastLevelBreakability.ONLY_IF_FIRST_LEVEL_FITS) {
             // Otherwise, we may be able to check if the first inner level of the lastLevel fits.
             // This is safe because we assume (and check) that a newline comes after it, even though
             // it might be nested somewhere deep in the 2nd level.
@@ -464,7 +466,7 @@ public final class Level extends Doc {
         return docs;
     }
 
-    Breakability getBreakabilityIfLastLevel() {
+    LastLevelBreakability getBreakabilityIfLastLevel() {
         return breakabilityIfLastLevel;
     }
 

@@ -58,11 +58,11 @@ import com.google.common.collect.Multiset;
 import com.google.common.collect.PeekingIterator;
 import com.google.common.collect.Streams;
 import com.palantir.javaformat.BreakBehaviours;
-import com.palantir.javaformat.Breakability;
 import com.palantir.javaformat.CloseOp;
 import com.palantir.javaformat.FormattingError;
 import com.palantir.javaformat.Indent;
 import com.palantir.javaformat.Input;
+import com.palantir.javaformat.LastLevelBreakability;
 import com.palantir.javaformat.Op;
 import com.palantir.javaformat.OpenOp;
 import com.palantir.javaformat.OpsBuilder;
@@ -442,7 +442,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     @Override
     public Void visitNewArray(NewArrayTree node, Void unused) {
         if (node.getType() != null) {
-            builder.open(plusFour, BreakBehaviours.breakThisLevel(), Breakability.BREAK_HERE);
+            builder.open(plusFour, BreakBehaviours.breakThisLevel(), LastLevelBreakability.BREAK_HERE);
             token("new");
             builder.space();
 
@@ -480,8 +480,8 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             }
             token("}", plusTwo);
         } else if ((cols = argumentsAreTabular(expressions)) != -1) {
-            builder.open(ZERO, BreakBehaviours.breakThisLevel(), Breakability.BREAK_HERE);
-            builder.open(plusTwo, BreakBehaviours.breakThisLevel(), Breakability.BREAK_HERE);
+            builder.open(ZERO, BreakBehaviours.breakThisLevel(), LastLevelBreakability.BREAK_HERE);
+            builder.open(plusTwo, BreakBehaviours.breakThisLevel(), LastLevelBreakability.BREAK_HERE);
             token("{");
             builder.forcedBreak();
             boolean first = true;
@@ -526,8 +526,8 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             boolean shortItems = hasOnlyShortItems(expressions);
             boolean allowFilledElementsOnOwnLine = shortItems || !inMemberValuePair;
 
-            builder.open(ZERO, BreakBehaviours.breakThisLevel(), Breakability.BREAK_HERE);
-            builder.open(plusTwo, BreakBehaviours.breakThisLevel(), Breakability.BREAK_HERE);
+            builder.open(ZERO, BreakBehaviours.breakThisLevel(), LastLevelBreakability.BREAK_HERE);
+            builder.open(plusTwo, BreakBehaviours.breakThisLevel(), LastLevelBreakability.BREAK_HERE);
             tokenBreakTrailingComment("{", plusTwo);
             boolean hasTrailingComma = hasTrailingToken(builder.getInput(), expressions, ",");
             builder.breakOp(hasTrailingComma ? FillMode.FORCED : FillMode.UNIFIED, "", ZERO);
@@ -659,7 +659,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     @Override
     public Void visitTypeCast(TypeCastTree node, Void unused) {
         sync(node);
-        builder.open(plusFour, BreakBehaviours.preferBreakingLastInnerLevel(true), Breakability.BREAK_HERE);
+        builder.open(plusFour, BreakBehaviours.preferBreakingLastInnerLevel(true), LastLevelBreakability.BREAK_HERE);
         token("(");
         scan(node.getType(), null);
         token(")");
@@ -672,7 +672,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     @Override
     public Void visitNewClass(NewClassTree node, Void unused) {
         sync(node);
-        builder.open(ZERO, BreakBehaviours.preferBreakingLastInnerLevel(true), Breakability.BREAK_HERE);
+        builder.open(ZERO, BreakBehaviours.preferBreakingLastInnerLevel(true), LastLevelBreakability.BREAK_HERE);
         if (node.getEnclosingExpression() != null) {
             scan(node.getEnclosingExpression(), null);
             builder.breakOp();
@@ -1115,7 +1115,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         List<String> operators = new ArrayList<>();
         walkInfix(precedence(node), node, operands, operators);
         FillMode fillMode = hasOnlyShortItems(operands) ? INDEPENDENT : UNIFIED;
-        builder.open(plusFour, BreakBehaviours.breakThisLevel(), Breakability.BREAK_HERE);
+        builder.open(plusFour, BreakBehaviours.breakThisLevel(), LastLevelBreakability.BREAK_HERE);
         scan(operands.get(0), null);
         int operatorsN = operators.size();
         for (int i = 0; i < operatorsN; i++) {
@@ -1197,11 +1197,12 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         builder.close();
         builder.space();
         builder.op("->");
-        builder.open(OpenOp.builder()
+        builder.open(OpenOp
+                .builder()
                 .name("lambda body")
                 .plusIndent(statementBody ? ZERO : plusFour)
                 .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(true))
-                .breakabilityIfLastLevel(Breakability.BREAK_HERE)
+                .breakabilityIfLastLevel(LastLevelBreakability.BREAK_HERE)
                 .build());
         if (statementBody) {
             builder.space();
@@ -2574,7 +2575,10 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 scan(getArrayBase(node), null);
                 token(".");
             } else {
-                builder.open(plusFour, BreakBehaviours.preferBreakingLastInnerLevel(true), Breakability.BREAK_HERE);
+                builder.open(
+                        plusFour,
+                        BreakBehaviours.preferBreakingLastInnerLevel(true),
+                        LastLevelBreakability.BREAK_HERE);
                 scan(getArrayBase(node), null);
                 builder.breakOp();
                 needDot = true;
@@ -2668,11 +2672,12 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             // This level can come after either:
             //      * checkArgument(        -- B19950815                (!trailingDereferences)
             //      * foo.bar()             -- palantir-chains-lambdas  ( trailingDereferences)
-            builder.open(OpenOp.builder()
+            builder.open(OpenOp
+                    .builder()
                     .name("visitRegularDot")
                     .plusIndent(plusFour)
                     .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(false))
-                    .breakabilityIfLastLevel(Breakability.CHECK_INNER)
+                    .breakabilityIfLastLevel(LastLevelBreakability.CHECK_INNER)
                     .build());
         }
         // don't break after the first element if it is every small, unless the
@@ -2750,16 +2755,16 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         // Are there method invocations or field accesses after the prefix?
         boolean trailingDereferences = !prefixes.isEmpty() && getLast(prefixes) < items.size() - 1;
 
-        builder.open(OpenOp.builder()
+        builder.open(OpenOp
+                .builder()
                 .name("visitDotWithPrefix")
                 .plusIndent(plusFour)
                 // This can't be PREFER_BREAKING_LAST_INNER_LEVEL unless we have breaks in _this_ level.
                 // That's only every the case if trailingDereferences is true.
-                .breakBehaviour(
-                        trailingDereferences
-                                ? BreakBehaviours.preferBreakingLastInnerLevel(true)
-                                : BreakBehaviours.breakThisLevel())
-                .breakabilityIfLastLevel(Breakability.ONLY_IF_FIRST_LEVEL_FITS)
+                .breakBehaviour(trailingDereferences
+                        ? BreakBehaviours.preferBreakingLastInnerLevel(true)
+                        : BreakBehaviours.breakThisLevel())
+                .breakabilityIfLastLevel(LastLevelBreakability.ONLY_IF_FIRST_LEVEL_FITS)
                 .build());
 
         for (int times = 0; times < prefixes.size(); times++) {
@@ -2872,10 +2877,11 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             case METHOD_INVOCATION:
                 // Note: we don't BREAK_HERE because we want to make sure that the last argument is actually
                 // breakable in a way we prefer.
-                builder.open(OpenOp.builder()
+                builder.open(OpenOp
+                        .builder()
                         .plusIndent(tyargIndent)
                         .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(true))
-                        .breakabilityIfLastLevel(Breakability.CHECK_INNER)
+                        .breakabilityIfLastLevel(LastLevelBreakability.CHECK_INNER)
                         .name("dotExpressionArgsAndParen")
                         .build());
                 MethodInvocationTree methodInvocation = (MethodInvocationTree) expression;
@@ -2961,11 +2967,12 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
          However we definitely don't wanna look inside for B18479811
          Solution: argList should CHECK_INNER.
         */
-        builder.open(OpenOp.builder()
+        builder.open(OpenOp
+                .builder()
                 .name("addArguments")
                 .plusIndent(plusIndent)
                 .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(false))
-                .breakabilityIfLastLevel(Breakability.CHECK_INNER)
+                .breakabilityIfLastLevel(LastLevelBreakability.CHECK_INNER)
                 .build());
         token("(");
         if (!arguments.isEmpty()) {
@@ -3009,11 +3016,12 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     }
 
     private void argList(List<? extends ExpressionTree> arguments) {
-        builder.open(OpenOp.builder()
+        builder.open(OpenOp
+                .builder()
                 .name("argList")
                 .plusIndent(ZERO)
                 .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(true))
-                .breakabilityIfLastLevel(Breakability.CHECK_INNER)
+                .breakabilityIfLastLevel(LastLevelBreakability.CHECK_INNER)
                 .build());
         boolean first = true;
         FillMode fillMode = hasOnlyShortItems(arguments) ? FillMode.INDEPENDENT : FillMode.UNIFIED;
@@ -3282,10 +3290,9 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                     initializer.get().accept(this, null);
                     builder.close();
                 } else {
-                    builder.open(
-                            Indent.If.make(typeBreak, plusFour, ZERO),
+                    builder.open(Indent.If.make(typeBreak, plusFour, ZERO),
                             BreakBehaviours.breakOnlyIfInnerLevelsThenFitOnOneLine(true),
-                            Breakability.NO_PREFERENCE);
+                            LastLevelBreakability.NO_PREFERENCE);
                     {
                         builder.breakToFill(" ");
                         scan(initializer.get(), null);
@@ -3433,7 +3440,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             if (braces.isYes()) {
                 builder.space();
                 tokenBreakTrailingComment("{", plusTwo);
-                builder.open(ZERO, BreakBehaviours.breakThisLevel(), Breakability.BREAK_HERE);
+                builder.open(ZERO, BreakBehaviours.breakThisLevel(), LastLevelBreakability.BREAK_HERE);
             }
             builder.open(plusTwo);
             boolean first = first0.isYes();

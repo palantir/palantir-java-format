@@ -16,7 +16,7 @@ public abstract class BreakBehaviour {
          *
          * @param keepIndentWhenInlined whether to keep this level's indent when inlined as a recursive level (when
          *     reached via a previous `preferBreakingLastInnerLevel` whose breakability was {@link
-         *     Breakability#CHECK_INNER})
+         *     LastLevelBreakability#CHECK_INNER})
          */
         R preferBreakingLastInnerLevel(boolean keepIndentWhenInlined);
 

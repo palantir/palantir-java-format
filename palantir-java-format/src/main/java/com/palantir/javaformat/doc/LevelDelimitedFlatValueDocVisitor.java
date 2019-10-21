@@ -18,8 +18,8 @@ package com.palantir.javaformat.doc;
 
 import com.google.common.base.Strings;
 import com.palantir.javaformat.BreakBehaviours;
-import com.palantir.javaformat.Breakability;
 import com.palantir.javaformat.Indent;
+import com.palantir.javaformat.LastLevelBreakability;
 
 public final class LevelDelimitedFlatValueDocVisitor implements DocVisitor<String> {
     int indent = 0;
@@ -65,7 +65,7 @@ public final class LevelDelimitedFlatValueDocVisitor implements DocVisitor<Strin
             builder.append(level.getBreakBehaviour());
             return null;
         });
-        if (level.getBreakabilityIfLastLevel() != Breakability.NO_PREFERENCE) {
+        if (level.getBreakabilityIfLastLevel() != LastLevelBreakability.NO_PREFERENCE) {
             builder.append(" ifLastLevel=");
             builder.append(level.getBreakabilityIfLastLevel());
         }
