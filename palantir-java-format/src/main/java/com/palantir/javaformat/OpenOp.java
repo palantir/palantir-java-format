@@ -38,8 +38,8 @@ public abstract class OpenOp implements Op {
     }
 
     @Default
-    public Breakability breakabilityIfLastLevel() {
-        return Breakability.NO_PREFERENCE;
+    public LastLevelBreakability breakabilityIfLastLevel() {
+        return LastLevelBreakability.NO_PREFERENCE;
     }
 
     /**
@@ -55,7 +55,7 @@ public abstract class OpenOp implements Op {
         return Optional.empty();
     }
 
-    public abstract Optional<String> name();
+    public abstract Optional<String> debugName();
 
     @Check
     protected void check() {
@@ -68,13 +68,13 @@ public abstract class OpenOp implements Op {
     /** Whether it's allowed to set {@link #keepIndentWhenInlined()}. */
     private boolean canUseKeepIndentWhenInlined() {
         return breakBehaviour() == BreakBehaviour.BREAK_ONLY_IF_INNER_LEVELS_THEN_FIT_ON_ONE_LINE
-                || breakabilityIfLastLevel() == Breakability.CHECK_INNER;
+                || breakabilityIfLastLevel() == LastLevelBreakability.CHECK_INNER;
     }
 
     /**
      * Make an ordinary {@code OpenOp}.
      *
-     * @see #make(Indent, BreakBehaviour, Breakability)
+     * @see #make(Indent, BreakBehaviour, LastLevelBreakability)
      */
     public static Op make(Indent plusIndent) {
         return builder().plusIndent(plusIndent).build();
@@ -87,7 +87,7 @@ public abstract class OpenOp implements Op {
      * @param breakBehaviour how to decide whether to break this level or not
      * @return the {@code OpenOp}
      */
-    public static Op make(Indent plusIndent, BreakBehaviour breakBehaviour, Breakability breakabilityIfLastLevel) {
+    public static Op make(Indent plusIndent, BreakBehaviour breakBehaviour, LastLevelBreakability breakabilityIfLastLevel) {
         return builder()
                 .plusIndent(plusIndent)
                 .breakBehaviour(breakBehaviour)
@@ -97,7 +97,7 @@ public abstract class OpenOp implements Op {
 
     @Override
     public void add(DocBuilder builder) {
-        builder.open(plusIndent(), breakBehaviour(), breakabilityIfLastLevel(), keepIndentWhenInlined(), name());
+        builder.open(plusIndent(), breakBehaviour(), breakabilityIfLastLevel(), keepIndentWhenInlined(), debugName());
     }
 
     public static Builder builder() {
