@@ -257,7 +257,7 @@ public final class Level extends Doc {
         }
         Level lastLevel = ((Level) getLast(docs));
         // Only split levels that have declared they want to be split in this way.
-        if (lastLevel.breakabilityIfLastLevel == LastLevelBreakability.NO_PREFERENCE) {
+        if (lastLevel.breakabilityIfLastLevel == LastLevelBreakability.ABORT) {
             return Optional.empty();
         }
         // See if we can fill in everything but the lastDoc.

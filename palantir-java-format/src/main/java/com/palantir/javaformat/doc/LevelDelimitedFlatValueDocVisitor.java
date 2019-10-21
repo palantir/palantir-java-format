@@ -65,7 +65,7 @@ public final class LevelDelimitedFlatValueDocVisitor implements DocVisitor<Strin
             builder.append(level.getBreakBehaviour());
             return null;
         });
-        if (level.getBreakabilityIfLastLevel() != LastLevelBreakability.NO_PREFERENCE) {
+        if (level.getBreakabilityIfLastLevel() != LastLevelBreakability.ABORT) {
             builder.append(" ifLastLevel=");
             builder.append(level.getBreakabilityIfLastLevel());
         }
