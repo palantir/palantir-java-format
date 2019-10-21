@@ -17,7 +17,7 @@
 package com.palantir.javaformat.doc;
 
 import com.google.common.base.Strings;
-import com.palantir.javaformat.BreakBehaviour;
+import com.palantir.javaformat.BreakBehaviours;
 import com.palantir.javaformat.Breakability;
 import com.palantir.javaformat.Indent;
 
@@ -60,10 +60,11 @@ public final class LevelDelimitedFlatValueDocVisitor implements DocVisitor<Strin
         if (!level.getPlusIndent().equals(Indent.Const.ZERO)) {
             builder.append(" +" + level.getPlusIndent().eval());
         }
-        if (level.getBreakBehaviour() != BreakBehaviour.BREAK_THIS_LEVEL) {
+        BreakBehaviours.caseOf(level.getBreakBehaviour()).breakThisLevel_(null).otherwise(() -> {
             builder.append(" ");
             builder.append(level.getBreakBehaviour());
-        }
+            return null;
+        });
         if (level.getBreakabilityIfLastLevel() != Breakability.NO_PREFERENCE) {
             builder.append(" ifLastLevel=");
             builder.append(level.getBreakabilityIfLastLevel());

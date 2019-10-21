@@ -22,6 +22,8 @@ import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Range;
 import com.palantir.javaformat.BreakBehaviour;
+import com.palantir.javaformat.BreakBehaviour.KeepIndentWhenInlined;
+import com.palantir.javaformat.BreakBehaviours;
 import com.palantir.javaformat.Breakability;
 import com.palantir.javaformat.CommentsHelper;
 import com.palantir.javaformat.Indent;
@@ -46,7 +48,6 @@ public final class Level extends Doc {
     private final Indent plusIndent; // The extra indent following breaks.
     private final BreakBehaviour breakBehaviour; // Where to break when we can't fit on one line.
     private final Breakability breakabilityIfLastLevel; // If last level, when to break this rather than parent.
-    private final Optional<Boolean> keepIndentWhenInlined;
     private final Optional<String> name;
     private final List<Doc> docs = new ArrayList<>(); // The elements of the level.
 
@@ -67,12 +68,10 @@ public final class Level extends Doc {
             Indent plusIndent,
             BreakBehaviour breakBehaviour,
             Breakability breakabilityIfLastLevel,
-            Optional<Boolean> keepIndentWhenInlined,
             Optional<String> name) {
         this.plusIndent = plusIndent;
         this.breakBehaviour = breakBehaviour;
         this.breakabilityIfLastLevel = breakabilityIfLastLevel;
-        this.keepIndentWhenInlined = keepIndentWhenInlined;
         this.name = name;
     }
 
@@ -82,7 +81,6 @@ public final class Level extends Doc {
      * @param plusIndent the extra indent inside the {@code Level}
      * @param breakBehaviour whether to attempt breaking only the last inner level first, instead of this level
      * @param breakabilityIfLastLevel if last level, when to break this rather than parent
-     * @param keepIndentWhenInlined
      * @param name
      * @return the new {@code Level}
      */
@@ -90,9 +88,8 @@ public final class Level extends Doc {
             Indent plusIndent,
             BreakBehaviour breakBehaviour,
             Breakability breakabilityIfLastLevel,
-            Optional<Boolean> keepIndentWhenInlined,
             Optional<String> name) {
-        return new Level(plusIndent, breakBehaviour, breakabilityIfLastLevel, keepIndentWhenInlined, name);
+        return new Level(plusIndent, breakBehaviour, breakabilityIfLastLevel, name);
     }
 
     /**
@@ -142,90 +139,116 @@ public final class Level extends Doc {
         }
         oneLine = false;
 
-        // Attempt 1: try to break the last inner doc if it's a level.
-        // No plusIndent since we expect this whole level (except part of the last inner level) to be
-        // on the first line.
-        if (breakBehaviour == BreakBehaviour.PREFER_BREAKING_LAST_INNER_LEVEL
-                && state.branchingCoefficient < MAX_BRANCHING_COEFFICIENT) {
-            // Try both breaking and not breaking. Choose the better one based on LOC, preferring
-            // breaks if the outcome is the same.
+        State newState = breakBehaviour.match(new BreakImpl(commentsHelper, maxWidth, state));
 
-            State state1 = state.withNewBranch();
-
-            State broken = computeBroken(commentsHelper, maxWidth, state1.withIndentIncrementedBy(plusIndent));
-
-            Optional<State> lastLevelBroken = tryBreakLastLevel(commentsHelper, maxWidth, state1.withNoIndent(), false);
-
-            if (lastLevelBroken.isPresent()) {
-                if (lastLevelBroken.get().numLines < broken.numLines) {
-                    return state.updateAfterLevel(lastLevelBroken.get());
-                }
-                // Must run computeBroken once again, because our last tryBreakLastLevel run modified
-                // mutable state.
-                // Therefore just fall through.
-            }
-        }
-
-        // Attempt 2: break this level.
-        State broken = computeBroken(commentsHelper, maxWidth, state.withIndentIncrementedBy(plusIndent));
-
-        // But undo the break in a special case, if the inner levels didn't fit on one line.
-        // Note: this is currently only used for variable initialisers
-        if (breakBehaviour == BreakBehaviour.BREAK_ONLY_IF_INNER_LEVELS_THEN_FIT_ON_ONE_LINE) {
-            List<Level> innerLevels = this.docs.stream()
-                    .filter(doc -> doc instanceof Level)
-                    .map(doc -> ((Level) doc))
-                    .collect(Collectors.toList());
-
-            boolean anyLevelWasBroken = innerLevels.stream().anyMatch(level -> !level.oneLine);
-
-            boolean prefixFits = false;
-            if (anyLevelWasBroken) {
-                // Find the last level, skipping empty levels (that contain nothing, or are made up
-                // entirely of other empty levels).
-
-                // Last level because there might be other in-between levels after the initial break like `new int[]
-                // {`, and we want to skip those.
-                Level lastLevel = innerLevels.stream()
-                        .filter(doc -> StartsWithBreakVisitor.INSTANCE.visit(doc) != Result.EMPTY)
-                        .collect(GET_LAST_COLLECTOR)
-                        .orElseThrow(() -> new IllegalStateException(
-                                "Levels were broken so expected to find at least a non-empty level"));
-
-                // Add the width of tokens, breaks before the lastLevel. We must always have space for
-                // these.
-                List<Doc> leadingDocs = docs.subList(0, docs.indexOf(lastLevel));
-                float leadingWidth = getWidth(leadingDocs);
-
-                // Potentially add the width of prefixes we want to consider as part of the width that
-                // must fit on the same line, so that we don't accidentally break prefixes when we could
-                // have avoided doing so.
-                leadingWidth += new CountWidthUntilBreakVisitor(maxWidth - state.indent).visit(lastLevel);
-
-                boolean fits = !Float.isInfinite(leadingWidth) && state.column + leadingWidth <= maxWidth;
-
-                if (fits) {
-                    prefixFits = true;
-                }
-            }
-
-            // Allow long strings to stay on the same line, expecting that StringWrapper will
-            // reflow them later.
-            if (prefixFits) {
-                State newState = state.withNoIndent();
-                if (isKeepIndentWhenInlined()) {
-                    newState = newState.withIndentIncrementedBy(plusIndent);
-                }
-                broken = tryToLayOutLevelOnOneLine(commentsHelper, maxWidth, newState);
-            }
-        }
-
-        return state.updateAfterLevel(broken);
+        return state.updateAfterLevel(newState);
     }
 
-    private boolean isKeepIndentWhenInlined() {
-        return keepIndentWhenInlined.orElseThrow(() -> new IllegalStateException(
-                String.format("Level expected keepIndentWhenInlined to be set but was absent:\n%s", representation())));
+    class BreakImpl implements BreakBehaviour.Cases<State> {
+        private final CommentsHelper commentsHelper;
+        private final int maxWidth;
+        private final State state;
+
+        public BreakImpl(CommentsHelper commentsHelper, int maxWidth, State state) {
+            this.commentsHelper = commentsHelper;
+            this.maxWidth = maxWidth;
+            this.state = state;
+        }
+
+        private State breakNormally() {
+            return computeBroken(commentsHelper, maxWidth, state.withIndentIncrementedBy(plusIndent));
+        }
+
+        @Override
+        public State breakThisLevel() {
+            return breakNormally();
+        }
+
+        @Override
+        public State preferBreakingLastInnerLevel(KeepIndentWhenInlined _keepIndentWhenInlined) {
+            if (state.branchingCoefficient < MAX_BRANCHING_COEFFICIENT) {
+                // Try both breaking and not breaking. Choose the better one based on LOC, preferring
+                // breaks if the outcome is the same.
+
+                State state1 = state.withNewBranch();
+
+                State broken = computeBroken(commentsHelper, maxWidth, state1.withIndentIncrementedBy(plusIndent));
+
+                // No plusIndent the first time around, since we expect this whole level (except part of the last inner
+                // level) to be on the first line.
+                Optional<State> lastLevelBroken = tryBreakLastLevel(commentsHelper, maxWidth, state1.withNoIndent(), false);
+
+                if (lastLevelBroken.isPresent()) {
+                    if (lastLevelBroken.get().numLines < broken.numLines) {
+                        return lastLevelBroken.get();
+                    }
+                    // Must run computeBroken once again, because our last tryBreakLastLevel run modified
+                    // mutable state.
+                    // Therefore just fall through.
+                }
+            }
+            return breakNormally();
+        }
+
+        @Override
+        public State breakOnlyIfInnerLevelsThenFitOnOneLine(KeepIndentWhenInlined keepIndentWhenInlined) {
+            State broken = breakNormally();
+            Optional<State> maybeInlined = handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
+                    commentsHelper, maxWidth, this.state, keepIndentWhenInlined);
+            return maybeInlined.orElse(broken);
+        }
+    }
+
+    private Optional<State> handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
+            CommentsHelper commentsHelper, int maxWidth, State state, KeepIndentWhenInlined keepIndent) {
+        List<Level> innerLevels = this.docs.stream()
+                .filter(doc -> doc instanceof Level)
+                .map(doc -> ((Level) doc))
+                .collect(Collectors.toList());
+
+        boolean anyLevelWasBroken = innerLevels.stream().anyMatch(level -> !level.oneLine);
+
+        boolean prefixFits = false;
+        if (anyLevelWasBroken) {
+            // Find the last level, skipping empty levels (that contain nothing, or are made up
+            // entirely of other empty levels).
+
+            // Last level because there might be other in-between levels after the initial break like `new
+            // int[]
+            // {`, and we want to skip those.
+            Level lastLevel = innerLevels.stream()
+                    .filter(doc -> StartsWithBreakVisitor.INSTANCE.visit(doc) != Result.EMPTY)
+                    .collect(GET_LAST_COLLECTOR)
+                    .orElseThrow(() -> new IllegalStateException(
+                            "Levels were broken so expected to find at least a non-empty level"));
+
+            // Add the width of tokens, breaks before the lastLevel. We must always have space for
+            // these.
+            List<Doc> leadingDocs = docs.subList(0, docs.indexOf(lastLevel));
+            float leadingWidth = getWidth(leadingDocs);
+
+            // Potentially add the width of prefixes we want to consider as part of the width that
+            // must fit on the same line, so that we don't accidentally break prefixes when we could
+            // have avoided doing so.
+            leadingWidth += new CountWidthUntilBreakVisitor(maxWidth - state.indent).visit(lastLevel);
+
+            boolean fits = !Float.isInfinite(leadingWidth) && state.column + leadingWidth <= maxWidth;
+
+            if (fits) {
+                prefixFits = true;
+            }
+        }
+
+        // Allow long strings to stay on the same line, expecting that StringWrapper will
+        // reflow them later.
+        if (prefixFits) {
+            State newState = state.withNoIndent();
+            if (keepIndent == KeepIndentWhenInlined.YES) {
+                newState = newState.withIndentIncrementedBy(plusIndent);
+            }
+            return Optional.of(tryToLayOutLevelOnOneLine(commentsHelper, maxWidth, newState));
+        }
+        return Optional.empty();
     }
 
     private Optional<State> tryBreakLastLevel(
@@ -254,9 +277,9 @@ public final class Level extends Doc {
         // TODO abstract out
         splitByBreaks(leadingDocs, splits, breaks);
 
-        state = tryToLayOutLevelOnOneLine(commentsHelper, maxWidth, state);
+        State state1 = tryToLayOutLevelOnOneLine(commentsHelper, maxWidth, state);
         Preconditions.checkState(
-                !state.mustBreak, "We messed up, it wants to break a bunch of splits that shouldn't be broken");
+                !state1.mustBreak, "We messed up, it wants to break a bunch of splits that shouldn't be broken");
 
         // manually add the last level to the last split
         getLast(splits).add(lastLevel);
@@ -274,16 +297,19 @@ public final class Level extends Doc {
         //    In this case, recurse rather than go into computeBreaks.
         if (lastLevel.breakabilityIfLastLevel == Breakability.CHECK_INNER) {
             // Try to fit the entire inner prefix if it's that kind of level.
-            if (lastLevel.breakBehaviour != BreakBehaviour.PREFER_BREAKING_LAST_INNER_LEVEL) {
-                // We don't know how to fit the inner level on the same line, so bail out.
-                return Optional.empty();
+            Optional<Optional<State>> couldBreakRecursively = BreakBehaviours.caseOf(lastLevel.breakBehaviour)
+                    .preferBreakingLastInnerLevel(keepIndentWhenInlined -> {
+                        State state2 = state1;
+                        if (keepIndentWhenInlined == KeepIndentWhenInlined.YES) {
+                            state2 = state2.withIndentIncrementedBy(lastLevel.getPlusIndent());
+                        }
+                        return lastLevel.tryBreakLastLevel(commentsHelper, maxWidth, state2, true);
+                    })
+                    // We don't know how to fit the inner level on the same line, so bail out.
+                    .otherwiseEmpty();
+            if (couldBreakRecursively.isPresent()) {
+                return couldBreakRecursively.get();
             }
-
-            if (lastLevel.isKeepIndentWhenInlined()) {
-                state = state.withIndentIncrementedBy(lastLevel.getPlusIndent());
-            }
-
-            return lastLevel.tryBreakLastLevel(commentsHelper, maxWidth, state, true);
 
         } else if (lastLevel.breakabilityIfLastLevel == Breakability.ONLY_IF_FIRST_LEVEL_FITS) {
             // Otherwise, we may be able to check if the first inner level of the lastLevel fits.
@@ -291,7 +317,7 @@ public final class Level extends Doc {
             // it might be nested somewhere deep in the 2nd level.
 
             float firstLevelWidth = lastLevel.docs.get(0).getWidth();
-            boolean enoughRoom = state.column + firstLevelWidth <= maxWidth;
+            boolean enoughRoom = state1.column + firstLevelWidth <= maxWidth;
 
             // Enforce our assumption.
             if (lastLevel.docs.size() > 1) {
@@ -307,7 +333,7 @@ public final class Level extends Doc {
 
         // Note: computeBreaks, not computeBroken, so it can try to do this logic recursively for the
         // lastLevel
-        return Optional.of(lastLevel.computeBreaks(commentsHelper, maxWidth, state));
+        return Optional.of(lastLevel.computeBreaks(commentsHelper, maxWidth, state1));
     }
 
     private static void assertStartsWithBreakOrEmpty(Doc doc) {
@@ -477,7 +503,6 @@ public final class Level extends Doc {
                 .add("plusIndent", plusIndent)
                 .add("breakBehaviour", breakBehaviour)
                 .add("breakabilityIfLastLevel", breakabilityIfLastLevel)
-                .add("keepIndentWhenInlined", keepIndentWhenInlined)
                 .add("docs", docs)
                 .toString();
     }
