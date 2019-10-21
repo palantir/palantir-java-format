@@ -1,0 +1,7 @@
+type: fix
+fix:
+  description: NON-NLS comments are moved behind `+` tokens in string concatenations.
+    This is a heuristic that doesn't look at what the thing before the `+` is, so
+    it might produce confusing results.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/45
