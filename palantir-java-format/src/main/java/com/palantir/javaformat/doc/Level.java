@@ -279,7 +279,6 @@ public final class Level extends Doc {
                 return Optional.empty();
             }
 
-            // We want to keep _lastLevel_'s indent, it is an _intermediate_ level.
             if (lastLevel.isKeepIndentWhenInlined()) {
                 state = state.withIndentIncrementedBy(lastLevel.getPlusIndent());
             }
