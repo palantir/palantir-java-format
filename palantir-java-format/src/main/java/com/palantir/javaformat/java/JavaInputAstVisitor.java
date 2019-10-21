@@ -899,8 +899,15 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     @Override
     public Void visitMemberReference(MemberReferenceTree node, Void unused) {
         sync(node);
-        builder.open(plusFour);
+        builder.open(OpenOp.builder()
+                .plusIndent(plusFour)
+                .debugName("methodReference")
+                // Would like to use CHECK_INNER but we'd have to check in the _first_ level rather than the last
+                // level, which the current logic can't do yet.
+                .breakabilityIfLastLevel(LastLevelBreakability.BREAK_HERE)
+                .build());
         scan(node.getQualifierExpression(), null);
+        builder.open(ZERO);
         builder.breakOp();
         builder.op("::");
         addTypeArguments(node.getTypeArguments(), plusFour);
@@ -914,6 +921,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             default:
                 throw new AssertionError(node.getMode());
         }
+        builder.close();
         builder.close();
         return null;
     }
