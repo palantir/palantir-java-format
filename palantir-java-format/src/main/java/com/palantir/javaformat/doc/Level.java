@@ -22,7 +22,6 @@ import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Range;
 import com.palantir.javaformat.BreakBehaviour;
-import com.palantir.javaformat.BreakBehaviour.KeepIndentWhenInlined;
 import com.palantir.javaformat.BreakBehaviours;
 import com.palantir.javaformat.Breakability;
 import com.palantir.javaformat.CommentsHelper;
@@ -165,7 +164,7 @@ public final class Level extends Doc {
         }
 
         @Override
-        public State preferBreakingLastInnerLevel(KeepIndentWhenInlined _keepIndentWhenInlined) {
+        public State preferBreakingLastInnerLevel(boolean _keepIndentWhenInlined) {
             if (state.branchingCoefficient < MAX_BRANCHING_COEFFICIENT) {
                 // Try both breaking and not breaking. Choose the better one based on LOC, preferring
                 // breaks if the outcome is the same.
@@ -191,7 +190,7 @@ public final class Level extends Doc {
         }
 
         @Override
-        public State breakOnlyIfInnerLevelsThenFitOnOneLine(KeepIndentWhenInlined keepIndentWhenInlined) {
+        public State breakOnlyIfInnerLevelsThenFitOnOneLine(boolean keepIndentWhenInlined) {
             State broken = breakNormally();
             Optional<State> maybeInlined = handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
                     commentsHelper, maxWidth, this.state, keepIndentWhenInlined);
@@ -200,7 +199,7 @@ public final class Level extends Doc {
     }
 
     private Optional<State> handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
-            CommentsHelper commentsHelper, int maxWidth, State state, KeepIndentWhenInlined keepIndent) {
+            CommentsHelper commentsHelper, int maxWidth, State state, boolean keepIndent) {
         List<Level> innerLevels = this.docs.stream()
                 .filter(doc -> doc instanceof Level)
                 .map(doc -> ((Level) doc))
@@ -243,7 +242,7 @@ public final class Level extends Doc {
         // reflow them later.
         if (prefixFits) {
             State newState = state.withNoIndent();
-            if (keepIndent == KeepIndentWhenInlined.YES) {
+            if (keepIndent) {
                 newState = newState.withIndentIncrementedBy(plusIndent);
             }
             return Optional.of(tryToLayOutLevelOnOneLine(commentsHelper, maxWidth, newState));
@@ -300,7 +299,7 @@ public final class Level extends Doc {
             Optional<Optional<State>> couldBreakRecursively = BreakBehaviours.caseOf(lastLevel.breakBehaviour)
                     .preferBreakingLastInnerLevel(keepIndentWhenInlined -> {
                         State state2 = state1;
-                        if (keepIndentWhenInlined == KeepIndentWhenInlined.YES) {
+                        if (keepIndentWhenInlined) {
                             state2 = state2.withIndentIncrementedBy(lastLevel.getPlusIndent());
                         }
                         return lastLevel.tryBreakLastLevel(commentsHelper, maxWidth, state2, true);

@@ -9,14 +9,9 @@ public abstract class BreakBehaviour {
 
         R breakThisLevel();
 
-        R preferBreakingLastInnerLevel(KeepIndentWhenInlined keepIndentWhenInlined);
+        R preferBreakingLastInnerLevel(boolean keepIndentWhenInlined);
 
-        R breakOnlyIfInnerLevelsThenFitOnOneLine(KeepIndentWhenInlined keepIndentWhenInlined);
-    }
-
-    public enum KeepIndentWhenInlined {
-        NO,
-        YES,
+        R breakOnlyIfInnerLevelsThenFitOnOneLine(boolean keepIndentWhenInlined);
     }
 
     public abstract <R> R match(Cases<R> cases);
