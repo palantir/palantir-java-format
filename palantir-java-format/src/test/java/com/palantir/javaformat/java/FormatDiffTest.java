@@ -45,9 +45,8 @@ class FormatDiffTest {
                         Paths.get("src/test/resources/com/palantir/javaformat/java/FormatDiffCliTest/example1.patch")),
                 StandardCharsets.UTF_8);
 
-        List<String> strings = FormatDiff.parseGitDiffOutput(example1)
-                .map(FormatDiff.SingleFileDiff::toString)
-                .collect(Collectors.toList());
+        List<String> strings = FormatDiff.parseGitDiffOutput(example1).map(FormatDiff.SingleFileDiff::toString).collect(
+                Collectors.toList());
         assertEquals(
                 ImmutableList.of(
                         "SingleFileDiff{path=build.gradle, lineRanges=[[24..25), [29..30)]}",
@@ -67,12 +66,10 @@ class FormatDiffTest {
         Files.createDirectories(subdir);
 
         Path reformatMe = subdir.resolve("ReformatMe.java");
-        Files.write(reformatMe, ImmutableList.of(
-                "                                 class ReformatMe {}"), UTF_8);
+        Files.write(reformatMe, ImmutableList.of("                                 class ReformatMe {}"), UTF_8);
 
         Path dontTouchMe = repo.resolve("DontTouchMe.java");
-        Files.write(dontTouchMe, ImmutableList.of(
-                "                                 class DontTouchMe {}"), UTF_8);
+        Files.write(dontTouchMe, ImmutableList.of("                                 class DontTouchMe {}"), UTF_8);
 
         runCommandInRepo("git", "add", "-N", ".");
 
@@ -83,10 +80,7 @@ class FormatDiffTest {
     }
 
     private void runCommandInRepo(String... args) throws IOException, InterruptedException {
-        Process process = new ProcessBuilder()
-                .command(args)
-                .directory(repo.toFile())
-                .start();
+        Process process = new ProcessBuilder().command(args).directory(repo.toFile()).start();
 
         Preconditions.checkState(process.waitFor(10, TimeUnit.SECONDS), "git diff took too long to terminate");
 

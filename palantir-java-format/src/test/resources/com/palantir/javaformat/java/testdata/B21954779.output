@@ -23,8 +23,8 @@ class B21954779 {
             }
         });
 
-        getContext().getErrorReporter().log(
-                new RuntimeException("Called layout with a non-zero segment index: " + segmentIndex));
+        getContext().getErrorReporter().log(new RuntimeException(
+                "Called layout with a non-zero segment index: " + segmentIndex));
 
         bind(new Key<ServiceMethodRunner<SyncReferenceNumberRequest, SyncReferenceNumberResponse>>() {});
 
