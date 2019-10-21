@@ -19,6 +19,11 @@ dependencies {
 
     compileOnly 'com.google.auto.service:auto-service'
     annotationProcessor 'com.google.auto.service:auto-service'
+    compileOnly "org.immutables:value::annotations"
+    annotationProcessor "org.immutables:value"
+
+    compileOnly 'org.derive4j:derive4j-annotation'
+    annotationProcessor 'org.derive4j:derive4j'
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -28,3 +33,8 @@ tasks.withType(JavaCompile).configureEach {
 // false positives due to org.junit.runners.* in the test cases
 tasks.checkJUnitDependencies.enabled = false
 
+tasks.test {
+    // Run all classes and tests in parallel
+    // https://junit.org/junit5/docs/current/user-guide/#writing-tests-parallel-execution
+    systemProperty 'junit.jupiter.execution.parallel.mode.default', 'concurrent'
+}
