@@ -4,43 +4,101 @@
 
 # palantir-java-format
 
-`palantir-java-format` is a program that reformats Java source code to comply with
-[Palantir Java Style][].
+_A modern, lambda-friendly, 120 character Java formatter._
 
-It is a fork of [google-java-format], but intending to achieve the following goals:
+- [IntelliJ plugin](https://plugins.jetbrains.com/plugin/13180-palantir-java-format)
+- [Gradle plugin](https://github.com/palantir/gradle-baseline#compalantirbaseline-format)
 
-* Enforce the Palantir Java Style, whose main difference compared to Google's style is that we use 120 character lines and 4 space indent.
+It is based on the excellent [google-java-format](https://github.com/google/google-java-format), and benefits from the work of all the [original authors](https://github.com/google/google-java-format/graphs/contributors). palantir-java-format is available under the same [Apache 2.0 License](./license).
 
-* Produce more compact code - Keep long method chains and invocations, as well as assignments and lambdas, on a single line, if we can break only the last argument of a method call, or the last method call in a chain.
+## Upsides of automatic formatting
 
-* don't break [NON-NLS markers][] - these are comments that are used when implementing NLS internationalisation, and need to stay on the same line with the strings they come after.
+- reduce 'nit' comments in code reviews, allowing engineers to focus on the important logic rather than bikeshedding about whitespace
+- bot-authored code changes can be auto-formatted to a highly readable style (we use [refaster](https://errorprone.info/docs/refaster) and [error-prone](https://errorprone.info/docs/patching) heavily)
+- increased consistency across all repos, so contributing to other projects feels familiar
+- reduce the number builds that trivially fail checkstyle
+- easier to onboard new devs
 
-We thank everyone who's worked on google-java-format for their good work and for making it available for free online. It's thanks to their work that we could incorporate our coding style preferences into a formatter so easily.
+## Downsides of automatic formatting
 
-[google-java-format]: https://github.com/google/google-java-format 
-[Palantir Java Style]: https://github.com/palantir/gradle-baseline/blob/develop/docs/java-style-guide/readme.md
-[NON-NLS markers]: https://stackoverflow.com/a/40266605
+- if you don't like how the formatter laid out your code, you may need to introduce new functions/variables
+- the formatter is not as clever as humans are, so it can sometimes produce less readable code (we want to fix this where feasible)
 
-## Using the formatter
+Many other languages have already adopted formatters enthusiastically, including typescript (prettier), go (gofmt), rust (rustfmt).
 
-### from the command-line
+## Motivation & examples
 
-[Download the formatter](https://github.com/palantir/palantir-java-format/releases)
-and run it with:
+(1) before:
 
+```java
+private static void configureResolvedVersionsWithVersionMapping(Project project) {
+    project.getPluginManager()
+            .withPlugin(
+                    "maven-publish",
+                    plugin -> {
+                        project.getExtensions()
+                                .getByType(PublishingExtension.class)
+                                .getPublications()
+                                .withType(MavenPublication.class)
+                                .configureEach(
+                                        publication ->
+                                                publication.versionMapping(
+                                                        mapping -> {
+                                                            mapping.allVariants(
+                                                                    VariantVersionMappingStrategy
+                                                                            ::fromResolutionResult);
+                                                        }));
+                    });
+}
 ```
-java -jar /path/to/palantir-java-format-<version>-all-deps.jar <options> [files...]
+
+(1) after:
+
+```java
+private static void configureResolvedVersionsWithVersionMapping(Project project) {
+    project.getPluginManager().withPlugin("maven-publish", plugin -> {
+        project.getExtensions()
+                .getByType(PublishingExtension.class)
+                .getPublications()
+                .withType(MavenPublication.class)
+                .configureEach(publication -> publication.versionMapping(mapping -> {
+                    mapping.allVariants(VariantVersionMappingStrategy::fromResolutionResult);
+                }));
+    });
+}
 ```
 
-The formatter can act on whole files, on limited lines (`--lines`), on specific
-offsets (`--offset`), passing through to standard-out (default) or altered
-in-place (`--replace`).
+(2) before:
 
-***Note:*** *There is no configurability as to the formatter's algorithm for
-formatting. This is a deliberate design decision to unify our code formatting on
-a single format.*
+```java
+private static GradleException notFound(
+        String group, String name, Configuration configuration) {
+    String actual =
+            configuration.getIncoming().getResolutionResult().getAllComponents().stream()
+                    .map(ResolvedComponentResult::getModuleVersion)
+                    .map(
+                            mvi ->
+                                    String.format(
+                                            "\t- %s:%s:%s",
+                                            mvi.getGroup(), mvi.getName(), mvi.getVersion()))
+                    .collect(Collectors.joining("\n"));
+    // ...
+}
+```
 
-### IntelliJ, Android Studio, and other JetBrains IDEs
+(2) after:
+
+```java
+private static GradleException notFound(String group, String name, Configuration configuration) {
+    String actual = configuration.getIncoming().getResolutionResult().getAllComponents().stream()
+            .map(ResolvedComponentResult::getModuleVersion)
+            .map(mvi -> String.format("\t- %s:%s:%s", mvi.getGroup(), mvi.getName(), mvi.getVersion()))
+            .collect(Collectors.joining("\n"));
+    // ...
+}
+```
+
+## IntelliJ plugin
 
 A
 [palantir-java-format IntelliJ plugin](https://plugins.jetbrains.com/plugin/13180)
@@ -61,84 +119,6 @@ When enabled, it will replace the normal `Reformat Code` action, which can be
 triggered from the `Code` menu or with the Ctrl-Alt-L (by default) keyboard
 shortcut.
 
-The import ordering is not handled by this plugin, unfortunately. To fix the
-import order, download the
-[IntelliJ Java Google Style file](https://raw.githubusercontent.com/google/styleguide/gh-pages/intellij-java-google-style.xml)
-and import it into File→Settings→Editor→Code Style.
-
-### Eclipse
-
-A palantir-java-format Eclipse plugin is not currently published but can be built individually. 
-Once built, drop it into the Eclipse
-[drop-ins folder](http://help.eclipse.org/neon/index.jsp?topic=%2Forg.eclipse.platform.doc.isv%2Freference%2Fmisc%2Fp2_dropins_format.html)
-to activate the plugin.
-
-The plugin adds a `palantir-java-format` formatter implementation that can be
-configured in `Window > Preferences > Java > Code Style > Formatter > Formatter
-Implementation`.
-
-### Third-party integrations
-
-*   Gradle plugins
-    *   [Spotless](https://github.com/diffplug/spotless/tree/master/plugin-gradle#applying-to-java-source-google-java-format):
-    *   [sherter/google-java-format-gradle-plugin](https://github.com/sherter/google-java-format-gradle-plugin)
-*   Apache Maven plugins
-    *   [coveo/fmt-maven-plugin](https://github.com/coveo/fmt-maven-plugin)
-    *   [talios/googleformatter-maven-plugin](https://github.com/talios/googleformatter-maven-plugin)
-    *   [Cosium/maven-git-code-format](https://github.com/Cosium/maven-git-code-format):
-        A maven plugin that automatically deploys google-java-format as a
-        pre-commit git hook.
-*   [maltzj/google-style-precommit-hook](https://github.com/maltzj/google-style-precommit-hook):
-    A pre-commit (pre-commit.com) hook that will automatically run GJF whenever
-    you commit code to your repository
-
-### as a library
-
-The formatter can be used in software which generates java to output more
-legible java code. Just include the library in your maven/gradle/etc.
-configuration.
-
-#### Maven
-
-```xml
-<dependency>
-  <groupId>com.palantir.javaformat</groupId>
-  <artifactId>palantir-java-format</artifactId>
-</dependency>
-```
-
-#### Gradle
-
-```groovy
-dependencies {
-  compile 'com.palantir.javaformat:palantir-java-format:<version>'
-}
-```
-
-You can then use the formatter through the `formatSource` methods. E.g.
-
-```java
-String formattedSource = new Formatter(JavaFormatterOptions.builder().style(Style.PALANTIR).build())
-        .formatSource(sourceString);
-```
-
-or
-
-```java
-CharSource source = ...
-CharSink output = ...
-new Formatter(JavaFormatterOptions.builder().style(Style.PALANTIR).build())
-        .formatSource(source, output);
-```
-
-Your starting point should be the instance methods of
-`com.palantir.javaformat.java.Formatter`.
-
-## Building from source
-
-```
-./gradlew publishToMavenLocal
-```
 
 ## License
 
