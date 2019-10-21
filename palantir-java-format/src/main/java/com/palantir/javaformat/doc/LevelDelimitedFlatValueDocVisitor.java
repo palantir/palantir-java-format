@@ -18,8 +18,8 @@ package com.palantir.javaformat.doc;
 
 import com.google.common.base.Strings;
 import com.palantir.javaformat.BreakBehaviour;
-import com.palantir.javaformat.LastLevelBreakability;
 import com.palantir.javaformat.Indent;
+import com.palantir.javaformat.LastLevelBreakability;
 
 public final class LevelDelimitedFlatValueDocVisitor implements DocVisitor<String> {
     int indent = 0;

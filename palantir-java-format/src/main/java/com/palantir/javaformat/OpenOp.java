@@ -87,7 +87,8 @@ public abstract class OpenOp implements Op {
      * @param breakBehaviour how to decide whether to break this level or not
      * @return the {@code OpenOp}
      */
-    public static Op make(Indent plusIndent, BreakBehaviour breakBehaviour, LastLevelBreakability breakabilityIfLastLevel) {
+    public static Op make(
+            Indent plusIndent, BreakBehaviour breakBehaviour, LastLevelBreakability breakabilityIfLastLevel) {
         return builder()
                 .plusIndent(plusIndent)
                 .breakBehaviour(breakBehaviour)

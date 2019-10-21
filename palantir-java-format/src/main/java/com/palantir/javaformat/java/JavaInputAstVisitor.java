@@ -58,11 +58,11 @@ import com.google.common.collect.Multiset;
 import com.google.common.collect.PeekingIterator;
 import com.google.common.collect.Streams;
 import com.palantir.javaformat.BreakBehaviour;
-import com.palantir.javaformat.LastLevelBreakability;
 import com.palantir.javaformat.CloseOp;
 import com.palantir.javaformat.FormattingError;
 import com.palantir.javaformat.Indent;
 import com.palantir.javaformat.Input;
+import com.palantir.javaformat.LastLevelBreakability;
 import com.palantir.javaformat.Op;
 import com.palantir.javaformat.OpenOp;
 import com.palantir.javaformat.OpsBuilder;
@@ -2578,7 +2578,8 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 scan(getArrayBase(node), null);
                 token(".");
             } else {
-                builder.open(plusFour, BreakBehaviour.PREFER_BREAKING_LAST_INNER_LEVEL, LastLevelBreakability.BREAK_HERE);
+                builder.open(
+                        plusFour, BreakBehaviour.PREFER_BREAKING_LAST_INNER_LEVEL, LastLevelBreakability.BREAK_HERE);
                 scan(getArrayBase(node), null);
                 builder.breakOp();
                 needDot = true;

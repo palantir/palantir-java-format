@@ -17,8 +17,8 @@ public enum LastLevelBreakability {
      */
     BREAK_HERE,
     /**
-     * Delegate to the {@link LastLevelBreakability} of _this_ level's last inner level. Typically, this will be true if this
-     * level is not immediately followed by a break (see StartsWithBreakVisitor). Behaves the same as {@link
+     * Delegate to the {@link LastLevelBreakability} of _this_ level's last inner level. Typically, this will be true if
+     * this level is not immediately followed by a break (see StartsWithBreakVisitor). Behaves the same as {@link
      * #NO_PREFERENCE} if this level is not {@link BreakBehaviour#PREFER_BREAKING_LAST_INNER_LEVEL}.
      */
     CHECK_INNER,

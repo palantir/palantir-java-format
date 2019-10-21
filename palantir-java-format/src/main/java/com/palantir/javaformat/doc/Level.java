@@ -22,9 +22,9 @@ import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Range;
 import com.palantir.javaformat.BreakBehaviour;
-import com.palantir.javaformat.LastLevelBreakability;
 import com.palantir.javaformat.CommentsHelper;
 import com.palantir.javaformat.Indent;
+import com.palantir.javaformat.LastLevelBreakability;
 import com.palantir.javaformat.Output;
 import com.palantir.javaformat.doc.StartsWithBreakVisitor.Result;
 import java.util.ArrayList;
@@ -45,7 +45,8 @@ public final class Level extends Doc {
 
     private final Indent plusIndent; // The extra indent following breaks.
     private final BreakBehaviour breakBehaviour; // Where to break when we can't fit on one line.
-    private final LastLevelBreakability breakabilityIfLastLevel; // If last level, when to break this rather than parent.
+    private final LastLevelBreakability
+            breakabilityIfLastLevel; // If last level, when to break this rather than parent.
     private final Optional<Boolean> keepIndentWhenInlined;
     private final Optional<String> debugName;
     private final List<Doc> docs = new ArrayList<>(); // The elements of the level.

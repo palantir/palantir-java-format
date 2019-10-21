@@ -276,7 +276,8 @@ public final class OpsBuilder {
      * @param breakBehaviour how to decide whether to break this level or not
      * @param breakabilityIfLastLevel if last level, when to break this rather than parent
      */
-    public final void open(Indent plusIndent, BreakBehaviour breakBehaviour, LastLevelBreakability breakabilityIfLastLevel) {
+    public final void open(
+            Indent plusIndent, BreakBehaviour breakBehaviour, LastLevelBreakability breakabilityIfLastLevel) {
         add(OpenOp.builder()
                 .plusIndent(plusIndent)
                 .breakBehaviour(breakBehaviour)
