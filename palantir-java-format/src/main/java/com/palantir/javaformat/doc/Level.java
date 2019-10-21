@@ -209,8 +209,6 @@ public final class Level extends Doc {
                 }
             }
 
-            // Allow long strings to stay on the same line, expecting that StringWrapper will
-            // reflow them later.
             if (prefixFits) {
                 State newState = state.withNoIndent();
                 if (isKeepIndentWhenInlined()) {
