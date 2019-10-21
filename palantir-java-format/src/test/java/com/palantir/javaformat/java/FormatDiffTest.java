@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-class FormatDiffCliTest {
+class FormatDiffTest {
     @TempDir Path repo;
 
     @Test
@@ -45,8 +45,8 @@ class FormatDiffCliTest {
                         Paths.get("src/test/resources/com/palantir/javaformat/java/FormatDiffCliTest/example1.patch")),
                 StandardCharsets.UTF_8);
 
-        List<String> strings = FormatDiffCli.parseGitDiffOutput(example1)
-                .map(FormatDiffCli.SingleFileDiff::toString)
+        List<String> strings = FormatDiff.parseGitDiffOutput(example1)
+                .map(FormatDiff.SingleFileDiff::toString)
                 .collect(Collectors.toList());
         assertEquals(
                 ImmutableList.of(
@@ -74,7 +74,7 @@ class FormatDiffCliTest {
 
         runCommandInRepo("git", "add", "-N", ".");
 
-        FormatDiffCli.formatDiff(subdir);
+        FormatDiff.formatDiff(subdir);
 
         assertThat(reformatMe).hasContent("class ReformatMe {}");
         assertThat(dontTouchMe).hasContent("                                 class DontTouchMe {}");

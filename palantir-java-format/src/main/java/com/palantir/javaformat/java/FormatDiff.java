@@ -37,7 +37,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-public final class FormatDiffCli {
+public final class FormatDiff {
     // each section in the git diff output starts like this
     private static final Pattern SEPARATOR = Pattern.compile("diff --git");
 
