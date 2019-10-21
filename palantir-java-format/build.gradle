@@ -13,6 +13,7 @@ dependencies {
     testCompile 'com.google.guava:guava-testlib'
     testCompile 'com.google.truth:truth'
     testCompile 'com.google.testing.compile:compile-testing'
+    testImplementation 'org.assertj:assertj-core'
     testImplementation 'org.junit.jupiter:junit-jupiter-migrationsupport'
     testImplementation 'org.junit.jupiter:junit-jupiter'
 

@@ -48,15 +48,16 @@ public final class FormatDiffCli {
     private static final Pattern HUNK =
             Pattern.compile("^@@.*\\+(?<startLineOneIndexed>\\d+)(,(?<numLines>\\d+))?", Pattern.MULTILINE);
 
-    public static void main(String[] _args) throws IOException, InterruptedException {
+    public static void formatDiff(Path dirToFormat) throws IOException, InterruptedException {
         Formatter formatter = Formatter.createFormatter(
                 JavaFormatterOptions.builder().style(JavaFormatterOptions.Style.PALANTIR).build());
-        Path cwd = Paths.get(".");
 
-        String gitOutput = gitDiff(cwd);
+        String gitOutput = gitDiff(dirToFormat);
+        Path gitTopLevelDir = gitTopLevelDir(dirToFormat);
+
         parseGitDiffOutput(gitOutput)
                 .filter(diff -> diff.path.toString().endsWith(".java"))
-                .map(diff -> new SingleFileDiff(cwd.resolve(diff.path), diff.lineRanges))
+                .map(diff -> new SingleFileDiff(gitTopLevelDir.resolve(diff.path), diff.lineRanges))
                 .filter(diff -> Files.exists(diff.path))
                 .forEach(diff -> format(formatter, diff));
     }
@@ -107,14 +108,27 @@ public final class FormatDiffCli {
         }
     }
 
-    private static String gitDiff(Path cwd) throws IOException, InterruptedException {
+    private static String gitDiff(Path dir) throws IOException, InterruptedException {
         // TODO(dfox): this does nothing if working dir is clean - maybe use HEAD^ to format prev commit?
-        Process process = new ProcessBuilder().command("git", "diff", "-U0", "HEAD").directory(cwd.toFile()).start();
+        return gitCommand(dir, "git", "diff", "-U0", "HEAD", dir.toAbsolutePath().toString());
+    }
+
+    private static Path gitTopLevelDir(Path dir) throws IOException, InterruptedException {
+        return Paths.get(gitCommand(dir, "git", "rev-parse", "--show-toplevel"));
+    }
+
+    private static String gitCommand(Path dir, String... args) throws IOException, InterruptedException {
+        Process process = new ProcessBuilder()
+                .command(args)
+                .directory(dir.toFile())
+                .start();
+
         Preconditions.checkState(process.waitFor(10, TimeUnit.SECONDS), "git diff took too long to terminate");
+        Preconditions.checkState(process.exitValue() == 0, "Expected return code of 0");
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ByteStreams.copy(process.getInputStream(), baos);
-        return new String(baos.toByteArray(), UTF_8);
+        return new String(baos.toByteArray(), UTF_8).trim();
     }
 
     // TODO(dfox): replace this with immutables
