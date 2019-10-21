@@ -1,0 +1,6 @@
+type: improvement
+improvement:
+  description: Stop breaking method invocations after `(` except in very few particular
+    circumstances.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/37
