@@ -119,6 +119,11 @@ When enabled, it will replace the normal `Reformat Code` action, which can be
 triggered from the `Code` menu or with the Ctrl-Alt-L (by default) keyboard
 shortcut.
 
+## Future works
+
+- [ ] preserve [NON-NLS markers][] - these are comments that are used when implementing NLS internationalisation, and need to stay on the same line with the strings they come after.
+
+[NON-NLS markers]: https://stackoverflow.com/a/40266605
 
 ## License
 
