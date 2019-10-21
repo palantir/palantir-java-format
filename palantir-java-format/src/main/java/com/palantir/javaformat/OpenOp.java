@@ -40,7 +40,7 @@ public abstract class OpenOp implements Op {
         return LastLevelBreakability.NO_PREFERENCE;
     }
 
-    public abstract Optional<String> name();
+    public abstract Optional<String> debugName();
 
     /**
      * Make an ordinary {@code OpenOp}.
@@ -54,14 +54,12 @@ public abstract class OpenOp implements Op {
     /**
      * Make an ordinary {@code OpenOp}.
      *
-     * @param plusIndent     the indent for breaks at this level
+     * @param plusIndent the indent for breaks at this level
      * @param breakBehaviour how to decide whether to break this level or not
      * @return the {@code OpenOp}
      */
     public static Op make(
-            Indent plusIndent,
-            BreakBehaviour breakBehaviour,
-            LastLevelBreakability breakabilityIfLastLevel) {
+            Indent plusIndent, BreakBehaviour breakBehaviour, LastLevelBreakability breakabilityIfLastLevel) {
         return builder()
                 .plusIndent(plusIndent)
                 .breakBehaviour(breakBehaviour)
@@ -71,7 +69,7 @@ public abstract class OpenOp implements Op {
 
     @Override
     public void add(DocBuilder builder) {
-        builder.open(plusIndent(), breakBehaviour(), breakabilityIfLastLevel(), name());
+        builder.open(plusIndent(), breakBehaviour(), breakabilityIfLastLevel(), debugName());
     }
 
     public static Builder builder() {

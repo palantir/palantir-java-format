@@ -9,9 +9,7 @@ import com.palantir.javaformat.java.JavaInputAstVisitor;
  * BreakBehaviour.Cases#preferBreakingLastInnerLevel}.
  */
 public enum LastLevelBreakability {
-    /**
-     * Default behaviour - it cannot be broken.
-     */
+    /** Default behaviour - it cannot be broken. */
     NO_PREFERENCE,
     /**
      * Unconditionally allow breaking this level. This should only be used when you know that the first non-Level {@link
@@ -19,9 +17,8 @@ public enum LastLevelBreakability {
      */
     BREAK_HERE,
     /**
-     * Delegate to the {@link LastLevelBreakability} of _this_ level's last inner level. Typically, this will be true
-      * if this
-     * level is not immediately followed by a break (see StartsWithBreakVisitor). Behaves the same as {@link
+     * Delegate to the {@link LastLevelBreakability} of _this_ level's last inner level. Typically, this will be true if
+     * this level is not immediately followed by a break (see StartsWithBreakVisitor). Behaves the same as {@link
      * #NO_PREFERENCE} if this level is not {@link BreakBehaviour.Cases#preferBreakingLastInnerLevel}.
      */
     CHECK_INNER,

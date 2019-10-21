@@ -262,26 +262,23 @@ public final class OpsBuilder {
     /**
      * Open a new level by emitting an {@link OpenOp}.
      *
-     * @param name a representative name for this lambda
+     * @param debugName a representative name for this lambda
      * @param plusIndent the extra indent for the new level
      */
-    public final void open(String name, Indent plusIndent) {
-        add(OpenOp.builder().plusIndent(plusIndent).name(name).build());
+    public final void open(String debugName, Indent plusIndent) {
+        add(OpenOp.builder().plusIndent(plusIndent).debugName(debugName).build());
     }
 
     /**
      * Open a new level by emitting an {@link OpenOp}.
      *
-     * @param plusIndent              the extra indent for the new level
-     * @param breakBehaviour          how to decide whether to break this level or not
+     * @param plusIndent the extra indent for the new level
+     * @param breakBehaviour how to decide whether to break this level or not
      * @param breakabilityIfLastLevel if last level, when to break this rather than parent
      */
     public final void open(
-            Indent plusIndent,
-            BreakBehaviour breakBehaviour,
-            LastLevelBreakability breakabilityIfLastLevel) {
-        add(OpenOp
-                .builder()
+            Indent plusIndent, BreakBehaviour breakBehaviour, LastLevelBreakability breakabilityIfLastLevel) {
+        add(OpenOp.builder()
                 .plusIndent(plusIndent)
                 .breakBehaviour(breakBehaviour)
                 .breakabilityIfLastLevel(breakabilityIfLastLevel)

@@ -1197,9 +1197,8 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         builder.close();
         builder.space();
         builder.op("->");
-        builder.open(OpenOp
-                .builder()
-                .name("lambda body")
+        builder.open(OpenOp.builder()
+                .debugName("lambda body")
                 .plusIndent(statementBody ? ZERO : plusFour)
                 .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(true))
                 .breakabilityIfLastLevel(LastLevelBreakability.BREAK_HERE)
@@ -2576,9 +2575,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 token(".");
             } else {
                 builder.open(
-                        plusFour,
-                        BreakBehaviours.preferBreakingLastInnerLevel(true),
-                        LastLevelBreakability.BREAK_HERE);
+                        plusFour, BreakBehaviours.preferBreakingLastInnerLevel(true), LastLevelBreakability.BREAK_HERE);
                 scan(getArrayBase(node), null);
                 builder.breakOp();
                 needDot = true;
@@ -2672,9 +2669,8 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             // This level can come after either:
             //      * checkArgument(        -- B19950815                (!trailingDereferences)
             //      * foo.bar()             -- palantir-chains-lambdas  ( trailingDereferences)
-            builder.open(OpenOp
-                    .builder()
-                    .name("visitRegularDot")
+            builder.open(OpenOp.builder()
+                    .debugName("visitRegularDot")
                     .plusIndent(plusFour)
                     .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(false))
                     .breakabilityIfLastLevel(LastLevelBreakability.CHECK_INNER)
@@ -2755,15 +2751,15 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         // Are there method invocations or field accesses after the prefix?
         boolean trailingDereferences = !prefixes.isEmpty() && getLast(prefixes) < items.size() - 1;
 
-        builder.open(OpenOp
-                .builder()
-                .name("visitDotWithPrefix")
+        builder.open(OpenOp.builder()
+                .debugName("visitDotWithPrefix")
                 .plusIndent(plusFour)
                 // This can't be PREFER_BREAKING_LAST_INNER_LEVEL unless we have breaks in _this_ level.
                 // That's only every the case if trailingDereferences is true.
-                .breakBehaviour(trailingDereferences
-                        ? BreakBehaviours.preferBreakingLastInnerLevel(true)
-                        : BreakBehaviours.breakThisLevel())
+                .breakBehaviour(
+                        trailingDereferences
+                                ? BreakBehaviours.preferBreakingLastInnerLevel(true)
+                                : BreakBehaviours.breakThisLevel())
                 .breakabilityIfLastLevel(LastLevelBreakability.ONLY_IF_FIRST_LEVEL_FITS)
                 .build());
 
@@ -2877,12 +2873,11 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             case METHOD_INVOCATION:
                 // Note: we don't BREAK_HERE because we want to make sure that the last argument is actually
                 // breakable in a way we prefer.
-                builder.open(OpenOp
-                        .builder()
+                builder.open(OpenOp.builder()
                         .plusIndent(tyargIndent)
                         .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(true))
                         .breakabilityIfLastLevel(LastLevelBreakability.CHECK_INNER)
-                        .name("dotExpressionArgsAndParen")
+                        .debugName("dotExpressionArgsAndParen")
                         .build());
                 MethodInvocationTree methodInvocation = (MethodInvocationTree) expression;
                 addArguments(methodInvocation.getArguments(), indent);
@@ -2967,9 +2962,8 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
          However we definitely don't wanna look inside for B18479811
          Solution: argList should CHECK_INNER.
         */
-        builder.open(OpenOp
-                .builder()
-                .name("addArguments")
+        builder.open(OpenOp.builder()
+                .debugName("addArguments")
                 .plusIndent(plusIndent)
                 .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(false))
                 .breakabilityIfLastLevel(LastLevelBreakability.CHECK_INNER)
@@ -3016,9 +3010,8 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     }
 
     private void argList(List<? extends ExpressionTree> arguments) {
-        builder.open(OpenOp
-                .builder()
-                .name("argList")
+        builder.open(OpenOp.builder()
+                .debugName("argList")
                 .plusIndent(ZERO)
                 .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(true))
                 .breakabilityIfLastLevel(LastLevelBreakability.CHECK_INNER)
@@ -3290,7 +3283,8 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                     initializer.get().accept(this, null);
                     builder.close();
                 } else {
-                    builder.open(Indent.If.make(typeBreak, plusFour, ZERO),
+                    builder.open(
+                            Indent.If.make(typeBreak, plusFour, ZERO),
                             BreakBehaviours.breakOnlyIfInnerLevelsThenFitOnOneLine(true),
                             LastLevelBreakability.NO_PREFERENCE);
                     {

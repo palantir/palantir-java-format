@@ -47,8 +47,8 @@ public final class Level extends Doc {
     private final Indent plusIndent; // The extra indent following breaks.
     private final BreakBehaviour breakBehaviour; // Where to break when we can't fit on one line.
     private final LastLevelBreakability breakabilityIfLastLevel;
-            // If last level, when to break this rather than parent.
-    private final Optional<String> name;
+    // If last level, when to break this rather than parent.
+    private final Optional<String> debugName;
     private final List<Doc> docs = new ArrayList<>(); // The elements of the level.
 
     // State that needs to be preserved between calculating breaks and
@@ -68,11 +68,11 @@ public final class Level extends Doc {
             Indent plusIndent,
             BreakBehaviour breakBehaviour,
             LastLevelBreakability breakabilityIfLastLevel,
-            Optional<String> name) {
+            Optional<String> debugName) {
         this.plusIndent = plusIndent;
         this.breakBehaviour = breakBehaviour;
         this.breakabilityIfLastLevel = breakabilityIfLastLevel;
-        this.name = name;
+        this.debugName = debugName;
     }
 
     /**
@@ -81,15 +81,15 @@ public final class Level extends Doc {
      * @param plusIndent the extra indent inside the {@code Level}
      * @param breakBehaviour whether to attempt breaking only the last inner level first, instead of this level
      * @param breakabilityIfLastLevel if last level, when to break this rather than parent
-     * @param name
+     * @param debugName
      * @return the new {@code Level}
      */
     static Level make(
             Indent plusIndent,
             BreakBehaviour breakBehaviour,
             LastLevelBreakability breakabilityIfLastLevel,
-            Optional<String> name) {
-        return new Level(plusIndent, breakBehaviour, breakabilityIfLastLevel, name);
+            Optional<String> debugName) {
+        return new Level(plusIndent, breakBehaviour, breakabilityIfLastLevel, debugName);
     }
 
     /**
@@ -176,7 +176,8 @@ public final class Level extends Doc {
 
                 // No plusIndent the first time around, since we expect this whole level (except part of the last inner
                 // level) to be on the first line.
-                Optional<State> lastLevelBroken = tryBreakLastLevel(commentsHelper, maxWidth, state1.withNoIndent(), false);
+                Optional<State> lastLevelBroken =
+                        tryBreakLastLevel(commentsHelper, maxWidth, state1.withNoIndent(), false);
 
                 if (lastLevelBroken.isPresent()) {
                     if (lastLevelBroken.get().numLines < broken.numLines) {
@@ -239,8 +240,6 @@ public final class Level extends Doc {
             }
         }
 
-        // Allow long strings to stay on the same line, expecting that StringWrapper will
-        // reflow them later.
         if (prefixFits) {
             State newState = state.withNoIndent();
             if (keepIndent) {
@@ -297,8 +296,7 @@ public final class Level extends Doc {
         //    In this case, recurse rather than go into computeBreaks.
         if (lastLevel.breakabilityIfLastLevel == LastLevelBreakability.CHECK_INNER) {
             // Try to fit the entire inner prefix if it's that kind of level.
-            Optional<Optional<State>> couldBreakRecursively = BreakBehaviours
-                    .caseOf(lastLevel.breakBehaviour)
+            Optional<Optional<State>> couldBreakRecursively = BreakBehaviours.caseOf(lastLevel.breakBehaviour)
                     .preferBreakingLastInnerLevel(keepIndentWhenInlined -> {
                         State state2 = state1;
                         if (keepIndentWhenInlined) {
@@ -470,8 +468,8 @@ public final class Level extends Doc {
         return breakabilityIfLastLevel;
     }
 
-    public Optional<String> getName() {
-        return name;
+    public Optional<String> getDebugName() {
+        return debugName;
     }
 
     /** An indented representation of this level and all nested levels inside it. */
@@ -500,7 +498,7 @@ public final class Level extends Doc {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("name", name)
+                .add("debugName", debugName)
                 .add("plusIndent", plusIndent)
                 .add("breakBehaviour", breakBehaviour)
                 .add("breakabilityIfLastLevel", breakabilityIfLastLevel)

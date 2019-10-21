@@ -29,10 +29,9 @@ import java.util.Optional;
 
 /** A {@code DocBuilder} converts a sequence of {@link Op}s into a {@link Doc}. */
 public final class DocBuilder {
-    private final Level base = Level.make(Indent.Const.ZERO,
-            BreakBehaviours.breakThisLevel(),
-            LastLevelBreakability.NO_PREFERENCE,
-            Optional.of("root"));
+    private final Level base = Level.make(
+            Indent.Const.ZERO, BreakBehaviours.breakThisLevel(), LastLevelBreakability.NO_PREFERENCE, Optional.of(
+                    "root"));
     private final ArrayDeque<Level> stack = new ArrayDeque<>();
 
     /**
@@ -76,13 +75,14 @@ public final class DocBuilder {
      * @param plusIndent the extra indent for the {@link Level}
      * @param breakBehaviour how to decide whether to break this level or not
      * @param breakabilityIfLastLevel if last level, when to break this rather than parent
+     * @param debugName
      */
     public void open(
             Indent plusIndent,
             BreakBehaviour breakBehaviour,
             LastLevelBreakability breakabilityIfLastLevel,
-            Optional<String> name) {
-        Level level = Level.make(plusIndent, breakBehaviour, breakabilityIfLastLevel, name);
+            Optional<String> debugName) {
+        Level level = Level.make(plusIndent, breakBehaviour, breakabilityIfLastLevel, debugName);
         stack.addLast(level);
     }
 
