@@ -547,8 +547,8 @@ public final class OpsBuilder {
                     boolean nonNlsCommentsAfterPlus = token.getToksAfter().stream()
                                     .anyMatch(OpsBuilder::isNonNlsComment)
                             && token.getTok().getText().equals("+")
-                            && i > 0
-                            && ops.get(i - 1) instanceof Break;
+                            && k > 0
+                            && ops.get(k - 1) instanceof Break;
 
                     int tokAfterPos = nonNlsCommentsAfterPlus ? k - 1 : k + 1;
 
