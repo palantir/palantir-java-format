@@ -59,6 +59,8 @@ class FormatDiffTest {
     @Test
     void reformat_a_subpath_of_a_git_directory_for_only_changed_lines() throws IOException, InterruptedException {
         runCommandInRepo("git", "init");
+        runCommandInRepo("git", "config", "user.name", "Test User");
+        runCommandInRepo("git", "config", "user.email", "test-user@palantir.com");
         runCommandInRepo("git", "commit", "--allow-empty", "-m", "Init");
 
         Path subdir = repo.resolve("subdir");
