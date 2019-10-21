@@ -65,6 +65,7 @@ public abstract class OpenOp implements Op {
                 this);
     }
 
+    /** Whether it's allowed to set {@link #keepIndentWhenInlined()}. */
     private boolean canUseKeepIndentWhenInlined() {
         return breakBehaviour() == BreakBehaviour.BREAK_ONLY_IF_INNER_LEVELS_THEN_FIT_ON_ONE_LINE
                 || breakabilityIfLastLevel() == Breakability.CHECK_INNER;
