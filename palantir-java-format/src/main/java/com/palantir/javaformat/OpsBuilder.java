@@ -544,11 +544,11 @@ public final class OpsBuilder {
 
                     // Reordering of NON-NLS comments that might follow a `+` in a chain of string concatenations, in
                     // order to move the comments before the Break that precedes the `+` token.
-                    Op previousOp = ops.get(i - 1);
                     boolean nonNlsCommentsAfterPlus = token.getToksAfter().stream()
                                     .anyMatch(OpsBuilder::isNonNlsComment)
                             && token.getTok().getText().equals("+")
-                            && previousOp instanceof Break;
+                            && i > 0
+                            && ops.get(i - 1) instanceof Break;
 
                     int tokAfterPos = nonNlsCommentsAfterPlus ? k - 1 : k + 1;
 
