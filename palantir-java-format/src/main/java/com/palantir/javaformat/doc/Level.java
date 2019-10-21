@@ -47,7 +47,7 @@ public final class Level extends Doc {
     private final BreakBehaviour breakBehaviour; // Where to break when we can't fit on one line.
     private final LastLevelBreakability breakabilityIfLastLevel; // If last level, when to break this rather than parent.
     private final Optional<Boolean> keepIndentWhenInlined;
-    private final Optional<String> name;
+    private final Optional<String> debugName;
     private final List<Doc> docs = new ArrayList<>(); // The elements of the level.
 
     // State that needs to be preserved between calculating breaks and
@@ -68,12 +68,12 @@ public final class Level extends Doc {
             BreakBehaviour breakBehaviour,
             LastLevelBreakability breakabilityIfLastLevel,
             Optional<Boolean> keepIndentWhenInlined,
-            Optional<String> name) {
+            Optional<String> debugName) {
         this.plusIndent = plusIndent;
         this.breakBehaviour = breakBehaviour;
         this.breakabilityIfLastLevel = breakabilityIfLastLevel;
         this.keepIndentWhenInlined = keepIndentWhenInlined;
-        this.name = name;
+        this.debugName = debugName;
     }
 
     /**
@@ -83,7 +83,7 @@ public final class Level extends Doc {
      * @param breakBehaviour whether to attempt breaking only the last inner level first, instead of this level
      * @param breakabilityIfLastLevel if last level, when to break this rather than parent
      * @param keepIndentWhenInlined
-     * @param name
+     * @param debugName
      * @return the new {@code Level}
      */
     static Level make(
@@ -91,8 +91,8 @@ public final class Level extends Doc {
             BreakBehaviour breakBehaviour,
             LastLevelBreakability breakabilityIfLastLevel,
             Optional<Boolean> keepIndentWhenInlined,
-            Optional<String> name) {
-        return new Level(plusIndent, breakBehaviour, breakabilityIfLastLevel, keepIndentWhenInlined, name);
+            Optional<String> debugName) {
+        return new Level(plusIndent, breakBehaviour, breakabilityIfLastLevel, keepIndentWhenInlined, debugName);
     }
 
     /**
@@ -443,8 +443,8 @@ public final class Level extends Doc {
         return breakabilityIfLastLevel;
     }
 
-    public Optional<String> getName() {
-        return name;
+    public Optional<String> getDebugName() {
+        return debugName;
     }
 
     /** An indented representation of this level and all nested levels inside it. */
@@ -473,7 +473,7 @@ public final class Level extends Doc {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("name", name)
+                .add("debugName", debugName)
                 .add("plusIndent", plusIndent)
                 .add("breakBehaviour", breakBehaviour)
                 .add("breakabilityIfLastLevel", breakabilityIfLastLevel)

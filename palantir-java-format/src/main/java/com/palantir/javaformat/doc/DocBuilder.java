@@ -78,15 +78,15 @@ public final class DocBuilder {
      * @param breakBehaviour how to decide whether to break this level or not
      * @param breakabilityIfLastLevel if last level, when to break this rather than parent
      * @param keepIndentWhenInlined
-     * @param name
+     * @param debugName
      */
     public void open(
             Indent plusIndent,
             BreakBehaviour breakBehaviour,
             LastLevelBreakability breakabilityIfLastLevel,
             Optional<Boolean> keepIndentWhenInlined,
-            Optional<String> name) {
-        Level level = Level.make(plusIndent, breakBehaviour, breakabilityIfLastLevel, keepIndentWhenInlined, name);
+            Optional<String> debugName) {
+        Level level = Level.make(plusIndent, breakBehaviour, breakabilityIfLastLevel, keepIndentWhenInlined, debugName);
         stack.addLast(level);
     }
 

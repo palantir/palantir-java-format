@@ -56,7 +56,7 @@ public final class LevelDelimitedFlatValueDocVisitor implements DocVisitor<Strin
         }
         StringBuilder builder = new StringBuilder();
         builder.append("❰");
-        level.getName().ifPresent(name -> builder.append(" \"" + name + "\""));
+        level.getDebugName().ifPresent(name -> builder.append(" \"" + name + "\""));
         if (!level.getPlusIndent().equals(Indent.Const.ZERO)) {
             builder.append(" +" + level.getPlusIndent().eval());
         }
