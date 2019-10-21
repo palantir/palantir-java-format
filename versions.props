@@ -12,4 +12,4 @@ org.immutables:value = 2.7.5
 org.junit.jupiter:* = 5.5.2
 org.junit.vintage:* = 5.5.0
 com.google.auto.service:auto-service = 1.0-rc6
-com.netflix.nebula:nebula-test = 7.3.0
+com.netflix.nebula:nebula-test = 7.4.0
