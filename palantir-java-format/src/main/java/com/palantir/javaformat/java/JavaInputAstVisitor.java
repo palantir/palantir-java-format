@@ -2754,8 +2754,8 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         builder.open(OpenOp.builder()
                 .debugName("visitDotWithPrefix")
                 .plusIndent(plusFour)
-                // This can't be PREFER_BREAKING_LAST_INNER_LEVEL unless we have breaks in _this_ level.
-                // That's only every the case if trailingDereferences is true.
+                // This can't be preferBreakingLastInnerLevel unless we have breaks in _this_ level.
+                // That's only ever the case if trailingDereferences is true.
                 .breakBehaviour(
                         trailingDereferences
                                 ? BreakBehaviours.preferBreakingLastInnerLevel(true)
@@ -2947,7 +2947,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
      */
     void addArguments(List<? extends ExpressionTree> arguments, Indent plusIndent) {
         /*
-         PREFER_BREAKING_LAST_INNER_LEVEL here in order to avoid immediately breaking a long
+         `preferBreakingLastInnerLevel` here in order to avoid immediately breaking a long
          invocation that can be one-lined:
 
          .method(
@@ -2955,10 +2955,10 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                     // body
                   });
 
-         This is so that the downstream 'PREFER_BREAKING_LAST_INNER_LEVEL' level made by
+         This is so that the downstream 'preferBreakingLastInnerLevel' level made by
          argList can be attempted without preemptively breaking after the opening bracket '('.
 
-         BREAK_THIS_LEVEL would break B20701054 ( `analysis().analyze(⏎` )
+         `breakThisLevel` would break B20701054 ( `analysis().analyze(⏎` )
          However we definitely don't wanna look inside for B18479811
          Solution: argList should CHECK_INNER.
         */
