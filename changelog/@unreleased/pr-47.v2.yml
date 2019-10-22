@@ -1,6 +1,6 @@
-type: feature
-feature:
+type: break
+break:
   description: Expose `formatSourceReflowStringsAndFixImports` from the API, which
-    formats a whole file returning the formatted file as a String.
+    formats a whole file returning the formatted file as a String, and remove JavaFormatterOptions altogether from the API.
   links:
   - https://github.com/palantir/palantir-java-format/pull/47
