@@ -16,13 +16,8 @@
 
 package com.palantir.javaformat.gradle;
 
-import com.google.common.collect.Iterables;
 import com.palantir.javaformat.java.FormatterService;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ServiceLoader;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
@@ -49,26 +44,10 @@ public final class PalantirJavaFormatPlugin implements Plugin<Project> {
 
         @TaskAction
         public final void formatDiff() throws IOException, InterruptedException {
-            URL[] jarUris = getProject()
-                    .getRootProject()
-                    .getConfigurations()
-                    .getByName(PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME)
-                    .getFiles()
-                    .stream()
-                    .map(file -> {
-                        try {
-                            return file.toURI().toURL();
-                        } catch (MalformedURLException e) {
-                            throw new RuntimeException("Unable to convert URI to URL: " + file, e);
-                        }
-                    })
-                    .toArray(URL[]::new);
-
-            ClassLoader classLoader = new URLClassLoader(jarUris, PalantirJavaFormatPlugin.class.getClassLoader());
-            FormatterService formatter =
-                    Iterables.getOnlyElement(ServiceLoader.load(FormatterService.class, classLoader));
-
-            FormatDiff.formatDiff(getProject().getProjectDir().toPath(), formatter);
+            JavaFormatExtension extension =
+                    getProject().getRootProject().getExtensions().getByType(JavaFormatExtension.class);
+            FormatterService formatterService = extension.serviceLoad();
+            FormatDiff.formatDiff(getProject().getProjectDir().toPath(), formatterService);
         }
     }
 }

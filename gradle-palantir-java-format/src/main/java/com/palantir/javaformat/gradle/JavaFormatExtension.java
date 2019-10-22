@@ -16,20 +16,35 @@
 
 package com.palantir.javaformat.gradle;
 
+import com.google.common.collect.Iterables;
+import com.palantir.javaformat.java.FormatterService;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ServiceLoader;
 import org.gradle.api.Project;
+import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.provider.Property;
 
 public class JavaFormatExtension {
-    private final Property<String> implementationVersion;
-    private static final String IMPLEMENTATION_VERSION =
-            JavaFormatExtension.class.getPackage().getImplementationVersion();
+    private final Configuration configuration;
 
-    public JavaFormatExtension(Project project) {
-        implementationVersion = project.getObjects().property(String.class);
-        implementationVersion.set(IMPLEMENTATION_VERSION);
+    public JavaFormatExtension(Configuration configuration) {
+        this.configuration = configuration;
     }
 
-    public final Property<String> getImplementationVersion() {
-        return implementationVersion;
+    public FormatterService serviceLoad() {
+        URL[] jarUris = configuration.getFiles().stream()
+                .map(file -> {
+                    try {
+                        return file.toURI().toURL();
+                    } catch (MalformedURLException e) {
+                        throw new RuntimeException("Unable to convert URI to URL: " + file, e);
+                    }
+                })
+                .toArray(URL[]::new);
+
+        ClassLoader classLoader = new URLClassLoader(jarUris, FormatterService.class.getClassLoader());
+        return Iterables.getOnlyElement(ServiceLoader.load(FormatterService.class, classLoader));
     }
 }

@@ -20,34 +20,31 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.artifacts.Configuration;
 
 public final class PalantirJavaFormatProviderPlugin implements Plugin<Project> {
 
-    public static final String CONFIGURATION_NAME = "palantirJavaFormat";
+    static final String CONFIGURATION_NAME = "palantirJavaFormat";
 
     @Override
-    public void apply(Project project) {
+    public void apply(Project rootProject) {
         Preconditions.checkState(
-                project == project.getRootProject(),
+                rootProject == rootProject.getRootProject(),
                 "May only apply com.palantir.java-format-provider to the root project");
 
-        JavaFormatExtension extension =
-                project.getExtensions().create("palantirJavaFormat", JavaFormatExtension.class, project);
-
-        project.getConfigurations().create(CONFIGURATION_NAME, conf -> {
+        Configuration configuration = rootProject.getConfigurations().create(CONFIGURATION_NAME, conf -> {
             conf.setDescription("Internal configuration for resolving the palantir-java-format implementation");
             conf.setVisible(false);
             conf.setCanBeConsumed(false);
-            // Using addLater instead of afterEvaluate, in order to delay reading the extension until after the user
-            // has configured it.
-            conf.defaultDependencies(deps -> deps.addLater(project.provider(() -> {
-                String version = extension.getImplementationVersion().get();
 
-                return project.getDependencies().create(ImmutableMap.of(
+            conf.defaultDependencies(deps -> {
+                deps.add(rootProject.getDependencies().create(ImmutableMap.of(
                         "group", "com.palantir.javaformat",
                         "name", "palantir-java-format",
-                        "version", version));
-            })));
+                        "version", JavaFormatExtension.class.getPackage().getImplementationVersion())));
+            });
         });
+
+        rootProject.getExtensions().create("palantirJavaFormat", JavaFormatExtension.class, configuration);
     }
 }
