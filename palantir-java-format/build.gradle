@@ -6,7 +6,7 @@ mainClassName = 'com.palantir.javaformat.java.Main'
 description = 'Google Java Format'
 
 dependencies {
-    api project(':palantir-java-format-api')
+    api project(':palantir-java-format-spi')
     api 'com.google.guava:guava'
     implementation 'com.google.errorprone:javac-shaded'
 

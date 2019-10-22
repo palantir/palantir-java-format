@@ -48,7 +48,7 @@ configurations {
 }
 
 dependencies {
-    implementation project(':palantir-java-format-api')
+    implementation project(':palantir-java-format-spi')
     implementation 'com.github.ben-manes.caffeine:caffeine'
 
     formatter project(':palantir-java-format')
