@@ -18,8 +18,8 @@ public interface FormatterService {
      * @return a list of {@link Replacement}s, sorted from low index to high index, without overlaps
      * @throws FormatterException if the input string cannot be parsed
      */
-    ImmutableList<Replacement> getFormatReplacements(
-            String input, Collection<Range<Integer>> ranges) throws FormatterException;
+    ImmutableList<Replacement> getFormatReplacements(String input, Collection<Range<Integer>> ranges)
+            throws FormatterException;
 
     /**
      * Formats an input string (a Java compilation unit), reflows strings and fixes imports.
