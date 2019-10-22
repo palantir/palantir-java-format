@@ -6,6 +6,7 @@ dependencies {
     implementation gradleApi()
     implementation 'com.google.guava:guava'
     implementation 'gradle.plugin.org.jetbrains.gradle.plugin.idea-ext:gradle-idea-ext'
+    implementation project(':palantir-java-format-utils')
 
     // it would be nicer if we could only depend on some small API and service load the 'logic', but many plumbing
     // utilities are currently in this (e.g. applying Replacements, lineRangesToCharRanges etc)

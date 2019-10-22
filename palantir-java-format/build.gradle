@@ -3,10 +3,11 @@ apply from: rootProject.file('gradle/publish-jar.gradle')
 
 mainClassName = 'com.palantir.javaformat.java.Main'
 
-description = 'Google Java Format'
+description = 'Palantir Java Format'
 
 dependencies {
     api project(':palantir-java-format-spi')
+    implementation project(':palantir-java-format-utils')
     api 'com.google.guava:guava'
     implementation 'com.google.errorprone:javac-shaded'
 
