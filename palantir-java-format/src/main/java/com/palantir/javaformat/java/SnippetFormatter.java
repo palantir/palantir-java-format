@@ -108,8 +108,9 @@ public class SnippetFormatter {
         replacement = replacement.substring(
                 wrapper.offset, replacement.length() - (wrapper.contents.length() - wrapper.offset - source.length()));
 
-        return toReplacements(source, replacement).stream().filter(r -> rangeSet.encloses(r.getReplaceRange())).collect(
-                toImmutableList());
+        return toReplacements(source, replacement).stream()
+                .filter(r -> rangeSet.encloses(r.getReplaceRange()))
+                .collect(toImmutableList());
     }
 
     /**

@@ -47,9 +47,8 @@ public class ModifierOrdererTest {
                                 "strictfp native synchronized volatile transient final static abstract"
                                         + " private protected public")
                         .getText())
-                .isEqualTo(
-                        "public protected private abstract static final transient volatile synchronized"
-                                + " native strictfp");
+                .isEqualTo("public protected private abstract static final transient volatile synchronized"
+                        + " native strictfp");
     }
 
     @Test
@@ -58,9 +57,8 @@ public class ModifierOrdererTest {
                                 "strictfp native synchronized volatile transient final static default abstract"
                                         + " private protected public")
                         .getText())
-                .isEqualTo(
-                        "public protected private abstract default static final transient volatile synchronized"
-                                + " native strictfp");
+                .isEqualTo("public protected private abstract default static final transient volatile synchronized"
+                        + " native strictfp");
     }
 
     @Test

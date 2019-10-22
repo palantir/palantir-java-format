@@ -334,8 +334,8 @@ public final class OpsBuilder {
              * (for example) we're guessing at an optional token.
              */
             if (realOrImaginary == Token.RealOrImaginary.REAL) {
-                throw new FormattingError(diagnostic(
-                        String.format("expected token: '%s'; generated %s instead", peekToken().orElse(null), token)));
+                throw new FormattingError(diagnostic(String.format(
+                        "expected token: '%s'; generated %s instead", peekToken().orElse(null), token)));
             }
         }
     }
@@ -559,8 +559,9 @@ public final class OpsBuilder {
                                             && tokenOp.breakAndIndentTrailingComment().isPresent());
                             if (breakAfter) {
                                 tokOps.put(tokAfterPos, Break.make(
-                                        FillMode.FORCED, "", tokenOp.breakAndIndentTrailingComment().orElse(
-                                                        Const.ZERO)));
+                                        FillMode.FORCED,
+                                        "",
+                                        tokenOp.breakAndIndentTrailingComment().orElse(Const.ZERO)));
                             } else {
                                 tokOps.put(tokAfterPos, SPACE);
                             }

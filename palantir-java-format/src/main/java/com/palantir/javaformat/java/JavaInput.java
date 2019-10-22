@@ -629,8 +629,8 @@ public final class JavaInput extends Input {
         RangeSet<Integer> tokenRangeSet = TreeRangeSet.create();
         for (Range<Integer> characterRange0 : characterRanges) {
             Range<Integer> characterRange = characterRange0.canonical(DiscreteDomain.integers());
-            tokenRangeSet.add(characterRangeToTokenRange(
-                    characterRange.lowerEndpoint(), characterRange.upperEndpoint() - characterRange.lowerEndpoint()));
+            tokenRangeSet.add(characterRangeToTokenRange(characterRange.lowerEndpoint(), characterRange.upperEndpoint()
+                    - characterRange.lowerEndpoint()));
         }
         return tokenRangeSet;
     }

@@ -327,13 +327,15 @@ public final class StringWrapper {
             }
         }
 
-        return lines.stream().collect(joining(
-                "\""
-                        + separator
-                        + Strings.repeat(" ", (first0 ? firstLineStartColumn + 4 : textStartColumn - 2))
-                        + "+ \"",
-                "\"",
-                "\""));
+        return lines.stream()
+                .collect(
+                        joining(
+                                "\""
+                                        + separator
+                                        + Strings.repeat(" ", (first0 ? firstLineStartColumn + 4 : textStartColumn - 2))
+                                        + "+ \"",
+                                "\"",
+                                "\""));
     }
 
     /**
