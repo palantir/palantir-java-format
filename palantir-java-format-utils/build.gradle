@@ -9,4 +9,5 @@ dependencies {
     testImplementation 'org.assertj:assertj-core'
     testImplementation 'org.junit.jupiter:junit-jupiter-migrationsupport'
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'junit:junit'
 }

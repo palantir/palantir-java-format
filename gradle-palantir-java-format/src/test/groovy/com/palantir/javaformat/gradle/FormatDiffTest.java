@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.palantir.javaformat.java;
+package com.palantir.javaformat.gradle;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -32,6 +31,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -47,7 +47,7 @@ class FormatDiffTest {
 
         List<String> strings = FormatDiff.parseGitDiffOutput(example1).map(FormatDiff.SingleFileDiff::toString).collect(
                 Collectors.toList());
-        assertEquals(
+        Assertions.assertEquals(
                 ImmutableList.of(
                         "SingleFileDiff{path=build.gradle, lineRanges=[[24..25), [29..30)]}",
                         "SingleFileDiff{path=tracing/src/test/java/com/palantir/tracing/TracersTest.java, "

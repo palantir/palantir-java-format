@@ -16,15 +16,13 @@
 
 package com.palantir.javaformat;
 
-import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.fail;
-
 import com.google.common.collect.ImmutableList;
+import com.google.common.truth.Truth;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
-/** {@link Newlines}Test */
 public class NewlinesTest {
     @Test
     public void offsets() {
