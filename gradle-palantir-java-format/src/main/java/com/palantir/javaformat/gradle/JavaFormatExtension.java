@@ -22,9 +22,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ServiceLoader;
-import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
-import org.gradle.api.provider.Property;
 
 public class JavaFormatExtension {
     private final Configuration configuration;

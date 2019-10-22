@@ -14,8 +14,6 @@
 
 package com.palantir.javaformat.java;
 
-import static java.util.Comparator.comparing;
-
 import com.google.common.base.CharMatcher;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.DiscreteDomain;
@@ -30,7 +28,6 @@ import com.palantir.javaformat.Newlines;
 import com.palantir.javaformat.OpsBuilder.BlankLineWanted;
 import com.palantir.javaformat.Output;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

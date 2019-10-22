@@ -44,7 +44,8 @@ public class NewlinesTest {
         Truth.assertThat(ImmutableList.copyOf(Newlines.lineIterator("foo\rbar\r"))).containsExactly("foo\r", "bar\r");
         Truth.assertThat(ImmutableList.copyOf(Newlines.lineIterator("foo\rbar"))).containsExactly("foo\r", "bar");
 
-        Truth.assertThat(ImmutableList.copyOf(Newlines.lineIterator("foo\r\nbar\r\n"))).containsExactly("foo\r\n", "bar\r\n");
+        Truth.assertThat(ImmutableList.copyOf(Newlines.lineIterator("foo\r\nbar\r\n")))
+                .containsExactly("foo\r\n", "bar\r\n");
         Truth.assertThat(ImmutableList.copyOf(Newlines.lineIterator("foo\r\nbar"))).containsExactly("foo\r\n", "bar");
     }
 
