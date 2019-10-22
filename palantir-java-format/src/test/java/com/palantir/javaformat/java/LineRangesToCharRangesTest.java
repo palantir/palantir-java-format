@@ -19,12 +19,13 @@ import static com.google.common.truth.Truth.assertThat;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
+import com.palantir.javaformat.Utils;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 
-/** Tests for {@link Formatter#lineRangesToCharRanges} */
+/** Tests for {@link Utils#lineRangesToCharRanges} */
 @Execution(ExecutionMode.CONCURRENT)
 public class LineRangesToCharRangesTest {
 
@@ -34,7 +35,7 @@ public class LineRangesToCharRangesTest {
         for (Range<Integer> range : ranges) {
             rangeSet.add(range);
         }
-        return Formatter.lineRangesToCharRanges(input, rangeSet).asRanges();
+        return Utils.lineRangesToCharRanges(input, rangeSet).asRanges();
     }
 
     @Test

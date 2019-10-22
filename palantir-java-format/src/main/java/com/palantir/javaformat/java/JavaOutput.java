@@ -14,8 +14,6 @@
 
 package com.palantir.javaformat.java;
 
-import static java.util.Comparator.comparing;
-
 import com.google.common.base.CharMatcher;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.DiscreteDomain;
@@ -328,19 +326,6 @@ public final class JavaOutput extends Output {
         loTok = partialFormatRanges.rangeContaining(loTok).lowerEndpoint();
         hiTok = partialFormatRanges.rangeContaining(hiTok).upperEndpoint();
         return Range.closedOpen(loTok, hiTok + 1);
-    }
-
-    public static String applyReplacements(String input, List<Replacement> replacements) {
-        replacements = new ArrayList<>(replacements);
-        replacements.sort(comparing((Replacement r) -> r.getReplaceRange().lowerEndpoint()).reversed());
-        StringBuilder writer = new StringBuilder(input);
-        for (Replacement replacement : replacements) {
-            writer.replace(
-                    replacement.getReplaceRange().lowerEndpoint(),
-                    replacement.getReplaceRange().upperEndpoint(),
-                    replacement.getReplacementString());
-        }
-        return writer.toString();
     }
 
     /** The earliest position of any Tok in the Token, including leading whitespace. */

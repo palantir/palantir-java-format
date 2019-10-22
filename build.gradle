@@ -24,7 +24,7 @@ apply plugin: 'com.palantir.git-version'
 apply plugin: 'com.palantir.baseline'
 apply plugin: 'com.palantir.consistent-versions'
 
-version = gitVersion()
+version System.env.CIRCLE_TAG ?: gitVersion()
 
 allprojects {
     group = 'com.palantir.javaformat'

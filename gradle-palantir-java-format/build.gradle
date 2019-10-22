@@ -6,8 +6,13 @@ dependencies {
     implementation gradleApi()
     implementation 'com.google.guava:guava'
     implementation 'gradle.plugin.org.jetbrains.gradle.plugin.idea-ext:gradle-idea-ext'
+    implementation project(':palantir-java-format-spi')
 
     testImplementation 'com.netflix.nebula:nebula-test'
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.junit.vintage:junit-vintage-engine'
+    testImplementation 'org.assertj:assertj-core'
+    testImplementation project(':palantir-java-format')
 }
 
 gradlePlugin {
@@ -15,8 +20,18 @@ gradlePlugin {
     plugins {
         palantirJavaFormat {
             id = 'com.palantir.java-format'
-            implementationClass = 'com.palantir.javaformat.gradle.JavaFormatPlugin'
+            implementationClass = 'com.palantir.javaformat.gradle.PalantirJavaFormatPlugin'
+            description = 'A modern, lambda-friendly, 120 character Java formatter.'
+        }
+        palantirJavaFormatIdea {
+            id = 'com.palantir.java-format-idea'
+            implementationClass = 'com.palantir.javaformat.gradle.PalantirJavaFormatIdeaPlugin'
             description = 'Plugin to configure the PalantirJavaFormat IDEA plugin based on an optional implementation version of the formatter.'
+        }
+        palantirJavaFormatProvider {
+            id = 'com.palantir.java-format-provider'
+            implementationClass = 'com.palantir.javaformat.gradle.PalantirJavaFormatProviderPlugin'
+            description = 'Exposes a configuration containing the palantir-java-format jarss'
         }
     }
 }
@@ -26,3 +41,20 @@ idea {
         sourceDirs += sourceSets.main.groovy.srcDirs
     }
 }
+
+configurations {
+    impl
+}
+
+dependencies {
+    impl project(':palantir-java-format')
+}
+
+task writeImplClasspath {
+    dependsOn configurations.impl
+    doLast {
+        file("$buildDir/impl.classpath").text = configurations.impl.asPath
+    }
+}
+
+test.dependsOn tasks.writeImplClasspath

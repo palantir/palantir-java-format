@@ -14,30 +14,39 @@
  * limitations under the License.
  */
 
-package com.palantir.javaformat.java;
+package com.palantir.javaformat.gradle;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Comparator.comparing;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.Streams;
 import com.google.common.collect.TreeRangeSet;
 import com.google.common.io.ByteStreams;
+import com.palantir.javaformat.java.FormatterException;
+import com.palantir.javaformat.java.FormatterService;
+import com.palantir.javaformat.java.Replacement;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-public final class FormatDiff {
+final class FormatDiff {
     // each section in the git diff output starts like this
     private static final Pattern SEPARATOR = Pattern.compile("diff --git");
 
@@ -48,10 +57,8 @@ public final class FormatDiff {
     private static final Pattern HUNK =
             Pattern.compile("^@@.*\\+(?<startLineOneIndexed>\\d+)(,(?<numLines>\\d+))?", Pattern.MULTILINE);
 
-    public static void formatDiff(Path dirToFormat) throws IOException, InterruptedException {
-        Formatter formatter = Formatter.createFormatter(
-                JavaFormatterOptions.builder().style(JavaFormatterOptions.Style.PALANTIR).build());
-
+    public static void formatDiff(Path dirToFormat, FormatterService formatter)
+            throws IOException, InterruptedException {
         String gitOutput = gitDiff(dirToFormat);
         Path gitTopLevelDir = gitTopLevelDir(dirToFormat);
 
@@ -86,7 +93,7 @@ public final class FormatDiff {
         });
     }
 
-    private static void format(Formatter formatter, SingleFileDiff diff) {
+    private static void format(FormatterService formatter, SingleFileDiff diff) {
         String input;
         try {
             input = new String(Files.readAllBytes(diff.path), UTF_8);
@@ -96,11 +103,12 @@ public final class FormatDiff {
             return;
         }
 
-        RangeSet<Integer> charRanges = Formatter.lineRangesToCharRanges(input, diff.lineRanges);
+        RangeSet<Integer> charRanges = lineRangesToCharRanges(input, diff.lineRanges);
 
         try {
             System.err.println("Formatting " + diff.path);
-            String output = formatter.formatSource(input, charRanges.asRanges());
+            ImmutableList<Replacement> replacements = formatter.getFormatReplacements(input, charRanges.asRanges());
+            String output = applyReplacements(input, replacements);
             Files.write(diff.path, output.getBytes(UTF_8));
         } catch (IOException | FormatterException e) {
             System.err.println("Failed to format file " + diff.path);
@@ -126,6 +134,37 @@ public final class FormatDiff {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ByteStreams.copy(process.getInputStream(), baos);
         return new String(baos.toByteArray(), UTF_8).trim();
+    }
+
+    private static String applyReplacements(String input, Collection<Replacement> replacementsCollection) {
+        List<Replacement> replacements = new ArrayList<>(replacementsCollection);
+        replacements.sort(comparing((Replacement r) -> r.getReplaceRange().lowerEndpoint()).reversed());
+        StringBuilder writer = new StringBuilder(input);
+        for (Replacement replacement : replacements) {
+            writer.replace(
+                    replacement.getReplaceRange().lowerEndpoint(),
+                    replacement.getReplaceRange().upperEndpoint(),
+                    replacement.getReplacementString());
+        }
+        return writer.toString();
+    }
+
+    /** Converts zero-indexed, [closed, open) line ranges in the given source file to character ranges. */
+    private static RangeSet<Integer> lineRangesToCharRanges(String input, RangeSet<Integer> lineRanges) {
+        List<Integer> lines = new ArrayList<>();
+        Iterators.addAll(lines, new LineOffsetIterator(input));
+        lines.add(input.length() + 1);
+
+        final RangeSet<Integer> characterRanges = TreeRangeSet.create();
+        for (Range<Integer> lineRange : lineRanges.subRangeSet(Range.closedOpen(0, lines.size() - 1)).asRanges()) {
+            int lineStart = lines.get(lineRange.lowerEndpoint());
+            // Exclude the trailing newline. This isn't strictly necessary, but handling blank lines
+            // as empty ranges is convenient.
+            int lineEnd = lines.get(lineRange.upperEndpoint()) - 1;
+            Range<Integer> range = Range.closedOpen(lineStart, lineEnd);
+            characterRanges.add(range);
+        }
+        return characterRanges;
     }
 
     // TODO(dfox): replace this with immutables
