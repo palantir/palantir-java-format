@@ -26,6 +26,7 @@ import com.google.common.collect.RangeSet;
 import com.google.common.collect.Streams;
 import com.google.common.collect.TreeRangeSet;
 import com.google.common.io.ByteStreams;
+import com.palantir.javaformat.Utils;
 import com.palantir.javaformat.java.Formatter;
 import com.palantir.javaformat.java.FormatterException;
 import com.palantir.javaformat.java.JavaFormatterOptions;
@@ -99,7 +100,7 @@ public final class FormatDiff {
             return;
         }
 
-        RangeSet<Integer> charRanges = Formatter.lineRangesToCharRanges(input, diff.lineRanges);
+        RangeSet<Integer> charRanges = Utils.lineRangesToCharRanges(input, diff.lineRanges);
 
         try {
             System.err.println("Formatting " + diff.path);
