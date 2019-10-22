@@ -1,0 +1,6 @@
+type: feature
+feature:
+  description: Expose `formatSourceReflowStringsAndFixImports` from the API, which
+    formats a whole file returning the formatted file as a String.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/47
