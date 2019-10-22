@@ -20,11 +20,18 @@ import nebula.test.IntegrationTestKitSpec
 
 class PalantirJavaFormatPluginTest extends IntegrationTestKitSpec {
 
+    /** ./gradlew writeImplClasspath generates this file. */
+    private static final CLASSPATH_FILE = new File("build/impl.classpath").absolutePath
+
     void setup() {
         buildFile << """
             plugins {
                 id 'java'
                 id 'com.palantir.java-format'
+            }
+            
+            dependencies {
+                palantirJavaFormat files(file("${CLASSPATH_FILE}").text.split(':'))
             }
             apply plugin: 'idea'
         """.stripIndent()

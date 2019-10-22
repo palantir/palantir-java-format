@@ -33,19 +33,19 @@ import org.jetbrains.gradle.ext.TaskTriggersConfig;
 public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
 
     @Override
-    public void apply(Project project) {
+    public void apply(Project rootProject) {
         Preconditions.checkState(
-                project == project.getRootProject(),
+                rootProject == rootProject.getRootProject(),
                 "May only apply com.palantir.java-format-idea to the root project");
 
-        project.getPlugins().apply(PalantirJavaFormatProviderPlugin.class);
+        rootProject.getPlugins().apply(PalantirJavaFormatProviderPlugin.class);
 
-        project.getPluginManager().withPlugin("idea", ideaPlugin -> {
+        rootProject.getPluginManager().withPlugin("idea", ideaPlugin -> {
             Configuration implConfiguration =
-                    project.getConfigurations().getByName(PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME);
+                    rootProject.getConfigurations().getByName(PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME);
 
-            configureLegacyIdea(project, implConfiguration);
-            configureIntelliJImport(project, implConfiguration);
+            configureLegacyIdea(rootProject, implConfiguration);
+            configureIntelliJImport(rootProject, implConfiguration);
         });
     }
 

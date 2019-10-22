@@ -41,3 +41,20 @@ idea {
         sourceDirs += sourceSets.main.groovy.srcDirs
     }
 }
+
+configurations {
+    impl
+}
+
+dependencies {
+    impl project(':palantir-java-format')
+}
+
+task writeImplClasspath {
+    dependsOn configurations.impl
+    doLast {
+        file("$buildDir/impl.classpath").text = configurations.impl.asPath
+    }
+}
+
+test.dependsOn tasks.writeImplClasspath
