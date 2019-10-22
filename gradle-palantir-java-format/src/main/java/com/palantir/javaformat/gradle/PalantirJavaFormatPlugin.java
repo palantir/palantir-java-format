@@ -19,6 +19,7 @@ package com.palantir.javaformat.gradle;
 import com.google.common.collect.Iterables;
 import com.palantir.javaformat.java.FormatterService;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ServiceLoader;
@@ -41,7 +42,7 @@ public final class PalantirJavaFormatPlugin implements Plugin<Project> {
     }
 
     public static class FormatDiffTask extends DefaultTask {
-        FormatDiffTask() {
+        public FormatDiffTask() {
             setDescription("Format only chunks of files that appear in git diff");
             setGroup("Formatting");
         }
@@ -54,7 +55,13 @@ public final class PalantirJavaFormatPlugin implements Plugin<Project> {
                     .getByName(PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME)
                     .getFiles()
                     .stream()
-                    .map(file -> file.toURI())
+                    .map(file -> {
+                        try {
+                            return file.toURI().toURL();
+                        } catch (MalformedURLException e) {
+                            throw new RuntimeException("Unable to convert URI to URL: " + file, e);
+                        }
+                    })
                     .toArray(URL[]::new);
 
             ClassLoader classLoader = new URLClassLoader(jarUris, PalantirJavaFormatPlugin.class.getClassLoader());

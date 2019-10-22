@@ -1,0 +1,68 @@
+/*
+ * (c) Copyright 2019 Palantir Technologies Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.palantir.javaformat.gradle
+
+import nebula.test.IntegrationTestKitSpec
+
+class PalantirJavaFormatPluginTest extends IntegrationTestKitSpec {
+
+    void setup() {
+        buildFile << """
+            plugins {
+                id 'java'
+                id 'com.palantir.java-format'
+            }
+            apply plugin: 'idea'
+        """.stripIndent()
+    }
+
+    def 'formatDiff updates only lines changed in git diff'() {
+        when:
+        "git init".execute(Collections.emptyList(), projectDir).waitFor()
+        "git config user.name Foo".execute(Collections.emptyList(), projectDir).waitFor()
+        "git config user.email foo@bar.com".execute(Collections.emptyList(), projectDir).waitFor()
+
+        file('src/main/java/Main.java') << '''
+        class Main {
+            public static void crazyExistingFormatting  (  String... args) {
+
+            }
+        }
+        '''.stripIndent()
+
+        "git add .".execute(Collections.emptyList(), projectDir).waitFor()
+        "git commit -m Commit".execute(Collections.emptyList(), projectDir).waitFor()
+
+        file('src/main/java/Main.java').text = '''
+        class Main {
+            public static void crazyExistingFormatting  (  String... args) {
+                                        System.out.println("Reformat me please");
+            }
+        }
+        '''.stripIndent()
+
+        then:
+        runTasks('formatDiff')
+        file('src/main/java/Main.java').text == '''
+        class Main {
+            public static void crazyExistingFormatting  (  String... args) {
+                System.out.println("Reformat me please");
+            }
+        }
+        '''.stripIndent()
+    }
+}

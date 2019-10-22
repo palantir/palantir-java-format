@@ -28,7 +28,7 @@ class PalantirJavaFormatIdeaPluginTest extends IntegrationTestKitSpec {
 
         buildFile << """
             plugins {
-                id 'com.palantir.java-format-idea"
+                id 'com.palantir.java-format-idea'
             }
             apply plugin: 'idea'
             
