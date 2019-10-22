@@ -42,7 +42,6 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.impl.CheckUtil;
 import com.intellij.psi.impl.source.codeStyle.CodeStyleManagerImpl;
-import com.intellij.serviceContainer.NonInjectable;
 import com.intellij.util.IncorrectOperationException;
 import com.palantir.javaformat.java.FormatterException;
 import com.palantir.javaformat.java.FormatterService;
@@ -81,12 +80,7 @@ class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
             Caffeine.newBuilder().maximumSize(1).build(PalantirCodeStyleManager::createFormatter);
 
     public PalantirCodeStyleManager(@NotNull Project project) {
-        this(new CodeStyleManagerImpl(project));
-    }
-
-    @NonInjectable
-    PalantirCodeStyleManager(@NotNull CodeStyleManager original) {
-        super(original);
+        super(new CodeStyleManagerImpl(project));
     }
 
     static Map<TextRange, String> getReplacements(
