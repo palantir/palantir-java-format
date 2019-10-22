@@ -43,7 +43,6 @@ import com.intellij.psi.impl.CheckUtil;
 import com.intellij.util.IncorrectOperationException;
 import com.palantir.javaformat.java.FormatterException;
 import com.palantir.javaformat.java.FormatterService;
-import com.palantir.javaformat.java.JavaFormatterOptions;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -83,10 +82,10 @@ class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
     }
 
     static Map<TextRange, String> getReplacements(
-            FormatterService formatter, JavaFormatterOptions options, String text, Collection<TextRange> ranges) {
+            FormatterService formatter, String text, Collection<TextRange> ranges) {
         try {
             ImmutableMap.Builder<TextRange, String> replacements = ImmutableMap.builder();
-            formatter.getFormatReplacements(options, text, toRanges(ranges)).forEach(replacement -> {
+            formatter.getFormatReplacements(text, toRanges(ranges)).forEach(replacement -> {
                 replacements.put(toTextRange(replacement.getReplaceRange()), replacement.getReplacementString());
             });
             return replacements.build();
@@ -201,9 +200,7 @@ class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
         PalantirJavaFormatSettings settings = PalantirJavaFormatSettings.getInstance(getProject());
         FormatterService formatter = implementationCache.get(settings.getImplementationClassPath());
 
-        JavaFormatterOptions options = JavaFormatterOptions.builder().style(settings.getStyle()).build();
-
-        performReplacements(document, getReplacements(formatter, options, document.getText(), ranges));
+        performReplacements(document, getReplacements(formatter, document.getText(), ranges));
     }
 
     private static FormatterService createFormatter(Optional<List<URI>> implementationClassPath) {
