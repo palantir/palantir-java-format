@@ -3,7 +3,6 @@ rootProject.name = 'palantir-java-format-parent'
 include ':gradle-palantir-java-format'
 include ':idea-plugin'
 include ':palantir-java-format-spi'
-include ':palantir-java-format-utils'
 include ':palantir-java-format'
 
 boolean isCiServer = System.getenv().containsKey('CI')

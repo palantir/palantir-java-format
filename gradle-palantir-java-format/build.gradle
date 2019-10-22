@@ -6,7 +6,6 @@ dependencies {
     implementation gradleApi()
     implementation 'com.google.guava:guava'
     implementation 'gradle.plugin.org.jetbrains.gradle.plugin.idea-ext:gradle-idea-ext'
-    implementation project(':palantir-java-format-utils')
     implementation project(':palantir-java-format-spi')
 
     testImplementation 'com.netflix.nebula:nebula-test'
