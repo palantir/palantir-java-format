@@ -29,6 +29,7 @@ import com.palantir.javaformat.FormattingError;
 import com.palantir.javaformat.Newlines;
 import com.palantir.javaformat.Op;
 import com.palantir.javaformat.OpsBuilder;
+import com.palantir.javaformat.Utils;
 import com.palantir.javaformat.doc.Doc;
 import com.palantir.javaformat.doc.DocBuilder;
 import com.palantir.javaformat.doc.State;
@@ -227,7 +228,7 @@ public final class Formatter {
      * @throws FormatterException if the input string cannot be parsed
      */
     public String formatSource(String input, Collection<Range<Integer>> characterRanges) throws FormatterException {
-        return JavaOutput.applyReplacements(input, getFormatReplacements(input, characterRanges));
+        return Utils.applyReplacements(input, getFormatReplacements(input, characterRanges));
     }
 
     /**

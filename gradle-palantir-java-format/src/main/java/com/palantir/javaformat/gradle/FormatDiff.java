@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.palantir.javaformat.java;
+package com.palantir.javaformat.gradle;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -26,6 +26,9 @@ import com.google.common.collect.RangeSet;
 import com.google.common.collect.Streams;
 import com.google.common.collect.TreeRangeSet;
 import com.google.common.io.ByteStreams;
+import com.palantir.javaformat.java.Formatter;
+import com.palantir.javaformat.java.FormatterException;
+import com.palantir.javaformat.java.JavaFormatterOptions;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;

@@ -331,19 +331,6 @@ public final class JavaOutput extends Output {
         return Range.closedOpen(loTok, hiTok + 1);
     }
 
-    public static String applyReplacements(String input, Collection<Replacement> replacementsCollection) {
-        List<Replacement> replacements = new ArrayList<>(replacementsCollection);
-        replacements.sort(comparing((Replacement r) -> r.getReplaceRange().lowerEndpoint()).reversed());
-        StringBuilder writer = new StringBuilder(input);
-        for (Replacement replacement : replacements) {
-            writer.replace(
-                    replacement.getReplaceRange().lowerEndpoint(),
-                    replacement.getReplaceRange().upperEndpoint(),
-                    replacement.getReplacementString());
-        }
-        return writer.toString();
-    }
-
     /** The earliest position of any Tok in the Token, including leading whitespace. */
     public static int startPosition(Token token) {
         int min = token.getTok().getPosition();
