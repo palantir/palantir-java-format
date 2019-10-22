@@ -23,7 +23,7 @@ import org.gradle.api.Project;
 
 public final class PalantirJavaFormatProviderPlugin implements Plugin<Project> {
 
-    static final String CONFIGURATION_NAME = "palantirJavaFormat";
+    public static final String CONFIGURATION_NAME = "palantirJavaFormat";
 
     @Override
     public void apply(Project project) {

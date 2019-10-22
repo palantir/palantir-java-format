@@ -29,7 +29,6 @@ public final class PalantirJavaFormatPlugin implements Plugin<Project> {
         project.getRootProject().getPlugins().apply(PalantirJavaFormatProviderPlugin.class);
         project.getPlugins().withId("java", p -> {
             project.getTasks().register("formatDiff", FormatDiffTask.class);
-            // TODO(dfox): also register a `format` or `palantirJavaFormat` task
         });
     }
 

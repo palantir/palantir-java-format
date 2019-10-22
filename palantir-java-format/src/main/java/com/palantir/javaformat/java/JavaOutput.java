@@ -30,6 +30,7 @@ import com.palantir.javaformat.Newlines;
 import com.palantir.javaformat.OpsBuilder.BlankLineWanted;
 import com.palantir.javaformat.Output;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -330,8 +331,8 @@ public final class JavaOutput extends Output {
         return Range.closedOpen(loTok, hiTok + 1);
     }
 
-    public static String applyReplacements(String input, List<Replacement> replacements) {
-        replacements = new ArrayList<>(replacements);
+    public static String applyReplacements(String input, Collection<Replacement> replacementsCollection) {
+        List<Replacement> replacements = new ArrayList<>(replacementsCollection);
         replacements.sort(comparing((Replacement r) -> r.getReplaceRange().lowerEndpoint()).reversed());
         StringBuilder writer = new StringBuilder(input);
         for (Replacement replacement : replacements) {
