@@ -22,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.ByteStreams;
+import com.palantir.javaformat.java.FormatterServiceImpl;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -73,7 +74,7 @@ class FormatDiffTest {
 
         runCommandInRepo("git", "add", "-N", ".");
 
-        FormatDiff.formatDiff(subdir);
+        FormatDiff.formatDiff(subdir, new FormatterServiceImpl());
 
         assertThat(reformatMe).hasContent("class ReformatMe {}");
         assertThat(dontTouchMe).hasContent("                                 class DontTouchMe {}");

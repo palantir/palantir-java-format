@@ -21,15 +21,16 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.Streams;
 import com.google.common.collect.TreeRangeSet;
 import com.google.common.io.ByteStreams;
 import com.palantir.javaformat.Utils;
-import com.palantir.javaformat.java.Formatter;
 import com.palantir.javaformat.java.FormatterException;
-import com.palantir.javaformat.java.JavaFormatterOptions;
+import com.palantir.javaformat.java.FormatterService;
+import com.palantir.javaformat.java.Replacement;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -52,10 +53,8 @@ public final class FormatDiff {
     private static final Pattern HUNK =
             Pattern.compile("^@@.*\\+(?<startLineOneIndexed>\\d+)(,(?<numLines>\\d+))?", Pattern.MULTILINE);
 
-    public static void formatDiff(Path dirToFormat) throws IOException, InterruptedException {
-        Formatter formatter = Formatter.createFormatter(
-                JavaFormatterOptions.builder().style(JavaFormatterOptions.Style.PALANTIR).build());
-
+    public static void formatDiff(Path dirToFormat, FormatterService formatter)
+            throws IOException, InterruptedException {
         String gitOutput = gitDiff(dirToFormat);
         Path gitTopLevelDir = gitTopLevelDir(dirToFormat);
 
@@ -90,7 +89,7 @@ public final class FormatDiff {
         });
     }
 
-    private static void format(Formatter formatter, SingleFileDiff diff) {
+    private static void format(FormatterService formatter, SingleFileDiff diff) {
         String input;
         try {
             input = new String(Files.readAllBytes(diff.path), UTF_8);
@@ -104,7 +103,8 @@ public final class FormatDiff {
 
         try {
             System.err.println("Formatting " + diff.path);
-            String output = formatter.formatSource(input, charRanges.asRanges());
+            ImmutableList<Replacement> replacements = formatter.getFormatReplacements(input, charRanges.asRanges());
+            String output = Utils.applyReplacements(input, replacements);
             Files.write(diff.path, output.getBytes(UTF_8));
         } catch (IOException | FormatterException e) {
             System.err.println("Failed to format file " + diff.path);
