@@ -15,7 +15,8 @@ public final class FormatterServiceImpl implements FormatterService {
     }
 
     @Override
-    public String formatSourceAndFixImports(JavaFormatterOptions options, String input) throws FormatterException {
+    public String formatSourceReflowStringsAndFixImports(JavaFormatterOptions options, String input)
+            throws FormatterException {
         return Formatter.createFormatter(options).formatSourceAndFixImports(input);
     }
 }
