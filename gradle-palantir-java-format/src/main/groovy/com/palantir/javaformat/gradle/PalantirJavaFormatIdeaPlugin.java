@@ -17,7 +17,6 @@
 package com.palantir.javaformat.gradle;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
 import java.io.File;
 import java.net.URI;
 import java.util.List;
@@ -31,35 +30,20 @@ import org.gradle.api.provider.Provider;
 import org.gradle.plugins.ide.idea.model.IdeaModel;
 import org.jetbrains.gradle.ext.TaskTriggersConfig;
 
-public class JavaFormatPlugin implements Plugin<Project> {
-
-    private static final String EXTENSION_NAME = "palantirJavaFormat";
+public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
         Preconditions.checkState(
-                project == project.getRootProject(), "May only apply com.palantir.java-format to the root project");
+                project == project.getRootProject(),
+                "May only apply com.palantir.java-format-idea to the root project");
 
-        JavaFormatExtension extension =
-                project.getExtensions().create(EXTENSION_NAME, JavaFormatExtension.class, project);
-
-        Configuration implConfiguration = project.getConfigurations().create("palantirJavaFormat", conf -> {
-            conf.setDescription("Internal configuration for resolving the palantirJavaFormat implementation");
-            conf.setVisible(false);
-            conf.setCanBeConsumed(false);
-            // Using addLater instead of afterEvaluate, in order to delay reading the extension until after the user
-            // has configured it.
-            conf.defaultDependencies(deps -> deps.addLater(project.provider(() -> {
-                String version = extension.getImplementationVersion().get();
-
-                return project.getDependencies().create(ImmutableMap.of(
-                        "group", "com.palantir.javaformat",
-                        "name", "palantir-java-format",
-                        "version", version));
-            })));
-        });
+        project.getPlugins().apply(PalantirJavaFormatProviderPlugin.class);
 
         project.getPluginManager().withPlugin("idea", ideaPlugin -> {
+            Configuration implConfiguration =
+                    project.getConfigurations().getByName(PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME);
+
             configureLegacyIdea(project, implConfiguration);
             configureIntelliJImport(project, implConfiguration);
         });

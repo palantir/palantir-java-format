@@ -15,8 +15,18 @@ gradlePlugin {
     plugins {
         palantirJavaFormat {
             id = 'com.palantir.java-format'
-            implementationClass = 'com.palantir.javaformat.gradle.JavaFormatPlugin'
+            implementationClass = 'com.palantir.javaformat.gradle.PalantirJavaFormatPlugin'
+            description = 'A modern, lambda-friendly, 120 character Java formatter.'
+        }
+        palantirJavaFormatIdea {
+            id = 'com.palantir.java-format-idea'
+            implementationClass = 'com.palantir.javaformat.gradle.PalantirJavaFormatIdeaPlugin'
             description = 'Plugin to configure the PalantirJavaFormat IDEA plugin based on an optional implementation version of the formatter.'
+        }
+        palantirJavaFormatProvider {
+            id = 'com.palantir.java-format-provider'
+            implementationClass = 'com.palantir.javaformat.gradle.PalantirJavaFormatProviderPlugin'
+            description = 'Exposes a configuration containing the palantir-java-format jarss'
         }
     }
 }
