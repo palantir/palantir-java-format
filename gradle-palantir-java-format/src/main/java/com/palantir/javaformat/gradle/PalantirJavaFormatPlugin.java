@@ -16,6 +16,8 @@
 
 package com.palantir.javaformat.gradle;
 
+import com.palantir.javaformat.java.FormatDiff;
+import java.io.IOException;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
@@ -29,6 +31,9 @@ public final class PalantirJavaFormatPlugin implements Plugin<Project> {
         project.getRootProject().getPlugins().apply(PalantirJavaFormatProviderPlugin.class);
         project.getPlugins().withId("java", p -> {
             project.getTasks().register("formatDiff", FormatDiffTask.class);
+
+            // TODO(dfox): in the future we may want to offer a simple 'format' task so people don't need to use
+            // spotless to try out our formatter
         });
     }
 
@@ -39,11 +44,8 @@ public final class PalantirJavaFormatPlugin implements Plugin<Project> {
         }
 
         @TaskAction
-        public final void formatDiff() {
-            Configuration _configuration = getProject().getRootProject().getConfigurations().getByName(
-                    PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME);
-            // TODO(dfox): serviceload the FormatDiff class from the configuration
-            // FormatDiff.formatDiff(getProject().getProjectDir().toPath());
+        public final void formatDiff() throws IOException, InterruptedException {
+            FormatDiff.formatDiff(getProject().getProjectDir().toPath());
         }
     }
 }
