@@ -22,7 +22,7 @@ apply from: rootProject.file('gradle/publish-jar.gradle')
 intellij {
     pluginName = "palantir-java-format"
     updateSinceUntilBuild = true
-    version = "IU-193.4697.15-EAP-SNAPSHOT"
+    version = "191.5849.21"
 }
 
 patchPluginXml {
