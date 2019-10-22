@@ -1,6 +1,17 @@
-type: break
-break:
-  description: Expose `formatSourceReflowStringsAndFixImports` from the API, which
-    formats a whole file returning the formatted file as a String, and remove JavaFormatterOptions altogether from the API.
-  links:
-  - https://github.com/palantir/palantir-java-format/pull/47
+changes:
+- type: break
+  break:
+    description: Rename `palantir-java-format-api` to `palantir-java-format-api`.
+    links:
+    - https://github.com/palantir/palantir-java-format/pull/47
+- type: break
+  break:
+    description: Remove `JavaFormatterOptions` altogether from the API, the style now being baked in to be PALANTIR.
+    links:
+      - https://github.com/palantir/palantir-java-format/pull/47
+- type: improvement
+  improvement:
+    description: Expose `formatSourceReflowStringsAndFixImports` from the SPI, which
+      formats a whole file returning the formatted file as a String.
+    links:
+      - https://github.com/palantir/palantir-java-format/pull/47
