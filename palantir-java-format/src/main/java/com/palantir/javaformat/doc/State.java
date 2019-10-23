@@ -19,6 +19,7 @@ package com.palantir.javaformat.doc;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.Indent;
 import com.palantir.javaformat.Output.BreakTag;
 import org.immutables.value.Value;
@@ -27,6 +28,7 @@ import org.immutables.value.Value.Parameter;
 /** State for writing. */
 @Value.Immutable
 @Value.Style(overshadowImplementation = true)
+@Immutable
 public abstract class State {
     /** Last indent that was actually taken. */
     public abstract int lastIndent();
