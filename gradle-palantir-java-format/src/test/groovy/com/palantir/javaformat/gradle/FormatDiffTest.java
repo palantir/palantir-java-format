@@ -46,8 +46,9 @@ class FormatDiffTest {
                         Paths.get("src/test/resources/com/palantir/javaformat/java/FormatDiffCliTest/example1.patch")),
                 StandardCharsets.UTF_8);
 
-        List<String> strings = FormatDiff.parseGitDiffOutput(example1).map(FormatDiff.SingleFileDiff::toString).collect(
-                Collectors.toList());
+        List<String> strings = FormatDiff.parseGitDiffOutput(example1)
+                .map(FormatDiff.SingleFileDiff::toString)
+                .collect(Collectors.toList());
         Assertions.assertEquals(
                 ImmutableList.of(
                         "SingleFileDiff{path=build.gradle, lineRanges=[[24..25), [29..30)]}",

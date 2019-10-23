@@ -53,18 +53,19 @@ public class DiagnosticTest {
 
     @Test
     public void parseError() throws Exception {
-        String input = Joiner.on('\n').join(
-                "public class InvalidSyntax {",
-                "  private static NumPrinter {",
-                "    public static void print(int n) {",
-                "      System.out.printf(\"%d%n\", n);",
-                "    }",
-                "  }",
-                "",
-                "  public static void main(String[] args) {",
-                "    NumPrinter.print(args.length);",
-                "  }",
-                "}");
+        String input = Joiner.on('\n')
+                .join(
+                        "public class InvalidSyntax {",
+                        "  private static NumPrinter {",
+                        "    public static void print(int n) {",
+                        "      System.out.printf(\"%d%n\", n);",
+                        "    }",
+                        "  }",
+                        "",
+                        "  public static void main(String[] args) {",
+                        "    NumPrinter.print(args.length);",
+                        "  }",
+                        "}");
 
         StringWriter stdout = new StringWriter();
         StringWriter stderr = new StringWriter();

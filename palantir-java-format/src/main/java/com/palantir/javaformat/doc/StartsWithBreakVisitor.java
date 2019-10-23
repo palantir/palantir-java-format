@@ -49,7 +49,10 @@ enum StartsWithBreakVisitor implements DocVisitor<Result> {
 
     @Override
     public Result visitLevel(Level doc) {
-        return doc.getDocs().stream().map(this::visit).filter(result -> result != Result.EMPTY).findFirst().orElse(
-                Result.EMPTY);
+        return doc.getDocs().stream()
+                .map(this::visit)
+                .filter(result -> result != Result.EMPTY)
+                .findFirst()
+                .orElse(Result.EMPTY);
     }
 }
