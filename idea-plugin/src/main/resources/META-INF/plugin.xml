@@ -11,12 +11,12 @@
   <depends>com.intellij.modules.lang</depends>
 
   <project-components>
-    <component>
-      <implementation-class>
-        com.palantir.javaformat.intellij.PalantirJavaFormatInstaller
-      </implementation-class>
-      <loadForDefaultProject/>
-    </component>
+<!--    <component>-->
+<!--      <implementation-class>-->
+<!--        com.palantir.javaformat.intellij.PalantirJavaFormatInstaller-->
+<!--      </implementation-class>-->
+<!--      <loadForDefaultProject/>-->
+<!--    </component>-->
     <component>
       <implementation-class>
         com.palantir.javaformat.intellij.InitialConfigurationComponent
@@ -29,6 +29,8 @@
                          id="palantir-java-format.settings"
                          displayName="palantir-java-format Settings"/>
     <projectService serviceImplementation="com.palantir.javaformat.intellij.PalantirJavaFormatSettings"/>
+    <externalFormatProcessor implementation="com.palantir.javaformat.intellij.PalantirExternalFormatProcessor"/>
+
   </extensions>
 
 </idea-plugin>
