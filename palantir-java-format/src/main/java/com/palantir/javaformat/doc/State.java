@@ -18,14 +18,14 @@ package com.palantir.javaformat.doc;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.Indent;
 import com.palantir.javaformat.Output.BreakTag;
 import fj.P;
 import fj.P2;
-import fj.data.HashMap;
 import fj.data.List;
+import fj.data.Set;
+import fj.data.TreeMap;
 import org.immutables.value.Value;
 import org.immutables.value.Value.Lazy;
 import org.immutables.value.Value.Parameter;
@@ -53,17 +53,17 @@ public abstract class State {
      */
     public abstract int branchingCoefficient();
 
-    protected abstract ImmutableSet<BreakTag> breakTagsTaken();
+    protected abstract Set<BreakTag> breakTagsTaken();
 
-    protected abstract ImmutableMap<Break, BreakState> breakStates();
+    protected abstract TreeMap<Break, BreakState> breakStates();
 
-    protected abstract ImmutableMap<Level, LevelState> levelStates();
+    protected abstract TreeMap<Level, LevelState> levelStates();
 
     protected abstract List<P2<Tok, TokState>> tokStates();
 
     @Lazy
-    protected HashMap<Tok, TokState> tokStatesAsMap() {
-        return HashMap.iterableHashMap(tokStates());
+    protected ImmutableMap<Tok, TokState> tokStatesAsMap() {
+        return tokStates().toCollection().stream().collect(ImmutableMap.toImmutableMap(P2::_1, P2::_2));
     }
 
     public static State startingState() {
@@ -74,46 +74,44 @@ public abstract class State {
                 .mustBreak(false)
                 .numLines(0)
                 .branchingCoefficient(0)
-                .breakTagsTaken(ImmutableSet.of())
-                .breakStates(ImmutableMap.of())
-                .levelStates(ImmutableMap.of())
+                .breakTagsTaken(Set.empty(HasUniqueId.ord()))
+                .breakStates(TreeMap.empty(HasUniqueId.ord()))
+                .levelStates(TreeMap.empty(HasUniqueId.ord()))
                 .tokStates(List.nil())
                 .build();
     }
 
     public BreakState getBreakState(Break brk) {
-        return breakStates().getOrDefault(brk, ImmutableBreakState.of(false, -1));
+        return breakStates().get(brk).orSome(ImmutableBreakState.of(false, -1));
     }
 
     public boolean wasBreakTaken(BreakTag breakTag) {
-        return breakTagsTaken().contains(breakTag);
+        return breakTagsTaken().member(breakTag);
     }
 
     boolean isOneLine(Level level) {
-        LevelState levelState = levelStates().get(level);
+        LevelState levelState = levelStates().get(level).toNull();
         return levelState != null && levelState.oneLine();
     }
 
     String getTokText(Tok tok) {
         return Preconditions.checkNotNull(
-                        tokStatesAsMap().get(tok).toNull(), "Expected Tok state to exist for: %s", tok)
+                        tokStatesAsMap().get(tok), "Expected Tok state to exist for: %s", tok)
                 .text();
     }
 
     /** Record whether break was taken. */
     State breakTaken(BreakTag breakTag, boolean broken) {
-        boolean currentlyBroken = breakTagsTaken().contains(breakTag);
+        boolean currentlyBroken = breakTagsTaken().member(breakTag);
         // TODO(dsanduleac): is the opposite ever a valid state?
         if (currentlyBroken != broken) {
+            Set<BreakTag> newSet;
             if (broken) {
-                return builder().from(this).addBreakTagsTaken(breakTag).build();
+                newSet = breakTagsTaken().insert(breakTag);
             } else {
-                return builder()
-                        .from(this)
-                        .breakTagsTaken(breakTagsTaken().stream().filter(it -> it != breakTag).collect(
-                                ImmutableSet.toImmutableSet()))
-                        .build();
+                newSet = breakTagsTaken().delete(breakTag);
             }
+            return builder().from(this).breakTagsTaken(newSet).build();
         }
         return this;
     }
@@ -147,7 +145,7 @@ public abstract class State {
                     .lastIndent(indent())
                     .column(newColumn)
                     .numLines(numLines() + 1)
-                    .putBreakStates(brk, ImmutableBreakState.of(true, newColumn))
+                    .breakStates(breakStates().set(brk, ImmutableBreakState.of(true, newColumn)))
                     .build();
         } else {
             return builder.column(column() + brk.getFlat().length()).build();
@@ -184,7 +182,7 @@ public abstract class State {
     }
 
     State withLevelState(Level level, LevelState levelState) {
-        return builder().from(this).putLevelStates(level, levelState).build();
+        return builder().from(this).levelStates(levelStates().set(level, levelState)).build();
     }
 
     State withTokState(Tok tok, TokState tokState) {
@@ -221,4 +219,5 @@ public abstract class State {
         @Parameter
         String text();
     }
+
 }

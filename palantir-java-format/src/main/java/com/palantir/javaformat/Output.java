@@ -18,13 +18,14 @@ import com.google.common.base.MoreObjects;
 import com.google.common.collect.Range;
 import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.OpsBuilder.BlankLineWanted;
+import com.palantir.javaformat.doc.HasUniqueId;
 import com.palantir.javaformat.doc.State;
 
 /** An output from the formatter. */
 public abstract class Output extends InputOutput {
     /** Unique identifier for a break. */
     @Immutable
-    public static final class BreakTag {}
+    public static final class BreakTag extends HasUniqueId {}
 
     /**
      * Indent by outputting {@code indent} spaces.

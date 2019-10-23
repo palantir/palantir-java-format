@@ -35,8 +35,7 @@ import java.util.function.Supplier;
  * represent non-token {@link Input.Tok}s, including comments and other white-space; {@link Space}s, representing single
  * spaces; and {@link Break}s, which represent optional line-breaks.
  */
-public abstract class Doc {
-
+public abstract class Doc extends HasUniqueId {
     static final Range<Integer> EMPTY_RANGE = Range.closedOpen(-1, -1);
     static final DiscreteDomain<Integer> INTEGERS = DiscreteDomain.integers();
 
