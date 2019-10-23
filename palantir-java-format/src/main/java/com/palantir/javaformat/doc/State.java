@@ -16,6 +16,7 @@
 
 package com.palantir.javaformat.doc;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.palantir.javaformat.Indent;
@@ -25,6 +26,7 @@ import org.immutables.value.Value.Parameter;
 
 /** State for writing. */
 @Value.Immutable
+@Value.Style(overshadowImplementation = true)
 public abstract class State {
     /** Last indent that was actually taken. */
     public abstract int lastIndent();
@@ -50,6 +52,8 @@ public abstract class State {
 
     protected abstract ImmutableMap<Level, LevelState> levelStates();
 
+    protected abstract ImmutableMap<Tok, TokState> tokStates();
+
     public static State startingState() {
         return builder()
                 .lastIndent(0)
@@ -61,6 +65,7 @@ public abstract class State {
                 .breakTagsTaken(ImmutableSet.of())
                 .breakStates(ImmutableMap.of())
                 .levelStates(ImmutableMap.of())
+                .tokStates(ImmutableMap.of())
                 .build();
     }
 
@@ -70,6 +75,15 @@ public abstract class State {
 
     public boolean wasBreakTaken(BreakTag breakTag) {
         return breakTagsTaken().contains(breakTag);
+    }
+
+    boolean isOneLine(Level level) {
+        LevelState levelState = levelStates().get(level);
+        return levelState != null && levelState.oneLine();
+    }
+
+    String getTokText(Tok tok) {
+        return Preconditions.checkNotNull(tokStates().get(tok), "Expected Tok state to exist for: %s", tok).text();
     }
 
     /** Record whether break was taken. */
@@ -135,6 +149,7 @@ public abstract class State {
                 .breakTagsTaken(state.breakTagsTaken())
                 .breakStates(state.breakStates())
                 .levelStates(state.levelStates())
+                .tokStates(state.tokStates())
                 .build();
     }
 
@@ -158,9 +173,8 @@ public abstract class State {
         return builder().from(this).putLevelStates(level, levelState).build();
     }
 
-    public boolean isOneLine(Level level) {
-        LevelState levelState = levelStates().get(level);
-        return levelState != null && levelState.oneLine();
+    State withTokState(Tok tok, TokState tokState) {
+        return builder().from(this).putTokStates(tok, tokState).build();
     }
 
     public static class Builder extends ImmutableState.Builder {}
@@ -170,6 +184,7 @@ public abstract class State {
     }
 
     @Value.Immutable
+    @Value.Style(overshadowImplementation = true)
     interface BreakState {
         @Parameter
         boolean broken();
@@ -179,9 +194,17 @@ public abstract class State {
     }
 
     @Value.Immutable
+    @Value.Style(overshadowImplementation = true)
     interface LevelState {
         /** True if the entire {@link Level} fits on one line. */
         @Parameter
         boolean oneLine();
+    }
+
+    @Value.Immutable
+    @Value.Style(overshadowImplementation = true)
+    interface TokState {
+        @Parameter
+        String text();
     }
 }
