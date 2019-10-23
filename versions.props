@@ -9,6 +9,7 @@ com.google.guava:guava-testlib = 27.0.1-jre
 com.google.truth:truth = 1.0
 com.google.testing.compile:compile-testing = 0.15
 org.derive4j:* = 1.1.1
+org.functionaljava:functionaljava = 4.8
 org.immutables:value = 2.7.5
 org.junit.jupiter:* = 5.5.2
 org.junit.vintage:* = 5.5.0
