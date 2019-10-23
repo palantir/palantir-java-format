@@ -34,14 +34,12 @@ import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.fileTypes.StdFileTypes;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.impl.CheckUtil;
-import com.intellij.psi.impl.source.codeStyle.CodeStyleManagerImpl;
 import com.intellij.util.IncorrectOperationException;
 import com.palantir.javaformat.java.FormatterException;
 import com.palantir.javaformat.java.FormatterService;
@@ -79,8 +77,8 @@ class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
     private final LoadingCache<Optional<List<URI>>, FormatterService> implementationCache =
             Caffeine.newBuilder().maximumSize(1).build(PalantirCodeStyleManager::createFormatter);
 
-    public PalantirCodeStyleManager(@NotNull Project project) {
-        super(new CodeStyleManagerImpl(project));
+    PalantirCodeStyleManager(@NotNull CodeStyleManager original) {
+        super(original);
     }
 
     static Map<TextRange, String> getReplacements(

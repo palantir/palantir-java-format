@@ -13,6 +13,12 @@
   <project-components>
     <component>
       <implementation-class>
+        com.palantir.javaformat.intellij.PalantirJavaFormatInstaller
+      </implementation-class>
+      <loadForDefaultProject/>
+    </component>
+    <component>
+      <implementation-class>
         com.palantir.javaformat.intellij.InitialConfigurationComponent
       </implementation-class>
     </component>
@@ -23,10 +29,6 @@
                          id="palantir-java-format.settings"
                          displayName="palantir-java-format Settings"/>
     <projectService serviceImplementation="com.palantir.javaformat.intellij.PalantirJavaFormatSettings"/>
-    <projectService serviceInterface="com.intellij.psi.codeStyle.CodeStyleManager"
-                    serviceImplementation="com.palantir.javaformat.intellij.PalantirCodeStyleManager"
-                    overrides="true"/>
   </extensions>
-
 
 </idea-plugin>
