@@ -103,7 +103,12 @@ public abstract class State {
     }
 
     State updateAfterLevel(State state) {
-        return builder().from(this).column(state.column()).numLines(state.numLines()).build();
+        return builder()
+                .from(this)
+                .column(state.column())
+                .numLines(state.numLines())
+                .breaksTaken(state.breaksTaken())
+                .build();
     }
 
     State addNewLines(int extraNewlines) {
