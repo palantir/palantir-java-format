@@ -16,7 +16,9 @@
 
 package com.palantir.javaformat.doc;
 
+import com.google.common.collect.ImmutableMap;
 import com.palantir.javaformat.Indent;
+import com.palantir.javaformat.Output.BreakTag;
 import org.immutables.value.Value;
 
 /** State for writing. */
@@ -40,14 +42,31 @@ public abstract class State {
      */
     public abstract int branchingCoefficient();
 
-    public static class Builder extends ImmutableState.Builder {}
-
-    public static Builder builder() {
-        return new Builder();
-    }
+    public abstract ImmutableMap<BreakTag, Boolean> breaksTaken();
 
     public static State startingState() {
-        return builder().lastIndent(0).indent(0).column(0).mustBreak(false).numLines(0).branchingCoefficient(0).build();
+        return builder()
+                .lastIndent(0)
+                .indent(0)
+                .column(0)
+                .mustBreak(false)
+                .numLines(0)
+                .branchingCoefficient(0)
+                .breaksTaken(ImmutableMap.of())
+                .build();
+    }
+
+    /** Record whether break was taken. */
+    public State breakTaken(BreakTag breakTag, boolean broken) {
+        Boolean currentValue = breaksTaken().get(breakTag);
+        if ((currentValue == null && broken) || (currentValue != null && currentValue != broken)) {
+            return builder().from(this).putBreaksTaken(breakTag, broken).build();
+        }
+        return this;
+    }
+
+    public boolean wasBreakTaken(BreakTag breakTag) {
+        return breaksTaken().getOrDefault(breakTag, false);
     }
 
     /**
@@ -55,7 +74,7 @@ public abstract class State {
      * not commit to the indent just yet though, so lastIndent stays the same.
      */
     State withIndentIncrementedBy(Indent plusIndent) {
-        return builder().from(this).indent(indent() + plusIndent.eval()).mustBreak(false).build();
+        return builder().from(this).indent(indent() + plusIndent.eval(this)).mustBreak(false).build();
     }
 
     /** Reset any accumulated indent to the same value as {@code lastIndent}. */
@@ -69,7 +88,7 @@ public abstract class State {
     }
 
     State withBreak(Break brk) {
-        int newColumn = Math.max(indent() + brk.evalPlusIndent(), 0);
+        int newColumn = Math.max(indent() + brk.evalPlusIndent(this), 0);
         // lastIndent = indent -- we've proven that we wrote some stuff at the new 'indent' so commit
         // to it
         return builder().from(this).lastIndent(indent()).column(newColumn).numLines(numLines() + 1).build();
@@ -93,5 +112,11 @@ public abstract class State {
 
     State withNewBranch() {
         return builder().from(this).branchingCoefficient(branchingCoefficient() + 1).build();
+    }
+
+    public static class Builder extends ImmutableState.Builder {}
+
+    public static Builder builder() {
+        return new Builder();
     }
 }

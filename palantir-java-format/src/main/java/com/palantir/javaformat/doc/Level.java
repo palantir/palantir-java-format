@@ -133,8 +133,7 @@ public final class Level extends Doc {
         float thisWidth = getWidth();
         if (state.column() + thisWidth <= maxWidth) {
             oneLine = true;
-            // Fix all breaks in this level, recursively.
-            ClearBreaksVisitor.INSTANCE.visitLevel(this);
+            // TODO still need to fix all breaks in this level?
             return state.withColumn(state.column() + (int) thisWidth);
         }
         oneLine = false;
@@ -320,7 +319,7 @@ public final class Level extends Doc {
 
             // Enforce our assumption.
             if (lastLevel.docs.size() > 1) {
-                assertStartsWithBreakOrEmpty(lastLevel.docs.get(1));
+                assertStartsWithBreakOrEmpty(state, lastLevel.docs.get(1));
             }
 
             if (!enoughRoom) {
@@ -335,11 +334,11 @@ public final class Level extends Doc {
         return Optional.of(lastLevel.computeBreaks(commentsHelper, maxWidth, state1));
     }
 
-    private static void assertStartsWithBreakOrEmpty(Doc doc) {
+    private static void assertStartsWithBreakOrEmpty(State state, Doc doc) {
         Preconditions.checkState(
                 StartsWithBreakVisitor.INSTANCE.visit(doc) != Result.NO,
                 "Doc should have started with a break but didn't:\n%s",
-                new LevelDelimitedFlatValueDocVisitor().visit(doc));
+                new LevelDelimitedFlatValueDocVisitor(state).visit(doc));
     }
 
     /**
@@ -430,24 +429,25 @@ public final class Level extends Doc {
     }
 
     @Override
-    public void write(Output output) {
+    public void write(State state, Output output) {
+        // TODO derive 'oneLine' from state
         if (oneLine) {
-            output.append(getFlat(), range()); // This is defined because width is finite.
+            output.append(state, getFlat(), range()); // This is defined because width is finite.
         } else {
-            writeFilled(output);
+            writeFilled(state, output);
         }
     }
 
-    private void writeFilled(Output output) {
+    private void writeFilled(State state, Output output) {
         // Handle first split.
         for (Doc doc : splits.get(0)) {
-            doc.write(output);
+            doc.write(state, output);
         }
         // Handle following breaks and split.
         for (int i = 0; i < breaks.size(); i++) {
-            breaks.get(i).write(output);
+            breaks.get(i).write(state, output);
             for (Doc doc : splits.get(i + 1)) {
-                doc.write(output);
+                doc.write(state, output);
             }
         }
     }
@@ -473,8 +473,8 @@ public final class Level extends Doc {
     }
 
     /** An indented representation of this level and all nested levels inside it. */
-    String representation() {
-        return new LevelDelimitedFlatValueDocVisitor().visit(this);
+    String representation(State state) {
+        return new LevelDelimitedFlatValueDocVisitor(state).visit(this);
     }
 
     /**

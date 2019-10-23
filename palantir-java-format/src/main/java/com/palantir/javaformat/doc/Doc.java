@@ -97,5 +97,5 @@ public abstract class Doc {
     public abstract State computeBreaks(CommentsHelper commentsHelper, int maxWidth, State state);
 
     /** Write a {@code Doc} to an {@link Output}, after breaking decisions have been made. */
-    public abstract void write(Output output);
+    public abstract void write(State state, Output output);
 }

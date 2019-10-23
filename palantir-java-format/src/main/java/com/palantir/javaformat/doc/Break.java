@@ -22,7 +22,6 @@ import com.palantir.javaformat.CommentsHelper;
 import com.palantir.javaformat.Indent;
 import com.palantir.javaformat.Op;
 import com.palantir.javaformat.Output;
-import com.palantir.javaformat.Output.BreakTag;
 import java.util.Optional;
 
 /** A leaf node in a {@link Doc} for an optional break. */
@@ -84,9 +83,10 @@ public final class Break extends Doc implements Op {
      * Return the {@code Break}'s extra indent.
      *
      * @return the extra indent
+     * @param state
      */
-    public int evalPlusIndent() {
-        return plusIndent.eval();
+    public int evalPlusIndent(State state) {
+        return plusIndent.eval(state);
     }
 
     Indent getPlusIndent() {
@@ -122,18 +122,8 @@ public final class Break extends Doc implements Op {
         return EMPTY_RANGE;
     }
 
-    /**
-     * For use only by {@link ClearBreaksVisitor}. Use case: ensure fresh state when we decide a level should be
-     * oneLine, because its inner breaks might have been previously broken in a different branch.
-     */
-    void clearBreak() {
-        optTag.ifPresent(BreakTag::reset);
-    }
-
-    public State computeBreaks(State state, boolean broken) {
-        if (optTag.isPresent()) {
-            optTag.get().recordBroken(broken);
-        }
+    public State computeBreaks(State stateIn, boolean broken) {
+        State state = optTag.map(breakTag -> stateIn.breakTaken(breakTag, broken)).orElse(stateIn);
 
         if (broken) {
             this.broken = true;
@@ -157,12 +147,13 @@ public final class Break extends Doc implements Op {
     }
 
     @Override
-    public void write(Output output) {
+    public void write(State state, Output output) {
+        // TODO get 'broken' from state
         if (broken) {
-            output.append("\n", EMPTY_RANGE);
+            output.append(state, "\n", EMPTY_RANGE);
             output.indent(newIndent);
         } else {
-            output.append(flat, range());
+            output.append(state, flat, range());
         }
     }
 

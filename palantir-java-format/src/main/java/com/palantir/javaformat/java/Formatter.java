@@ -154,8 +154,9 @@ public final class Formatter {
         builder.sync(javaInput.getText().length());
         builder.drain();
         Doc doc = new DocBuilder().withOps(builder.build()).build();
-        doc.computeBreaks(javaOutput.getCommentsHelper(), options.maxLineLength(), State.startingState());
-        doc.write(javaOutput);
+        State finalState =
+                doc.computeBreaks(javaOutput.getCommentsHelper(), options.maxLineLength(), State.startingState());
+        doc.write(finalState, javaOutput);
         javaOutput.flush();
     }
 

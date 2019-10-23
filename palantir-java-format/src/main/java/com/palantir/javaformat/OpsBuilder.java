@@ -26,6 +26,7 @@ import com.palantir.javaformat.doc.Doc;
 import com.palantir.javaformat.doc.DocBuilder;
 import com.palantir.javaformat.doc.FillMode;
 import com.palantir.javaformat.doc.Space;
+import com.palantir.javaformat.doc.State;
 import com.palantir.javaformat.doc.Tok;
 import com.palantir.javaformat.doc.Token;
 import com.palantir.javaformat.java.FormatterDiagnostic;
@@ -87,7 +88,7 @@ public final class OpsBuilder {
         public static final BlankLineWanted PRESERVE = new SimpleBlankLine(/* wanted= */ Optional.empty());
 
         /** Is the blank line wanted? */
-        public abstract Optional<Boolean> wanted();
+        public abstract Optional<Boolean> wanted(State state);
 
         /** Merge this blank line request with another. */
         public abstract BlankLineWanted merge(BlankLineWanted wanted);
@@ -105,7 +106,7 @@ public final class OpsBuilder {
             }
 
             @Override
-            public Optional<Boolean> wanted() {
+            public Optional<Boolean> wanted(State _state) {
                 return wanted;
             }
 
@@ -124,9 +125,9 @@ public final class OpsBuilder {
             }
 
             @Override
-            public Optional<Boolean> wanted() {
+            public Optional<Boolean> wanted(State state) {
                 for (BreakTag tag : tags) {
-                    if (tag.wasBreakTaken()) {
+                    if (state.wasBreakTaken(tag)) {
                         return Optional.of(true);
                     }
                 }
@@ -602,7 +603,7 @@ public final class OpsBuilder {
             if (afterForcedBreak
                     && (op instanceof Space
                             || (op instanceof Break
-                                    && ((Break) op).evalPlusIndent() == 0
+                                    && ((Break) op).evalPlusIndent(State.startingState()) == 0
                                     && " ".equals(((Doc) op).getFlat())))) {
                 continue;
             }

@@ -63,8 +63,8 @@ public final class Space extends Doc implements Op {
     }
 
     @Override
-    public void write(Output output) {
-        output.append(" ", range());
+    public void write(State state, Output output) {
+        output.append(state, " ", range());
     }
 
     @Override

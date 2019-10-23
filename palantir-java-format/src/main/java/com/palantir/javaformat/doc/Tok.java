@@ -91,8 +91,8 @@ public final class Tok extends Doc implements Op {
     }
 
     @Override
-    public void write(Output output) {
-        output.append(text, range());
+    public void write(State state, Output output) {
+        output.append(state, text, range());
     }
 
     @Override
