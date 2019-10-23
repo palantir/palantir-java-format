@@ -16,10 +16,12 @@
 
 package com.palantir.javaformat.doc;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.palantir.javaformat.Indent;
 import com.palantir.javaformat.Output.BreakTag;
 import org.immutables.value.Value;
+import org.immutables.value.Value.Parameter;
 
 /** State for writing. */
 @Value.Immutable
@@ -42,7 +44,9 @@ public abstract class State {
      */
     public abstract int branchingCoefficient();
 
-    public abstract ImmutableSet<BreakTag> breaksTaken();
+    protected abstract ImmutableSet<BreakTag> breakTagsTaken();
+
+    protected abstract ImmutableMap<Break, BreakState> breakStates();
 
     public static State startingState() {
         return builder()
@@ -52,20 +56,26 @@ public abstract class State {
                 .mustBreak(false)
                 .numLines(0)
                 .branchingCoefficient(0)
-                .breaksTaken(ImmutableSet.of())
+                .breakTagsTaken(ImmutableSet.of())
+                .breakStates(ImmutableMap.of())
                 .build();
+    }
+
+    public BreakState getBreakState(Break brk) {
+        return breakStates().getOrDefault(brk, ImmutableBreakState.of(false, -1));
     }
 
     /** Record whether break was taken. */
     public State breakTaken(BreakTag breakTag, boolean broken) {
-        boolean currentlyBroken = breaksTaken().contains(breakTag);
+        boolean currentlyBroken = breakTagsTaken().contains(breakTag);
+        // TODO(dsanduleac): is the opposite ever a valid state?
         if (currentlyBroken != broken) {
             if (broken) {
-                return builder().from(this).addBreaksTaken(breakTag).build();
+                return builder().from(this).addBreakTagsTaken(breakTag).build();
             } else {
                 return builder()
                         .from(this)
-                        .breaksTaken(breaksTaken().stream().filter(it -> it != breakTag).collect(
+                        .breakTagsTaken(breakTagsTaken().stream().filter(it -> it != breakTag).collect(
                                 ImmutableSet.toImmutableSet()))
                         .build();
             }
@@ -74,7 +84,7 @@ public abstract class State {
     }
 
     public boolean wasBreakTaken(BreakTag breakTag) {
-        return breaksTaken().contains(breakTag);
+        return breakTagsTaken().contains(breakTag);
     }
 
     /**
@@ -95,11 +105,22 @@ public abstract class State {
         return builder().from(this).lastIndent(indent()).build();
     }
 
-    State withBreak(Break brk) {
-        int newColumn = Math.max(indent() + brk.evalPlusIndent(this), 0);
-        // lastIndent = indent -- we've proven that we wrote some stuff at the new 'indent' so commit
-        // to it
-        return builder().from(this).lastIndent(indent()).column(newColumn).numLines(numLines() + 1).build();
+    State withBreak(Break brk, boolean broken) {
+        Builder builder = builder().from(this);
+
+        if (broken) {
+            int newColumn = Math.max(indent() + brk.evalPlusIndent(this), 0);
+
+            return builder
+                    // lastIndent = indent -- we've proven that we wrote some stuff at the new 'indent'
+                    .lastIndent(indent())
+                    .column(newColumn)
+                    .numLines(numLines() + 1)
+                    .putBreakStates(brk, ImmutableBreakState.of(true, newColumn))
+                    .build();
+        } else {
+            return builder.column(column() + brk.getFlat().length()).build();
+        }
     }
 
     State updateAfterLevel(State state) {
@@ -107,7 +128,9 @@ public abstract class State {
                 .from(this)
                 .column(state.column())
                 .numLines(state.numLines())
-                .breaksTaken(state.breaksTaken())
+                // TODO(dsanduleac): put these behind a "GlobalState"
+                .breakTagsTaken(state.breakTagsTaken())
+                .breakStates(state.breakStates())
                 .build();
     }
 
@@ -131,5 +154,14 @@ public abstract class State {
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    @Value.Immutable
+    interface BreakState {
+        @Parameter
+        boolean broken();
+
+        @Parameter
+        int newIndent();
     }
 }

@@ -18,21 +18,21 @@ package com.palantir.javaformat.doc;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Range;
+import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.CommentsHelper;
 import com.palantir.javaformat.Indent;
 import com.palantir.javaformat.Op;
 import com.palantir.javaformat.Output;
+import com.palantir.javaformat.doc.State.BreakState;
 import java.util.Optional;
 
 /** A leaf node in a {@link Doc} for an optional break. */
+@Immutable
 public final class Break extends Doc implements Op {
     private final FillMode fillMode;
     private final String flat;
     private final Indent plusIndent;
     private final Optional<Output.BreakTag> optTag;
-
-    private boolean broken;
-    private int newIndent;
 
     private Break(FillMode fillMode, String flat, Indent plusIndent, Optional<Output.BreakTag> optTag) {
         this.fillMode = fillMode;
@@ -124,17 +124,7 @@ public final class Break extends Doc implements Op {
 
     public State computeBreaks(State stateIn, boolean broken) {
         State state = optTag.map(breakTag -> stateIn.breakTaken(breakTag, broken)).orElse(stateIn);
-
-        if (broken) {
-            this.broken = true;
-            State newState = state.withBreak(this);
-            this.newIndent = newState.column();
-            return newState;
-        } else {
-            this.broken = false;
-            this.newIndent = -1;
-            return state.withColumn(state.column() + flat.length());
-        }
+        return state.withBreak(this, broken);
     }
 
     @Override
@@ -148,10 +138,10 @@ public final class Break extends Doc implements Op {
 
     @Override
     public void write(State state, Output output) {
-        // TODO get 'broken' from state
-        if (broken) {
+        BreakState breakState = state.getBreakState(this);
+        if (breakState.broken()) {
             output.append(state, "\n", EMPTY_RANGE);
-            output.indent(newIndent);
+            output.indent(breakState.newIndent());
         } else {
             output.append(state, flat, range());
         }

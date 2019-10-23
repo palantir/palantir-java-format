@@ -133,7 +133,6 @@ public final class Level extends Doc {
         float thisWidth = getWidth();
         if (state.column() + thisWidth <= maxWidth) {
             oneLine = true;
-            // TODO still need to fix all breaks in this level?
             return state.withColumn(state.column() + (int) thisWidth);
         }
         oneLine = false;
