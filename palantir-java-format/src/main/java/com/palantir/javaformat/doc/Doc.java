@@ -19,6 +19,7 @@ package com.palantir.javaformat.doc;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.DiscreteDomain;
 import com.google.common.collect.Range;
+import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.CommentsHelper;
 import com.palantir.javaformat.Input;
 import com.palantir.javaformat.Op;
@@ -39,9 +40,12 @@ public abstract class Doc {
     static final Range<Integer> EMPTY_RANGE = Range.closedOpen(-1, -1);
     static final DiscreteDomain<Integer> INTEGERS = DiscreteDomain.integers();
 
-    private final Supplier<Float> memoizedWidth = Suppliers.memoize(this::computeWidth);
-    private final Supplier<String> memoizedFlat = Suppliers.memoize(this::computeFlat);
-    private final Supplier<Range<Integer>> memoizedRange = Suppliers.memoize(this::computeRange);
+    @Immutable
+    interface ImmutableSupplier<T> extends Supplier<T> {}
+
+    private final ImmutableSupplier<Float> memoizedWidth = Suppliers.memoize(this::computeWidth)::get;
+    private final ImmutableSupplier<String> memoizedFlat = Suppliers.memoize(this::computeFlat)::get;
+    private final ImmutableSupplier<Range<Integer>> memoizedRange = Suppliers.memoize(this::computeRange)::get;
 
     /**
      * Return the width of a {@code Doc}, or {@code Float.POSITIVE_INFINITY} if it must be broken.
