@@ -48,6 +48,8 @@ public abstract class State {
 
     protected abstract ImmutableMap<Break, BreakState> breakStates();
 
+    protected abstract ImmutableMap<Level, LevelState> levelStates();
+
     public static State startingState() {
         return builder()
                 .lastIndent(0)
@@ -58,6 +60,7 @@ public abstract class State {
                 .branchingCoefficient(0)
                 .breakTagsTaken(ImmutableSet.of())
                 .breakStates(ImmutableMap.of())
+                .levelStates(ImmutableMap.of())
                 .build();
     }
 
@@ -65,8 +68,12 @@ public abstract class State {
         return breakStates().getOrDefault(brk, ImmutableBreakState.of(false, -1));
     }
 
+    public boolean wasBreakTaken(BreakTag breakTag) {
+        return breakTagsTaken().contains(breakTag);
+    }
+
     /** Record whether break was taken. */
-    public State breakTaken(BreakTag breakTag, boolean broken) {
+    State breakTaken(BreakTag breakTag, boolean broken) {
         boolean currentlyBroken = breakTagsTaken().contains(breakTag);
         // TODO(dsanduleac): is the opposite ever a valid state?
         if (currentlyBroken != broken) {
@@ -81,10 +88,6 @@ public abstract class State {
             }
         }
         return this;
-    }
-
-    public boolean wasBreakTaken(BreakTag breakTag) {
-        return breakTagsTaken().contains(breakTag);
     }
 
     /**
@@ -131,6 +134,7 @@ public abstract class State {
                 // TODO(dsanduleac): put these behind a "GlobalState"
                 .breakTagsTaken(state.breakTagsTaken())
                 .breakStates(state.breakStates())
+                .levelStates(state.levelStates())
                 .build();
     }
 
@@ -150,6 +154,15 @@ public abstract class State {
         return builder().from(this).branchingCoefficient(branchingCoefficient() + 1).build();
     }
 
+    State withLevelState(Level level, LevelState levelState) {
+        return builder().from(this).putLevelStates(level, levelState).build();
+    }
+
+    public boolean isOneLine(Level level) {
+        LevelState levelState = levelStates().get(level);
+        return levelState != null && levelState.oneLine();
+    }
+
     public static class Builder extends ImmutableState.Builder {}
 
     public static Builder builder() {
@@ -163,5 +176,12 @@ public abstract class State {
 
         @Parameter
         int newIndent();
+    }
+
+    @Value.Immutable
+    interface LevelState {
+        /** True if the entire {@link Level} fits on one line. */
+        @Parameter
+        boolean oneLine();
     }
 }

@@ -51,13 +51,6 @@ public final class Level extends Doc {
     private final Optional<String> debugName;
     private final List<Doc> docs = new ArrayList<>(); // The elements of the level.
 
-    // State that needs to be preserved between calculating breaks and
-    // writing output.
-    // TODO(cushon): represent phases as separate immutable data.
-
-    /** True if the entire {@link Level} fits on one line. */
-    boolean oneLine = false;
-
     /** Groups of {@link Doc}s that are children of the current {@link Level}, separated by {@link Break}s. */
     List<List<Doc>> splits = new ArrayList<>();
 
@@ -132,10 +125,9 @@ public final class Level extends Doc {
     public State computeBreaks(CommentsHelper commentsHelper, int maxWidth, State state) {
         float thisWidth = getWidth();
         if (state.column() + thisWidth <= maxWidth) {
-            oneLine = true;
-            return state.withColumn(state.column() + (int) thisWidth);
+            return state.withColumn(state.column() + (int) thisWidth)
+                    .withLevelState(this, ImmutableLevelState.of(true));
         }
-        oneLine = false;
 
         State newState = breakBehaviour.match(new BreakImpl(commentsHelper, maxWidth, state));
 
@@ -193,19 +185,19 @@ public final class Level extends Doc {
         public State breakOnlyIfInnerLevelsThenFitOnOneLine(boolean keepIndentWhenInlined) {
             State broken = breakNormally();
             Optional<State> maybeInlined = handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
-                    commentsHelper, maxWidth, this.state, keepIndentWhenInlined);
+                    commentsHelper, maxWidth, this.state, broken, keepIndentWhenInlined);
             return maybeInlined.orElse(broken);
         }
     }
 
     private Optional<State> handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
-            CommentsHelper commentsHelper, int maxWidth, State state, boolean keepIndent) {
+            CommentsHelper commentsHelper, int maxWidth, State state, State brokenState, boolean keepIndent) {
         List<Level> innerLevels = this.docs.stream()
                 .filter(doc -> doc instanceof Level)
                 .map(doc -> ((Level) doc))
                 .collect(Collectors.toList());
 
-        boolean anyLevelWasBroken = innerLevels.stream().anyMatch(level -> !level.oneLine);
+        boolean anyLevelWasBroken = innerLevels.stream().anyMatch(level -> !brokenState.isOneLine(level));
 
         boolean prefixFits = false;
         if (anyLevelWasBroken) {
@@ -280,12 +272,6 @@ public final class Level extends Doc {
 
         // manually add the last level to the last split
         getLast(splits).add(lastLevel);
-
-        // When recursing into a level, ensure we clear its oneLine.
-        // We have to do this because of branching and because oneLine is mutable.
-        if (recursive) {
-            oneLine = false;
-        }
 
         // Ok now how to handle the last level?
         // There are two options:
@@ -429,8 +415,7 @@ public final class Level extends Doc {
 
     @Override
     public void write(State state, Output output) {
-        // TODO derive 'oneLine' from state
-        if (oneLine) {
+        if (state.isOneLine(this)) {
             output.append(state, getFlat(), range()); // This is defined because width is finite.
         } else {
             writeFilled(state, output);
