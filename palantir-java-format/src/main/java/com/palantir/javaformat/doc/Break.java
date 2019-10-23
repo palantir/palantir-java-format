@@ -138,12 +138,12 @@ public final class Break extends Doc implements Op {
         if (broken) {
             this.broken = true;
             State newState = state.withBreak(this);
-            this.newIndent = newState.column;
+            this.newIndent = newState.column();
             return newState;
         } else {
             this.broken = false;
             this.newIndent = -1;
-            return state.withColumn(state.column + flat.length());
+            return state.withColumn(state.column() + flat.length());
         }
     }
 

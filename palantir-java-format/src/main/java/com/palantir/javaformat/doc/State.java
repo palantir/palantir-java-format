@@ -16,39 +16,38 @@
 
 package com.palantir.javaformat.doc;
 
-import com.google.common.base.MoreObjects;
 import com.palantir.javaformat.Indent;
+import org.immutables.value.Value;
 
 /** State for writing. */
-public final class State {
+@Value.Immutable
+public abstract class State {
     /** Last indent that was actually taken. */
-    final int lastIndent;
+    public abstract int lastIndent();
     /** Next indent, if the level is about to be broken. */
-    final int indent;
+    public abstract int indent();
 
-    final int column;
-    final boolean mustBreak;
+    public abstract int column();
+
+    public abstract boolean mustBreak();
     /** Counts how many lines a particular formatting took. */
-    final int numLines;
+    public abstract int numLines();
     /**
      * Counts how many times reached a branch, where multiple formattings would be considered. Expected runtime is
      * exponential in this number.
      *
      * @see State#withNewBranch()
      */
-    final int branchingCoefficient;
+    public abstract int branchingCoefficient();
 
-    State(int lastIndent, int indent, int column, boolean mustBreak, int numLines, int branchingCoefficient) {
-        this.lastIndent = lastIndent;
-        this.indent = indent;
-        this.column = column;
-        this.mustBreak = mustBreak;
-        this.numLines = numLines;
-        this.branchingCoefficient = branchingCoefficient;
+    public static class Builder extends ImmutableState.Builder {}
+
+    public static Builder builder() {
+        return new Builder();
     }
 
-    public State(int indent0, int column0) {
-        this(indent0, indent0, column0, false, 0, 0);
+    public static State startingState() {
+        return builder().lastIndent(0).indent(0).column(0).mustBreak(false).numLines(0).branchingCoefficient(0).build();
     }
 
     /**
@@ -56,53 +55,43 @@ public final class State {
      * not commit to the indent just yet though, so lastIndent stays the same.
      */
     State withIndentIncrementedBy(Indent plusIndent) {
-        return new State(lastIndent, indent + plusIndent.eval(), column, false, numLines, branchingCoefficient);
+        return builder().from(this).indent(indent() + plusIndent.eval()).mustBreak(false).build();
     }
 
     /** Reset any accumulated indent to the same value as {@code lastIndent}. */
     State withNoIndent() {
-        return new State(lastIndent, lastIndent, column, false, numLines, branchingCoefficient);
+        return builder().from(this).indent(lastIndent()).mustBreak(false).build();
     }
 
     /** The current level is being broken and it has breaks in it. Commit to the indent. */
     State withBrokenLevel() {
-        return new State(indent, indent, column, mustBreak, numLines, branchingCoefficient);
+        return builder().from(this).lastIndent(indent()).build();
     }
 
     State withBreak(Break brk) {
-        int newColumn = Math.max(indent + brk.evalPlusIndent(), 0);
+        int newColumn = Math.max(indent() + brk.evalPlusIndent(), 0);
         // lastIndent = indent -- we've proven that we wrote some stuff at the new 'indent' so commit
         // to it
-        return new State(indent, indent, newColumn, mustBreak, numLines + 1, branchingCoefficient);
+        return builder().from(this).lastIndent(indent()).column(newColumn).numLines(numLines() + 1).build();
     }
 
     State updateAfterLevel(State state) {
-        return new State(lastIndent, indent, state.column, mustBreak, state.numLines, branchingCoefficient);
+        return builder().from(this).column(state.column()).numLines(state.numLines()).build();
     }
 
     State addNewLines(int extraNewlines) {
-        return new State(lastIndent, indent, column, mustBreak, numLines + extraNewlines, branchingCoefficient);
+        return builder().from(this).numLines(numLines() + extraNewlines).build();
     }
 
     State withColumn(int column) {
-        return new State(lastIndent, indent, column, mustBreak, numLines, branchingCoefficient);
+        return builder().from(this).column(column).build();
     }
 
     State withMustBreak(boolean mustBreak) {
-        return new State(lastIndent, indent, column, mustBreak, numLines, branchingCoefficient);
+        return builder().from(this).mustBreak(mustBreak).build();
     }
 
     State withNewBranch() {
-        return new State(lastIndent, indent, column, mustBreak, numLines, branchingCoefficient + 1);
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("lastIndent", lastIndent)
-                .add("indent", indent)
-                .add("column", column)
-                .add("mustBreak", mustBreak)
-                .toString();
+        return builder().from(this).branchingCoefficient(branchingCoefficient() + 1).build();
     }
 }

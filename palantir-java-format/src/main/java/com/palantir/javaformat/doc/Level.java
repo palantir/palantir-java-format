@@ -131,11 +131,11 @@ public final class Level extends Doc {
     @Override
     public State computeBreaks(CommentsHelper commentsHelper, int maxWidth, State state) {
         float thisWidth = getWidth();
-        if (state.column + thisWidth <= maxWidth) {
+        if (state.column() + thisWidth <= maxWidth) {
             oneLine = true;
             // Fix all breaks in this level, recursively.
             ClearBreaksVisitor.INSTANCE.visitLevel(this);
-            return state.withColumn(state.column + (int) thisWidth);
+            return state.withColumn(state.column() + (int) thisWidth);
         }
         oneLine = false;
 
@@ -166,7 +166,7 @@ public final class Level extends Doc {
 
         @Override
         public State preferBreakingLastInnerLevel(boolean _keepIndentWhenInlined) {
-            if (state.branchingCoefficient < MAX_BRANCHING_COEFFICIENT) {
+            if (state.branchingCoefficient() < MAX_BRANCHING_COEFFICIENT) {
                 // Try both breaking and not breaking. Choose the better one based on LOC, preferring
                 // breaks if the outcome is the same.
 
@@ -180,7 +180,7 @@ public final class Level extends Doc {
                         tryBreakLastLevel(commentsHelper, maxWidth, state1.withNoIndent(), false);
 
                 if (lastLevelBroken.isPresent()) {
-                    if (lastLevelBroken.get().numLines < broken.numLines) {
+                    if (lastLevelBroken.get().numLines() < broken.numLines()) {
                         return lastLevelBroken.get();
                     }
                     // Must run computeBroken once again, because our last tryBreakLastLevel run modified
@@ -231,9 +231,9 @@ public final class Level extends Doc {
             // Potentially add the width of prefixes we want to consider as part of the width that
             // must fit on the same line, so that we don't accidentally break prefixes when we could
             // have avoided doing so.
-            leadingWidth += new CountWidthUntilBreakVisitor(maxWidth - state.indent).visit(lastLevel);
+            leadingWidth += new CountWidthUntilBreakVisitor(maxWidth - state.indent()).visit(lastLevel);
 
-            boolean fits = !Float.isInfinite(leadingWidth) && state.column + leadingWidth <= maxWidth;
+            boolean fits = !Float.isInfinite(leadingWidth) && state.column() + leadingWidth <= maxWidth;
 
             if (fits) {
                 prefixFits = true;
@@ -265,7 +265,7 @@ public final class Level extends Doc {
         List<Doc> leadingDocs = docs.subList(0, docs.size() - 1);
         float leadingWidth = getWidth(leadingDocs);
 
-        if (state.column + leadingWidth > maxWidth) {
+        if (state.column() + leadingWidth > maxWidth) {
             return Optional.empty();
         }
 
@@ -278,7 +278,7 @@ public final class Level extends Doc {
 
         State state1 = tryToLayOutLevelOnOneLine(commentsHelper, maxWidth, state);
         Preconditions.checkState(
-                !state1.mustBreak, "We messed up, it wants to break a bunch of splits that shouldn't be broken");
+                !state1.mustBreak(), "We messed up, it wants to break a bunch of splits that shouldn't be broken");
 
         // manually add the last level to the last split
         getLast(splits).add(lastLevel);
@@ -316,7 +316,7 @@ public final class Level extends Doc {
             // it might be nested somewhere deep in the 2nd level.
 
             float firstLevelWidth = lastLevel.docs.get(0).getWidth();
-            boolean enoughRoom = state1.column + firstLevelWidth <= maxWidth;
+            boolean enoughRoom = state1.column() + firstLevelWidth <= maxWidth;
 
             // Enforce our assumption.
             if (lastLevel.docs.size() > 1) {
@@ -359,7 +359,7 @@ public final class Level extends Doc {
 
             List<Doc> split = splits.get(i);
             float splitWidth = getWidth(split);
-            boolean enoughRoom = state.column + splitWidth <= maxWidth;
+            boolean enoughRoom = state.column() + splitWidth <= maxWidth;
             state = computeSplit(commentsHelper, maxWidth, split, state.withMustBreak(false));
             if (!enoughRoom) {
                 state = state.withMustBreak(true);
@@ -408,13 +408,13 @@ public final class Level extends Doc {
         float breakWidth = optBreakDoc.isPresent() ? optBreakDoc.get().getWidth() : 0.0F;
         float splitWidth = getWidth(split);
         boolean shouldBreak = (optBreakDoc.isPresent() && optBreakDoc.get().getFillMode() == FillMode.UNIFIED)
-                || state.mustBreak
-                || state.column + breakWidth + splitWidth > maxWidth;
+                || state.mustBreak()
+                || state.column() + breakWidth + splitWidth > maxWidth;
 
         if (optBreakDoc.isPresent()) {
             state = optBreakDoc.get().computeBreaks(state, shouldBreak);
         }
-        boolean enoughRoom = state.column + splitWidth <= maxWidth;
+        boolean enoughRoom = state.column() + splitWidth <= maxWidth;
         state = computeSplit(commentsHelper, maxWidth, split, state.withMustBreak(false));
         if (!enoughRoom) {
             state = state.withMustBreak(true); // Break after, too.

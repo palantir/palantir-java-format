@@ -59,7 +59,7 @@ public final class Space extends Doc implements Op {
 
     @Override
     public State computeBreaks(CommentsHelper commentsHelper, int maxWidth, State state) {
-        return state.withColumn(state.column + 1);
+        return state.withColumn(state.column() + 1);
     }
 
     @Override
