@@ -145,24 +145,22 @@ public final class Level extends Doc {
             this.state = state;
         }
 
-        private State breakNormally() {
+        private State breakNormally(State state) {
             return computeBroken(commentsHelper, maxWidth, state.withIndentIncrementedBy(plusIndent));
         }
 
         @Override
         public State breakThisLevel() {
-            return breakNormally();
+            return breakNormally(this.state);
         }
 
         @Override
         public State preferBreakingLastInnerLevel(boolean _keepIndentWhenInlined) {
+            State broken = breakNormally(state);
             if (state.branchingCoefficient() < MAX_BRANCHING_COEFFICIENT) {
                 // Try both breaking and not breaking. Choose the better one based on LOC, preferring
                 // breaks if the outcome is the same.
-
-                State state1 = state.withNewBranch();
-
-                State broken = computeBroken(commentsHelper, maxWidth, state1.withIndentIncrementedBy(plusIndent));
+                State state1 = this.state.withNewBranch();
 
                 // No plusIndent the first time around, since we expect this whole level (except part of the last inner
                 // level) to be on the first line.
@@ -173,17 +171,14 @@ public final class Level extends Doc {
                     if (lastLevelBroken.get().numLines() < broken.numLines()) {
                         return lastLevelBroken.get();
                     }
-                    // Must run computeBroken once again, because our last tryBreakLastLevel run modified
-                    // mutable state.
-                    // Therefore just fall through.
                 }
             }
-            return breakNormally();
+            return broken;
         }
 
         @Override
         public State breakOnlyIfInnerLevelsThenFitOnOneLine(boolean keepIndentWhenInlined) {
-            State broken = breakNormally();
+            State broken = breakNormally(this.state);
             Optional<State> maybeInlined = handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
                     commentsHelper, maxWidth, this.state, broken, keepIndentWhenInlined);
             return maybeInlined.orElse(broken);
