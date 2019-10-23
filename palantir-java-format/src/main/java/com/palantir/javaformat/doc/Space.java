@@ -18,11 +18,13 @@ package com.palantir.javaformat.doc;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Range;
+import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.CommentsHelper;
 import com.palantir.javaformat.Op;
 import com.palantir.javaformat.Output;
 
 /** A Leaf node in a {@link Doc} for a non-breaking space. */
+@Immutable
 public final class Space extends Doc implements Op {
     private static final Space SPACE = new Space();
 

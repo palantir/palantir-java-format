@@ -18,6 +18,7 @@ package com.palantir.javaformat.doc;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Range;
+import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.CommentsHelper;
 import com.palantir.javaformat.Indent;
 import com.palantir.javaformat.Input;
@@ -26,6 +27,7 @@ import com.palantir.javaformat.Output;
 import java.util.Optional;
 
 /** A leaf {@link Doc} for a token. */
+@Immutable
 public final class Token extends Doc implements Op {
     /** Is a Token a real token, or imaginary (e.g., a token generated incorrectly, or an EOF)? */
     public enum RealOrImaginary {
