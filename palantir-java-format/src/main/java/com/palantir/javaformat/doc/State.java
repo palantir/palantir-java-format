@@ -16,7 +16,7 @@
 
 package com.palantir.javaformat.doc;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.palantir.javaformat.Indent;
 import com.palantir.javaformat.Output.BreakTag;
 import org.immutables.value.Value;
@@ -42,7 +42,7 @@ public abstract class State {
      */
     public abstract int branchingCoefficient();
 
-    public abstract ImmutableMap<BreakTag, Boolean> breaksTaken();
+    public abstract ImmutableSet<BreakTag> breaksTaken();
 
     public static State startingState() {
         return builder()
@@ -52,21 +52,29 @@ public abstract class State {
                 .mustBreak(false)
                 .numLines(0)
                 .branchingCoefficient(0)
-                .breaksTaken(ImmutableMap.of())
+                .breaksTaken(ImmutableSet.of())
                 .build();
     }
 
     /** Record whether break was taken. */
     public State breakTaken(BreakTag breakTag, boolean broken) {
-        Boolean currentValue = breaksTaken().get(breakTag);
-        if ((currentValue == null && broken) || (currentValue != null && currentValue != broken)) {
-            return builder().from(this).putBreaksTaken(breakTag, broken).build();
+        boolean currentlyBroken = breaksTaken().contains(breakTag);
+        if (currentlyBroken != broken) {
+            if (broken) {
+                return builder().from(this).addBreaksTaken(breakTag).build();
+            } else {
+                return builder()
+                        .from(this)
+                        .breaksTaken(breaksTaken().stream().filter(it -> it != breakTag).collect(
+                                ImmutableSet.toImmutableSet()))
+                        .build();
+            }
         }
         return this;
     }
 
     public boolean wasBreakTaken(BreakTag breakTag) {
-        return breaksTaken().getOrDefault(breakTag, false);
+        return breaksTaken().contains(breakTag);
     }
 
     /**
