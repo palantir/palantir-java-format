@@ -22,7 +22,12 @@ import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.Indent;
 import com.palantir.javaformat.Output.BreakTag;
+import fj.P;
+import fj.P2;
+import fj.data.HashMap;
+import fj.data.List;
 import org.immutables.value.Value;
+import org.immutables.value.Value.Lazy;
 import org.immutables.value.Value.Parameter;
 
 /** State for writing. */
@@ -54,7 +59,12 @@ public abstract class State {
 
     protected abstract ImmutableMap<Level, LevelState> levelStates();
 
-    protected abstract ImmutableMap<Tok, TokState> tokStates();
+    protected abstract List<P2<Tok, TokState>> tokStates();
+
+    @Lazy
+    protected HashMap<Tok, TokState> tokStatesAsMap() {
+        return HashMap.iterableHashMap(tokStates());
+    }
 
     public static State startingState() {
         return builder()
@@ -67,7 +77,7 @@ public abstract class State {
                 .breakTagsTaken(ImmutableSet.of())
                 .breakStates(ImmutableMap.of())
                 .levelStates(ImmutableMap.of())
-                .tokStates(ImmutableMap.of())
+                .tokStates(List.nil())
                 .build();
     }
 
@@ -85,7 +95,9 @@ public abstract class State {
     }
 
     String getTokText(Tok tok) {
-        return Preconditions.checkNotNull(tokStates().get(tok), "Expected Tok state to exist for: %s", tok).text();
+        return Preconditions.checkNotNull(
+                        tokStatesAsMap().get(tok).toNull(), "Expected Tok state to exist for: %s", tok)
+                .text();
     }
 
     /** Record whether break was taken. */
@@ -176,7 +188,7 @@ public abstract class State {
     }
 
     State withTokState(Tok tok, TokState tokState) {
-        return builder().from(this).putTokStates(tok, tokState).build();
+        return builder().from(this).tokStates(tokStates().cons(P.p(tok, tokState))).build();
     }
 
     public static class Builder extends ImmutableState.Builder {}
