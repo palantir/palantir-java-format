@@ -15,6 +15,7 @@
 package com.palantir.javaformat;
 
 import com.google.common.base.MoreObjects;
+import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.Output.BreakTag;
 import com.palantir.javaformat.doc.Break;
 import com.palantir.javaformat.doc.Level;
@@ -24,6 +25,7 @@ import com.palantir.javaformat.doc.State;
  * An indent for a {@link Level} or {@link Break}. The indent is either a constant {@code int}, or a conditional
  * expression whose value depends on whether or not a {@link Break} has been broken.
  */
+@Immutable
 public abstract class Indent {
 
     public abstract int eval(State state);
