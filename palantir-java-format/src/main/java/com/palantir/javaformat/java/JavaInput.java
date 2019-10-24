@@ -30,6 +30,7 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
+import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.Input;
 import com.palantir.javaformat.Newlines;
 import com.palantir.javaformat.java.JavacTokens.RawTok;
@@ -65,6 +66,7 @@ public final class JavaInput extends Input {
      * <p>A {@code /*} comment possibly contains newlines; a {@code //} comment does not contain the terminating newline
      * character, but is followed by a newline {@link Tok}.
      */
+    @Immutable
     static final class Tok implements Input.Tok {
         private final int index;
         private final String originalText;
@@ -177,6 +179,7 @@ public final class JavaInput extends Input {
      * Tok}s, each preceded by the texts of its {@code toksBefore} and followed by the texts of its {@code toksAfter},
      * equals the input.
      */
+    @Immutable
     static final class Token implements Input.Token {
         private final Tok tok;
         private final ImmutableList<Tok> toksBefore;

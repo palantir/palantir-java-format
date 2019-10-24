@@ -67,8 +67,8 @@ import com.palantir.javaformat.Op;
 import com.palantir.javaformat.OpenOp;
 import com.palantir.javaformat.OpsBuilder;
 import com.palantir.javaformat.OpsBuilder.BlankLineWanted;
-import com.palantir.javaformat.Output.BreakTag;
 import com.palantir.javaformat.doc.Break;
+import com.palantir.javaformat.doc.BreakTag;
 import com.palantir.javaformat.doc.FillMode;
 import com.palantir.javaformat.doc.Token;
 import com.palantir.javaformat.java.DimensionHelpers.SortedDims;
@@ -1355,8 +1355,8 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         }
 
         builder.open(plusFour);
-        BreakTag breakBeforeName = genSym();
-        BreakTag breakBeforeType = genSym();
+        BreakTag breakBeforeName = new BreakTag();
+        BreakTag breakBeforeType = new BreakTag();
         builder.open(ZERO);
         {
             boolean first = true;
@@ -2708,7 +2708,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 length++;
             }
             if (!fillFirstArgument(e, items, trailingDereferences ? ZERO : minusFour)) {
-                BreakTag tyargTag = genSym();
+                BreakTag tyargTag = new BreakTag();
                 dotExpressionUpToArgs(e, Optional.of(tyargTag));
                 Indent tyargIndent = Indent.If.make(tyargTag, plusFour, ZERO);
                 dotExpressionArgsAndParen(e, tyargIndent, (trailingDereferences || needDot) ? plusFour : ZERO);
@@ -2773,8 +2773,8 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         builder.open(OpenOp.builder()
                 .debugName("visitDotWithPrefix")
                 .plusIndent(plusFour)
-                // This can't be PREFER_BREAKING_LAST_INNER_LEVEL unless we have breaks in _this_ level.
-                // That's only every the case if trailingDereferences is true.
+                // This can't be preferBreakingLastInnerLevel unless we have breaks in _this_ level.
+                // That's only ever the case if trailingDereferences is true.
                 .breakBehaviour(
                         trailingDereferences
                                 ? BreakBehaviours.preferBreakingLastInnerLevel(true)
@@ -2787,7 +2787,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         }
 
         Deque<Integer> unconsumedPrefixes = new ArrayDeque<>(ImmutableSortedSet.copyOf(prefixes));
-        BreakTag nameTag = genSym();
+        BreakTag nameTag = new BreakTag();
         for (int i = 0; i < items.size(); i++) {
             ExpressionTree e = items.get(i);
             if (needDot) {
@@ -2801,7 +2801,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 builder.breakOp(fillMode, "", ZERO, Optional.of(nameTag));
                 token(".");
             }
-            BreakTag tyargTag = genSym();
+            BreakTag tyargTag = new BreakTag();
             dotExpressionUpToArgs(e, Optional.of(tyargTag));
             if (!unconsumedPrefixes.isEmpty() && i == unconsumedPrefixes.peekFirst()) {
                 builder.close();
@@ -2966,7 +2966,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
      */
     void addArguments(List<? extends ExpressionTree> arguments, Indent plusIndent) {
         /*
-         PREFER_BREAKING_LAST_INNER_LEVEL here in order to avoid immediately breaking a long
+         `preferBreakingLastInnerLevel` here in order to avoid immediately breaking a long
          invocation that can be one-lined:
 
          .method(
@@ -2974,10 +2974,10 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                     // body
                   });
 
-         This is so that the downstream 'PREFER_BREAKING_LAST_INNER_LEVEL' level made by
+         This is so that the downstream 'preferBreakingLastInnerLevel' level made by
          argList can be attempted without preemptively breaking after the opening bracket '('.
 
-         BREAK_THIS_LEVEL would break B20701054 ( `analysis().analyze(⏎` )
+         `breakThisLevel` would break B20701054 ( `analysis().analyze(⏎` )
          However we definitely don't wanna look inside for B18479811
          Solution: argList should CHECK_INNER.
         */
@@ -3229,8 +3229,8 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             Optional<ExpressionTree> receiverExpression,
             Optional<TypeWithDims> typeWithDims) {
 
-        BreakTag typeBreak = genSym();
-        BreakTag verticalAnnotationBreak = genSym();
+        BreakTag typeBreak = new BreakTag();
+        BreakTag verticalAnnotationBreak = new BreakTag();
 
         // If the node is a field declaration, try to output any declaration
         // annotations in-line. If the entire declaration doesn't fit on a single
@@ -3305,7 +3305,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                     builder.open(
                             Indent.If.make(typeBreak, plusFour, ZERO),
                             BreakBehaviours.breakOnlyIfInnerLevelsThenFitOnOneLine(true),
-                            LastLevelBreakability.NO_PREFERENCE);
+                            LastLevelBreakability.ABORT);
                     {
                         builder.breakToFill(" ");
                         scan(initializer.get(), null);
@@ -3617,10 +3617,6 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
      */
     final void sync(Tree node) {
         builder.sync(((JCTree) node).getStartPosition());
-    }
-
-    final BreakTag genSym() {
-        return new BreakTag();
     }
 
     @Override

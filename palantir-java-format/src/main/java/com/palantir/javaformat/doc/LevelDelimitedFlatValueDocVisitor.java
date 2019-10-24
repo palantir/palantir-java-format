@@ -22,7 +22,12 @@ import com.palantir.javaformat.Indent;
 import com.palantir.javaformat.LastLevelBreakability;
 
 public final class LevelDelimitedFlatValueDocVisitor implements DocVisitor<String> {
+    private final State state;
     int indent = 0;
+
+    public LevelDelimitedFlatValueDocVisitor(State state) {
+        this.state = state;
+    }
 
     @Override
     public String visitSpace(Space doc) {
@@ -44,7 +49,7 @@ public final class LevelDelimitedFlatValueDocVisitor implements DocVisitor<Strin
         StringBuilder sb =
                 new StringBuilder().append("⏎").append(doc.getFlat().isEmpty() ? "" : "(" + doc.getFlat() + ")");
         if (!doc.getPlusIndent().equals(Indent.Const.ZERO)) {
-            sb.append(" +" + doc.evalPlusIndent());
+            sb.append(" +" + doc.evalPlusIndent(state));
         }
         return sb.toString();
     }
@@ -58,14 +63,14 @@ public final class LevelDelimitedFlatValueDocVisitor implements DocVisitor<Strin
         builder.append("❰");
         level.getDebugName().ifPresent(name -> builder.append(" \"" + name + "\""));
         if (!level.getPlusIndent().equals(Indent.Const.ZERO)) {
-            builder.append(" +" + level.getPlusIndent().eval());
+            builder.append(" +" + level.getPlusIndent().eval(state));
         }
         BreakBehaviours.caseOf(level.getBreakBehaviour()).breakThisLevel_(null).otherwise(() -> {
             builder.append(" ");
             builder.append(level.getBreakBehaviour());
             return null;
         });
-        if (level.getBreakabilityIfLastLevel() != LastLevelBreakability.NO_PREFERENCE) {
+        if (level.getBreakabilityIfLastLevel() != LastLevelBreakability.ABORT) {
             builder.append(" ifLastLevel=");
             builder.append(level.getBreakabilityIfLastLevel());
         }

@@ -12,6 +12,7 @@ gradle.plugin.org.jetbrains.gradle.plugin.idea-ext:gradle-idea-ext = 0.5
 junit:junit = 4.12
 org.assertj:assertj-core = 3.13.2
 org.derive4j:* = 1.1.1
+org.functionaljava:functionaljava = 4.8
 org.immutables:value = 2.8.1
 org.junit.jupiter:* = 5.5.2
 org.junit.vintage:* = 5.5.0

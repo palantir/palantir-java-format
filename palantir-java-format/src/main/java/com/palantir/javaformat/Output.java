@@ -17,33 +17,10 @@ package com.palantir.javaformat;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Range;
 import com.palantir.javaformat.OpsBuilder.BlankLineWanted;
-import java.util.Optional;
+import com.palantir.javaformat.doc.State;
 
 /** An output from the formatter. */
 public abstract class Output extends InputOutput {
-    /** Unique identifier for a break. */
-    public static final class BreakTag {
-
-        Optional<Boolean> taken = Optional.empty();
-
-        public void recordBroken(boolean broken) {
-            // TODO(cushon): enforce invariants.
-            // Currently we rely on setting Breaks multiple times, e.g. when deciding
-            // whether a Level should be flowed. Using separate data structures
-            // instead of mutation or adding an explicit 'reset' step would allow
-            // a useful invariant to be enforced here.
-            taken = Optional.of(broken);
-        }
-
-        public void reset() {
-            taken = Optional.empty();
-        }
-
-        public boolean wasBreakTaken() {
-            return taken.orElse(false);
-        }
-    }
-
     /**
      * Indent by outputting {@code indent} spaces.
      *
@@ -54,10 +31,11 @@ public abstract class Output extends InputOutput {
     /**
      * Output a string.
      *
+     * @param state
      * @param text the string
      * @param range the {@link Range} corresponding to the string
      */
-    public abstract void append(String text, Range<Integer> range);
+    public abstract void append(State state, String text, Range<Integer> range);
 
     /**
      * A blank line is or is not wanted here.

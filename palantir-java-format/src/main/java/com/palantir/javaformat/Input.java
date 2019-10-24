@@ -18,6 +18,7 @@ import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableRangeMap;
+import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.java.FormatterDiagnostic;
 
 /** An input to the formatter. */
@@ -27,6 +28,7 @@ public abstract class Input extends InputOutput {
      * underlies a {@link Token}, and each other {@code Tok} is attached to a single {@code Token}. Tokens and comments
      * have indices; white space {@code Tok}s do not.
      */
+    @Immutable
     public interface Tok {
         /**
          * Return the {@code Tok}'s index.
@@ -75,6 +77,7 @@ public abstract class Input extends InputOutput {
     }
 
     /** A {@code Token} is a language-level token. */
+    @Immutable
     public interface Token {
         /**
          * Get the token's {@link Tok}.

@@ -20,6 +20,8 @@ import static com.google.common.collect.Iterables.getLast;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Suppliers;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import com.palantir.javaformat.BreakBehaviour;
 import com.palantir.javaformat.BreakBehaviours;
@@ -33,6 +35,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import org.immutables.value.Value;
 
 /** A {@code Level} inside a {@link Doc}. */
 public final class Level extends Doc {
@@ -40,7 +43,7 @@ public final class Level extends Doc {
      * How many branches we are allowed to take (i.e how many times we can consider breaking vs not breaking the current
      * level) before we stop branching and always break, which is the google-java-format default behaviour.
      */
-    private static final int MAX_BRANCHING_COEFFICIENT = 7;
+    private static final int MAX_BRANCHING_COEFFICIENT = 20;
 
     private static final Collector<Level, ?, Optional<Level>> GET_LAST_COLLECTOR = Collectors.reducing((u, v) -> v);
 
@@ -50,19 +53,8 @@ public final class Level extends Doc {
     // If last level, when to break this rather than parent.
     private final Optional<String> debugName;
     private final List<Doc> docs = new ArrayList<>(); // The elements of the level.
-
-    // State that needs to be preserved between calculating breaks and
-    // writing output.
-    // TODO(cushon): represent phases as separate immutable data.
-
-    /** True if the entire {@link Level} fits on one line. */
-    boolean oneLine = false;
-
-    /** Groups of {@link Doc}s that are children of the current {@link Level}, separated by {@link Break}s. */
-    List<List<Doc>> splits = new ArrayList<>();
-
-    /** {@link Break}s between {@link Doc}s in the current {@link Level}. */
-    List<Break> breaks = new ArrayList<>();
+    private final ImmutableSupplier<SplitsBreaks> memoizedSplitsBreaks =
+            Suppliers.memoize(() -> splitByBreaks(docs))::get;
 
     private Level(
             Indent plusIndent,
@@ -131,13 +123,10 @@ public final class Level extends Doc {
     @Override
     public State computeBreaks(CommentsHelper commentsHelper, int maxWidth, State state) {
         float thisWidth = getWidth();
-        if (state.column + thisWidth <= maxWidth) {
-            oneLine = true;
-            // Fix all breaks in this level, recursively.
-            ClearBreaksVisitor.INSTANCE.visitLevel(this);
-            return state.withColumn(state.column + (int) thisWidth);
+        if (state.column() + thisWidth <= maxWidth) {
+            return state.withColumn(state.column() + (int) thisWidth)
+                    .withLevelState(this, ImmutableLevelState.of(true));
         }
-        oneLine = false;
 
         State newState = breakBehaviour.match(new BreakImpl(commentsHelper, maxWidth, state));
 
@@ -155,59 +144,54 @@ public final class Level extends Doc {
             this.state = state;
         }
 
-        private State breakNormally() {
+        private State breakNormally(State state) {
             return computeBroken(commentsHelper, maxWidth, state.withIndentIncrementedBy(plusIndent));
         }
 
         @Override
         public State breakThisLevel() {
-            return breakNormally();
+            return breakNormally(this.state);
         }
 
         @Override
         public State preferBreakingLastInnerLevel(boolean _keepIndentWhenInlined) {
-            if (state.branchingCoefficient < MAX_BRANCHING_COEFFICIENT) {
-                // Try both breaking and not breaking. Choose the better one based on LOC, preferring
-                // breaks if the outcome is the same.
+            // Try both breaking and not breaking. Choose the better one based on LOC, preferring
+            // breaks if the outcome is the same.
+            State state = this.state.withNewBranch();
 
-                State state1 = state.withNewBranch();
-
-                State broken = computeBroken(commentsHelper, maxWidth, state1.withIndentIncrementedBy(plusIndent));
-
+            State broken = breakNormally(state);
+            if (state.branchingCoefficient() < MAX_BRANCHING_COEFFICIENT) {
                 // No plusIndent the first time around, since we expect this whole level (except part of the last inner
                 // level) to be on the first line.
                 Optional<State> lastLevelBroken =
-                        tryBreakLastLevel(commentsHelper, maxWidth, state1.withNoIndent(), false);
+                        tryBreakLastLevel(commentsHelper, maxWidth, state.withNoIndent(), false);
 
                 if (lastLevelBroken.isPresent()) {
-                    if (lastLevelBroken.get().numLines < broken.numLines) {
+                    if (lastLevelBroken.get().numLines() < broken.numLines()) {
                         return lastLevelBroken.get();
                     }
-                    // Must run computeBroken once again, because our last tryBreakLastLevel run modified
-                    // mutable state.
-                    // Therefore just fall through.
                 }
             }
-            return breakNormally();
+            return broken;
         }
 
         @Override
         public State breakOnlyIfInnerLevelsThenFitOnOneLine(boolean keepIndentWhenInlined) {
-            State broken = breakNormally();
+            State broken = breakNormally(this.state);
             Optional<State> maybeInlined = handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
-                    commentsHelper, maxWidth, this.state, keepIndentWhenInlined);
+                    commentsHelper, maxWidth, this.state, broken, keepIndentWhenInlined);
             return maybeInlined.orElse(broken);
         }
     }
 
     private Optional<State> handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
-            CommentsHelper commentsHelper, int maxWidth, State state, boolean keepIndent) {
+            CommentsHelper commentsHelper, int maxWidth, State state, State brokenState, boolean keepIndent) {
         List<Level> innerLevels = this.docs.stream()
                 .filter(doc -> doc instanceof Level)
                 .map(doc -> ((Level) doc))
                 .collect(Collectors.toList());
 
-        boolean anyLevelWasBroken = innerLevels.stream().anyMatch(level -> !level.oneLine);
+        boolean anyLevelWasBroken = innerLevels.stream().anyMatch(level -> !brokenState.isOneLine(level));
 
         boolean prefixFits = false;
         if (anyLevelWasBroken) {
@@ -231,9 +215,9 @@ public final class Level extends Doc {
             // Potentially add the width of prefixes we want to consider as part of the width that
             // must fit on the same line, so that we don't accidentally break prefixes when we could
             // have avoided doing so.
-            leadingWidth += new CountWidthUntilBreakVisitor(maxWidth - state.indent).visit(lastLevel);
+            leadingWidth += new CountWidthUntilBreakVisitor(maxWidth - state.indent()).visit(lastLevel);
 
-            boolean fits = !Float.isInfinite(leadingWidth) && state.column + leadingWidth <= maxWidth;
+            boolean fits = !Float.isInfinite(leadingWidth) && state.column() + leadingWidth <= maxWidth;
 
             if (fits) {
                 prefixFits = true;
@@ -245,7 +229,8 @@ public final class Level extends Doc {
             if (keepIndent) {
                 newState = newState.withIndentIncrementedBy(plusIndent);
             }
-            return Optional.of(tryToLayOutLevelOnOneLine(commentsHelper, maxWidth, newState));
+            return Optional.of(
+                    tryToLayOutLevelOnOneLine(commentsHelper, maxWidth, newState, memoizedSplitsBreaks.get()));
         }
         return Optional.empty();
     }
@@ -257,7 +242,7 @@ public final class Level extends Doc {
         }
         Level lastLevel = ((Level) getLast(docs));
         // Only split levels that have declared they want to be split in this way.
-        if (lastLevel.breakabilityIfLastLevel == LastLevelBreakability.NO_PREFERENCE) {
+        if (lastLevel.breakabilityIfLastLevel == LastLevelBreakability.ABORT) {
             return Optional.empty();
         }
         // See if we can fill in everything but the lastDoc.
@@ -265,7 +250,7 @@ public final class Level extends Doc {
         List<Doc> leadingDocs = docs.subList(0, docs.size() - 1);
         float leadingWidth = getWidth(leadingDocs);
 
-        if (state.column + leadingWidth > maxWidth) {
+        if (state.column() + leadingWidth > maxWidth) {
             return Optional.empty();
         }
 
@@ -273,21 +258,11 @@ public final class Level extends Doc {
         // _we_ are breaking.
         //       See computeBreakAndSplit -> shouldBreak
 
-        // TODO abstract out
-        splitByBreaks(leadingDocs, splits, breaks);
+        SplitsBreaks prefixSplitsBreaks = splitByBreaks(leadingDocs);
 
-        State state1 = tryToLayOutLevelOnOneLine(commentsHelper, maxWidth, state);
+        State state1 = tryToLayOutLevelOnOneLine(commentsHelper, maxWidth, state, prefixSplitsBreaks);
         Preconditions.checkState(
-                !state1.mustBreak, "We messed up, it wants to break a bunch of splits that shouldn't be broken");
-
-        // manually add the last level to the last split
-        getLast(splits).add(lastLevel);
-
-        // When recursing into a level, ensure we clear its oneLine.
-        // We have to do this because of branching and because oneLine is mutable.
-        if (recursive) {
-            oneLine = false;
-        }
+                !state1.mustBreak(), "We messed up, it wants to break a bunch of splits that shouldn't be broken");
 
         // Ok now how to handle the last level?
         // There are two options:
@@ -313,11 +288,11 @@ public final class Level extends Doc {
             // it might be nested somewhere deep in the 2nd level.
 
             float firstLevelWidth = lastLevel.docs.get(0).getWidth();
-            boolean enoughRoom = state1.column + firstLevelWidth <= maxWidth;
+            boolean enoughRoom = state1.column() + firstLevelWidth <= maxWidth;
 
             // Enforce our assumption.
             if (lastLevel.docs.size() > 1) {
-                assertStartsWithBreakOrEmpty(lastLevel.docs.get(1));
+                assertStartsWithBreakOrEmpty(state, lastLevel.docs.get(1));
             }
 
             if (!enoughRoom) {
@@ -332,31 +307,29 @@ public final class Level extends Doc {
         return Optional.of(lastLevel.computeBreaks(commentsHelper, maxWidth, state1));
     }
 
-    private static void assertStartsWithBreakOrEmpty(Doc doc) {
+    private static void assertStartsWithBreakOrEmpty(State state, Doc doc) {
         Preconditions.checkState(
                 StartsWithBreakVisitor.INSTANCE.visit(doc) != Result.NO,
                 "Doc should have started with a break but didn't:\n%s",
-                new LevelDelimitedFlatValueDocVisitor().visit(doc));
+                new LevelDelimitedFlatValueDocVisitor(state).visit(doc));
     }
 
     /**
      * Mark breaks in this level as not broken, but lay out the inner levels normally, according to their own {@link
      * BreakBehaviour}. The resulting {@link State#mustBreak} will be true if this level did not fit on exactly one
      * line.
-     *
-     * <p>This relies on {@link #splitByBreaks} having been called beforehand so that {@link #splits} and {@link
-     * #breaks} are set.
      */
-    private State tryToLayOutLevelOnOneLine(CommentsHelper commentsHelper, int maxWidth, State state) {
+    private State tryToLayOutLevelOnOneLine(
+            CommentsHelper commentsHelper, int maxWidth, State state, SplitsBreaks splitsBreaks) {
 
-        for (int i = 0; i < splits.size(); ++i) {
+        for (int i = 0; i < splitsBreaks.splits().size(); ++i) {
             if (i > 0) {
-                state = breaks.get(i - 1).computeBreaks(state, false);
+                state = splitsBreaks.breaks().get(i - 1).computeBreaks(state, false);
             }
 
-            List<Doc> split = splits.get(i);
+            List<Doc> split = splitsBreaks.splits().get(i);
             float splitWidth = getWidth(split);
-            boolean enoughRoom = state.column + splitWidth <= maxWidth;
+            boolean enoughRoom = state.column() + splitWidth <= maxWidth;
             state = computeSplit(commentsHelper, maxWidth, split, state.withMustBreak(false));
             if (!enoughRoom) {
                 state = state.withMustBreak(true);
@@ -365,36 +338,41 @@ public final class Level extends Doc {
         return state;
     }
 
-    private static void splitByBreaks(List<Doc> docs, List<List<Doc>> splits, List<Break> breaks) {
-        splits.clear();
-        breaks.clear();
-        splits.add(new ArrayList<>());
+    private static SplitsBreaks splitByBreaks(List<Doc> docs) {
+        ImmutableSplitsBreaks.Builder builder = ImmutableSplitsBreaks.builder();
+        ImmutableList.Builder<Doc> currentSplit = ImmutableList.builder();
         for (Doc doc : docs) {
             if (doc instanceof Break) {
-                breaks.add((Break) doc);
-                splits.add(new ArrayList<>());
+                builder.addSplits(currentSplit.build());
+                currentSplit = ImmutableList.builder();
+                builder.addBreaks((Break) doc);
             } else {
-                getLast(splits).add(doc);
+                currentSplit.add(doc);
             }
         }
+        builder.addSplits(currentSplit.build());
+        return builder.build();
     }
 
     /** Compute breaks for a {@link Level} that spans multiple lines. */
     private State computeBroken(CommentsHelper commentsHelper, int maxWidth, State state) {
-        // TODO abstract out
-        splitByBreaks(docs, splits, breaks);
+        SplitsBreaks splitsBreaks = memoizedSplitsBreaks.get();
 
-        if (!breaks.isEmpty()) {
+        if (!splitsBreaks.breaks().isEmpty()) {
             state = state.withBrokenLevel();
         }
 
         state = computeBreakAndSplit(
-                commentsHelper, maxWidth, state, /* optBreakDoc= */ Optional.empty(), splits.get(0));
+                commentsHelper, maxWidth, state, /* optBreakDoc= */ Optional.empty(), splitsBreaks.splits().get(0));
 
         // Handle following breaks and split.
-        for (int i = 0; i < breaks.size(); i++) {
+        for (int i = 0; i < splitsBreaks.breaks().size(); i++) {
             state = computeBreakAndSplit(
-                    commentsHelper, maxWidth, state, Optional.of(breaks.get(i)), splits.get(i + 1));
+                    commentsHelper,
+                    maxWidth,
+                    state,
+                    Optional.of(splitsBreaks.breaks().get(i)),
+                    splitsBreaks.splits().get(i + 1));
         }
         return state;
     }
@@ -405,13 +383,13 @@ public final class Level extends Doc {
         float breakWidth = optBreakDoc.isPresent() ? optBreakDoc.get().getWidth() : 0.0F;
         float splitWidth = getWidth(split);
         boolean shouldBreak = (optBreakDoc.isPresent() && optBreakDoc.get().getFillMode() == FillMode.UNIFIED)
-                || state.mustBreak
-                || state.column + breakWidth + splitWidth > maxWidth;
+                || state.mustBreak()
+                || state.column() + breakWidth + splitWidth > maxWidth;
 
         if (optBreakDoc.isPresent()) {
             state = optBreakDoc.get().computeBreaks(state, shouldBreak);
         }
-        boolean enoughRoom = state.column + splitWidth <= maxWidth;
+        boolean enoughRoom = state.column() + splitWidth <= maxWidth;
         state = computeSplit(commentsHelper, maxWidth, split, state.withMustBreak(false));
         if (!enoughRoom) {
             state = state.withMustBreak(true); // Break after, too.
@@ -427,24 +405,25 @@ public final class Level extends Doc {
     }
 
     @Override
-    public void write(Output output) {
-        if (oneLine) {
-            output.append(getFlat(), range()); // This is defined because width is finite.
+    public void write(State state, Output output) {
+        if (state.isOneLine(this)) {
+            output.append(state, getFlat(), range()); // This is defined because width is finite.
         } else {
-            writeFilled(output);
+            writeFilled(state, output);
         }
     }
 
-    private void writeFilled(Output output) {
+    private void writeFilled(State state, Output output) {
+        SplitsBreaks splitsBreaks = memoizedSplitsBreaks.get();
         // Handle first split.
-        for (Doc doc : splits.get(0)) {
-            doc.write(output);
+        for (Doc doc : splitsBreaks.splits().get(0)) {
+            doc.write(state, output);
         }
         // Handle following breaks and split.
-        for (int i = 0; i < breaks.size(); i++) {
-            breaks.get(i).write(output);
-            for (Doc doc : splits.get(i + 1)) {
-                doc.write(output);
+        for (int i = 0; i < splitsBreaks.breaks().size(); i++) {
+            splitsBreaks.breaks().get(i).write(state, output);
+            for (Doc doc : splitsBreaks.splits().get(i + 1)) {
+                doc.write(state, output);
             }
         }
     }
@@ -470,8 +449,8 @@ public final class Level extends Doc {
     }
 
     /** An indented representation of this level and all nested levels inside it. */
-    String representation() {
-        return new LevelDelimitedFlatValueDocVisitor().visit(this);
+    String representation(State state) {
+        return new LevelDelimitedFlatValueDocVisitor(state).visit(this);
     }
 
     /**
@@ -501,5 +480,14 @@ public final class Level extends Doc {
                 .add("breakabilityIfLastLevel", breakabilityIfLastLevel)
                 .add("docs", docs)
                 .toString();
+    }
+
+    @Value.Immutable
+    @Value.Style(overshadowImplementation = true)
+    interface SplitsBreaks {
+        /** Groups of {@link Doc}s that are children of the current {@link Level}, separated by {@link Break}s. */
+        ImmutableList<ImmutableList<Doc>> splits();
+        /** {@link Break}s between {@link Doc}s in the current {@link Level}. */
+        ImmutableList<Break> breaks();
     }
 }

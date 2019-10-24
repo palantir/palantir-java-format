@@ -9,6 +9,7 @@ dependencies {
     api project(':palantir-java-format-spi')
     api 'com.google.guava:guava'
     implementation 'com.google.errorprone:javac-shaded'
+    implementation 'org.functionaljava:functionaljava'
 
     testCompile 'com.google.guava:guava-testlib'
     testCompile 'com.google.truth:truth'

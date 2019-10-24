@@ -30,8 +30,7 @@ import java.util.Optional;
 /** A {@code DocBuilder} converts a sequence of {@link Op}s into a {@link Doc}. */
 public final class DocBuilder {
     private final Level base = Level.make(
-            Indent.Const.ZERO, BreakBehaviours.breakThisLevel(), LastLevelBreakability.NO_PREFERENCE, Optional.of(
-                    "root"));
+            Indent.Const.ZERO, BreakBehaviours.breakThisLevel(), LastLevelBreakability.ABORT, Optional.of("root"));
     private final ArrayDeque<Level> stack = new ArrayDeque<>();
 
     /**

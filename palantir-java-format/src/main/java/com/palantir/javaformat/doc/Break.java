@@ -18,24 +18,23 @@ package com.palantir.javaformat.doc;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Range;
+import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.CommentsHelper;
 import com.palantir.javaformat.Indent;
 import com.palantir.javaformat.Op;
 import com.palantir.javaformat.Output;
-import com.palantir.javaformat.Output.BreakTag;
+import com.palantir.javaformat.doc.State.BreakState;
 import java.util.Optional;
 
 /** A leaf node in a {@link Doc} for an optional break. */
+@Immutable
 public final class Break extends Doc implements Op {
     private final FillMode fillMode;
     private final String flat;
     private final Indent plusIndent;
-    private final Optional<Output.BreakTag> optTag;
+    private final Optional<BreakTag> optTag;
 
-    private boolean broken;
-    private int newIndent;
-
-    private Break(FillMode fillMode, String flat, Indent plusIndent, Optional<Output.BreakTag> optTag) {
+    private Break(FillMode fillMode, String flat, Indent plusIndent, Optional<BreakTag> optTag) {
         this.fillMode = fillMode;
         this.flat = flat;
         this.plusIndent = plusIndent;
@@ -67,7 +66,7 @@ public final class Break extends Doc implements Op {
      * @param optTag an optional tag for remembering whether the break was taken
      * @return the new {@code Break}
      */
-    public static Break make(FillMode fillMode, String flat, Indent plusIndent, Optional<Output.BreakTag> optTag) {
+    public static Break make(FillMode fillMode, String flat, Indent plusIndent, Optional<BreakTag> optTag) {
         return new Break(fillMode, flat, plusIndent, optTag);
     }
 
@@ -84,9 +83,10 @@ public final class Break extends Doc implements Op {
      * Return the {@code Break}'s extra indent.
      *
      * @return the extra indent
+     * @param state
      */
-    public int evalPlusIndent() {
-        return plusIndent.eval();
+    public int evalPlusIndent(State state) {
+        return plusIndent.eval(state);
     }
 
     Indent getPlusIndent() {
@@ -122,29 +122,9 @@ public final class Break extends Doc implements Op {
         return EMPTY_RANGE;
     }
 
-    /**
-     * For use only by {@link ClearBreaksVisitor}. Use case: ensure fresh state when we decide a level should be
-     * oneLine, because its inner breaks might have been previously broken in a different branch.
-     */
-    void clearBreak() {
-        optTag.ifPresent(BreakTag::reset);
-    }
-
-    public State computeBreaks(State state, boolean broken) {
-        if (optTag.isPresent()) {
-            optTag.get().recordBroken(broken);
-        }
-
-        if (broken) {
-            this.broken = true;
-            State newState = state.withBreak(this);
-            this.newIndent = newState.column;
-            return newState;
-        } else {
-            this.broken = false;
-            this.newIndent = -1;
-            return state.withColumn(state.column + flat.length());
-        }
+    public State computeBreaks(State stateIn, boolean broken) {
+        State state = optTag.map(breakTag -> stateIn.breakTaken(breakTag, broken)).orElse(stateIn);
+        return state.withBreak(this, broken);
     }
 
     @Override
@@ -157,12 +137,13 @@ public final class Break extends Doc implements Op {
     }
 
     @Override
-    public void write(Output output) {
-        if (broken) {
-            output.append("\n", EMPTY_RANGE);
-            output.indent(newIndent);
+    public void write(State state, Output output) {
+        BreakState breakState = state.getBreakState(this);
+        if (breakState.broken()) {
+            output.append(state, "\n", EMPTY_RANGE);
+            output.indent(breakState.newIndent());
         } else {
-            output.append(flat, range());
+            output.append(state, flat, range());
         }
     }
 

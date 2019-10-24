@@ -37,7 +37,7 @@ public abstract class OpenOp implements Op {
 
     @Default
     public LastLevelBreakability breakabilityIfLastLevel() {
-        return LastLevelBreakability.NO_PREFERENCE;
+        return LastLevelBreakability.ABORT;
     }
 
     public abstract Optional<String> debugName();

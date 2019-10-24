@@ -72,7 +72,7 @@ class CountWidthUntilBreakVisitor implements DocVisitor<Float> {
         Preconditions.checkState(
                 StartsWithBreakVisitor.INSTANCE.visit(level) == Result.YES,
                 "Didn't find expected break at the beginning of level.\n%s",
-                level.representation());
+                level.representation(State.startingState()));
         return 0f;
     }
 

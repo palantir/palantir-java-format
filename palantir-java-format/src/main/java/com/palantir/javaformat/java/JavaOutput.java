@@ -27,6 +27,7 @@ import com.palantir.javaformat.Input.Token;
 import com.palantir.javaformat.Newlines;
 import com.palantir.javaformat.OpsBuilder.BlankLineWanted;
 import com.palantir.javaformat.Output;
+import com.palantir.javaformat.doc.State;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -88,7 +89,7 @@ public final class JavaOutput extends Output {
 
     // TODO(jdd): Add invariant.
     @Override
-    public void append(String text, Range<Integer> range) {
+    public void append(State state, String text, Range<Integer> range) {
         if (!range.isEmpty()) {
             boolean sawNewlines = false;
             // Skip over input line we've passed.
@@ -107,7 +108,7 @@ public final class JavaOutput extends Output {
              * there's a blank line here and it's a comment.
              */
             BlankLineWanted wanted = blankLines.getOrDefault(lastK, BlankLineWanted.NO);
-            if (isComment(text) ? sawNewlines : wanted.wanted().orElse(sawNewlines)) {
+            if (isComment(text) ? sawNewlines : wanted.wanted(state).orElse(sawNewlines)) {
                 ++newlinesPending;
             }
         }
