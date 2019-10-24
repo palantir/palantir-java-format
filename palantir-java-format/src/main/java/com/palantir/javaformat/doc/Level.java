@@ -40,7 +40,7 @@ public final class Level extends Doc {
      * How many branches we are allowed to take (i.e how many times we can consider breaking vs not breaking the current
      * level) before we stop branching and always break, which is the google-java-format default behaviour.
      */
-    private static final int MAX_BRANCHING_COEFFICIENT = 7;
+    private static final int MAX_BRANCHING_COEFFICIENT = 20;
 
     private static final Collector<Level, ?, Optional<Level>> GET_LAST_COLLECTOR = Collectors.reducing((u, v) -> v);
 
@@ -156,16 +156,16 @@ public final class Level extends Doc {
 
         @Override
         public State preferBreakingLastInnerLevel(boolean _keepIndentWhenInlined) {
+            // Try both breaking and not breaking. Choose the better one based on LOC, preferring
+            // breaks if the outcome is the same.
+            State state = this.state.withNewBranch();
+
             State broken = breakNormally(state);
             if (state.branchingCoefficient() < MAX_BRANCHING_COEFFICIENT) {
-                // Try both breaking and not breaking. Choose the better one based on LOC, preferring
-                // breaks if the outcome is the same.
-                State state1 = this.state.withNewBranch();
-
                 // No plusIndent the first time around, since we expect this whole level (except part of the last inner
                 // level) to be on the first line.
                 Optional<State> lastLevelBroken =
-                        tryBreakLastLevel(commentsHelper, maxWidth, state1.withNoIndent(), false);
+                        tryBreakLastLevel(commentsHelper, maxWidth, state.withNoIndent(), false);
 
                 if (lastLevelBroken.isPresent()) {
                     if (lastLevelBroken.get().numLines() < broken.numLines()) {
