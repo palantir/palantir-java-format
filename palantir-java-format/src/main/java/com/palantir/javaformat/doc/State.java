@@ -20,7 +20,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.Indent;
-import com.palantir.javaformat.Output.BreakTag;
 import fj.P;
 import fj.P2;
 import fj.data.List;

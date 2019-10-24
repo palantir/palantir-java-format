@@ -32,9 +32,9 @@ public final class Break extends Doc implements Op {
     private final FillMode fillMode;
     private final String flat;
     private final Indent plusIndent;
-    private final Optional<Output.BreakTag> optTag;
+    private final Optional<BreakTag> optTag;
 
-    private Break(FillMode fillMode, String flat, Indent plusIndent, Optional<Output.BreakTag> optTag) {
+    private Break(FillMode fillMode, String flat, Indent plusIndent, Optional<BreakTag> optTag) {
         this.fillMode = fillMode;
         this.flat = flat;
         this.plusIndent = plusIndent;
@@ -66,7 +66,7 @@ public final class Break extends Doc implements Op {
      * @param optTag an optional tag for remembering whether the break was taken
      * @return the new {@code Break}
      */
-    public static Break make(FillMode fillMode, String flat, Indent plusIndent, Optional<Output.BreakTag> optTag) {
+    public static Break make(FillMode fillMode, String flat, Indent plusIndent, Optional<BreakTag> optTag) {
         return new Break(fillMode, flat, plusIndent, optTag);
     }
 

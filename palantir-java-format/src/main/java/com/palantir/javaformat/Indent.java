@@ -16,8 +16,8 @@ package com.palantir.javaformat;
 
 import com.google.common.base.MoreObjects;
 import com.google.errorprone.annotations.Immutable;
-import com.palantir.javaformat.Output.BreakTag;
 import com.palantir.javaformat.doc.Break;
+import com.palantir.javaformat.doc.BreakTag;
 import com.palantir.javaformat.doc.Level;
 import com.palantir.javaformat.doc.State;
 
