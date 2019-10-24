@@ -1355,8 +1355,8 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         }
 
         builder.open(plusFour);
-        BreakTag breakBeforeName = genSym();
-        BreakTag breakBeforeType = genSym();
+        BreakTag breakBeforeName = new BreakTag();
+        BreakTag breakBeforeType = new BreakTag();
         builder.open(ZERO);
         {
             boolean first = true;
@@ -2708,7 +2708,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 length++;
             }
             if (!fillFirstArgument(e, items, trailingDereferences ? ZERO : minusFour)) {
-                BreakTag tyargTag = genSym();
+                BreakTag tyargTag = new BreakTag();
                 dotExpressionUpToArgs(e, Optional.of(tyargTag));
                 Indent tyargIndent = Indent.If.make(tyargTag, plusFour, ZERO);
                 dotExpressionArgsAndParen(e, tyargIndent, (trailingDereferences || needDot) ? plusFour : ZERO);
@@ -2787,7 +2787,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         }
 
         Deque<Integer> unconsumedPrefixes = new ArrayDeque<>(ImmutableSortedSet.copyOf(prefixes));
-        BreakTag nameTag = genSym();
+        BreakTag nameTag = new BreakTag();
         for (int i = 0; i < items.size(); i++) {
             ExpressionTree e = items.get(i);
             if (needDot) {
@@ -2801,7 +2801,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 builder.breakOp(fillMode, "", ZERO, Optional.of(nameTag));
                 token(".");
             }
-            BreakTag tyargTag = genSym();
+            BreakTag tyargTag = new BreakTag();
             dotExpressionUpToArgs(e, Optional.of(tyargTag));
             if (!unconsumedPrefixes.isEmpty() && i == unconsumedPrefixes.peekFirst()) {
                 builder.close();
@@ -3229,8 +3229,8 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             Optional<ExpressionTree> receiverExpression,
             Optional<TypeWithDims> typeWithDims) {
 
-        BreakTag typeBreak = genSym();
-        BreakTag verticalAnnotationBreak = genSym();
+        BreakTag typeBreak = new BreakTag();
+        BreakTag verticalAnnotationBreak = new BreakTag();
 
         // If the node is a field declaration, try to output any declaration
         // annotations in-line. If the entire declaration doesn't fit on a single
@@ -3617,10 +3617,6 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
      */
     final void sync(Tree node) {
         builder.sync(((JCTree) node).getStartPosition());
-    }
-
-    final BreakTag genSym() {
-        return new BreakTag();
     }
 
     @Override
