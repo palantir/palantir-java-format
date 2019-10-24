@@ -149,16 +149,22 @@ public abstract class State {
         }
     }
 
-    State updateAfterLevel(State state) {
+    /** Update the current state after having processed an _inner_ level. */
+    State updateAfterLevel(State afterInnerLevel) {
         return builder()
-                .from(this)
-                .column(state.column())
-                .numLines(state.numLines())
+                // Inherited current state
+                .lastIndent(lastIndent())
+                .indent(indent())
+                .branchingCoefficient(branchingCoefficient())
+                .mustBreak(mustBreak())
+                // Overridden state
+                .column(afterInnerLevel.column())
+                .numLines(afterInnerLevel.numLines())
                 // TODO(dsanduleac): put these behind a "GlobalState"
-                .breakTagsTaken(state.breakTagsTaken())
-                .breakStates(state.breakStates())
-                .levelStates(state.levelStates())
-                .tokStates(state.tokStates())
+                .breakTagsTaken(afterInnerLevel.breakTagsTaken())
+                .breakStates(afterInnerLevel.breakStates())
+                .levelStates(afterInnerLevel.levelStates())
+                .tokStates(afterInnerLevel.tokStates())
                 .build();
     }
 
