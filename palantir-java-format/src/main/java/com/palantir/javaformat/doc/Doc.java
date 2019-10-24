@@ -19,13 +19,11 @@ package com.palantir.javaformat.doc;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.DiscreteDomain;
 import com.google.common.collect.Range;
-import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.CommentsHelper;
 import com.palantir.javaformat.Input;
 import com.palantir.javaformat.Op;
 import com.palantir.javaformat.OpsBuilder;
 import com.palantir.javaformat.Output;
-import java.util.function.Supplier;
 
 /**
  * {@link com.palantir.javaformat.java.JavaInputAstVisitor JavaInputAstVisitor} outputs a sequence of {@link Op}s using
@@ -38,9 +36,6 @@ import java.util.function.Supplier;
 public abstract class Doc extends HasUniqueId {
     static final Range<Integer> EMPTY_RANGE = Range.closedOpen(-1, -1);
     static final DiscreteDomain<Integer> INTEGERS = DiscreteDomain.integers();
-
-    @Immutable
-    interface ImmutableSupplier<T> extends Supplier<T> {}
 
     private final ImmutableSupplier<Float> memoizedWidth = Suppliers.memoize(this::computeWidth)::get;
     private final ImmutableSupplier<String> memoizedFlat = Suppliers.memoize(this::computeFlat)::get;
