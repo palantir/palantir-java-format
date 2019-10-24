@@ -95,9 +95,7 @@ public abstract class State {
     }
 
     String getTokText(Tok tok) {
-        return Preconditions.checkNotNull(
-                        tokStatesAsMap().get(tok), "Expected Tok state to exist for: %s", tok)
-                .text();
+        return Preconditions.checkNotNull(tokStatesAsMap().get(tok), "Expected Tok state to exist for: %s", tok).text();
     }
 
     /** Record whether break was taken. */
@@ -219,5 +217,4 @@ public abstract class State {
         @Parameter
         String text();
     }
-
 }
