@@ -160,8 +160,9 @@ public class CommandLineFlagsTest {
             Main.processArgs("--assume-filename=Foo.java", "Foo.java");
             fail();
         } catch (UsageException e) {
-            assertThat(e).hasMessageThat().contains(
-                    "--assume-filename is only supported when formatting standard input");
+            assertThat(e)
+                    .hasMessageThat()
+                    .contains("--assume-filename is only supported when formatting standard input");
         }
     }
 }

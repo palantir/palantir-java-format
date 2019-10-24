@@ -28,17 +28,14 @@ intellij {
 patchPluginXml {
     pluginDescription = "Formats source code using the palantir-java-format tool."
     version = project.version
-    sinceBuild = '173' // TODO: test against this version of IntelliJ to ensure no regressions
+    sinceBuild = '182' // TODO: test against this version of IntelliJ to ensure no regressions
     untilBuild = ''
 }
 
 publishPlugin {
     token = System.env.JETBRAINS_PLUGIN_REPO_TOKEN
-    if (!versionDetails().isCleanTag) {
-        channels 'eap'
-    }
 }
-
+tasks.publishPlugin.onlyIf { versionDetails().isCleanTag }
 tasks.publish.dependsOn publishPlugin
 
 configurations {
@@ -48,7 +45,7 @@ configurations {
 }
 
 dependencies {
-    implementation project(':palantir-java-format-api')
+    implementation project(':palantir-java-format-spi')
     implementation 'com.github.ben-manes.caffeine:caffeine'
 
     formatter project(':palantir-java-format')

@@ -17,6 +17,7 @@ package com.palantir.javaformat.java;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
+import com.palantir.javaformat.Utils;
 import java.util.concurrent.Callable;
 
 /** Encapsulates information about a file to be formatted, including which parts of the file to format. */
@@ -64,7 +65,7 @@ class FormatFileCallable implements Callable<String> {
             return characterRanges;
         }
 
-        characterRanges.addAll(Formatter.lineRangesToCharRanges(input, parameters.lines()));
+        characterRanges.addAll(Utils.lineRangesToCharRanges(input, parameters.lines()));
 
         for (int i = 0; i < parameters.offsets().size(); i++) {
             Integer length = parameters.lengths().get(i);

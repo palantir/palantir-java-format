@@ -899,8 +899,15 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     @Override
     public Void visitMemberReference(MemberReferenceTree node, Void unused) {
         sync(node);
-        builder.open(plusFour);
+        builder.open(OpenOp.builder()
+                .plusIndent(plusFour)
+                .debugName("methodReference")
+                // Would like to use CHECK_INNER but we'd have to check in the _first_ level rather than the last
+                // level, which the current logic can't do yet.
+                .breakabilityIfLastLevel(LastLevelBreakability.BREAK_HERE)
+                .build());
         scan(node.getQualifierExpression(), null);
+        builder.open(ZERO);
         builder.breakOp();
         builder.op("::");
         addTypeArguments(node.getTypeArguments(), plusFour);
@@ -914,6 +921,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             default:
                 throw new AssertionError(node.getMode());
         }
+        builder.close();
         builder.close();
         return null;
     }
@@ -1083,7 +1091,10 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             }
             token("else");
             visitStatement(
-            node.getElseStatement(), CollapseEmptyOrNot.NO, AllowLeadingBlankLine.YES, AllowTrailingBlankLine.NO);
+                    node.getElseStatement(),
+                    CollapseEmptyOrNot.NO,
+                    AllowLeadingBlankLine.YES,
+                    AllowTrailingBlankLine.NO);
         }
         builder.close();
         return null;
@@ -1211,7 +1222,10 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
 
         if (node.getBody().getKind() == Tree.Kind.BLOCK) {
             visitBlock(
-            (BlockTree) node.getBody(), CollapseEmptyOrNot.YES, AllowLeadingBlankLine.NO, AllowTrailingBlankLine.NO);
+                    (BlockTree) node.getBody(),
+                    CollapseEmptyOrNot.YES,
+                    AllowLeadingBlankLine.NO,
+                    AllowTrailingBlankLine.NO);
         } else {
             scan(node.getBody(), null);
         }
@@ -1883,7 +1897,10 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             token("finally");
             builder.space();
             visitBlock(
-            node.getFinallyBlock(), CollapseEmptyOrNot.NO, AllowLeadingBlankLine.YES, AllowTrailingBlankLine.NO);
+                    node.getFinallyBlock(),
+                    CollapseEmptyOrNot.NO,
+                    AllowLeadingBlankLine.YES,
+                    AllowTrailingBlankLine.NO);
         }
         builder.close();
         return null;
@@ -2103,8 +2120,10 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             first = false;
             List<VariableTree> fragments = variableFragments(it, tree);
             if (!fragments.isEmpty()) {
-                visitVariables(fragments, DeclarationKind.NONE, canLocalHaveHorizontalAnnotations(
-                        fragments.get(0).getModifiers()));
+                visitVariables(
+                        fragments,
+                        DeclarationKind.NONE,
+                        canLocalHaveHorizontalAnnotations(fragments.get(0).getModifiers()));
             } else {
                 scan(tree, null);
             }
@@ -3455,8 +3474,9 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
 
                 if (bodyDeclaration.getKind() == VARIABLE) {
                     visitVariables(
-                            variableFragments(it, bodyDeclaration), DeclarationKind.FIELD, fieldAnnotationDirection(
-                                    ((VariableTree) bodyDeclaration).getModifiers()));
+                            variableFragments(it, bodyDeclaration),
+                            DeclarationKind.FIELD,
+                            fieldAnnotationDirection(((VariableTree) bodyDeclaration).getModifiers()));
                 } else {
                     scan(bodyDeclaration, null);
                 }

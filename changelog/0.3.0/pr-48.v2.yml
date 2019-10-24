@@ -1,0 +1,6 @@
+type: break
+break:
+  description: The standalone `com.palantir.java-format` plugin provides a `formatDiff`
+    task. IntelliJ setup has been moved to a `com.palantir.java-format-idea` plugin.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/48

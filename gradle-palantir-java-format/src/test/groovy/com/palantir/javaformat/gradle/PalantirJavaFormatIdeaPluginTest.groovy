@@ -1,10 +1,24 @@
-package com.palantir.javaformat.gradle
+/*
+ * (c) Copyright 2019 Palantir Technologies Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
+package com.palantir.javaformat.gradle
 
 import nebula.test.IntegrationTestKitSpec
 
-class JavaFormatPluginTest extends IntegrationTestKitSpec {
-    private static def PLUGIN_ID = "com.palantir.java-format"
+class PalantirJavaFormatIdeaPluginTest extends IntegrationTestKitSpec {
 
     void setup() {
         // Note: this deprecation is due to gradle-idea-ext-plugin 0.5, however they fixed the issue in master, which
@@ -14,7 +28,7 @@ class JavaFormatPluginTest extends IntegrationTestKitSpec {
 
         buildFile << """
             plugins {
-                id "${PLUGIN_ID}"
+                id 'com.palantir.java-format-idea'
             }
             apply plugin: 'idea'
             
@@ -25,9 +39,6 @@ class JavaFormatPluginTest extends IntegrationTestKitSpec {
     }
 
     def "idea_configuresIpr"() {
-        buildFile << """
-        """.stripIndent()
-
         when:
         runTasks('idea')
 

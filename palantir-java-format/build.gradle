@@ -3,10 +3,10 @@ apply from: rootProject.file('gradle/publish-jar.gradle')
 
 mainClassName = 'com.palantir.javaformat.java.Main'
 
-description = 'Google Java Format'
+description = 'Palantir Java Format'
 
 dependencies {
-    api project(':palantir-java-format-api')
+    api project(':palantir-java-format-spi')
     api 'com.google.guava:guava'
     implementation 'com.google.errorprone:javac-shaded'
     implementation 'org.functionaljava:functionaljava'
@@ -14,6 +14,7 @@ dependencies {
     testCompile 'com.google.guava:guava-testlib'
     testCompile 'com.google.truth:truth'
     testCompile 'com.google.testing.compile:compile-testing'
+    testImplementation 'org.assertj:assertj-core'
     testImplementation 'org.junit.jupiter:junit-jupiter-migrationsupport'
     testImplementation 'org.junit.jupiter:junit-jupiter'
 

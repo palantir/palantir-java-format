@@ -335,8 +335,8 @@ public final class OpsBuilder {
              * (for example) we're guessing at an optional token.
              */
             if (realOrImaginary == Token.RealOrImaginary.REAL) {
-                throw new FormattingError(diagnostic(
-                        String.format("expected token: '%s'; generated %s instead", peekToken().orElse(null), token)));
+                throw new FormattingError(diagnostic(String.format(
+                        "expected token: '%s'; generated %s instead", peekToken().orElse(null), token)));
             }
         }
     }
@@ -542,21 +542,33 @@ public final class OpsBuilder {
                         tokOps.put(j, SPACE);
                     }
                     // Now we've seen the Token; output the toksAfter.
+
+                    // Reordering of NON-NLS comments that might follow a `+` in a chain of string concatenations, in
+                    // order to move the comments before the Break that precedes the `+` token.
+                    boolean nonNlsCommentsAfterPlus = token.getToksAfter().stream()
+                                    .anyMatch(OpsBuilder::isNonNlsComment)
+                            && token.getTok().getText().equals("+")
+                            && k > 0
+                            && ops.get(k - 1) instanceof Break;
+
+                    int tokAfterPos = nonNlsCommentsAfterPlus ? k - 1 : k + 1;
+
                     for (Input.Tok tokAfter : token.getToksAfter()) {
                         if (tokAfter.isComment()) {
                             boolean breakAfter = tokAfter.isJavadocComment()
                                     || (tokAfter.isSlashStarComment()
                                             && tokenOp.breakAndIndentTrailingComment().isPresent());
                             if (breakAfter) {
-                                tokOps.put(k + 1, Break.make(
-                                        FillMode.FORCED, "", tokenOp.breakAndIndentTrailingComment().orElse(
-                                                        Const.ZERO)));
+                                tokOps.put(tokAfterPos, Break.make(
+                                        FillMode.FORCED,
+                                        "",
+                                        tokenOp.breakAndIndentTrailingComment().orElse(Const.ZERO)));
                             } else {
-                                tokOps.put(k + 1, SPACE);
+                                tokOps.put(tokAfterPos, SPACE);
                             }
-                            tokOps.putAll(k + 1, makeComment(tokAfter));
+                            tokOps.putAll(tokAfterPos, makeComment(tokAfter));
                             if (breakAfter) {
-                                tokOps.put(k + 1, Break.make(FillMode.FORCED, "", ZERO));
+                                tokOps.put(tokAfterPos, Break.make(FillMode.FORCED, "", ZERO));
                             }
                         }
                     }
@@ -619,6 +631,10 @@ public final class OpsBuilder {
             }
         }
         return newOps.build();
+    }
+
+    private static boolean isNonNlsComment(Input.Tok tokAfter) {
+        return tokAfter.isSlashSlashComment() && tokAfter.getText().contains("$NON-NLS");
     }
 
     private static boolean isForcedBreak(Op op) {

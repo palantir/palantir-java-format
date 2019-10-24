@@ -572,11 +572,12 @@ public final class PartialFormattingTest {
     @TestTemplate
     public void emptyFile() throws Exception {
         Formatter.create().formatSource("");
-        Formatter.create().formatSource(
-                lines(
-                        "", //
-                        ""),
-                ImmutableList.of(Range.closedOpen(0, 1)));
+        Formatter.create()
+                .formatSource(
+                        lines(
+                                "", //
+                                ""),
+                        ImmutableList.of(Range.closedOpen(0, 1)));
     }
 
     @TestTemplate
@@ -594,9 +595,11 @@ public final class PartialFormattingTest {
                 Formatter.create().getFormatReplacements(input, ImmutableList.of(Range.closedOpen(start, start + 1)));
         assertThat(ranges).hasSize(1);
         Replacement replacement = ranges.get(0);
-        assertThat(replacement.getReplacementString()).isEqualTo(lines(
-                "", //
-                "  void f() {}"));
+        assertThat(replacement.getReplacementString())
+                .isEqualTo(
+                        lines(
+                                "", //
+                                "  void f() {}"));
         int replaceFrom = input.indexOf("void f") - newline.length();
         assertThat(replacement.getReplaceRange().lowerEndpoint()).isEqualTo(replaceFrom);
     }
@@ -1180,7 +1183,11 @@ public final class PartialFormattingTest {
         }
 
         String expectedFormatLine1And2 = lines(
-        "class Test {{", "    for (Integer x : Arrays.asList(1, 2, 3)) {", "      System.err.println(x);", "}}}", "");
+                "class Test {{",
+                "    for (Integer x : Arrays.asList(1, 2, 3)) {",
+                "      System.err.println(x);",
+                "}}}",
+                "");
 
         for (; length <= line1.length() + line2.length() + 2 * newline.length(); length++) {
             Range<Integer> range = Range.closedOpen(startOffset, startOffset + length);
@@ -1428,7 +1435,15 @@ public final class PartialFormattingTest {
         String input = lines(
                 "// copyright", "", "package p;", "import static c.g.I.c;", "", "/** */", "class Foo {{ c(); }}", "");
         String expectedOutput = lines(
-        "// copyright", "", "package p;", "", "import static c.g.I.c;", "", "/** */", "class Foo {{ c(); }}", "");
+                "// copyright",
+                "",
+                "package p;",
+                "",
+                "import static c.g.I.c;",
+                "",
+                "/** */",
+                "class Foo {{ c(); }}",
+                "");
 
         String output = runFormatter(input, new String[] {"-lines", "4"});
         assertThat(output).isEqualTo(expectedOutput);

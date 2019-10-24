@@ -275,7 +275,7 @@ public final class Level extends Doc {
         //    In this case, recurse rather than go into computeBreaks.
         if (lastLevel.breakabilityIfLastLevel == LastLevelBreakability.CHECK_INNER) {
             // Try to fit the entire inner prefix if it's that kind of level.
-            Optional<Optional<State>> couldBreakRecursively = BreakBehaviours.caseOf(lastLevel.breakBehaviour)
+            return BreakBehaviours.caseOf(lastLevel.breakBehaviour)
                     .preferBreakingLastInnerLevel(keepIndentWhenInlined -> {
                         State state2 = state1;
                         if (keepIndentWhenInlined) {
@@ -284,10 +284,7 @@ public final class Level extends Doc {
                         return lastLevel.tryBreakLastLevel(commentsHelper, maxWidth, state2, true);
                     })
                     // We don't know how to fit the inner level on the same line, so bail out.
-                    .otherwiseEmpty();
-            if (couldBreakRecursively.isPresent()) {
-                return couldBreakRecursively.get();
-            }
+                    .otherwise_(Optional.empty());
 
         } else if (lastLevel.breakabilityIfLastLevel == LastLevelBreakability.ONLY_IF_FIRST_LEVEL_FITS) {
             // Otherwise, we may be able to check if the first inner level of the lastLevel fits.
