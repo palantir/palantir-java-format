@@ -17,16 +17,11 @@
 package com.palantir.javaformat.doc;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.Indent;
-import fj.P;
-import fj.P2;
-import fj.data.List;
 import fj.data.Set;
 import fj.data.TreeMap;
 import org.immutables.value.Value;
-import org.immutables.value.Value.Lazy;
 import org.immutables.value.Value.Parameter;
 
 /** State for writing. */
@@ -58,12 +53,11 @@ public abstract class State {
 
     protected abstract TreeMap<Level, LevelState> levelStates();
 
-    protected abstract List<P2<Tok, TokState>> tokStates();
-
-    @Lazy
-    protected ImmutableMap<Tok, TokState> tokStatesAsMap() {
-        return tokStates().toCollection().stream().collect(ImmutableMap.toImmutableMap(P2::_1, P2::_2));
-    }
+    /**
+     * Keep track of how each {@link Tok} was written (these are mostly comments), which can differ depending on the
+     * starting column and the maxLength.
+     */
+    protected abstract TreeMap<Tok, TokState> tokStates();
 
     public static State startingState() {
         return builder()
@@ -76,7 +70,7 @@ public abstract class State {
                 .breakTagsTaken(Set.empty(HasUniqueId.ord()))
                 .breakStates(TreeMap.empty(HasUniqueId.ord()))
                 .levelStates(TreeMap.empty(HasUniqueId.ord()))
-                .tokStates(List.nil())
+                .tokStates(TreeMap.empty(HasUniqueId.ord()))
                 .build();
     }
 
@@ -94,7 +88,8 @@ public abstract class State {
     }
 
     String getTokText(Tok tok) {
-        return Preconditions.checkNotNull(tokStatesAsMap().get(tok), "Expected Tok state to exist for: %s", tok).text();
+        return Preconditions.checkNotNull(tokStates().get(tok).toNull(), "Expected Tok state to exist for: %s", tok)
+                .text();
     }
 
     /** Record whether break was taken. */
@@ -189,7 +184,7 @@ public abstract class State {
     }
 
     State withTokState(Tok tok, TokState tokState) {
-        return builder().from(this).tokStates(tokStates().cons(P.p(tok, tokState))).build();
+        return builder().from(this).tokStates(tokStates().set(tok, tokState)).build();
     }
 
     public static class Builder extends ImmutableState.Builder {}
