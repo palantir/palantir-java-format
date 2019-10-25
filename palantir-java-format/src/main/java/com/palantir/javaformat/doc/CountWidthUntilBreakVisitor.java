@@ -17,7 +17,7 @@
 package com.palantir.javaformat.doc;
 
 import com.google.common.base.Preconditions;
-import com.palantir.javaformat.LastLevelBreakability;
+import com.palantir.javaformat.Inlineability;
 import com.palantir.javaformat.doc.StartsWithBreakVisitor.Result;
 import java.util.List;
 import java.util.OptionalInt;
@@ -56,7 +56,7 @@ class CountWidthUntilBreakVisitor implements DocVisitor<Float> {
 
     @Override
     public Float visitLevel(Level level) {
-        if (level.getBreakabilityIfLastLevel() == LastLevelBreakability.ONLY_IF_FIRST_LEVEL_FITS
+        if (level.inlineability() == Inlineability.IF_FIRST_LEVEL_FITS
                 // If this prefix wouldn't fit on a new line (within the availableWidth), then don't
                 // consider it at all, because there's no point, it would always be broken.
                 && level.getDocs().get(0).getWidth() <= availableWidth) {
