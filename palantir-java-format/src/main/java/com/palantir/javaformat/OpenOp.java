@@ -50,6 +50,11 @@ public abstract class OpenOp extends HasUniqueId implements Op {
         return LastLevelBreakability.ABORT;
     }
 
+    @Default
+    public Inlineability inlineability() {
+        return Inlineability.ALWAYS_INLINEABLE;
+    }
+
     public abstract Optional<String> debugName();
 
     /** Custom max column limit that contents of this level <em>before the last break</em> may not exceed. */
@@ -58,26 +63,10 @@ public abstract class OpenOp extends HasUniqueId implements Op {
     /**
      * Make an ordinary {@code OpenOp}.
      *
-     * @see #make(Indent, BreakBehaviour, LastLevelBreakability)
+     * @see #builder()
      */
     public static Op make(Indent plusIndent) {
         return builder().plusIndent(plusIndent).build();
-    }
-
-    /**
-     * Make an ordinary {@code OpenOp}.
-     *
-     * @param plusIndent the indent for breaks at this level
-     * @param breakBehaviour how to decide whether to break this level or not
-     * @return the {@code OpenOp}
-     */
-    public static Op make(
-            Indent plusIndent, BreakBehaviour breakBehaviour, LastLevelBreakability breakabilityIfLastLevel) {
-        return builder()
-                .plusIndent(plusIndent)
-                .breakBehaviour(breakBehaviour)
-                .breakabilityIfLastLevel(breakabilityIfLastLevel)
-                .build();
     }
 
     @Override
@@ -85,6 +74,7 @@ public abstract class OpenOp extends HasUniqueId implements Op {
         builder.open(this);
     }
 
+    /** @see ImmutableOpenOp.Builder#Builder() */
     public static Builder builder() {
         return new Builder();
     }

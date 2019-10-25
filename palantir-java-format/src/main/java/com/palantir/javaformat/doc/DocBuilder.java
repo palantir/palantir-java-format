@@ -18,6 +18,8 @@ package com.palantir.javaformat.doc;
 
 import com.google.common.base.MoreObjects;
 import com.palantir.javaformat.Indent;
+import com.palantir.javaformat.Inlineability;
+import com.palantir.javaformat.LastLevelBreakability;
 import com.palantir.javaformat.Op;
 import com.palantir.javaformat.OpenOp;
 import com.palantir.javaformat.OpsBuilder;

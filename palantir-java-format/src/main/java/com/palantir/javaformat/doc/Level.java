@@ -27,6 +27,7 @@ import com.palantir.javaformat.BreakBehaviour;
 import com.palantir.javaformat.BreakBehaviours;
 import com.palantir.javaformat.CommentsHelper;
 import com.palantir.javaformat.Indent;
+import com.palantir.javaformat.Inlineability;
 import com.palantir.javaformat.LastLevelBreakability;
 import com.palantir.javaformat.OpenOp;
 import com.palantir.javaformat.Output;
