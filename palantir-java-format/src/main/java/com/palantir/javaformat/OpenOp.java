@@ -40,38 +40,28 @@ public abstract class OpenOp implements Op {
         return LastLevelBreakability.ABORT;
     }
 
+    @Default
+    public Inlineability inlineability() {
+        return Inlineability.ALWAYS_INLINEABLE;
+    }
+
     public abstract Optional<String> debugName();
 
     /**
      * Make an ordinary {@code OpenOp}.
      *
-     * @see #make(Indent, BreakBehaviour, LastLevelBreakability)
+     * @see #builder()
      */
     public static Op make(Indent plusIndent) {
         return builder().plusIndent(plusIndent).build();
     }
 
-    /**
-     * Make an ordinary {@code OpenOp}.
-     *
-     * @param plusIndent the indent for breaks at this level
-     * @param breakBehaviour how to decide whether to break this level or not
-     * @return the {@code OpenOp}
-     */
-    public static Op make(
-            Indent plusIndent, BreakBehaviour breakBehaviour, LastLevelBreakability breakabilityIfLastLevel) {
-        return builder()
-                .plusIndent(plusIndent)
-                .breakBehaviour(breakBehaviour)
-                .breakabilityIfLastLevel(breakabilityIfLastLevel)
-                .build();
-    }
-
     @Override
     public void add(DocBuilder builder) {
-        builder.open(plusIndent(), breakBehaviour(), breakabilityIfLastLevel(), debugName());
+        builder.open(plusIndent(), breakBehaviour(), breakabilityIfLastLevel(), debugName(), inlineability());
     }
 
+    /** @see ImmutableOpenOp.Builder#Builder() */
     public static Builder builder() {
         return new Builder();
     }

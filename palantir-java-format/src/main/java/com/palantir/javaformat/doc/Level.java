@@ -27,6 +27,7 @@ import com.palantir.javaformat.BreakBehaviour;
 import com.palantir.javaformat.BreakBehaviours;
 import com.palantir.javaformat.CommentsHelper;
 import com.palantir.javaformat.Indent;
+import com.palantir.javaformat.Inlineability;
 import com.palantir.javaformat.LastLevelBreakability;
 import com.palantir.javaformat.Output;
 import com.palantir.javaformat.doc.StartsWithBreakVisitor.Result;
@@ -52,6 +53,7 @@ public final class Level extends Doc {
     private final LastLevelBreakability breakabilityIfLastLevel;
     // If last level, when to break this rather than parent.
     private final Optional<String> debugName;
+    private final Inlineability inlineability;
     private final List<Doc> docs = new ArrayList<>(); // The elements of the level.
     private final ImmutableSupplier<SplitsBreaks> memoizedSplitsBreaks =
             Suppliers.memoize(() -> splitByBreaks(docs))::get;
@@ -60,11 +62,13 @@ public final class Level extends Doc {
             Indent plusIndent,
             BreakBehaviour breakBehaviour,
             LastLevelBreakability breakabilityIfLastLevel,
-            Optional<String> debugName) {
+            Optional<String> debugName,
+            Inlineability inlineability) {
         this.plusIndent = plusIndent;
         this.breakBehaviour = breakBehaviour;
         this.breakabilityIfLastLevel = breakabilityIfLastLevel;
         this.debugName = debugName;
+        this.inlineability = inlineability;
     }
 
     /**
@@ -73,15 +77,15 @@ public final class Level extends Doc {
      * @param plusIndent the extra indent inside the {@code Level}
      * @param breakBehaviour whether to attempt breaking only the last inner level first, instead of this level
      * @param breakabilityIfLastLevel if last level, when to break this rather than parent
-     * @param debugName
      * @return the new {@code Level}
      */
     static Level make(
             Indent plusIndent,
             BreakBehaviour breakBehaviour,
             LastLevelBreakability breakabilityIfLastLevel,
-            Optional<String> debugName) {
-        return new Level(plusIndent, breakBehaviour, breakabilityIfLastLevel, debugName);
+            Optional<String> debugName,
+            Inlineability inlineability) {
+        return new Level(plusIndent, breakBehaviour, breakabilityIfLastLevel, debugName, inlineability);
     }
 
     /**
