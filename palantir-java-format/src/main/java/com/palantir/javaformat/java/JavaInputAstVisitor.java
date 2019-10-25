@@ -450,7 +450,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     @Override
     public Void visitNewArray(NewArrayTree node, Void unused) {
         if (node.getType() != null) {
-            builder.open(plusFour, BreakBehaviours.breakThisLevel(), LastLevelBreakability.BREAK_HERE);
+            builder.open(plusFour, BreakBehaviours.breakThisLevel(), LastLevelBreakability.CHECK_INNER);
             token("new");
             builder.space();
 
