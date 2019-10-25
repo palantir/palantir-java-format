@@ -61,6 +61,7 @@ import com.palantir.javaformat.BreakBehaviours;
 import com.palantir.javaformat.CloseOp;
 import com.palantir.javaformat.FormattingError;
 import com.palantir.javaformat.Indent;
+import com.palantir.javaformat.Inlineability;
 import com.palantir.javaformat.Input;
 import com.palantir.javaformat.LastLevelBreakability;
 import com.palantir.javaformat.Op;
@@ -2794,7 +2795,8 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                         trailingDereferences
                                 ? BreakBehaviours.preferBreakingLastInnerLevel(true)
                                 : BreakBehaviours.breakThisLevel())
-                .breakabilityIfLastLevel(LastLevelBreakability.ONLY_IF_FIRST_LEVEL_FITS)
+                .breakabilityIfLastLevel(LastLevelBreakability.ABORT)
+                .inlineability(Inlineability.IF_FIRST_LEVEL_FITS)
                 .columnLimitBeforeLastBreak(METHOD_CHAIN_COLUMN_LIMIT)
                 .build());
 

@@ -325,7 +325,15 @@ public final class Level extends Doc {
                     // We don't know how to fit the inner level on the same line, so bail out.
                     .otherwise_(Optional.empty());
 
-        } else if (lastLevel.getBreakabilityIfLastLevel() == LastLevelBreakability.ONLY_IF_FIRST_LEVEL_FITS) {
+        }
+
+        if (lastLevel.getBreakabilityIfLastLevel() != LastLevelBreakability.BREAK_HERE) {
+            return Optional.empty();
+        }
+
+        // Ok then, we are allowed to break here, but first verify that we have enough room to inline this last
+        // level's prefix.
+        if (lastLevel.inlineability() == Inlineability.IF_FIRST_LEVEL_FITS) {
             // Otherwise, we may be able to check if the first inner level of the lastLevel fits.
             // This is safe because we assume (and check) that a newline comes after it, even though
             // it might be nested somewhere deep in the 2nd level.
@@ -507,6 +515,10 @@ public final class Level extends Doc {
 
     LastLevelBreakability getBreakabilityIfLastLevel() {
         return openOp.breakabilityIfLastLevel();
+    }
+
+    public Inlineability inlineability() {
+        return openOp.inlineability();
     }
 
     public Optional<String> getDebugName() {
