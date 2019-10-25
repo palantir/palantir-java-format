@@ -1,7 +1,8 @@
 class PalantirLongSafeArg {
     public static void foo() {
         Preconditions.checkArgument(
-                hostPortString.charAt(0) == '[', "Bracketed host-port string must start with a bracket", SafeArg.of(
-                        "port", hostPortString));
+                hostPortString.charAt(0) == '[',
+                "Bracketed host-port string must start with a bracket",
+                SafeArg.of("port", hostPortString));
     }
 }
