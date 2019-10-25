@@ -47,16 +47,20 @@ public abstract class State {
      */
     public abstract int branchingCoefficient();
 
+    @Value.Auxiliary
     protected abstract Set<BreakTag> breakTagsTaken();
 
+    @Value.Auxiliary
     protected abstract TreeMap<Break, BreakState> breakStates();
 
+    @Value.Auxiliary
     protected abstract TreeMap<Level, LevelState> levelStates();
 
     /**
      * Keep track of how each {@link Tok} was written (these are mostly comments), which can differ depending on the
      * starting column and the maxLength.
      */
+    @Value.Auxiliary
     protected abstract TreeMap<Tok, TokState> tokStates();
 
     public static State startingState() {
