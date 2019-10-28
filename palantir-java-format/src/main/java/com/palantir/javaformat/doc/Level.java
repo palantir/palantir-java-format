@@ -180,15 +180,15 @@ public final class Level extends Doc {
 
         @Override
         public State breakOnlyIfInnerLevelsThenFitOnOneLine(boolean keepIndentWhenInlined) {
-            State broken = breakNormally(this.state);
-            Optional<State> maybeInlined = handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
-                    commentsHelper, maxWidth, this.state, broken, keepIndentWhenInlined);
-            return maybeInlined.orElse(broken);
+            return handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
+                    commentsHelper, maxWidth, this.state, keepIndentWhenInlined);
         }
     }
 
-    private Optional<State> handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
-            CommentsHelper commentsHelper, int maxWidth, State state, State brokenState, boolean keepIndent) {
+    private State handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
+            CommentsHelper commentsHelper, int maxWidth, State state, boolean keepIndent) {
+        State brokenState = computeBroken(commentsHelper, maxWidth, state.withIndentIncrementedBy(plusIndent));
+
         List<Level> innerLevels = this.docs.stream()
                 .filter(doc -> doc instanceof Level)
                 .map(doc -> ((Level) doc))
@@ -196,7 +196,6 @@ public final class Level extends Doc {
 
         boolean anyLevelWasBroken = innerLevels.stream().anyMatch(level -> !brokenState.isOneLine(level));
 
-        boolean prefixFits = false;
         if (anyLevelWasBroken) {
             // Find the last level, skipping empty levels (that contain nothing, or are made up
             // entirely of other empty levels).
@@ -210,24 +209,27 @@ public final class Level extends Doc {
                     .orElseThrow(() -> new IllegalStateException(
                             "Levels were broken so expected to find at least a non-empty level"));
 
-            // Add the width of tokens, breaks before the lastLevel. We must always have space for
-            // these.
-            List<Doc> leadingDocs = docs.subList(0, docs.indexOf(lastLevel));
-            float leadingWidth = getWidth(leadingDocs);
-
-            // Potentially add the width of prefixes we want to consider as part of the width that
-            // must fit on the same line, so that we don't accidentally break prefixes when we could
-            // have avoided doing so.
-            leadingWidth += new CountWidthUntilBreakVisitor(maxWidth - state.indent()).visit(lastLevel);
-
-            boolean fits = !Float.isInfinite(leadingWidth) && state.column() + leadingWidth <= maxWidth;
-
-            if (fits) {
-                prefixFits = true;
-            }
+            return inlineUpToLastDocThatIsALevel(commentsHelper, maxWidth, state, keepIndent, lastLevel)
+                    .orElse(brokenState);
         }
+        return brokenState;
+    }
 
-        if (prefixFits) {
+    private Optional<State> inlineUpToLastDocThatIsALevel(
+            CommentsHelper commentsHelper, int maxWidth, State state, boolean keepIndent, Level lastLevel) {
+        // Add the width of tokens, breaks before the lastLevel. We must always have space for
+        // these.
+        List<Doc> leadingDocs = docs.subList(0, docs.indexOf(lastLevel));
+        float leadingWidth = getWidth(leadingDocs);
+
+        // Potentially add the width of prefixes we want to consider as part of the width that
+        // must fit on the same line, so that we don't accidentally break prefixes when we could
+        // have avoided doing so.
+        leadingWidth += new CountWidthUntilBreakVisitor(maxWidth - state.indent()).visit(lastLevel);
+
+        boolean fits = !Float.isInfinite(leadingWidth) && state.column() + leadingWidth <= maxWidth;
+
+        if (fits) {
             State newState = state.withNoIndent();
             if (keepIndent) {
                 newState = newState.withIndentIncrementedBy(plusIndent);
@@ -283,7 +285,6 @@ public final class Level extends Doc {
                     })
                     // We don't know how to fit the inner level on the same line, so bail out.
                     .otherwise_(Optional.empty());
-
         }
 
         if (lastLevel.breakabilityIfLastLevel != LastLevelBreakability.BREAK_HERE) {
