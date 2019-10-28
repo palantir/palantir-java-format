@@ -5,24 +5,26 @@ class B20128760 {
 
         XxxxxxxxxXxx.<Xxxxxx, Xxxxxx>xxxxxxx()
                 .xxx(XxxxxxxxxXxxXxxx.Xxxxx.XXXXX, "Xxxxx xxxxxxxxx xxxxx")
-                .xxx(XxxxxxxxxXxxXxxx.Xxxxx.XXXXXxXXXXX, XxxxXxxxxxxxxx.xxxXxxxxxxxxXxxxxXxxxxXxXxxxxx(
-                        Xxxxxxxxxx.xxxXxxxXxxxx(x)))
+                .xxx(
+                        XxxxxxxxxXxxXxxx.Xxxxx.XXXXXxXXXXX,
+                        XxxxXxxxxxxxxx.xxxXxxxxxxxxXxxxxXxxxxXxXxxxxx(Xxxxxxxxxx.xxxXxxxXxxxx(x)))
                 .xxxxx();
 
-        xxxxxxXxxx(
-                        xxx.xxxXxXxxxxxxx(new XxxxxxxxxXxxxxxxx.Xxxxxxx()
-                                        .xxxxXxxxXxx(Xxxxx.xxxXxxxxXxxx(new XxxxXx(
-                                                xxxxxxxxx1.xxxXxxxXx().xxxXxxxx() + xxxxxxxxx2.xxxXxxxXx().xxxXxxxx())))
-                                        .xxxxx())
-                                .xxxXxxxxxx())
+        xxxxxxXxxx(xxx.xxxXxXxxxxxxx(new XxxxxxxxxXxxxxxxx.Xxxxxxx()
+                                .xxxxXxxxXxx(Xxxxx.xxxXxxxxXxxx(new XxxxXx(
+                                        xxxxxxxxx1.xxxXxxxXx().xxxXxxxx() + xxxxxxxxx2.xxxXxxxXx().xxxXxxxx())))
+                                .xxxxx())
+                        .xxxXxxxxxx())
                 .xxxxxxxxXxxxxxx();
 
         XXxxxx<Xxxx, XxxxxxxXxxxxxxxxxxXxxxxxxxx> xxxxxxxxxXxxXxxXxXxxxxxxxXx = XX.xxxxXxxXxxx2(
                         "XxxxXxxxxxxxXxxxXxxxXxxxxxxxXxxxXxxXxxxxxxXxxxxxxxx",
                         xxxxxxxxXxxxXxXxxxxxxxXx,
                         xxxxxxxxXxxxXxxxxXxxxXxXxxxxxxxXx)
-                .xxxxxxxxXx("XxxxxxxxXxxxxxxxxXxx", xxxxxxxxXxxxxxxxxXxxXx, XX.xxxxxXx(
-                        XX.xxxxx(), XX.xxxxxx(XxxxxxxXxxxxxxxxxxXxxxxxxxx.xxxxx)));
+                .xxxxxxxxXx(
+                        "XxxxxxxxXxxxxxxxxXxx",
+                        xxxxxxxxXxxxxxxxxXxxXx,
+                        XX.xxxxxXx(XX.xxxxx(), XX.xxxxxx(XxxxxxxXxxxxxxxxxxXxxxxxxxx.xxxxx)));
 
         xxXxxxxxxxXxxxXxxx = (XxxxXxxx)
                 xxxxxxxxXxxxxxxxxx
@@ -32,10 +34,9 @@ class B20128760 {
                         .xxxXxxx()
                         .xxxxXxxxXxXx(X.xx.xxxxxxxxxxxxxxxxxxxxxxxxxxx);
 
-        xxxxxxXxxx(
-                        xxxxxxxxxx
-                                .xxxXxxxXxxxxXxxxxxxxxxxXxxxXxxxXxxxxXxxx(XXXxXXXXxXX, XXXXXXxXXXxXXXXxXX, XXXXXxXX)
-                                .xxxxxxxxxxxXxxxXxxxXxxxxx())
+        xxxxxxXxxx(xxxxxxxxxx
+                        .xxxXxxxXxxxxXxxxxxxxxxxXxxxXxxxXxxxxXxxx(XXXxXXXXxXX, XXXXXXxXXXxXXXXxXX, XXXXXxXX)
+                        .xxxxxxxxxxxXxxxXxxxXxxxxx())
                 .xxxxxxxxXxxxxxx(
                         xxxxXxxxxxxxxxxXxxxXxxxXxxxx(xxxx1Xxxx, Xxxxx.XXxXXX),
                         xxxxXxxxxxxxxxxXxxxXxxxXxxxx(xxxx2Xxxx, Xxxxx.XXxXXX));
