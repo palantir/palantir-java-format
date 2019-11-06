@@ -2774,13 +2774,8 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         builder.open(OpenOp.builder()
                 .debugName("visitDotWithPrefix")
                 .plusIndent(plusFour)
-                // This can't be preferBreakingLastInnerLevel unless we have breaks in _this_ level.
-                // That's only ever the case if trailingDereferences is true.
-                .breakBehaviour(
-                        trailingDereferences
-                                ? BreakBehaviours.preferBreakingLastInnerLevel(true)
-                                : BreakBehaviours.breakThisLevel())
-                .breakabilityIfLastLevel(LastLevelBreakability.ABORT)
+                .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(true))
+                .breakabilityIfLastLevel(LastLevelBreakability.CHECK_INNER)
                 .inlineability(Inlineability.IF_FIRST_LEVEL_FITS)
                 .build());
 
@@ -2982,12 +2977,33 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
          `breakThisLevel` would break B20701054 ( `analysis().analyze(⏎` )
          However we definitely don't wanna look inside for B18479811
          Solution: argList should CHECK_INNER.
+
+         If there is a single argument however, we relax the conditions by allowing it to inline a prefix of that
+         argument's level (if any), in order to support things like:
+
+         method(arg1.stream()
+                 .filter(...)
+                 .map(...));
+
+         or:
+
+         throw new RuntimeException(String.format(
+                 "message",
+                 arg, arg, arg));
         */
+
         builder.open(OpenOp.builder()
                 .debugName("addArguments")
                 .plusIndent(plusIndent)
-                .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(false))
-                .breakabilityIfLastLevel(LastLevelBreakability.CHECK_INNER)
+                .breakBehaviour(
+                        arguments.size() == 1
+                                // jared style, or else inline
+                                ? BreakBehaviours.breakOnlyIfInnerLevelsThenFitOnOneLine(false)
+                                : BreakBehaviours.preferBreakingLastInnerLevel(false))
+                .breakabilityIfLastLevel(
+                        // don't think we ever want BREAK_HERE.
+                        // arguments.size() == 1 ? LastLevelBreakability.INLINE_ONLY :
+                        LastLevelBreakability.CHECK_INNER)
                 .build());
         token("(");
         if (!arguments.isEmpty()) {
@@ -3036,6 +3052,10 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 .plusIndent(ZERO)
                 .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(true))
                 .breakabilityIfLastLevel(LastLevelBreakability.CHECK_INNER)
+                .inlineability(
+                        arguments.size() > 1
+                                ? Inlineability.NOT_INLINEABLE_AND_POISON_FUTURE_INLINING_ON_THIS_LINE
+                                : Inlineability.ALWAYS_INLINEABLE)
                 .build());
         boolean first = true;
         FillMode fillMode = hasOnlyShortItems(arguments) ? FillMode.INDEPENDENT : FillMode.UNIFIED;
