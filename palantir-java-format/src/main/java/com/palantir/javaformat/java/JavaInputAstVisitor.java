@@ -3268,6 +3268,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         int baseDims = 0;
 
         builder.open(
+                "declareOne",
                 kind == DeclarationKind.PARAMETER
                                 && (modifiers.isPresent() && !modifiers.get().getAnnotations().isEmpty())
                         ? plusFour
@@ -3276,16 +3277,16 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             if (modifiers.isPresent()) {
                 visitAndBreakModifiers(modifiers.get(), annotationsDirection, Optional.of(verticalAnnotationBreak));
             }
-            builder.open(type != null ? plusFour : ZERO);
+            builder.open("declareOne type, dims and receiver", type != null ? plusFour : ZERO);
             {
-                builder.open(ZERO);
+                builder.open("declareOne type, dims and receiver (2)", ZERO);
                 {
-                    builder.open(ZERO);
+                    builder.open("declareOne typeWithDims", ZERO);
                     {
                         if (typeWithDims.isPresent() && typeWithDims.get().node != null) {
                             scan(typeWithDims.get().node, null);
                             int totalDims = dims.size();
-                            builder.open(plusFour);
+                            builder.open("declareOne dims", plusFour);
                             maybeAddDims(dims);
                             builder.close();
                             baseDims = totalDims - dims.size();
@@ -3301,7 +3302,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
 
                     // conditionally ident the name and initializer +4 if the type spans
                     // multiple lines
-                    builder.open(Indent.If.make(typeBreak, plusFour, ZERO));
+                    builder.open("declareOne receiver/name", Indent.If.make(typeBreak, plusFour, ZERO));
                     if (receiverExpression.isPresent()) {
                         scan(receiverExpression.get(), null);
                     } else {
@@ -3324,10 +3325,12 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                     initializer.get().accept(this, null);
                     builder.close();
                 } else {
-                    builder.open(
-                            Indent.If.make(typeBreak, plusFour, ZERO),
-                            BreakBehaviours.breakOnlyIfInnerLevelsThenFitOnOneLine(true),
-                            LastLevelBreakability.ABORT);
+                    builder.open(OpenOp.builder()
+                            .debugName("declareOne initializer")
+                            .plusIndent(Indent.If.make(typeBreak, plusFour, ZERO))
+                            .breakBehaviour(BreakBehaviours.breakOnlyIfInnerLevelsThenFitOnOneLine(true))
+                            .breakabilityIfLastLevel(LastLevelBreakability.ABORT)
+                            .build());
                     {
                         builder.breakToFill(" ");
                         scan(initializer.get(), null);
