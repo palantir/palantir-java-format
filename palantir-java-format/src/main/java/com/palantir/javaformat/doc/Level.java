@@ -158,7 +158,10 @@ public final class Level extends Doc {
         }
 
         @Override
-        public State preferBreakingLastInnerLevel(boolean _keepIndentWhenInlined) {
+        public State preferBreakingLastInnerLevel(boolean keepIndentWhenInlined, boolean replaceIndent) {
+            if (!replaceIndent) {
+                return breakThisLevel();
+            }
             // Try both breaking and not breaking. Choose the better one based on LOC, preferring
             // breaks if the outcome is the same.
             State state = this.state.withNewBranch();
@@ -167,7 +170,14 @@ public final class Level extends Doc {
             if (state.branchingCoefficient() < MAX_BRANCHING_COEFFICIENT) {
                 // No plusIndent the first time around, since we expect this whole level (except part of the last inner
                 // level) to be on the first line.
-                Optional<State> lastLevelBroken = tryBreakLastLevel(commentsHelper, maxWidth, state.withNoIndent());
+                state = state.withNoIndent();
+                // TODO are we sure about this?
+                /*
+                if (keepIndentWhenInlined) {
+                    state = state.withIndentIncrementedBy(plusIndent);
+                }
+                */
+                Optional<State> lastLevelBroken = tryBreakLastLevel(commentsHelper, maxWidth, state, true);
 
                 if (lastLevelBroken.isPresent()) {
                     if (lastLevelBroken.get().numLines() < broken.numLines()) {
@@ -179,14 +189,17 @@ public final class Level extends Doc {
         }
 
         @Override
-        public State breakOnlyIfInnerLevelsThenFitOnOneLine(boolean keepIndentWhenInlined) {
+        public State breakOnlyIfInnerLevelsThenFitOnOneLine(boolean keepIndentWhenInlined, boolean replaceIndent) {
+            if (!replaceIndent) {
+                return breakThisLevel();
+            }
             return handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
-                    commentsHelper, maxWidth, this.state, keepIndentWhenInlined);
+                    commentsHelper, maxWidth, this.state, keepIndentWhenInlined, true);
         }
     }
 
     private State handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
-            CommentsHelper commentsHelper, int maxWidth, State state, boolean keepIndent) {
+            CommentsHelper commentsHelper, int maxWidth, State state, boolean keepIndent, boolean replaceIndent) {
         State brokenState = computeBroken(commentsHelper, maxWidth, state.withIndentIncrementedBy(plusIndent));
 
         List<Level> innerLevels = this.docs.stream()
@@ -209,14 +222,19 @@ public final class Level extends Doc {
                     .orElseThrow(() -> new IllegalStateException(
                             "Levels were broken so expected to find at least a non-empty level"));
 
-            return inlineUpToLastDocThatIsALevel(commentsHelper, maxWidth, state, keepIndent, lastLevel)
+            return inlineUpToLastDocThatIsALevel(commentsHelper, maxWidth, state, keepIndent, lastLevel, replaceIndent)
                     .orElse(brokenState);
         }
         return brokenState;
     }
 
     private Optional<State> inlineUpToLastDocThatIsALevel(
-            CommentsHelper commentsHelper, int maxWidth, State state, boolean keepIndent, Level lastLevel) {
+            CommentsHelper commentsHelper,
+            int maxWidth,
+            State state,
+            boolean keepIndent,
+            Level lastLevel,
+            boolean replaceIndent) {
         // Add the width of tokens, breaks before the lastLevel. We must always have space for
         // these.
         List<Doc> leadingDocs = docs.subList(0, docs.indexOf(lastLevel));
@@ -230,7 +248,10 @@ public final class Level extends Doc {
         boolean fits = !Float.isInfinite(leadingWidth) && state.column() + leadingWidth <= maxWidth;
 
         if (fits) {
-            State newState = state.withNoIndent();
+            State newState = state;
+            if (replaceIndent) {
+                newState = newState.withNoIndent();
+            }
             if (keepIndent) {
                 newState = newState.withIndentIncrementedBy(plusIndent);
             }
@@ -276,12 +297,28 @@ public final class Level extends Doc {
         if (lastLevel.breakabilityIfLastLevel == LastLevelBreakability.CHECK_INNER) {
             // Try to fit the entire inner prefix if it's that kind of level.
             return BreakBehaviours.caseOf(lastLevel.breakBehaviour)
-                    .preferBreakingLastInnerLevel(keepIndentWhenInlined -> {
+                    .preferBreakingLastInnerLevel((keepIndentWhenInlined, replaceIndent) -> {
                         State state2 = state1;
+                        // This is to break cycles of visitRegularDot -> ... -> visitRegularDot
+                        if (replaceIndent) {
+                            state2 = state2.withNoIndent();
+                        }
                         if (keepIndentWhenInlined) {
                             state2 = state2.withIndentIncrementedBy(lastLevel.getPlusIndent());
                         }
-                        return lastLevel.tryBreakLastLevel(commentsHelper, maxWidth, state2);
+                        return lastLevel.tryBreakLastLevel(commentsHelper, maxWidth, state2, canInline);
+                    })
+                    // This case always succeeds, but might not always allow inlining.
+                    .breakOnlyIfInnerLevelsThenFitOnOneLine((keepIndentWhenInlined, replaceIndent) -> {
+                        if (!canInline) {
+                            return Optional.empty();
+                        }
+                        return Optional.of(lastLevel.handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
+                                commentsHelper,
+                                maxWidth,
+                                state1.withBrokenLevel(),
+                                keepIndentWhenInlined,
+                                replaceIndent));
                     })
                     // We don't know how to fit the inner level on the same line, so bail out.
                     .otherwise_(Optional.empty());

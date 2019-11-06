@@ -20,14 +20,14 @@ public abstract class BreakBehaviour {
          *     reached via a previous `preferBreakingLastInnerLevel` whose breakability was {@link
          *     LastLevelBreakability#CHECK_INNER})
          */
-        R preferBreakingLastInnerLevel(boolean keepIndentWhenInlined);
+        R preferBreakingLastInnerLevel(boolean keepIndentWhenInlined, boolean replaceIndent);
 
         /**
          * Break if by doing so all inner levels then fit on a single line. However, don't break if we can fit in the
          * {@link Doc docs} up to the first break (which might be nested inside the next doc if it's a {@link Level}),
          * in order to prevent exceeding the maxLength accidentally.
          */
-        R breakOnlyIfInnerLevelsThenFitOnOneLine(boolean keepIndentWhenInlined);
+        R breakOnlyIfInnerLevelsThenFitOnOneLine(boolean keepIndentWhenInlined, boolean replaceIndent);
     }
 
     public abstract <R> R match(Cases<R> cases);
