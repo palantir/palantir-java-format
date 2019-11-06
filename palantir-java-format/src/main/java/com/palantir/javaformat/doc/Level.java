@@ -261,7 +261,11 @@ public final class Level extends Doc {
         return Optional.empty();
     }
 
-    private Optional<State> tryBreakLastLevel(CommentsHelper commentsHelper, int maxWidth, State state) {
+    private Optional<State> tryBreakLastLevel(
+            CommentsHelper commentsHelper, int maxWidth, State state, boolean canInlineSoFar) {
+        boolean canInline =
+                canInlineSoFar && inlineability != Inlineability.NOT_INLINEABLE_AND_POISON_FUTURE_INLINING_ON_THIS_LINE;
+
         if (docs.isEmpty() || !(getLast(docs) instanceof Level)) {
             return Optional.empty();
         }
