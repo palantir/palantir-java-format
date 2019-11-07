@@ -323,6 +323,7 @@ public final class Level extends Doc {
                         }
                         State state2 = state1.withBrokenLevel();
                         logDecision(state2, "Recursing into inner level");
+                        lastLevel.logLevelAndState(state2, true);
                         state2 = state2.increaseDepth();
                         return Optional.of(lastLevel.handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
                                 commentsHelper, maxWidth, state2, keepIndentWhenInlined, replaceIndent));
