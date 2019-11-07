@@ -169,10 +169,9 @@ public final class Level extends Doc {
             // breaks if the outcome is the same.
             State state = this.state.withNewBranch();
 
+            logDecision(state, "breaking normally first");
             State broken = breakNormally(state);
             if (state.branchingCoefficient() < MAX_BRANCHING_COEFFICIENT) {
-                // No plusIndent the first time around, since we expect this whole level (except part of the last inner
-                // level) to be on the first line.
                 state = state.withNoIndent();
                 // TODO are we sure about this?
                 /*
@@ -205,6 +204,7 @@ public final class Level extends Doc {
 
     private State handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
             CommentsHelper commentsHelper, int maxWidth, State state, boolean keepIndent, boolean replaceIndent) {
+        logDecision(state, "breaking normally first");
         State brokenState = computeBroken(commentsHelper, maxWidth, state.withIndentIncrementedBy(plusIndent));
 
         List<Level> innerLevels = this.docs.stream()
@@ -312,6 +312,7 @@ public final class Level extends Doc {
                         if (keepIndentWhenInlined) {
                             state2 = state2.withIndentIncrementedBy(lastLevel.getPlusIndent());
                         }
+                        logDecision(state2, "Recursing into inner level");
                         lastLevel.logLevelAndState(state2, true);
                         state2 = state2.increaseDepth();
                         return lastLevel.tryBreakLastLevel(commentsHelper, maxWidth, state2, canInline);
@@ -321,12 +322,11 @@ public final class Level extends Doc {
                         if (!canInline) {
                             return Optional.empty();
                         }
+                        State state2 = state1.withBrokenLevel();
+                        logDecision(state2, "Recursing into inner level");
+                        state2 = state2.increaseDepth();
                         return Optional.of(lastLevel.handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
-                                commentsHelper,
-                                maxWidth,
-                                state1.withBrokenLevel(),
-                                keepIndentWhenInlined,
-                                replaceIndent));
+                                commentsHelper, maxWidth, state2, keepIndentWhenInlined, replaceIndent));
                     })
                     // We don't know how to fit the inner level on the same line, so bail out.
                     .otherwise_(Optional.empty());
