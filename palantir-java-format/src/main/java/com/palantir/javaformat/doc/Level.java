@@ -105,7 +105,7 @@ public final class Level extends Doc {
     public State computeBreaks(CommentsHelper commentsHelper, int maxWidth, State state) {
         return tryToFitOnOneLine(maxWidth, state).orElseGet(() -> {
             logLevelAndState(state, true);
-            State newState = breakBehaviour.match(new BreakImpl(commentsHelper, maxWidth, state.increaseDepth()));
+            State newState = getBreakBehaviour().match(new BreakImpl(commentsHelper, maxWidth, state.increaseDepth()));
 
             return logLevelAndState(state.updateAfterLevel(newState), false);
         });
@@ -167,10 +167,9 @@ public final class Level extends Doc {
             // breaks if the outcome is the same.
             State state = this.state.withNewBranch();
 
+            logDecision(state, "breaking normally first");
             State broken = breakNormally(state);
             if (state.branchingCoefficient() < MAX_BRANCHING_COEFFICIENT) {
-                // No plusIndent the first time around, since we expect this whole level (except part of the last inner
-                // level) to be on the first line.
                 state = state.withNoIndent();
                 logDecision(state, "tryBreakLastLevel");
                 Optional<State> lastLevelBroken = tryBreakLastLevel(commentsHelper, maxWidth, state, true);
@@ -186,7 +185,7 @@ public final class Level extends Doc {
 
         @Override
         public State breakOnlyIfInnerLevelsThenFitOnOneLine(boolean keepIndentWhenInlined) {
-            logDecision(state, "breakNormally");
+            logDecision(state, "breaking normally first");
             State broken = breakNormally(this.state);
             logDecision(state, "handleBreakOnlyIfInnerLevelsThenFitOnOneLine");
             Optional<State> maybeInlined = handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
@@ -288,6 +287,7 @@ public final class Level extends Doc {
                         if (keepIndentWhenInlined) {
                             state2 = state2.withIndentIncrementedBy(lastLevel.getPlusIndent());
                         }
+                        logDecision(state2, "Recursing into inner level");
                         lastLevel.logLevelAndState(state2, true);
                         state2 = state2.increaseDepth();
                         return lastLevel.tryBreakLastLevel(commentsHelper, maxWidth, state2, true);
