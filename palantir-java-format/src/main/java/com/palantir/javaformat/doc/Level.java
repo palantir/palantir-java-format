@@ -222,8 +222,14 @@ public final class Level extends Doc {
                     .orElseThrow(() -> new IllegalStateException(
                             "Levels were broken so expected to find at least a non-empty level"));
 
-            return inlineUpToLastDocThatIsALevel(commentsHelper, maxWidth, state, keepIndent, lastLevel, replaceIndent)
-                    .orElse(brokenState);
+            if (replaceIndent) {
+                state = state.withNoIndent();
+            }
+            if (keepIndent) {
+                state = state.withIndentIncrementedBy(plusIndent);
+            }
+
+            return inlineUpToLastDocThatIsALevel(commentsHelper, maxWidth, state, lastLevel).orElse(brokenState);
         }
         return brokenState;
     }
@@ -232,9 +238,7 @@ public final class Level extends Doc {
             CommentsHelper commentsHelper,
             int maxWidth,
             State state,
-            boolean keepIndent,
-            Level lastLevel,
-            boolean replaceIndent) {
+            Level lastLevel) {
         // Add the width of tokens, breaks before the lastLevel. We must always have space for
         // these.
         List<Doc> leadingDocs = docs.subList(0, docs.indexOf(lastLevel));
@@ -248,15 +252,8 @@ public final class Level extends Doc {
         boolean fits = !Float.isInfinite(leadingWidth) && state.column() + leadingWidth <= maxWidth;
 
         if (fits) {
-            State newState = state;
-            if (replaceIndent) {
-                newState = newState.withNoIndent();
-            }
-            if (keepIndent) {
-                newState = newState.withIndentIncrementedBy(plusIndent);
-            }
             return Optional.of(
-                    tryToLayOutLevelOnOneLine(commentsHelper, maxWidth, newState, memoizedSplitsBreaks.get()));
+                    tryToLayOutLevelOnOneLine(commentsHelper, maxWidth, state, memoizedSplitsBreaks.get()));
         }
         return Optional.empty();
     }
