@@ -335,6 +335,14 @@ public final class Level extends Doc {
             return Optional.empty();
         }
 
+        // Experimental: clear accumulated indent if level we are breaking at would prefer replacing indent
+        State state2;
+        if (BreakBehaviours.getReplaceIndent(lastLevel.breakBehaviour).orElse(false)) {
+            state2 = state1.withNoIndent();
+        } else {
+            state2 = state1;
+        }
+
         // Ok then, we are allowed to break here, but first verify that we have enough room to inline this last
         // level's prefix.
         if (lastLevel.inlineability == Inlineability.IF_FIRST_LEVEL_FITS) {
@@ -343,7 +351,7 @@ public final class Level extends Doc {
             // it might be nested somewhere deep in the 2nd level.
 
             float firstLevelWidth = lastLevel.docs.get(0).getWidth();
-            boolean enoughRoom = state1.column() + firstLevelWidth <= maxWidth;
+            boolean enoughRoom = state2.column() + firstLevelWidth <= maxWidth;
 
             // Enforce our assumption.
             if (lastLevel.docs.size() > 1) {
@@ -359,7 +367,7 @@ public final class Level extends Doc {
 
         // Note: computeBreaks, not computeBroken, so it can try to do this logic recursively for the
         // lastLevel
-        return Optional.of(lastLevel.computeBreaks(commentsHelper, maxWidth, state1));
+        return Optional.of(lastLevel.computeBreaks(commentsHelper, maxWidth, state2));
     }
 
     private State logLevelAndState(State state, boolean in) {
