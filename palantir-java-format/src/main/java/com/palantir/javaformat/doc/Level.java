@@ -20,6 +20,7 @@ import static com.google.common.collect.Iterables.getLast;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
@@ -103,8 +104,10 @@ public final class Level extends Doc {
     @Override
     public State computeBreaks(CommentsHelper commentsHelper, int maxWidth, State state) {
         return tryToFitOnOneLine(maxWidth, state).orElseGet(() -> {
-            State newState = getBreakBehaviour().match(new BreakImpl(commentsHelper, maxWidth, state));
-            return state.updateAfterLevel(newState);
+            logLevelAndState(state, true);
+            State newState = breakBehaviour.match(new BreakImpl(commentsHelper, maxWidth, state.increaseDepth()));
+
+            return logLevelAndState(state.updateAfterLevel(newState), false);
         });
     }
 
@@ -168,8 +171,9 @@ public final class Level extends Doc {
             if (state.branchingCoefficient() < MAX_BRANCHING_COEFFICIENT) {
                 // No plusIndent the first time around, since we expect this whole level (except part of the last inner
                 // level) to be on the first line.
-                Optional<State> lastLevelBroken =
-                        tryBreakLastLevel(commentsHelper, maxWidth, state.withNoIndent(), false);
+                state = state.withNoIndent();
+                logDecision(state, "tryBreakLastLevel");
+                Optional<State> lastLevelBroken = tryBreakLastLevel(commentsHelper, maxWidth, state, true);
 
                 if (lastLevelBroken.isPresent()) {
                     if (lastLevelBroken.get().numLines() < broken.numLines()) {
@@ -182,7 +186,9 @@ public final class Level extends Doc {
 
         @Override
         public State breakOnlyIfInnerLevelsThenFitOnOneLine(boolean keepIndentWhenInlined) {
+            logDecision(state, "breakNormally");
             State broken = breakNormally(this.state);
+            logDecision(state, "handleBreakOnlyIfInnerLevelsThenFitOnOneLine");
             Optional<State> maybeInlined = handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
                     commentsHelper, maxWidth, this.state, broken, keepIndentWhenInlined);
             return maybeInlined.orElse(broken);
@@ -282,6 +288,8 @@ public final class Level extends Doc {
                         if (keepIndentWhenInlined) {
                             state2 = state2.withIndentIncrementedBy(lastLevel.getPlusIndent());
                         }
+                        lastLevel.logLevelAndState(state2, true);
+                        state2 = state2.increaseDepth();
                         return lastLevel.tryBreakLastLevel(commentsHelper, maxWidth, state2, true);
                     })
                     // We don't know how to fit the inner level on the same line, so bail out.
@@ -310,6 +318,22 @@ public final class Level extends Doc {
         // Note: computeBreaks, not computeBroken, so it can try to do this logic recursively for the
         // lastLevel
         return Optional.of(lastLevel.computeBreaks(commentsHelper, maxWidth, state1));
+    }
+
+    private State logLevelAndState(State state, boolean in) {
+        String prefix = in ? "->" : "<-";
+        System.err.println(Strings.repeat("  ", state.depth())
+                + prefix
+                + getDebugName().map(it -> " \"" + it + "\"").orElse("")
+                + BreakBehaviours.caseOf(getBreakBehaviour()).breakThisLevel_("").otherwise(() ->
+                        " " + getBreakBehaviour())
+                + " "
+                + state.toString());
+        return state;
+    }
+
+    private void logDecision(State state, String decision) {
+        System.err.println(Strings.repeat("  ", state.depth()) + "-- DECISION: " + decision + " " + state.toString());
     }
 
     private static void assertStartsWithBreakOrEmpty(State state, Doc doc) {
