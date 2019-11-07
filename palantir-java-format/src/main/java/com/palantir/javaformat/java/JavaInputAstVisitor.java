@@ -2695,7 +2695,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             builder.open(OpenOp.builder()
                     .debugName("visitRegularDot")
                     .plusIndent(plusFour)
-                    .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(false, true))
+                    .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(true, true))
                     .breakabilityIfLastLevel(LastLevelBreakability.CHECK_INNER)
                     .build());
         }

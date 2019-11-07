@@ -174,7 +174,6 @@ public final class Level extends Doc {
             if (state.branchingCoefficient() < MAX_BRANCHING_COEFFICIENT) {
                 state = state.withNoIndent();
                 // TODO are we sure about this?
-                /*
                 if (keepIndentWhenInlined) {
                     state = state.withIndentIncrementedBy(plusIndent);
                 }
