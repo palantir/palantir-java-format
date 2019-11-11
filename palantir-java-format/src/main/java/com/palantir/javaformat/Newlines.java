@@ -99,7 +99,7 @@ public class Newlines {
         return new LineIterator(input);
     }
 
-    private static class LineOffsetIterator implements Iterator<Integer> {
+    private static final class LineOffsetIterator implements Iterator<Integer> {
 
         private int curr = 0;
         private int idx = 0;
@@ -150,7 +150,7 @@ public class Newlines {
         }
     }
 
-    private static class LineIterator implements Iterator<String> {
+    private static final class LineIterator implements Iterator<String> {
 
         int idx;
         String curr;

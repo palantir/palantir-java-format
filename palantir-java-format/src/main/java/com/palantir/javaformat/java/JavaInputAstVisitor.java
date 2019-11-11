@@ -278,16 +278,16 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     private final Indent.Const plusTwo;
     private final Indent.Const plusFour;
 
-    private static final ImmutableList<Op> breakList(Optional<BreakTag> breakTag) {
+    private static ImmutableList<Op> breakList(Optional<BreakTag> breakTag) {
         return ImmutableList.of(Break.make(FillMode.UNIFIED, " ", ZERO, breakTag));
     }
 
-    private static final ImmutableList<Op> breakFillList(Optional<BreakTag> breakTag) {
+    private static ImmutableList<Op> breakFillList(Optional<BreakTag> breakTag) {
         return ImmutableList.of(
                 OpenOp.make(ZERO), Break.make(FillMode.INDEPENDENT, " ", ZERO, breakTag), CloseOp.make());
     }
 
-    private static final ImmutableList<Op> forceBreakList(Optional<BreakTag> breakTag) {
+    private static ImmutableList<Op> forceBreakList(Optional<BreakTag> breakTag) {
         return ImmutableList.of(Break.make(FillMode.FORCED, "", Indent.Const.ZERO, breakTag));
     }
 
@@ -3580,7 +3580,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
      *
      * @param token the {@link String} to wrap in a {@link Token}
      */
-    final void token(String token) {
+    void token(String token) {
         builder.token(token, Token.RealOrImaginary.REAL, ZERO, /* breakAndIndentTrailingComment= */ Optional.empty());
     }
 
@@ -3590,7 +3590,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
      * @param token the {@link String} to wrap in a {@link Token}
      * @param plusIndentCommentsBefore extra indent for comments before this token
      */
-    final void token(String token, Indent plusIndentCommentsBefore) {
+    void token(String token, Indent plusIndentCommentsBefore) {
         builder.token(
                 token,
                 Token.RealOrImaginary.REAL,
@@ -3599,7 +3599,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     }
 
     /** Emit a {@link Token}, and breaks and indents trailing javadoc or block comments. */
-    final void tokenBreakTrailingComment(String token, Indent breakAndIndentTrailingComment) {
+    void tokenBreakTrailingComment(String token, Indent breakAndIndentTrailingComment) {
         builder.token(token, Token.RealOrImaginary.REAL, ZERO, Optional.of(breakAndIndentTrailingComment));
     }
 
@@ -3615,12 +3615,12 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
      *
      * @param node the ASTNode holding the input position
      */
-    final void sync(Tree node) {
+    void sync(Tree node) {
         builder.sync(((JCTree) node).getStartPosition());
     }
 
     @Override
-    public final String toString() {
+    public String toString() {
         return MoreObjects.toStringHelper(this).add("builder", builder).toString();
     }
 }

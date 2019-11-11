@@ -88,7 +88,7 @@ public class RemoveUnusedImports {
     // This is still reasonably effective in practice because type names differ
     // from other kinds of names in casing convention, and simple name
     // clashes between imported and declared types are rare.
-    private static class UnusedImportScanner extends TreePathScanner<Void, Void> {
+    private static final class UnusedImportScanner extends TreePathScanner<Void, Void> {
 
         private final Set<String> usedNames = new LinkedHashSet<>();
         private final Multimap<String, Range<Integer>> usedInJavadoc = HashMultimap.create();
