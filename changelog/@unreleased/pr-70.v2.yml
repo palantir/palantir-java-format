@@ -1,0 +1,8 @@
+type: improvement
+improvement:
+  description: |-
+    Limit how far dots may appear in long method chains to 80 chars.
+
+    Note that this doesn't currently apply to prefixes (such as `foo.bar().baz().stream()`) because prefixes are also used to group together fully qualified class names and it's a bit trickier to handle that case.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/70
