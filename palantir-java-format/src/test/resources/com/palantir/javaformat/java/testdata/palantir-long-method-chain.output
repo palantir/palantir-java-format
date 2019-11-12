@@ -1,0 +1,8 @@
+class PalantirLongMethodChain {
+    private static void foo() {
+        new ObjectMapper()
+                .registerModule(new Jdk8Module())
+                .readValue(file, TestCases.class)
+                .getClient();
+    }
+}
