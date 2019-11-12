@@ -28,13 +28,19 @@ import org.immutables.value.Value.Default;
  */
 @Value.Immutable
 public abstract class OpenOp implements Op {
+    /** The extra indent inside this level. */
     public abstract Indent plusIndent();
 
+    /**
+     * When this level doesn't fit on one line, controls whether this level is to be broken (its breaks taken) or
+     * partially inlined onto the current line.
+     */
     @Default
     public BreakBehaviour breakBehaviour() {
         return BreakBehaviours.breakThisLevel();
     }
 
+    /** If it's the last level of its parent, when to inline this level rather than break the parent. */
     @Default
     public LastLevelBreakability breakabilityIfLastLevel() {
         return LastLevelBreakability.ABORT;
