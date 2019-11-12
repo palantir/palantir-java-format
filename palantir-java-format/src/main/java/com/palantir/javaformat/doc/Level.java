@@ -102,14 +102,10 @@ public final class Level extends Doc {
 
     @Override
     public State computeBreaks(CommentsHelper commentsHelper, int maxWidth, State state) {
-        Optional<State> oneLine = tryToFitOnOneLine(maxWidth, state);
-        if (oneLine.isPresent()) {
-            return oneLine.get();
-        }
-
-        State newState = getBreakBehaviour().match(new BreakImpl(commentsHelper, maxWidth, state));
-
-        return state.updateAfterLevel(newState);
+        return tryToFitOnOneLine(maxWidth, state).orElseGet(() -> {
+            State newState = getBreakBehaviour().match(new BreakImpl(commentsHelper, maxWidth, state));
+            return state.updateAfterLevel(newState);
+        });
     }
 
     /**
