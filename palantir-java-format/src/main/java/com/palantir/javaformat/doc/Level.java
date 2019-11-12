@@ -73,7 +73,7 @@ public final class Level extends Doc {
     }
 
     @Override
-    float computeWidth() {
+    protected float computeWidth() {
         float thisWidth = 0.0F;
         for (Doc doc : docs) {
             thisWidth += doc.getWidth();
@@ -82,7 +82,7 @@ public final class Level extends Doc {
     }
 
     @Override
-    String computeFlat() {
+    protected String computeFlat() {
         StringBuilder builder = new StringBuilder();
         for (Doc doc : docs) {
             builder.append(doc.getFlat());
@@ -91,7 +91,7 @@ public final class Level extends Doc {
     }
 
     @Override
-    Range<Integer> computeRange() {
+    protected Range<Integer> computeRange() {
         Range<Integer> docRange = EMPTY_RANGE;
         for (Doc doc : docs) {
             docRange = union(docRange, doc.range());

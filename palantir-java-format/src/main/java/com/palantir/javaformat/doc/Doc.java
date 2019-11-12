@@ -69,21 +69,21 @@ public abstract class Doc extends HasUniqueId {
      *
      * @return the width, or {@code Float.POSITIVE_INFINITY} if it must be broken
      */
-    abstract float computeWidth();
+    protected abstract float computeWidth();
 
     /**
      * Compute the {@code Doc}'s flat value. Not defined (and never called) if contains forced breaks.
      *
      * @return the flat value
      */
-    abstract String computeFlat();
+    protected abstract String computeFlat();
 
     /**
      * Compute the {@code Doc}'s {@link Range} of {@link Input.Token}s.
      *
      * @return the {@link Range}
      */
-    abstract Range<Integer> computeRange();
+    protected abstract Range<Integer> computeRange();
 
     /**
      * Make breaking decisions for a {@code Doc}.

@@ -105,17 +105,17 @@ public final class Token extends Doc implements Op {
     }
 
     @Override
-    float computeWidth() {
+    protected float computeWidth() {
         return token.getTok().length();
     }
 
     @Override
-    String computeFlat() {
+    protected String computeFlat() {
         return token.getTok().getOriginalText();
     }
 
     @Override
-    Range<Integer> computeRange() {
+    protected Range<Integer> computeRange() {
         return Range.singleton(token.getTok().getIndex()).canonical(INTEGERS);
     }
 

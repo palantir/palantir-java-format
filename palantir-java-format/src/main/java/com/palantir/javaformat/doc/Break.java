@@ -96,17 +96,17 @@ public abstract class Break extends Doc implements Op {
     }
 
     @Override
-    float computeWidth() {
+    protected float computeWidth() {
         return isForced() ? Float.POSITIVE_INFINITY : (float) flat().length();
     }
 
     @Override
-    String computeFlat() {
+    protected String computeFlat() {
         return flat();
     }
 
     @Override
-    Range<Integer> computeRange() {
+    protected Range<Integer> computeRange() {
         return EMPTY_RANGE;
     }
 
