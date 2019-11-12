@@ -18,6 +18,7 @@ import com.palantir.javaformat.doc.Doc;
 import com.palantir.javaformat.doc.DocBuilder;
 import com.palantir.javaformat.doc.Level;
 import java.util.Optional;
+import java.util.OptionalInt;
 import org.immutables.value.Value;
 import org.immutables.value.Value.Default;
 
@@ -47,6 +48,9 @@ public abstract class OpenOp implements Op {
     }
 
     public abstract Optional<String> debugName();
+
+    /** Custom max column limit that contents of this level <em>before the last break</em> may not exceed. */
+    public abstract OptionalInt columnLimitBeforeLastBreak();
 
     /**
      * Make an ordinary {@code OpenOp}.

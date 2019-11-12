@@ -34,6 +34,7 @@ import com.palantir.javaformat.doc.StartsWithBreakVisitor.Result;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import org.immutables.value.Value;
@@ -101,15 +102,44 @@ public final class Level extends Doc {
 
     @Override
     public State computeBreaks(CommentsHelper commentsHelper, int maxWidth, State state) {
-        float thisWidth = getWidth();
-        if (state.column() + thisWidth <= maxWidth) {
-            return state.withColumn(state.column() + (int) thisWidth)
-                    .withLevelState(this, ImmutableLevelState.of(true));
+        Optional<State> oneLine = tryToFitOnOneLine(maxWidth, state);
+        if (oneLine.isPresent()) {
+            return oneLine.get();
         }
 
         State newState = getBreakBehaviour().match(new BreakImpl(commentsHelper, maxWidth, state));
 
         return state.updateAfterLevel(newState);
+    }
+
+    /**
+     * Try to fit this level onto one line. If this returns empty, then the level will be broken in some way that is
+     * dictated by the {@link #getBreakBehaviour()}.
+     */
+    private Optional<State> tryToFitOnOneLine(int maxWidth, State state) {
+        if (getColumnLimitBeforeLastBreak().isPresent()) {
+            float width = 0.0f;
+            float widthBeforeLastBreak = 0.0f;
+            for (Doc doc : docs) {
+                if (doc instanceof Break) {
+                    widthBeforeLastBreak = width;
+                }
+                width += doc.getWidth();
+            }
+            // Make an additional check that widthBeforeLastBreak fits in the column limit
+            if (state.column() + widthBeforeLastBreak > getColumnLimitBeforeLastBreak().getAsInt()) {
+                return Optional.empty();
+            }
+        }
+
+        // Check that the entirety of this level fits on the current line.
+        float thisWidth = getWidth();
+        if (state.column() + thisWidth <= maxWidth) {
+            return Optional.of(
+                    state.withColumn(state.column() + (int) thisWidth)
+                            .withLevelState(this, ImmutableLevelState.of(true)));
+        }
+        return Optional.empty();
     }
 
     class BreakImpl implements BreakBehaviour.Cases<State> {
@@ -425,6 +455,10 @@ public final class Level extends Doc {
 
     public Optional<String> getDebugName() {
         return openOp.debugName();
+    }
+
+    public OptionalInt getColumnLimitBeforeLastBreak() {
+        return openOp.columnLimitBeforeLastBreak();
     }
 
     /** An indented representation of this level and all nested levels inside it. */
