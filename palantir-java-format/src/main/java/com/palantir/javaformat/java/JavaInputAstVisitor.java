@@ -2600,8 +2600,13 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 scan(getArrayBase(node), null);
                 token(".");
             } else {
-                builder.open(
-                        plusFour, BreakBehaviours.preferBreakingLastInnerLevel(true), LastLevelBreakability.BREAK_HERE);
+                builder.open(OpenOp.builder()
+                        .debugName("visitDot")
+                        .plusIndent(plusFour)
+                        .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(true))
+                        .breakabilityIfLastLevel(LastLevelBreakability.BREAK_HERE)
+                        .columnLimitBeforeLastBreak(METHOD_CHAIN_COLUMN_LIMIT)
+                        .build());
                 scan(getArrayBase(node), null);
                 builder.breakOp();
                 needDot = true;
