@@ -157,6 +157,13 @@ import org.openjdk.tools.javac.tree.TreeScanner;
 /** An AST visitor that builds a stream of {@link Op}s to format from the given {@link CompilationUnitTree}. */
 public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
 
+    /**
+     * Maximum column at which the last dot of a method chain may start. This exists in particular to improve
+     * readability of builder chains, but also in general to prevent hard to spot extra actions at the end of a method
+     * chain.
+     */
+    private static final int METHOD_CHAIN_COLUMN_LIMIT = 80;
+
     /** Direction for Annotations (usually VERTICAL). */
     enum Direction {
         VERTICAL,
@@ -2693,6 +2700,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                     .plusIndent(plusFour)
                     .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(false))
                     .breakabilityIfLastLevel(LastLevelBreakability.CHECK_INNER)
+                    .columnLimitBeforeLastBreak(METHOD_CHAIN_COLUMN_LIMIT)
                     .build());
         }
         // don't break after the first element if it is every small, unless the
@@ -2780,6 +2788,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                                 ? BreakBehaviours.preferBreakingLastInnerLevel(true)
                                 : BreakBehaviours.breakThisLevel())
                 .breakabilityIfLastLevel(LastLevelBreakability.ONLY_IF_FIRST_LEVEL_FITS)
+                .columnLimitBeforeLastBreak(METHOD_CHAIN_COLUMN_LIMIT)
                 .build());
 
         for (int times = 0; times < prefixes.size(); times++) {

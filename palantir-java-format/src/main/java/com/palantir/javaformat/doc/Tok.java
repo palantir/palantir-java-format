@@ -51,7 +51,7 @@ public final class Tok extends Doc implements Op {
     }
 
     @Override
-    float computeWidth() {
+    protected float computeWidth() {
         int idx = Newlines.firstBreak(tok.getOriginalText());
         // only count the first line of multi-line block comments
         if (tok.isComment()) {
@@ -68,7 +68,7 @@ public final class Tok extends Doc implements Op {
     }
 
     @Override
-    String computeFlat() {
+    protected String computeFlat() {
         // TODO(cushon): commentsHelper.rewrite doesn't get called for spans that fit in a single
         // line. That's fine for multi-line comment reflowing, but problematic for adding missing
         // spaces in line comments.
@@ -79,7 +79,7 @@ public final class Tok extends Doc implements Op {
     }
 
     @Override
-    Range<Integer> computeRange() {
+    protected Range<Integer> computeRange() {
         return Range.singleton(tok.getIndex()).canonical(INTEGERS);
     }
 

@@ -45,17 +45,17 @@ public final class Space extends Doc implements Op {
     }
 
     @Override
-    float computeWidth() {
+    protected float computeWidth() {
         return 1.0F;
     }
 
     @Override
-    String computeFlat() {
+    protected String computeFlat() {
         return " ";
     }
 
     @Override
-    Range<Integer> computeRange() {
+    protected Range<Integer> computeRange() {
         return Doc.EMPTY_RANGE;
     }
 

@@ -29,6 +29,7 @@ class B21954779 {
         bind(new Key<ServiceMethodRunner<SyncReferenceNumberRequest, SyncReferenceNumberResponse>>() {});
 
         // this isn't a feature; we'd prefer to keep `new Key...` as one unit
-        bind(new Key<ServiceMethodRunner<SyncReferenceNumberRequest, SyncReferenceNumberResponses>>() {}).then();
+        bind(new Key<ServiceMethodRunner<SyncReferenceNumberRequest, SyncReferenceNumberResponses>>() {})
+                .then();
     }
 }
