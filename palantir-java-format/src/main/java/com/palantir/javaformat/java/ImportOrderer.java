@@ -35,7 +35,7 @@ import java.util.stream.Stream;
 import org.openjdk.tools.javac.parser.Tokens.TokenKind;
 
 /** Orders imports in Java source code. */
-public class ImportOrderer {
+public final class ImportOrderer {
 
     private static final Splitter DOT_SPLITTER = Splitter.on('.');
 

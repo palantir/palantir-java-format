@@ -20,7 +20,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /** An error that prevented formatting from succeeding. */
-public class FormatterDiagnostic {
+public final class FormatterDiagnostic {
     private final int lineNumber;
     private final String message;
     private final int column;
