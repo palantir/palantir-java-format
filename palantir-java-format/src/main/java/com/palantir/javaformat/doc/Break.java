@@ -16,7 +16,6 @@
 
 package com.palantir.javaformat.doc;
 
-import com.google.common.base.MoreObjects;
 import com.google.common.collect.Range;
 import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.CommentsHelper;
@@ -25,25 +24,19 @@ import com.palantir.javaformat.Op;
 import com.palantir.javaformat.Output;
 import com.palantir.javaformat.doc.State.BreakState;
 import java.util.Optional;
+import org.immutables.value.Value;
 
 /** A leaf node in a {@link Doc} for an optional break. */
 @Immutable
-public final class Break extends Doc implements Op {
-    private final FillMode fillMode;
-    private final String flat;
-    private final Indent plusIndent;
-    private final Optional<BreakTag> optTag;
+@Value.Immutable
+public abstract class Break extends Doc implements Op {
+    public abstract FillMode fillMode();
 
-    private Break(FillMode fillMode, String flat, Indent plusIndent, Optional<BreakTag> optTag) {
-        this.fillMode = fillMode;
-        this.flat = flat;
-        this.plusIndent = plusIndent;
-        this.optTag = optTag;
-    }
+    public abstract String flat();
 
-    public FillMode getFillMode() {
-        return fillMode;
-    }
+    public abstract Indent plusIndent();
+
+    public abstract Optional<BreakTag> optTag();
 
     /**
      * Make a {@code Break}.
@@ -54,7 +47,7 @@ public final class Break extends Doc implements Op {
      * @return the new {@code Break}
      */
     public static Break make(FillMode fillMode, String flat, Indent plusIndent) {
-        return new Break(fillMode, flat, plusIndent, /* optTag= */ Optional.empty());
+        return builder().fillMode(fillMode).flat(flat).plusIndent(plusIndent).build();
     }
 
     /**
@@ -67,7 +60,7 @@ public final class Break extends Doc implements Op {
      * @return the new {@code Break}
      */
     public static Break make(FillMode fillMode, String flat, Indent plusIndent, Optional<BreakTag> optTag) {
-        return new Break(fillMode, flat, plusIndent, optTag);
+        return builder().fillMode(fillMode).flat(flat).plusIndent(plusIndent).optTag(optTag).build();
     }
 
     /**
@@ -76,21 +69,16 @@ public final class Break extends Doc implements Op {
      * @return the new forced {@code Break}
      */
     public static Break makeForced() {
-        return make(FillMode.FORCED, "", Indent.Const.ZERO);
+        return builder().fillMode(FillMode.FORCED).flat("").plusIndent(Indent.Const.ZERO).build();
     }
 
     /**
      * Return the {@code Break}'s extra indent.
      *
      * @return the extra indent
-     * @param state
      */
     public int evalPlusIndent(State state) {
-        return plusIndent.eval(state);
-    }
-
-    Indent getPlusIndent() {
-        return plusIndent;
+        return plusIndent().eval(state);
     }
 
     /**
@@ -99,7 +87,7 @@ public final class Break extends Doc implements Op {
      * @return whether the {@code Break} is forced
      */
     public boolean isForced() {
-        return fillMode == FillMode.FORCED;
+        return fillMode() == FillMode.FORCED;
     }
 
     @Override
@@ -109,12 +97,12 @@ public final class Break extends Doc implements Op {
 
     @Override
     float computeWidth() {
-        return isForced() ? Float.POSITIVE_INFINITY : (float) flat.length();
+        return isForced() ? Float.POSITIVE_INFINITY : (float) flat().length();
     }
 
     @Override
     String computeFlat() {
-        return flat;
+        return flat();
     }
 
     @Override
@@ -123,7 +111,7 @@ public final class Break extends Doc implements Op {
     }
 
     public State computeBreaks(State stateIn, boolean broken) {
-        State state = optTag.map(breakTag -> stateIn.breakTaken(breakTag, broken)).orElse(stateIn);
+        State state = optTag().map(breakTag -> stateIn.breakTaken(breakTag, broken)).orElse(stateIn);
         return state.withBreak(this, broken);
     }
 
@@ -143,17 +131,13 @@ public final class Break extends Doc implements Op {
             output.append(state, "\n", EMPTY_RANGE);
             output.indent(breakState.newIndent());
         } else {
-            output.append(state, flat, range());
+            output.append(state, flat(), range());
         }
     }
 
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("fillMode", fillMode)
-                .add("flat", flat)
-                .add("plusIndent", plusIndent)
-                .add("optTag", optTag)
-                .toString();
+    public static class Builder extends ImmutableBreak.Builder {}
+
+    public static Builder builder() {
+        return new Builder();
     }
 }

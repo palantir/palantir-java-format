@@ -48,7 +48,7 @@ public final class LevelDelimitedFlatValueDocVisitor implements DocVisitor<Strin
     public String visitBreak(Break doc) {
         StringBuilder sb =
                 new StringBuilder().append("⏎").append(doc.getFlat().isEmpty() ? "" : "(" + doc.getFlat() + ")");
-        if (!doc.getPlusIndent().equals(Indent.Const.ZERO)) {
+        if (!doc.plusIndent().equals(Indent.Const.ZERO)) {
             sb.append(" +" + doc.evalPlusIndent(state));
         }
         return sb.toString();

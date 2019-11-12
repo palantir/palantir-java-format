@@ -361,7 +361,7 @@ public final class Level extends Doc {
             CommentsHelper commentsHelper, int maxWidth, State state, Optional<Break> optBreakDoc, List<Doc> split) {
         float breakWidth = optBreakDoc.isPresent() ? optBreakDoc.get().getWidth() : 0.0F;
         float splitWidth = getWidth(split);
-        boolean shouldBreak = (optBreakDoc.isPresent() && optBreakDoc.get().getFillMode() == FillMode.UNIFIED)
+        boolean shouldBreak = (optBreakDoc.isPresent() && optBreakDoc.get().fillMode() == FillMode.UNIFIED)
                 || state.mustBreak()
                 || state.column() + breakWidth + splitWidth > maxWidth;
 
