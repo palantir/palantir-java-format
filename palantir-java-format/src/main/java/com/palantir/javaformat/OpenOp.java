@@ -69,7 +69,7 @@ public abstract class OpenOp implements Op {
 
     @Override
     public void add(DocBuilder builder) {
-        builder.open(plusIndent(), breakBehaviour(), breakabilityIfLastLevel(), debugName());
+        builder.open(this);
     }
 
     public static Builder builder() {
