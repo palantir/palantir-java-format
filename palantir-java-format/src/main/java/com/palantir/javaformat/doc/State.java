@@ -23,10 +23,14 @@ import fj.data.Set;
 import fj.data.TreeMap;
 import org.immutables.value.Value;
 import org.immutables.value.Value.Parameter;
+import org.immutables.value.Value.Style.ImplementationVisibility;
 
 /** State for writing. */
 @Value.Immutable
-@Value.Style(overshadowImplementation = true)
+@Value.Style(
+        overshadowImplementation = true,
+        privateNoargConstructor = true,
+        visibility = ImplementationVisibility.PACKAGE)
 @Immutable
 public abstract class State {
     /** Last indent that was actually taken. */
@@ -187,9 +191,9 @@ public abstract class State {
         return builder().from(this).tokStates(tokStates().set(tok, tokState)).build();
     }
 
-    public static class Builder extends ImmutableState.Builder {}
+    protected static class Builder extends ImmutableState.Builder {}
 
-    public static Builder builder() {
+    private static Builder builder() {
         return new Builder();
     }
 
