@@ -153,6 +153,7 @@ public final class Level extends Doc {
         }
 
         private State breakNormally(State state) {
+            // TODO(dsanduleac): can't just do .withBrokenLevel()
             return computeBroken(commentsHelper, maxWidth, state.withIndentIncrementedBy(getPlusIndent()));
         }
 
@@ -333,7 +334,7 @@ public final class Level extends Doc {
     }
 
     private void logDecision(State state, String decision) {
-        System.err.println(Strings.repeat("  ", state.depth()) + "-- DECISION: " + decision + " " + state.toString());
+        System.out.println(Strings.repeat("  ", state.depth()) + "-- DECISION: " + decision + " " + state.toString());
     }
 
     private static void assertStartsWithBreakOrEmpty(State state, Doc doc) {
