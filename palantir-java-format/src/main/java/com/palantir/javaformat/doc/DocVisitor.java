@@ -26,13 +26,13 @@ public interface DocVisitor<T> {
             return visitToken((Token) doc);
         } else if (doc instanceof Comment) {
             return visitTok((Comment) doc);
-        } else if (doc instanceof Space) {
-            return visitSpace((Space) doc);
+        } else if (doc instanceof NonBreakingSpace) {
+            return visitSpace((NonBreakingSpace) doc);
         }
         throw new RuntimeException();
     }
 
-    T visitSpace(Space doc);
+    T visitSpace(NonBreakingSpace doc);
 
     T visitTok(Comment doc);
 

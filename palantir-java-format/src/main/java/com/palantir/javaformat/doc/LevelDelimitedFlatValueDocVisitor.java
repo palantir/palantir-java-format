@@ -30,7 +30,7 @@ public final class LevelDelimitedFlatValueDocVisitor implements DocVisitor<Strin
     }
 
     @Override
-    public String visitSpace(Space doc) {
+    public String visitSpace(NonBreakingSpace doc) {
         return doc.getFlat();
     }
 
