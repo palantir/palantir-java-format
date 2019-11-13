@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
-import com.palantir.javaformat.CommentsHelper;
 import com.palantir.javaformat.Input;
 import com.palantir.javaformat.Input.Token;
 import com.palantir.javaformat.Newlines;
@@ -29,7 +28,6 @@ import com.palantir.javaformat.OpsBuilder.BlankLineWanted;
 import com.palantir.javaformat.Output;
 import com.palantir.javaformat.doc.State;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,12 +44,10 @@ import java.util.Map;
 public final class JavaOutput extends Output {
     private final String lineSeparator;
     private final JavaInput javaInput; // Used to follow along while emitting the output.
-    private final CommentsHelper commentsHelper; // Used to re-flow comments.
-    private final Map<Integer, BlankLineWanted> blankLines = new HashMap<>(); // Info on blank lines.
-    private final RangeSet<Integer> partialFormatRanges = TreeRangeSet.create();
 
     private final List<String> mutableLines = new ArrayList<>();
     private final int kN; // The number of tokens or comments in the input, excluding the EOF.
+    private final InputMetadata inputMetadata;
     private int iLine = 0; // Closest corresponding line number on input.
     private int lastK = -1; // Last {@link Tok} index output.
     private int spacesPending = 0;
@@ -62,29 +58,12 @@ public final class JavaOutput extends Output {
      * {@code JavaOutput} constructor.
      *
      * @param javaInput the {@link JavaInput}, used to match up blank lines in the output
-     * @param commentsHelper the {@link CommentsHelper}, used to rewrite comments
      */
-    public JavaOutput(String lineSeparator, JavaInput javaInput, CommentsHelper commentsHelper) {
-        this.lineSeparator = lineSeparator;
+    public JavaOutput(JavaInput javaInput, InputMetadata inputMetadata) {
+        this.lineSeparator = javaInput.getLineSeparator();
         this.javaInput = javaInput;
-        this.commentsHelper = commentsHelper;
         kN = javaInput.getkN();
-    }
-
-    @Override
-    public void blankLine(int k, BlankLineWanted wanted) {
-        if (blankLines.containsKey(k)) {
-            blankLines.put(k, blankLines.get(k).merge(wanted));
-        } else {
-            blankLines.put(k, wanted);
-        }
-    }
-
-    @Override
-    public void markForPartialFormat(Token start, Token end) {
-        int lo = JavaOutput.startTok(start).getIndex();
-        int hi = JavaOutput.endTok(end).getIndex();
-        partialFormatRanges.add(Range.closed(lo, hi));
+        this.inputMetadata = inputMetadata;
     }
 
     // TODO(jdd): Add invariant.
@@ -107,7 +86,7 @@ public final class JavaOutput extends Output {
              * Output blank line if we've called {@link OpsBuilder#blankLine}{@code (true)} here, or if
              * there's a blank line here and it's a comment.
              */
-            BlankLineWanted wanted = blankLines.getOrDefault(lastK, BlankLineWanted.NO);
+            BlankLineWanted wanted = inputMetadata.blankLines().getOrDefault(lastK, BlankLineWanted.NO);
             if (isComment(text) ? sawNewlines : wanted.wanted(state).orElse(sawNewlines)) {
                 ++newlinesPending;
             }
@@ -192,11 +171,6 @@ public final class JavaOutput extends Output {
     }
 
     // The following methods can be used after the Output has been built.
-
-    @Override
-    public CommentsHelper getCommentsHelper() {
-        return commentsHelper;
-    }
 
     /**
      * Emit a list of {@link Replacement}s to convert from input to output.
@@ -298,7 +272,7 @@ public final class JavaOutput extends Output {
                 } else {
                     if (newline == -1) {
                         // If there wasn't a trailing newline in the input, indent the next line.
-                        replacement.append(after.substring(0, idx));
+                        replacement.append(after, 0, idx);
                     }
                     break;
                 }
@@ -321,12 +295,16 @@ public final class JavaOutput extends Output {
         int hiTok = iRange.upperEndpoint() - 1;
 
         // Expand the token indices to formattable boundaries (e.g. edges of statements).
-        if (!partialFormatRanges.contains(loTok) || !partialFormatRanges.contains(hiTok)) {
+        if (!partialFormatRanges().contains(loTok) || !partialFormatRanges().contains(hiTok)) {
             return EMPTY_RANGE;
         }
-        loTok = partialFormatRanges.rangeContaining(loTok).lowerEndpoint();
-        hiTok = partialFormatRanges.rangeContaining(hiTok).upperEndpoint();
+        loTok = partialFormatRanges().rangeContaining(loTok).lowerEndpoint();
+        hiTok = partialFormatRanges().rangeContaining(hiTok).upperEndpoint();
         return Range.closedOpen(loTok, hiTok + 1);
+    }
+
+    private RangeSet<Integer> partialFormatRanges() {
+        return inputMetadata.partialFormatRanges();
     }
 
     /** The earliest position of any Tok in the Token, including leading whitespace. */
@@ -374,7 +352,7 @@ public final class JavaOutput extends Output {
                 .add("lastK", lastK)
                 .add("spacesPending", spacesPending)
                 .add("newlinesPending", newlinesPending)
-                .add("blankLines", blankLines)
+                .add("inputMetadata", inputMetadata)
                 .add("super", super.toString())
                 .toString();
     }
