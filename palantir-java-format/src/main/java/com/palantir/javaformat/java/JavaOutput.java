@@ -59,8 +59,8 @@ public final class JavaOutput extends Output {
      *
      * @param javaInput the {@link JavaInput}, used to match up blank lines in the output
      */
-    public JavaOutput(String lineSeparator, JavaInput javaInput, InputMetadata inputMetadata) {
-        this.lineSeparator = lineSeparator;
+    public JavaOutput(JavaInput javaInput, InputMetadata inputMetadata) {
+        this.lineSeparator = javaInput.getLineSeparator();
         this.javaInput = javaInput;
         kN = javaInput.getkN();
         this.inputMetadata = inputMetadata;

@@ -25,7 +25,6 @@ import com.google.common.io.CharSource;
 import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.CommentsHelper;
 import com.palantir.javaformat.FormattingError;
-import com.palantir.javaformat.Newlines;
 import com.palantir.javaformat.Op;
 import com.palantir.javaformat.OpsBuilder;
 import com.palantir.javaformat.OpsBuilder.OpsOutput;
@@ -108,14 +107,12 @@ public final class Formatter {
      *
      * @param javaInput the input, a Java compilation unit
      * @param options the {@link JavaFormatterOptions}
-     * @param lineSeparator what line separator was used in the javaInput
      * @param commentsHelper the {@link CommentsHelper}, used to rewrite comments
      * @return javaOutput the output produced
      */
     static JavaOutput format(
             final JavaInput javaInput,
             JavaFormatterOptions options,
-            String lineSeparator,
             CommentsHelper commentsHelper)
             throws FormatterException {
 
@@ -162,7 +159,7 @@ public final class Formatter {
         OpsOutput opsOutput = builder.build();
         Doc doc = new DocBuilder().withOps(opsOutput.ops()).build();
         State finalState = doc.computeBreaks(commentsHelper, options.maxLineLength(), State.startingState());
-        JavaOutput javaOutput = new JavaOutput(lineSeparator, javaInput, opsOutput.inputPreservingState());
+        JavaOutput javaOutput = new JavaOutput(javaInput, opsOutput.inputPreservingState());
         doc.write(finalState, javaOutput);
         javaOutput.flush();
         return javaOutput;
@@ -256,11 +253,10 @@ public final class Formatter {
         // 'de-linting' changes (e.g. import ordering).
         javaInput = ModifierOrderer.reorderModifiers(javaInput, characterRanges);
 
-        String lineSeparator = Newlines.guessLineSeparator(input);
-        JavaCommentsHelper commentsHelper = new JavaCommentsHelper(lineSeparator, options);
+        JavaCommentsHelper commentsHelper = new JavaCommentsHelper(javaInput.getLineSeparator(), options);
         JavaOutput javaOutput;
         try {
-            javaOutput = format(javaInput, options, lineSeparator, commentsHelper);
+            javaOutput = format(javaInput, options, commentsHelper);
         } catch (FormattingError e) {
             throw new FormatterException(e.diagnostics());
         }
