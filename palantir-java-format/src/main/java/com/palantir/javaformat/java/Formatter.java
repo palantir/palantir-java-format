@@ -157,13 +157,12 @@ public final class Formatter {
         opsBuilder.drain();
         OpsOutput opsOutput = opsBuilder.build();
 
-        DebugRenderer.render(javaInput, opsOutput);
-
         Level doc = new DocBuilder().withOps(opsOutput.ops()).build();
         State finalState = doc.computeBreaks(commentsHelper, options.maxLineLength(), State.startingState());
         JavaOutput javaOutput = new JavaOutput(javaInput, opsOutput.inputMetadata());
         doc.write(finalState, javaOutput);
         javaOutput.flush();
+        DebugRenderer.render(javaInput, opsOutput, doc, finalState, javaOutput);
         return javaOutput;
     }
 

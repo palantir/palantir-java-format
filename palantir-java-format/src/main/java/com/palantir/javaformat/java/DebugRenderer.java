@@ -22,12 +22,14 @@ import com.palantir.javaformat.CloseOp;
 import com.palantir.javaformat.Input;
 import com.palantir.javaformat.Op;
 import com.palantir.javaformat.OpenOp;
-import com.palantir.javaformat.OpsBuilder;
+import com.palantir.javaformat.OpsBuilder.OpsOutput;
 import com.palantir.javaformat.doc.Break;
 import com.palantir.javaformat.doc.BreakTag;
 import com.palantir.javaformat.doc.Comment;
 import com.palantir.javaformat.doc.Doc;
+import com.palantir.javaformat.doc.Level;
 import com.palantir.javaformat.doc.NonBreakingSpace;
+import com.palantir.javaformat.doc.State;
 import com.palantir.javaformat.doc.Token;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -37,7 +39,8 @@ import java.util.Optional;
 
 public class DebugRenderer {
 
-    public static void render(JavaInput javaInput, OpsBuilder.OpsOutput opsOutput) {
+    public static void render(
+            JavaInput javaInput, OpsOutput opsOutput, Level doc, State finalState, JavaOutput javaOutput) {
 
         StringBuilder sb = new StringBuilder();
 
@@ -88,8 +91,7 @@ public class DebugRenderer {
                         "<span class=\"break-tag %s\" title=\"%s\"></span>",
                         breakTag.isPresent() ? "conditional" : "", op.toString()));
             }
-            if (op instanceof NonBreakingSpace) {
-            }
+            if (op instanceof NonBreakingSpace) {}
             if (op instanceof Comment) {}
 
             if (op instanceof OpenOp) {
@@ -100,10 +102,20 @@ public class DebugRenderer {
             }
         }
 
+        sb.append("<h1>javaOutput</h1>");
+        sb.append("<code>");
+        for (int i = 0; i < javaOutput.getLineCount(); ++i) {
+            sb.append(javaOutput.getLine(i));
+            sb.append("\n");
+        }
+        sb.append("</code>");
+
         sb.append("</div>");
 
         try {
-            Files.write(Paths.get("/Users/dfox/Desktop/output.html"), sb.toString().getBytes(StandardCharsets.UTF_8));
+            Files.write(
+                    Paths.get(System.getProperty("user.home")).resolve("Desktop/output.html"),
+                    sb.toString().getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
