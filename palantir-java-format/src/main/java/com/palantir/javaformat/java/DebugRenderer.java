@@ -46,7 +46,16 @@ public class DebugRenderer {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append("<head>");
+        sb.append("<html>\n");
+        sb.append("<head>\n");
+        sb.append("<meta charset=\"utf-8\">");
+
+        sb.append("<link href=\"https://unpkg.com/normalize.css@^7.0.0\" rel=\"stylesheet\" />\n");
+        sb.append("<link href=\"https://unpkg.com/@blueprintjs/icons@^3.4.0/lib/css/blueprint-icons.css\" "
+                + "rel=\"stylesheet\" />\n");
+        sb.append("<link href=\"https://unpkg.com/@blueprintjs/core@^3.10.0/lib/css/blueprint.css\" "
+                + "rel=\"stylesheet\" />");
+
         sb.append("<style type=\"text/css\">"
                 + "span.token:hover { outline: 1px solid black; } "
                 + "span.token:hover span.token-body { text-decoration: underline; }"
@@ -60,6 +69,8 @@ public class DebugRenderer {
                 + "span.break-tag.conditional { height: 0.4em; width: 0.4em; vertical-align:middle;}"
                 + "</style>");
         sb.append("</head>");
+
+        sb.append("<body>");
 
         sb.append("<div style=\"white-space: pre; font-family: monospace; line-height: 1em;\">");
 
@@ -95,17 +106,17 @@ public class DebugRenderer {
                 String conditional = breakTag.isPresent() ? "conditional" : "";
                 FillMode fillMode = ((Break) op).fillMode();
                 sb.append(String.format(
-                        "<span class=\"break-tag %s FillMode-%s\" title=\"%s\"></span>",
+                        "<span class=\"tooltip break-tag %s FillMode-%s\" title=\"%s\"></span>",
                         conditional, fillMode, op.toString()));
             }
             if (op instanceof NonBreakingSpace) {}
             if (op instanceof Comment) {}
 
             if (op instanceof OpenOp) {
-                sb.append("<span class=\"open-op\" title=\"" + op.toString() + "\"></span>");
+                sb.append("<span class=\"tooltip open-op\" title=\"" + op.toString() + "\"></span>");
             }
             if (op instanceof CloseOp) {
-                sb.append("<span class=\"close-op\" title=\"" + op.toString() + "\"></span>");
+                sb.append("<span class=\"tooltip close-op\" title=\"" + op.toString() + "\"></span>");
             }
         }
 
@@ -124,6 +135,29 @@ public class DebugRenderer {
 
         sb.append("</div>");
 
+        // All the react scripts go at the end, right before </body>
+        // See https://reactjs.org/docs/add-react-to-a-website.html#step-2-add-the-script-tags
+        sb.append("<!-- Blueprint dependencies -->\n"
+                + "<script src=\"https://unpkg.com/classnames@^2.2\"></script>\n"
+                + "<script src=\"https://unpkg.com/dom4@^1.8\"></script>\n"
+                + "<script src=\"https://unpkg.com/tslib@^1.9.0\"></script>\n"
+                + "<script src=\"https://unpkg.com/react@^16.2.0/umd/react.development.js\"></script>\n"
+                + "<script src=\"https://unpkg.com/react-dom@^16.11.0/umd/react-dom.development.js\"></script>\n"
+                // TODO requires commonsJS, accesses exports??
+                // + "<script src=\"https://unpkg.com/create-react-context@^0.3.0\"></script>\n"
+                + "<script src=\"https://unpkg.com/react-transition-group@^2.2.1/dist/react-transition-group.min.js\"/>\n"
+                + "<script src=\"https://unpkg.com/popper.js@^1.14.1/dist/umd/popper.js\"></script>\n"
+                + "<script src=\"https://unpkg.com/react-popper@^1.3.3/dist/index.umd.js\"></script>\n"
+                // + "<script src=\"https://unpkg.com/react-popper@^1.3.3/dist/index.umd.min.js\"></script>\n"
+                + "<script src=\"https://unpkg.com/resize-observer-polyfill@^1.5.0\"></script>\n"
+                + "<!-- Blueprint packages (note: icons script must come first) -->\n"
+                + "<script src=\"https://unpkg.com/@blueprintjs/icons@^3.4.0\"></script>\n"
+                + "<script src=\"https://unpkg.com/@blueprintjs/core@^3.10.0\"></script>\n");
+        sb.append(String.format(
+                "<script src=\"%s\"></script>\n",
+                Paths.get("src/main/resources/custom.js").toAbsolutePath().toUri()));
+        sb.append("</body>");
+        sb.append("</html>");
         try {
             Files.write(
                     Paths.get(System.getProperty("user.home")).resolve("Desktop/output.html"),
