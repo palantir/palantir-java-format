@@ -22,12 +22,12 @@ import com.google.common.collect.Multimap;
 import com.palantir.javaformat.Indent.Const;
 import com.palantir.javaformat.doc.Break;
 import com.palantir.javaformat.doc.BreakTag;
+import com.palantir.javaformat.doc.Comment;
 import com.palantir.javaformat.doc.Doc;
 import com.palantir.javaformat.doc.DocBuilder;
 import com.palantir.javaformat.doc.FillMode;
 import com.palantir.javaformat.doc.Space;
 import com.palantir.javaformat.doc.State;
-import com.palantir.javaformat.doc.Tok;
 import com.palantir.javaformat.doc.Token;
 import com.palantir.javaformat.java.FormatterDiagnostic;
 import com.palantir.javaformat.java.InputMetadata;
@@ -483,7 +483,7 @@ public final class OpsBuilder {
     public interface OpsOutput {
         ImmutableList<Op> ops();
 
-        InputMetadata inputPreservingState();
+        InputMetadata inputMetadata();
     }
 
     /** Build a list of {@link Op}s from the {@code OpsBuilder}. */
@@ -596,10 +596,10 @@ public final class OpsBuilder {
                         if (lastWasComment && newlines > 0) {
                             tokOps.put(j, Break.makeForced());
                         }
-                        tokOps.put(j, Tok.make(tokBefore));
+                        tokOps.put(j, Comment.make(tokBefore));
                     }
                     for (Input.Tok tokAfter : token.getToksAfter()) {
-                        tokOps.put(k + 1, Tok.make(tokAfter));
+                        tokOps.put(k + 1, Comment.make(tokAfter));
                     }
                 }
             }
@@ -638,7 +638,7 @@ public final class OpsBuilder {
         }
         return ImmutableOpsOutput.builder()
                 .ops(newOps.build())
-                .inputPreservingState(inputMetadataBuilder.build())
+                .inputMetadata(inputMetadataBuilder.build())
                 .build();
     }
 
@@ -652,8 +652,8 @@ public final class OpsBuilder {
 
     private static List<Op> makeComment(Input.Tok comment) {
         return comment.isSlashStarComment()
-                ? ImmutableList.of(Tok.make(comment))
-                : ImmutableList.of(Tok.make(comment), Break.makeForced());
+                ? ImmutableList.of(Comment.make(comment))
+                : ImmutableList.of(Comment.make(comment), Break.makeForced());
     }
 
     @Override

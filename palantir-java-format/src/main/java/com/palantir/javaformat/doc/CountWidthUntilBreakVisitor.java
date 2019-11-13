@@ -40,7 +40,7 @@ class CountWidthUntilBreakVisitor implements DocVisitor<Float> {
     }
 
     @Override
-    public Float visitTok(Tok doc) {
+    public Float visitTok(Comment doc) {
         return doc.getWidth();
     }
 

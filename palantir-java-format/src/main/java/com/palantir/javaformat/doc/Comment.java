@@ -28,10 +28,10 @@ import com.palantir.javaformat.Output;
 
 /** A leaf node in a {@link Doc} for a non-token. */
 @Immutable
-public final class Tok extends Doc implements Op {
+public final class Comment extends Doc implements Op {
     private final Input.Tok tok;
 
-    private Tok(Input.Tok tok) {
+    private Comment(Input.Tok tok) {
         this.tok = tok;
     }
 
@@ -41,8 +41,8 @@ public final class Tok extends Doc implements Op {
      * @param tok the {@link Input.Tok} to wrap
      * @return the new {@code Tok}
      */
-    public static Tok make(Input.Tok tok) {
-        return new Tok(tok);
+    public static Comment make(Input.Tok tok) {
+        return new Comment(tok);
     }
 
     @Override

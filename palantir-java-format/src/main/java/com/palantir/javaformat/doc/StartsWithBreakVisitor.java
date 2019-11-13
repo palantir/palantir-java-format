@@ -33,7 +33,7 @@ enum StartsWithBreakVisitor implements DocVisitor<Result> {
     }
 
     @Override
-    public Result visitTok(Tok doc) {
+    public Result visitTok(Comment doc) {
         return Result.NO;
     }
 
