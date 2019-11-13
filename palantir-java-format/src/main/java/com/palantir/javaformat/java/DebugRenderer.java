@@ -27,6 +27,7 @@ import com.palantir.javaformat.doc.Break;
 import com.palantir.javaformat.doc.BreakTag;
 import com.palantir.javaformat.doc.Comment;
 import com.palantir.javaformat.doc.Doc;
+import com.palantir.javaformat.doc.HtmlDocVisitor;
 import com.palantir.javaformat.doc.Level;
 import com.palantir.javaformat.doc.NonBreakingSpace;
 import com.palantir.javaformat.doc.State;
@@ -102,6 +103,11 @@ public class DebugRenderer {
             }
         }
 
+        sb.append("<h1>Doc</h1>");
+        sb.append("<code>");
+        sb.append(new HtmlDocVisitor(finalState).visit(doc));
+        sb.append("</code>");
+
         sb.append("<h1>javaOutput</h1>");
         sb.append("<code>");
         for (int i = 0; i < javaOutput.getLineCount(); ++i) {
@@ -121,7 +127,7 @@ public class DebugRenderer {
         }
     }
 
-    private static String backgroundColor(Doc op) {
+    public static String backgroundColor(Doc op) {
         long hue = Hashing.adler32().hashInt(op.uniqueId).padToLong() % 360;
         return String.format("background: hsl(%d, 60%%, 90%%)", hue);
     }

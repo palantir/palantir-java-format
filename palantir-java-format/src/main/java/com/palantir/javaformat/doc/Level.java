@@ -458,7 +458,7 @@ public final class Level extends Doc {
     }
 
     /** An indented representation of this level and all nested levels inside it. */
-    String representation(State state) {
+    public String representation(State state) {
         return new LevelDelimitedFlatValueDocVisitor(state).visit(this);
     }
 
