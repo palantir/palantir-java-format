@@ -15,7 +15,7 @@ import org.immutables.value.Value.Default;
 @Value.Immutable
 @Value.Style(overshadowImplementation = true)
 public interface InputMetadata {
-    /** Remembers preferences from the input about whether blank lines are wanted or not at various lines. */
+    /** Remembers preferences from the input about whether blank lines are wanted or not at a given token index. */
     ImmutableMap<Integer, BlankLineWanted> blankLines();
 
     /**
