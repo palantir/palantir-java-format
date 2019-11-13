@@ -19,7 +19,7 @@ import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.doc.Break;
 import com.palantir.javaformat.doc.BreakTag;
 import com.palantir.javaformat.doc.Level;
-import com.palantir.javaformat.doc.State;
+import com.palantir.javaformat.state.State;
 
 /**
  * An indent for a {@link Level} or {@link Break}. The indent is either a constant {@code int}, or a conditional

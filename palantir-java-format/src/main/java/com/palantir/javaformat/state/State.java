@@ -14,11 +14,16 @@
  * limitations under the License.
  */
 
-package com.palantir.javaformat.doc;
+package com.palantir.javaformat.state;
 
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.Indent;
+import com.palantir.javaformat.doc.Break;
+import com.palantir.javaformat.doc.BreakTag;
+import com.palantir.javaformat.doc.HasUniqueId;
+import com.palantir.javaformat.doc.Level;
+import com.palantir.javaformat.doc.Tok;
 import fj.data.Set;
 import fj.data.TreeMap;
 import org.immutables.value.Value;
@@ -86,18 +91,18 @@ public abstract class State {
         return breakTagsTaken().member(breakTag);
     }
 
-    boolean isOneLine(Level level) {
+    public boolean isOneLine(Level level) {
         LevelState levelState = levelStates().get(level).toNull();
         return levelState != null && levelState.oneLine();
     }
 
-    String getTokText(Tok tok) {
+    public String getTokText(Tok tok) {
         return Preconditions.checkNotNull(tokStates().get(tok).toNull(), "Expected Tok state to exist for: %s", tok)
                 .text();
     }
 
     /** Record whether break was taken. */
-    State breakTaken(BreakTag breakTag, boolean broken) {
+    public State breakTaken(BreakTag breakTag, boolean broken) {
         boolean currentlyBroken = breakTagsTaken().member(breakTag);
         // TODO(dsanduleac): is the opposite ever a valid state?
         if (currentlyBroken != broken) {
@@ -116,21 +121,21 @@ public abstract class State {
      * Increases the indent by {@link Indent#eval} of the {@code plusIndent}, and sets {@code mustBreak} to false. Does
      * not commit to the indent just yet though, so lastIndent stays the same.
      */
-    State withIndentIncrementedBy(Indent plusIndent) {
+    public State withIndentIncrementedBy(Indent plusIndent) {
         return builder().from(this).indent(indent() + plusIndent.eval(this)).mustBreak(false).build();
     }
 
     /** Reset any accumulated indent to the same value as {@code lastIndent}. */
-    State withNoIndent() {
+    public State withNoIndent() {
         return builder().from(this).indent(lastIndent()).mustBreak(false).build();
     }
 
     /** The current level is being broken and it has breaks in it. Commit to the indent. */
-    State withBrokenLevel() {
+    public State withBrokenLevel() {
         return builder().from(this).lastIndent(indent()).build();
     }
 
-    State withBreak(Break brk, boolean broken) {
+    public State withBreak(Break brk, boolean broken) {
         Builder builder = builder().from(this);
 
         if (broken) {
@@ -149,7 +154,7 @@ public abstract class State {
     }
 
     /** Update the current state after having processed an _inner_ level. */
-    State updateAfterLevel(State afterInnerLevel) {
+    public State updateAfterLevel(State afterInnerLevel) {
         return builder()
                 // Inherited current state
                 .lastIndent(lastIndent())
@@ -167,27 +172,27 @@ public abstract class State {
                 .build();
     }
 
-    State addNewLines(int extraNewlines) {
+    public State addNewLines(int extraNewlines) {
         return builder().from(this).numLines(numLines() + extraNewlines).build();
     }
 
-    State withColumn(int column) {
+    public State withColumn(int column) {
         return builder().from(this).column(column).build();
     }
 
-    State withMustBreak(boolean mustBreak) {
+    public State withMustBreak(boolean mustBreak) {
         return builder().from(this).mustBreak(mustBreak).build();
     }
 
-    State withNewBranch() {
+    public State withNewBranch() {
         return builder().from(this).branchingCoefficient(branchingCoefficient() + 1).build();
     }
 
-    State withLevelState(Level level, LevelState levelState) {
+    public State withLevelState(Level level, LevelState levelState) {
         return builder().from(this).levelStates(levelStates().set(level, levelState)).build();
     }
 
-    State withTokState(Tok tok, TokState tokState) {
+    public State withTokState(Tok tok, TokState tokState) {
         return builder().from(this).tokStates(tokStates().set(tok, tokState)).build();
     }
 
@@ -199,7 +204,7 @@ public abstract class State {
 
     @Value.Immutable
     @Value.Style(overshadowImplementation = true)
-    interface BreakState {
+    public interface BreakState {
         @Parameter
         boolean broken();
 
@@ -209,7 +214,7 @@ public abstract class State {
 
     @Value.Immutable
     @Value.Style(overshadowImplementation = true)
-    interface LevelState {
+    public interface LevelState {
         /** True if the entire {@link Level} fits on one line. */
         @Parameter
         boolean oneLine();
@@ -217,7 +222,7 @@ public abstract class State {
 
     @Value.Immutable
     @Value.Style(overshadowImplementation = true)
-    interface TokState {
+    public interface TokState {
         @Parameter
         String text();
     }

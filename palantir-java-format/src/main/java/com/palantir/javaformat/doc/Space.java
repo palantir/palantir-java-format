@@ -22,6 +22,7 @@ import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.CommentsHelper;
 import com.palantir.javaformat.Op;
 import com.palantir.javaformat.Output;
+import com.palantir.javaformat.state.State;
 
 /** A Leaf node in a {@link Doc} for a non-breaking space. */
 @Immutable

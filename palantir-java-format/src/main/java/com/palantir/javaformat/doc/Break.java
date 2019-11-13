@@ -22,7 +22,8 @@ import com.palantir.javaformat.CommentsHelper;
 import com.palantir.javaformat.Indent;
 import com.palantir.javaformat.Op;
 import com.palantir.javaformat.Output;
-import com.palantir.javaformat.doc.State.BreakState;
+import com.palantir.javaformat.state.State;
+import com.palantir.javaformat.state.State.BreakState;
 import java.util.Optional;
 import org.immutables.value.Value;
 

@@ -24,6 +24,7 @@ import com.palantir.javaformat.Indent;
 import com.palantir.javaformat.Input;
 import com.palantir.javaformat.Op;
 import com.palantir.javaformat.Output;
+import com.palantir.javaformat.state.State;
 import java.util.Optional;
 
 /** A leaf {@link Doc} for a token. */

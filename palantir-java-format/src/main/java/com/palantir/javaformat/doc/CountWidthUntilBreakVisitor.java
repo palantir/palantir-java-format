@@ -19,6 +19,7 @@ package com.palantir.javaformat.doc;
 import com.google.common.base.Preconditions;
 import com.palantir.javaformat.LastLevelBreakability;
 import com.palantir.javaformat.doc.StartsWithBreakVisitor.Result;
+import com.palantir.javaformat.state.State;
 import java.util.List;
 import java.util.OptionalInt;
 

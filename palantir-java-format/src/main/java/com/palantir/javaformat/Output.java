@@ -16,7 +16,7 @@ package com.palantir.javaformat;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Range;
-import com.palantir.javaformat.doc.State;
+import com.palantir.javaformat.state.State;
 
 /** An output from the formatter. */
 public abstract class Output extends InputOutput {

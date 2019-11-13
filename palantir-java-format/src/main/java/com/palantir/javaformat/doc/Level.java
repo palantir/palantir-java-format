@@ -31,6 +31,8 @@ import com.palantir.javaformat.LastLevelBreakability;
 import com.palantir.javaformat.OpenOp;
 import com.palantir.javaformat.Output;
 import com.palantir.javaformat.doc.StartsWithBreakVisitor.Result;
+import com.palantir.javaformat.state.ImmutableLevelState;
+import com.palantir.javaformat.state.State;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

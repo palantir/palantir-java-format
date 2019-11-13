@@ -25,6 +25,8 @@ import com.palantir.javaformat.Input;
 import com.palantir.javaformat.Newlines;
 import com.palantir.javaformat.Op;
 import com.palantir.javaformat.Output;
+import com.palantir.javaformat.state.ImmutableTokState;
+import com.palantir.javaformat.state.State;
 
 /** A leaf node in a {@link Doc} for a non-token. */
 @Immutable

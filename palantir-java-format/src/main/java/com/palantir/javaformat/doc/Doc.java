@@ -24,6 +24,7 @@ import com.palantir.javaformat.Input;
 import com.palantir.javaformat.Op;
 import com.palantir.javaformat.OpsBuilder;
 import com.palantir.javaformat.Output;
+import com.palantir.javaformat.state.State;
 
 /**
  * {@link com.palantir.javaformat.java.JavaInputAstVisitor JavaInputAstVisitor} outputs a sequence of {@link Op}s using

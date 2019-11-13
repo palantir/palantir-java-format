@@ -26,7 +26,7 @@ import com.palantir.javaformat.Input.Token;
 import com.palantir.javaformat.Newlines;
 import com.palantir.javaformat.OpsBuilder.BlankLineWanted;
 import com.palantir.javaformat.Output;
-import com.palantir.javaformat.doc.State;
+import com.palantir.javaformat.state.State;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

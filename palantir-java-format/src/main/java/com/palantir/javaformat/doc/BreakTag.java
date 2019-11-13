@@ -1,6 +1,7 @@
 package com.palantir.javaformat.doc;
 
 import com.google.errorprone.annotations.Immutable;
+import com.palantir.javaformat.state.State;
 
 /**
  * Unique identifier for a break. A BreakTag can correspond to one or more {@link Break breaks}, and the state of the

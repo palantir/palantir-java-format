@@ -31,7 +31,7 @@ import com.palantir.javaformat.OpsBuilder.OpsOutput;
 import com.palantir.javaformat.Utils;
 import com.palantir.javaformat.doc.Doc;
 import com.palantir.javaformat.doc.DocBuilder;
-import com.palantir.javaformat.doc.State;
+import com.palantir.javaformat.state.State;
 import java.io.IOError;
 import java.io.IOException;
 import java.net.URI;
