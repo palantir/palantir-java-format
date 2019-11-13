@@ -30,9 +30,12 @@ import com.palantir.javaformat.doc.State;
 import com.palantir.javaformat.doc.Tok;
 import com.palantir.javaformat.doc.Token;
 import com.palantir.javaformat.java.FormatterDiagnostic;
+import com.palantir.javaformat.java.InputPreservingState;
+import com.palantir.javaformat.java.InputPreservingStateBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.immutables.value.Value;
 
 /** An {@code OpsBuilder} creates a list of {@link Op}s, which is turned into a {@link Doc} by {@link DocBuilder}. */
 public final class OpsBuilder {
@@ -146,7 +149,9 @@ public final class OpsBuilder {
 
     private final Input input;
     private final List<Op> ops = new ArrayList<>();
-    private final Output output;
+    /** Used to record blank-line information. */
+    private final InputPreservingStateBuilder inputPreservingStateBuilder = new InputPreservingStateBuilder();
+
     private static final Const ZERO = Const.ZERO;
 
     private int tokenI = 0;
@@ -179,11 +184,9 @@ public final class OpsBuilder {
      * The {@code OpsBuilder} constructor.
      *
      * @param input the {@link Input}, used for retrieve information from the AST
-     * @param output the {@link Output}, used here only to record blank-line information
      */
-    public OpsBuilder(Input input, Output output) {
+    public OpsBuilder(Input input) {
         this.input = input;
-        this.output = output;
     }
 
     /** Get the {@code OpsBuilder}'s {@link Input}. */
@@ -451,7 +454,7 @@ public final class OpsBuilder {
         }
         Input.Token start = input.getTokens().get(lastPartialFormatBoundary);
         Input.Token end = input.getTokens().get(tokenI - 1);
-        output.markForPartialFormat(start, end);
+        inputPreservingStateBuilder.markForPartialFormat(start, end);
         lastPartialFormatBoundary = tokenI;
     }
 
@@ -461,7 +464,7 @@ public final class OpsBuilder {
      * @param wanted whether to force ({@code true}) or suppress {@code false}) the blank line
      */
     public void blankLineWanted(BlankLineWanted wanted) {
-        output.blankLine(getI(input.getTokens().get(tokenI)), wanted);
+        inputPreservingStateBuilder.blankLine(getI(input.getTokens().get(tokenI)), wanted);
     }
 
     private static int getI(Input.Token token) {
@@ -475,12 +478,16 @@ public final class OpsBuilder {
 
     private static final Space SPACE = Space.make();
 
-    /**
-     * Build a list of {@link Op}s from the {@code OpsBuilder}.
-     *
-     * @return the list of {@link Op}s
-     */
-    public ImmutableList<Op> build() {
+    @Value.Immutable
+    @Value.Style(overshadowImplementation = true)
+    public interface OpsOutput {
+        ImmutableList<Op> ops();
+
+        InputPreservingState inputPreservingState();
+    }
+
+    /** Build a list of {@link Op}s from the {@code OpsBuilder}. */
+    public OpsOutput build() {
         markForPartialFormat();
         // Rewrite the ops to insert comments.
         Multimap<Integer, Op> tokOps = ArrayListMultimap.create();
@@ -533,7 +540,7 @@ public final class OpsBuilder {
                     }
                     if (allowBlankAfterLastComment && newlines > 1) {
                         // Force a line break after two newlines in a row following a line or block comment
-                        output.blankLine(token.getTok().getIndex(), BlankLineWanted.YES);
+                        inputPreservingStateBuilder.blankLine(token.getTok().getIndex(), BlankLineWanted.YES);
                     }
                     if (lastWasComment && newlines > 0) {
                         tokOps.put(j, Break.makeForced());
@@ -629,7 +636,10 @@ public final class OpsBuilder {
                 afterForcedBreak = isForcedBreak(op);
             }
         }
-        return newOps.build();
+        return ImmutableOpsOutput.builder()
+                .ops(newOps.build())
+                .inputPreservingState(inputPreservingStateBuilder.build())
+                .build();
     }
 
     private static boolean isNonNlsComment(Input.Tok tokAfter) {
@@ -651,7 +661,6 @@ public final class OpsBuilder {
         return MoreObjects.toStringHelper(this)
                 .add("input", input)
                 .add("ops", ops)
-                .add("output", output)
                 .add("tokenI", tokenI)
                 .add("inputPosition", inputPosition)
                 .toString();

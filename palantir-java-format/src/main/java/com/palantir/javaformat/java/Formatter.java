@@ -28,6 +28,7 @@ import com.palantir.javaformat.FormattingError;
 import com.palantir.javaformat.Newlines;
 import com.palantir.javaformat.Op;
 import com.palantir.javaformat.OpsBuilder;
+import com.palantir.javaformat.OpsBuilder.OpsOutput;
 import com.palantir.javaformat.Utils;
 import com.palantir.javaformat.doc.Doc;
 import com.palantir.javaformat.doc.DocBuilder;
@@ -106,14 +107,15 @@ public final class Formatter {
      * corresponding {@link JavaOutput}.
      *
      * @param javaInput the input, a Java compilation unit
-     * @param javaOutput the {@link JavaOutput}
      * @param options the {@link JavaFormatterOptions}
+     * @param lineSeparator what line separator was used in the javaInput
      * @param commentsHelper the {@link CommentsHelper}, used to rewrite comments
+     * @return javaOutput the output produced
      */
-    static void format(
+    static JavaOutput format(
             final JavaInput javaInput,
-            JavaOutput javaOutput,
             JavaFormatterOptions options,
+            String lineSeparator,
             CommentsHelper commentsHelper)
             throws FormatterException {
 
@@ -152,15 +154,18 @@ public final class Formatter {
         if (!Iterables.isEmpty(errorDiagnostics)) {
             throw FormatterExceptions.fromJavacDiagnostics(errorDiagnostics);
         }
-        OpsBuilder builder = new OpsBuilder(javaInput, javaOutput);
+        OpsBuilder builder = new OpsBuilder(javaInput);
         // Output the compilation unit.
         new JavaInputAstVisitor(builder, options.indentationMultiplier()).scan(unit, null);
         builder.sync(javaInput.getText().length());
         builder.drain();
-        Doc doc = new DocBuilder().withOps(builder.build()).build();
+        OpsOutput opsOutput = builder.build();
+        Doc doc = new DocBuilder().withOps(opsOutput.ops()).build();
         State finalState = doc.computeBreaks(commentsHelper, options.maxLineLength(), State.startingState());
+        JavaOutput javaOutput = new JavaOutput(lineSeparator, javaInput, opsOutput.inputPreservingState());
         doc.write(finalState, javaOutput);
         javaOutput.flush();
+        return javaOutput;
     }
 
     static boolean errorDiagnostic(Diagnostic<?> input) {
@@ -253,9 +258,9 @@ public final class Formatter {
 
         String lineSeparator = Newlines.guessLineSeparator(input);
         JavaCommentsHelper commentsHelper = new JavaCommentsHelper(lineSeparator, options);
-        JavaOutput javaOutput = new JavaOutput(lineSeparator, javaInput);
+        JavaOutput javaOutput;
         try {
-            format(javaInput, javaOutput, options, commentsHelper);
+            javaOutput = format(javaInput, options, lineSeparator, commentsHelper);
         } catch (FormattingError e) {
             throw new FormatterException(e.diagnostics());
         }

@@ -16,7 +16,6 @@ package com.palantir.javaformat;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Range;
-import com.palantir.javaformat.OpsBuilder.BlankLineWanted;
 import com.palantir.javaformat.doc.State;
 
 /** An output from the formatter. */
@@ -36,17 +35,6 @@ public abstract class Output extends InputOutput {
      * @param range the {@link Range} corresponding to the string
      */
     public abstract void append(State state, String text, Range<Integer> range);
-
-    /**
-     * A blank line is or is not wanted here.
-     *
-     * @param k the {@link Input.Tok} index
-     * @param wanted whether a blank line is wanted here
-     */
-    public abstract void blankLine(int k, BlankLineWanted wanted);
-
-    /** Marks a region that can be partially formatted. */
-    public abstract void markForPartialFormat(Input.Token start, Input.Token end);
 
     @Override
     public String toString() {
