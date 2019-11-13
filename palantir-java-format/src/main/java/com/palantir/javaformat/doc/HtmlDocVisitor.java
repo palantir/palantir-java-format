@@ -61,8 +61,9 @@ public final class HtmlDocVisitor implements DocVisitor<String> {
             return "";
         }
         StringBuilder builder = new StringBuilder();
-        builder.append(String.format("<span class=\"level\" style=\"%s\">", DebugRenderer.backgroundColor(level)));
-        level.getDebugName().ifPresent(name -> builder.append(" \"" + name + "\""));
+        builder.append(String.format(
+                "<span class=\"level\" style=\"%s\" title=\"%s\">",
+                DebugRenderer.backgroundColor(level), level.getDebugName().orElse("")));
         if (!level.getPlusIndent().equals(Indent.Const.ZERO)) {
             builder.append(" +" + level.getPlusIndent().eval(state));
         }

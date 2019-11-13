@@ -162,6 +162,7 @@ public final class Formatter {
         JavaOutput javaOutput = new JavaOutput(javaInput, opsOutput.inputMetadata());
         doc.write(finalState, javaOutput);
         javaOutput.flush();
+
         DebugRenderer.render(javaInput, opsOutput, doc, finalState, javaOutput);
         return javaOutput;
     }

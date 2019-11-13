@@ -27,6 +27,7 @@ import com.palantir.javaformat.doc.Break;
 import com.palantir.javaformat.doc.BreakTag;
 import com.palantir.javaformat.doc.Comment;
 import com.palantir.javaformat.doc.Doc;
+import com.palantir.javaformat.doc.FillMode;
 import com.palantir.javaformat.doc.HtmlDocVisitor;
 import com.palantir.javaformat.doc.Level;
 import com.palantir.javaformat.doc.NonBreakingSpace;
@@ -53,11 +54,14 @@ public class DebugRenderer {
                 + "inline-block; margin: 0 1px;}"
                 + "span.open-op { background: green;}"
                 + "span.close-op { background: red;}"
-                + "span.break-tag { background: black;}"
+                + "span.break-tag.FillMode-UNIFIED { background: #777;}"
+                + "span.break-tag.FillMode-INDEPENDENT { background: #333;}"
+                + "span.break-tag.FillMode-FORCED { background: #000; width: 5px;}"
+                + "span.break-tag.conditional { height: 0.4em; width: 0.4em; vertical-align:middle;}"
                 + "</style>");
         sb.append("</head>");
 
-        sb.append("<div style=\"white-space: pre; font-family: monospace\">");
+        sb.append("<div style=\"white-space: pre; font-family: monospace; line-height: 1em;\">");
 
         sb.append("<h1>javaInput</h1>");
         sb.append("<code>");
@@ -88,9 +92,11 @@ public class DebugRenderer {
             }
             if (op instanceof Break) {
                 Optional<BreakTag> breakTag = ((Break) op).optTag();
+                String conditional = breakTag.isPresent() ? "conditional" : "";
+                FillMode fillMode = ((Break) op).fillMode();
                 sb.append(String.format(
-                        "<span class=\"break-tag %s\" title=\"%s\"></span>",
-                        breakTag.isPresent() ? "conditional" : "", op.toString()));
+                        "<span class=\"break-tag %s FillMode-%s\" title=\"%s\"></span>",
+                        conditional, fillMode, op.toString()));
             }
             if (op instanceof NonBreakingSpace) {}
             if (op instanceof Comment) {}
