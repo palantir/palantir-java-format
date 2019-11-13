@@ -10,7 +10,7 @@ import com.palantir.javaformat.OpsBuilder.BlankLineWanted;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class InputPreservingStateBuilder {
+public final class InputMetadataBuilder {
     private final Map<Integer, BlankLineWanted> blankLines = new HashMap<>(); // Info on blank lines.
     private final RangeSet<Integer> partialFormatRanges = TreeRangeSet.create();
 
@@ -35,8 +35,8 @@ public final class InputPreservingStateBuilder {
         partialFormatRanges.add(Range.closed(lo, hi));
     }
 
-    public InputPreservingState build() {
-        return ImmutableInputPreservingState.builder()
+    public InputMetadata build() {
+        return ImmutableInputMetadata.builder()
                 .blankLines(ImmutableMap.copyOf(blankLines))
                 .partialFormatRanges(ImmutableRangeSet.copyOf(partialFormatRanges))
                 .build();

@@ -8,13 +8,13 @@ import org.immutables.value.Value;
 import org.immutables.value.Value.Default;
 
 /**
- * Used to record metadata about the input, namely existing blank lines that we might want to preserve, as well as what
- * ranges can be partially formatted.
+ * Records metadata about the input, namely existing blank lines that we might want to preserve, as well as what ranges
+ * can be partially formatted.
  */
 @Immutable
 @Value.Immutable
 @Value.Style(overshadowImplementation = true)
-public interface InputPreservingState {
+public interface InputMetadata {
     /** Remembers preferences from the input about whether blank lines are wanted or not at various lines. */
     ImmutableMap<Integer, BlankLineWanted> blankLines();
 

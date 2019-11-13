@@ -47,7 +47,7 @@ public final class JavaOutput extends Output {
 
     private final List<String> mutableLines = new ArrayList<>();
     private final int kN; // The number of tokens or comments in the input, excluding the EOF.
-    private final InputPreservingState inputPreservingState;
+    private final InputMetadata inputMetadata;
     private int iLine = 0; // Closest corresponding line number on input.
     private int lastK = -1; // Last {@link Tok} index output.
     private int spacesPending = 0;
@@ -59,11 +59,11 @@ public final class JavaOutput extends Output {
      *
      * @param javaInput the {@link JavaInput}, used to match up blank lines in the output
      */
-    public JavaOutput(String lineSeparator, JavaInput javaInput, InputPreservingState inputPreservingState) {
+    public JavaOutput(String lineSeparator, JavaInput javaInput, InputMetadata inputMetadata) {
         this.lineSeparator = lineSeparator;
         this.javaInput = javaInput;
         kN = javaInput.getkN();
-        this.inputPreservingState = inputPreservingState;
+        this.inputMetadata = inputMetadata;
     }
 
     // TODO(jdd): Add invariant.
@@ -86,7 +86,7 @@ public final class JavaOutput extends Output {
              * Output blank line if we've called {@link OpsBuilder#blankLine}{@code (true)} here, or if
              * there's a blank line here and it's a comment.
              */
-            BlankLineWanted wanted = inputPreservingState.blankLines().getOrDefault(lastK, BlankLineWanted.NO);
+            BlankLineWanted wanted = inputMetadata.blankLines().getOrDefault(lastK, BlankLineWanted.NO);
             if (isComment(text) ? sawNewlines : wanted.wanted(state).orElse(sawNewlines)) {
                 ++newlinesPending;
             }
@@ -304,7 +304,7 @@ public final class JavaOutput extends Output {
     }
 
     private RangeSet<Integer> partialFormatRanges() {
-        return inputPreservingState.partialFormatRanges();
+        return inputMetadata.partialFormatRanges();
     }
 
     /** The earliest position of any Tok in the Token, including leading whitespace. */
@@ -352,7 +352,7 @@ public final class JavaOutput extends Output {
                 .add("lastK", lastK)
                 .add("spacesPending", spacesPending)
                 .add("newlinesPending", newlinesPending)
-                .add("blankLines", inputPreservingState.blankLines())
+                .add("blankLines", inputMetadata.blankLines())
                 .add("super", super.toString())
                 .toString();
     }

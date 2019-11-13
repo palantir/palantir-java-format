@@ -30,8 +30,8 @@ import com.palantir.javaformat.doc.State;
 import com.palantir.javaformat.doc.Tok;
 import com.palantir.javaformat.doc.Token;
 import com.palantir.javaformat.java.FormatterDiagnostic;
-import com.palantir.javaformat.java.InputPreservingState;
-import com.palantir.javaformat.java.InputPreservingStateBuilder;
+import com.palantir.javaformat.java.InputMetadata;
+import com.palantir.javaformat.java.InputMetadataBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -150,7 +150,7 @@ public final class OpsBuilder {
     private final Input input;
     private final List<Op> ops = new ArrayList<>();
     /** Used to record blank-line information. */
-    private final InputPreservingStateBuilder inputPreservingStateBuilder = new InputPreservingStateBuilder();
+    private final InputMetadataBuilder inputMetadataBuilder = new InputMetadataBuilder();
 
     private static final Const ZERO = Const.ZERO;
 
@@ -454,7 +454,7 @@ public final class OpsBuilder {
         }
         Input.Token start = input.getTokens().get(lastPartialFormatBoundary);
         Input.Token end = input.getTokens().get(tokenI - 1);
-        inputPreservingStateBuilder.markForPartialFormat(start, end);
+        inputMetadataBuilder.markForPartialFormat(start, end);
         lastPartialFormatBoundary = tokenI;
     }
 
@@ -464,7 +464,7 @@ public final class OpsBuilder {
      * @param wanted whether to force ({@code true}) or suppress {@code false}) the blank line
      */
     public void blankLineWanted(BlankLineWanted wanted) {
-        inputPreservingStateBuilder.blankLine(getI(input.getTokens().get(tokenI)), wanted);
+        inputMetadataBuilder.blankLine(getI(input.getTokens().get(tokenI)), wanted);
     }
 
     private static int getI(Input.Token token) {
@@ -483,7 +483,7 @@ public final class OpsBuilder {
     public interface OpsOutput {
         ImmutableList<Op> ops();
 
-        InputPreservingState inputPreservingState();
+        InputMetadata inputPreservingState();
     }
 
     /** Build a list of {@link Op}s from the {@code OpsBuilder}. */
@@ -540,7 +540,7 @@ public final class OpsBuilder {
                     }
                     if (allowBlankAfterLastComment && newlines > 1) {
                         // Force a line break after two newlines in a row following a line or block comment
-                        inputPreservingStateBuilder.blankLine(token.getTok().getIndex(), BlankLineWanted.YES);
+                        inputMetadataBuilder.blankLine(token.getTok().getIndex(), BlankLineWanted.YES);
                     }
                     if (lastWasComment && newlines > 0) {
                         tokOps.put(j, Break.makeForced());
@@ -638,7 +638,7 @@ public final class OpsBuilder {
         }
         return ImmutableOpsOutput.builder()
                 .ops(newOps.build())
-                .inputPreservingState(inputPreservingStateBuilder.build())
+                .inputPreservingState(inputMetadataBuilder.build())
                 .build();
     }
 
