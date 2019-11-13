@@ -110,10 +110,7 @@ public final class Formatter {
      * @param commentsHelper the {@link CommentsHelper}, used to rewrite comments
      * @return javaOutput the output produced
      */
-    static JavaOutput format(
-            final JavaInput javaInput,
-            JavaFormatterOptions options,
-            CommentsHelper commentsHelper)
+    static JavaOutput format(final JavaInput javaInput, JavaFormatterOptions options, CommentsHelper commentsHelper)
             throws FormatterException {
 
         Context context = new Context();
