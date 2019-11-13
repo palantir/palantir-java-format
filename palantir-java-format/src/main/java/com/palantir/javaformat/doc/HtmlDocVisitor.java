@@ -61,21 +61,12 @@ public final class HtmlDocVisitor implements DocVisitor<String> {
             return "";
         }
         StringBuilder builder = new StringBuilder();
+        String titleStr = computeTitle(level, state);
         builder.append(String.format(
                 "<span class=\"level\" style=\"%s\" title=\"%s\">",
-                DebugRenderer.backgroundColor(level), level.getDebugName().orElse("")));
-        if (!level.getPlusIndent().equals(Indent.Const.ZERO)) {
-            builder.append(" +" + level.getPlusIndent().eval(state));
-        }
-        BreakBehaviours.caseOf(level.getBreakBehaviour()).breakThisLevel_(null).otherwise(() -> {
-            builder.append(" ");
-            builder.append(level.getBreakBehaviour());
-            return null;
-        });
-        if (level.getBreakabilityIfLastLevel() != LastLevelBreakability.ABORT) {
-            builder.append(" ifLastLevel=");
-            builder.append(level.getBreakabilityIfLastLevel());
-        }
+                DebugRenderer.backgroundColor(level), titleStr));
+
+        // References break tag
 
         indent += 2;
         boolean breakNext = true;
@@ -93,6 +84,24 @@ public final class HtmlDocVisitor implements DocVisitor<String> {
         generateIndent(builder);
         builder.append("</span>");
         return builder.toString();
+    }
+
+    private static String computeTitle(Level level, State state) {
+        StringBuilder title = new StringBuilder();
+        if (!level.getPlusIndent().equals(Indent.Const.ZERO)) {
+            title.append(" +" + level.getPlusIndent().eval(state));
+        }
+        BreakBehaviours.caseOf(level.getBreakBehaviour()).breakThisLevel_(null).otherwise(() -> {
+            title.append(" ");
+            title.append(level.getBreakBehaviour());
+            return null;
+        });
+        if (level.getBreakabilityIfLastLevel() != LastLevelBreakability.ABORT) {
+            title.append(" ifLastLevel=");
+            title.append(level.getBreakabilityIfLastLevel());
+        }
+
+        return title.toString();
     }
 
     private void generateIndent(StringBuilder builder) {
