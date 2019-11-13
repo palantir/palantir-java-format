@@ -151,6 +151,7 @@ public final class Level extends Doc {
         }
 
         private State breakNormally(State state) {
+            // TODO(dsanduleac): can't just do .withBrokenLevel()
             return computeBroken(commentsHelper, maxWidth, state.withIndentIncrementedBy(plusIndent));
         }
 
@@ -162,7 +163,7 @@ public final class Level extends Doc {
         @Override
         public State preferBreakingLastInnerLevel(boolean keepIndentWhenInlined, boolean replaceIndent) {
             if (!replaceIndent) {
-                logDecision(state, "breakThisLevel");
+                logDecision(state, "falling back to breakThisLevel");
                 return breakThisLevel();
             }
             // Try both breaking and not breaking. Choose the better one based on LOC, preferring
@@ -192,7 +193,7 @@ public final class Level extends Doc {
         @Override
         public State breakOnlyIfInnerLevelsThenFitOnOneLine(boolean keepIndentWhenInlined, boolean replaceIndent) {
             if (!replaceIndent) {
-                logDecision(state, "breakThisLevel");
+                logDecision(state, "falling back to breakThisLevel");
                 return breakThisLevel();
             }
             logDecision(state, "handleBreakOnlyIfInnerLevelsThenFitOnOneLine");
@@ -384,7 +385,7 @@ public final class Level extends Doc {
     }
 
     private void logDecision(State state, String decision) {
-        System.err.println(Strings.repeat("  ", state.depth()) + "-- DECISION: " + decision + " " + state.toString());
+        System.out.println(Strings.repeat("  ", state.depth()) + "-- DECISION: " + decision + " " + state.toString());
     }
 
     private static void assertStartsWithBreakOrEmpty(State state, Doc doc) {
