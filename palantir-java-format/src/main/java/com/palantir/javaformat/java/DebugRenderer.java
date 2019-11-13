@@ -26,6 +26,7 @@ import com.palantir.javaformat.OpsBuilder;
 import com.palantir.javaformat.doc.Break;
 import com.palantir.javaformat.doc.BreakTag;
 import com.palantir.javaformat.doc.Comment;
+import com.palantir.javaformat.doc.Doc;
 import com.palantir.javaformat.doc.NonBreakingSpace;
 import com.palantir.javaformat.doc.Token;
 import java.io.IOException;
@@ -42,8 +43,13 @@ public class DebugRenderer {
 
         sb.append("<head>");
         sb.append("<style type=\"text/css\">"
-                + "span.token:hover { outline: 1px solid black } "
-                + "span.token:hover span.token-body { text-decoration: underline }"
+                + "span.token:hover { outline: 1px solid black; } "
+                + "span.token:hover span.token-body { text-decoration: underline; }"
+                + "span.open-op, span.close-op, span.break-tag { position: relative;width: 3px;height: 1em;display: "
+                + "inline-block; margin: 0 1px;}"
+                + "span.open-op { background: green;}"
+                + "span.close-op { background: red;}"
+                + "span.break-tag { background: black;}"
                 + "</style>");
         sb.append("</head>");
 
@@ -55,13 +61,13 @@ public class DebugRenderer {
         sb.append("</code>");
 
         sb.append("<h1>List&lt;Op&gt;</h1>");
+        sb.append("<p><i>Note: Comment and NonBreakingSpaces are not rendered here. Columns may be misaligned"
+                + ".</i></p>");
 
         ImmutableList<Op> ops = opsOutput.ops();
         for (Op op : ops) {
             if (op instanceof Token) {
-                long hue = Hashing.adler32().hashInt(((Token) op).uniqueId).padToLong() % 360;
-
-                sb.append(String.format("<span class=\"token\" style=\"background: hsl(%d, 60%%, 90%%)\">", hue));
+                sb.append(String.format("<span class=\"token\" style=\"%s\">", backgroundColor((Doc) op)));
                 Input.Token foo = ((Token) op).getToken();
                 foo.getToksBefore().forEach(before -> {
                     sb.append(before.getText());
@@ -78,17 +84,19 @@ public class DebugRenderer {
             }
             if (op instanceof Break) {
                 Optional<BreakTag> breakTag = ((Break) op).optTag();
-                // sb.append("break?" + breakTag.map(t -> Integer.toString(t.uniqueId)).orElse(""));
+                sb.append(String.format(
+                        "<span class=\"break-tag %s\" title=\"%s\"></span>",
+                        breakTag.isPresent() ? "conditional" : "", op.toString()));
             }
             if (op instanceof NonBreakingSpace) {
-                // sb.append("#");
             }
             if (op instanceof Comment) {}
+
             if (op instanceof OpenOp) {
-                OpenOp openOp = (OpenOp) op;
+                sb.append("<span class=\"open-op\" title=\"" + op.toString() + "\"></span>");
             }
             if (op instanceof CloseOp) {
-                CloseOp closeOp = (CloseOp) op;
+                sb.append("<span class=\"close-op\" title=\"" + op.toString() + "\"></span>");
             }
         }
 
@@ -99,5 +107,10 @@ public class DebugRenderer {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static String backgroundColor(Doc op) {
+        long hue = Hashing.adler32().hashInt(op.uniqueId).padToLong() % 360;
+        return String.format("background: hsl(%d, 60%%, 90%%)", hue);
     }
 }
