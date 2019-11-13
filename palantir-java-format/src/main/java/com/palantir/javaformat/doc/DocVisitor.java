@@ -25,7 +25,7 @@ public interface DocVisitor<T> {
         } else if (doc instanceof Token) {
             return visitToken((Token) doc);
         } else if (doc instanceof Comment) {
-            return visitTok((Comment) doc);
+            return visitComment((Comment) doc);
         } else if (doc instanceof NonBreakingSpace) {
             return visitSpace((NonBreakingSpace) doc);
         }
@@ -34,7 +34,7 @@ public interface DocVisitor<T> {
 
     T visitSpace(NonBreakingSpace doc);
 
-    T visitTok(Comment doc);
+    T visitComment(Comment doc);
 
     T visitToken(Token doc);
 
