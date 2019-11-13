@@ -28,7 +28,7 @@ enum StartsWithBreakVisitor implements DocVisitor<Result> {
     }
 
     @Override
-    public Result visitSpace(Space doc) {
+    public Result visitSpace(NonBreakingSpace doc) {
         return Result.NO;
     }
 

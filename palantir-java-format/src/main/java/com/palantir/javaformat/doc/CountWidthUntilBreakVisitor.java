@@ -35,7 +35,7 @@ class CountWidthUntilBreakVisitor implements DocVisitor<Float> {
     }
 
     @Override
-    public Float visitSpace(Space doc) {
+    public Float visitSpace(NonBreakingSpace doc) {
         return doc.getWidth();
     }
 

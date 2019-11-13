@@ -22,20 +22,16 @@ import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.CommentsHelper;
 import com.palantir.javaformat.Op;
 import com.palantir.javaformat.Output;
+import sun.jvm.hotspot.gc.shared.Space;
 
 /** A Leaf node in a {@link Doc} for a non-breaking space. */
 @Immutable
-public final class Space extends Doc implements Op {
-    private static final Space SPACE = new Space();
+public final class NonBreakingSpace extends Doc implements Op {
+    private static final NonBreakingSpace SPACE = new NonBreakingSpace();
 
-    private Space() {}
+    private NonBreakingSpace() {}
 
-    /**
-     * Factor method for {@code Space}.
-     *
-     * @return the new {@code Space}
-     */
-    public static Space make() {
+    public static NonBreakingSpace make() {
         return SPACE;
     }
 

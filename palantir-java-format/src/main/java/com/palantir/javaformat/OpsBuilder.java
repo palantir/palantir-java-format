@@ -26,7 +26,7 @@ import com.palantir.javaformat.doc.Comment;
 import com.palantir.javaformat.doc.Doc;
 import com.palantir.javaformat.doc.DocBuilder;
 import com.palantir.javaformat.doc.FillMode;
-import com.palantir.javaformat.doc.Space;
+import com.palantir.javaformat.doc.NonBreakingSpace;
 import com.palantir.javaformat.doc.State;
 import com.palantir.javaformat.doc.Token;
 import com.palantir.javaformat.java.FormatterDiagnostic;
@@ -359,9 +359,9 @@ public final class OpsBuilder {
         }
     }
 
-    /** Emit a {@link Space}. */
+    /** Emit a {@link NonBreakingSpace}. */
     public void space() {
-        add(Space.make());
+        add(NonBreakingSpace.make());
     }
 
     /** Emit a {@link Break}. */
@@ -476,7 +476,7 @@ public final class OpsBuilder {
         return token.getTok().getIndex();
     }
 
-    private static final Space SPACE = Space.make();
+    private static final NonBreakingSpace SPACE = NonBreakingSpace.make();
 
     @Value.Immutable
     @Value.Style(overshadowImplementation = true)
@@ -612,14 +612,14 @@ public final class OpsBuilder {
         boolean afterForcedBreak = false; // Was the last Op a forced break? If so, suppress spaces.
         for (int i = 0; i < opsN; i++) {
             for (Op op : tokOps.get(i)) {
-                if (!(afterForcedBreak && op instanceof Space)) {
+                if (!(afterForcedBreak && op instanceof NonBreakingSpace)) {
                     newOps.add(op);
                     afterForcedBreak = isForcedBreak(op);
                 }
             }
             Op op = ops.get(i);
             if (afterForcedBreak
-                    && (op instanceof Space
+                    && (op instanceof NonBreakingSpace
                             || (op instanceof Break
                                     && ((Break) op).evalPlusIndent(State.startingState()) == 0
                                     && " ".equals(((Doc) op).getFlat())))) {
@@ -631,7 +631,7 @@ public final class OpsBuilder {
             }
         }
         for (Op op : tokOps.get(opsN)) {
-            if (!(afterForcedBreak && op instanceof Space)) {
+            if (!(afterForcedBreak && op instanceof NonBreakingSpace)) {
                 newOps.add(op);
                 afterForcedBreak = isForcedBreak(op);
             }
