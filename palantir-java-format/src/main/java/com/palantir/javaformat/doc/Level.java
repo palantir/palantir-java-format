@@ -322,7 +322,7 @@ public final class Level extends Doc {
                         if (!canInline) {
                             return Optional.empty();
                         }
-                        State state2 = state1.withBrokenLevel();
+                        State state2 = state1; //.withBrokenLevel(); // TODO why did we do this?
                         logDecision(state2, "Recursing into inner level");
                         lastLevel.logLevelAndState(state2, true);
                         state2 = state2.increaseDepth();
