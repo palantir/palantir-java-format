@@ -35,7 +35,7 @@ public final class LevelDelimitedFlatValueDocVisitor implements DocVisitor<Strin
     }
 
     @Override
-    public String visitTok(Tok doc) {
+    public String visitTok(Comment doc) {
         return doc.getFlat();
     }
 

@@ -31,6 +31,7 @@ import com.palantir.javaformat.OpsBuilder.OpsOutput;
 import com.palantir.javaformat.Utils;
 import com.palantir.javaformat.doc.Doc;
 import com.palantir.javaformat.doc.DocBuilder;
+import com.palantir.javaformat.doc.Level;
 import com.palantir.javaformat.doc.State;
 import java.io.IOError;
 import java.io.IOException;
@@ -148,15 +149,19 @@ public final class Formatter {
         if (!Iterables.isEmpty(errorDiagnostics)) {
             throw FormatterExceptions.fromJavacDiagnostics(errorDiagnostics);
         }
-        OpsBuilder builder = new OpsBuilder(javaInput);
+
+        OpsBuilder opsBuilder = new OpsBuilder(javaInput);
         // Output the compilation unit.
-        new JavaInputAstVisitor(builder, options.indentationMultiplier()).scan(unit, null);
-        builder.sync(javaInput.getText().length());
-        builder.drain();
-        OpsOutput opsOutput = builder.build();
-        Doc doc = new DocBuilder().withOps(opsOutput.ops()).build();
+        new JavaInputAstVisitor(opsBuilder, options.indentationMultiplier()).scan(unit, null);
+        opsBuilder.sync(javaInput.getText().length());
+        opsBuilder.drain();
+        OpsOutput opsOutput = opsBuilder.build();
+
+        DebugRenderer.render(javaInput, opsOutput);
+
+        Level doc = new DocBuilder().withOps(opsOutput.ops()).build();
         State finalState = doc.computeBreaks(commentsHelper, options.maxLineLength(), State.startingState());
-        JavaOutput javaOutput = new JavaOutput(javaInput, opsOutput.inputPreservingState());
+        JavaOutput javaOutput = new JavaOutput(javaInput, opsOutput.inputMetadata());
         doc.write(finalState, javaOutput);
         javaOutput.flush();
         return javaOutput;
