@@ -352,7 +352,7 @@ public final class JavaOutput extends Output {
                 .add("lastK", lastK)
                 .add("spacesPending", spacesPending)
                 .add("newlinesPending", newlinesPending)
-                .add("blankLines", inputMetadata.blankLines())
+                .add("inputMetadata", inputMetadata)
                 .add("super", super.toString())
                 .toString();
     }
