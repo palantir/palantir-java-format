@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
-import com.palantir.javaformat.CommentsHelper;
 import com.palantir.javaformat.Input;
 import com.palantir.javaformat.Input.Token;
 import com.palantir.javaformat.Newlines;
@@ -46,7 +45,6 @@ import java.util.Map;
 public final class JavaOutput extends Output {
     private final String lineSeparator;
     private final JavaInput javaInput; // Used to follow along while emitting the output.
-    private final CommentsHelper commentsHelper; // Used to re-flow comments.
     private final Map<Integer, BlankLineWanted> blankLines = new HashMap<>(); // Info on blank lines.
     private final RangeSet<Integer> partialFormatRanges = TreeRangeSet.create();
 
@@ -62,12 +60,10 @@ public final class JavaOutput extends Output {
      * {@code JavaOutput} constructor.
      *
      * @param javaInput the {@link JavaInput}, used to match up blank lines in the output
-     * @param commentsHelper the {@link CommentsHelper}, used to rewrite comments
      */
-    public JavaOutput(String lineSeparator, JavaInput javaInput, CommentsHelper commentsHelper) {
+    public JavaOutput(String lineSeparator, JavaInput javaInput) {
         this.lineSeparator = lineSeparator;
         this.javaInput = javaInput;
-        this.commentsHelper = commentsHelper;
         kN = javaInput.getkN();
     }
 
@@ -192,11 +188,6 @@ public final class JavaOutput extends Output {
     }
 
     // The following methods can be used after the Output has been built.
-
-    @Override
-    public CommentsHelper getCommentsHelper() {
-        return commentsHelper;
-    }
 
     /**
      * Emit a list of {@link Replacement}s to convert from input to output.

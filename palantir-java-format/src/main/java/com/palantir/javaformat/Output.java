@@ -48,13 +48,6 @@ public abstract class Output extends InputOutput {
     /** Marks a region that can be partially formatted. */
     public abstract void markForPartialFormat(Input.Token start, Input.Token end);
 
-    /**
-     * Get the {@link CommentsHelper}.
-     *
-     * @return the {@link CommentsHelper}
-     */
-    public abstract CommentsHelper getCommentsHelper();
-
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this).add("super", super.toString()).toString();

@@ -23,6 +23,7 @@ import com.google.common.collect.RangeSet;
 import com.google.common.io.CharSink;
 import com.google.common.io.CharSource;
 import com.google.errorprone.annotations.Immutable;
+import com.palantir.javaformat.CommentsHelper;
 import com.palantir.javaformat.FormattingError;
 import com.palantir.javaformat.Newlines;
 import com.palantir.javaformat.Op;
@@ -107,9 +108,15 @@ public final class Formatter {
      * @param javaInput the input, a Java compilation unit
      * @param javaOutput the {@link JavaOutput}
      * @param options the {@link JavaFormatterOptions}
+     * @param commentsHelper the {@link CommentsHelper}, used to rewrite comments
      */
-    static void format(final JavaInput javaInput, JavaOutput javaOutput, JavaFormatterOptions options)
+    static void format(
+            final JavaInput javaInput,
+            JavaOutput javaOutput,
+            JavaFormatterOptions options,
+            CommentsHelper commentsHelper)
             throws FormatterException {
+
         Context context = new Context();
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
         context.put(DiagnosticListener.class, diagnostics);
@@ -151,8 +158,7 @@ public final class Formatter {
         builder.sync(javaInput.getText().length());
         builder.drain();
         Doc doc = new DocBuilder().withOps(builder.build()).build();
-        State finalState =
-                doc.computeBreaks(javaOutput.getCommentsHelper(), options.maxLineLength(), State.startingState());
+        State finalState = doc.computeBreaks(commentsHelper, options.maxLineLength(), State.startingState());
         doc.write(finalState, javaOutput);
         javaOutput.flush();
     }
@@ -246,10 +252,10 @@ public final class Formatter {
         javaInput = ModifierOrderer.reorderModifiers(javaInput, characterRanges);
 
         String lineSeparator = Newlines.guessLineSeparator(input);
-        JavaOutput javaOutput =
-                new JavaOutput(lineSeparator, javaInput, new JavaCommentsHelper(lineSeparator, options));
+        JavaCommentsHelper commentsHelper = new JavaCommentsHelper(lineSeparator, options);
+        JavaOutput javaOutput = new JavaOutput(lineSeparator, javaInput);
         try {
-            format(javaInput, javaOutput, options);
+            format(javaInput, javaOutput, options, commentsHelper);
         } catch (FormattingError e) {
             throw new FormatterException(e.diagnostics());
         }
