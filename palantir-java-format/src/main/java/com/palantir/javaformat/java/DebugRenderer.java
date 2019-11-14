@@ -37,6 +37,7 @@ import com.palantir.javaformat.doc.Token;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
@@ -52,21 +53,21 @@ public class DebugRenderer {
         // TODO(dfox): import the script built by App.tsx?
         sb.append("<script type=\"text/javascript\">\n");
 
-        sb.append(String.format(
+        String javascript = String.format(
                 "window.palantirJavaFormat = {\njavaInput: %s,\nops: %s,\ndoc: {},\njavaOutput: %s\n};\n",
                 jsonEscapedString(javaInput.getText()),
                 opsJson(opsOutput),
-                jsonEscapedString(outputAsString(javaOutput))));
+                jsonEscapedString(outputAsString(javaOutput)));
+        sb.append(javascript);
 
         sb.append("</script>\n");
         sb.append("</head>\n");
         sb.append("<body><div id=\"root\"></div></body>\n");
         sb.append("</html>\n");
 
+        Path publicDir = Paths.get("../debugger/public");
         try {
-            Files.write(
-                    Paths.get(System.getProperty("user.home")).resolve("Desktop/output.html"),
-                    sb.toString().getBytes(StandardCharsets.UTF_8));
+            Files.write(publicDir.resolve("output.js"), javascript.getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

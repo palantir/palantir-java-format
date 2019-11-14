@@ -1,3 +1,7 @@
+.App code {
+    white-space: pre; font-family: monospace; line-height: 1em;
+}
+
 span.token:hover {
     outline: 1px solid black;
 }
