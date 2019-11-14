@@ -83,7 +83,7 @@ export interface ITreeState {
 }
 
 export class DecisionTree extends React.Component<{ formatterDecisions: FormatterDecisions }, ITreeState> {
-    public state: ITreeState = { nodes: Array(DecisionTree.createExplorationNode(this.props.formatterDecisions)) };
+    public state: ITreeState = { nodes: DecisionTree.createExplorationNode(this.props.formatterDecisions).childNodes!! };
 
     public render() {
         return <Tree
