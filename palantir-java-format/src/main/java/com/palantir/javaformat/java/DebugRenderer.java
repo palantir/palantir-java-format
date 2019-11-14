@@ -16,6 +16,10 @@
 
 package com.palantir.javaformat.java;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableList;
 import com.google.common.hash.Hashing;
 import com.palantir.javaformat.CloseOp;
@@ -24,11 +28,8 @@ import com.palantir.javaformat.Op;
 import com.palantir.javaformat.OpenOp;
 import com.palantir.javaformat.OpsBuilder.OpsOutput;
 import com.palantir.javaformat.doc.Break;
-import com.palantir.javaformat.doc.BreakTag;
 import com.palantir.javaformat.doc.Comment;
 import com.palantir.javaformat.doc.Doc;
-import com.palantir.javaformat.doc.FillMode;
-import com.palantir.javaformat.doc.HtmlDocVisitor;
 import com.palantir.javaformat.doc.Level;
 import com.palantir.javaformat.doc.NonBreakingSpace;
 import com.palantir.javaformat.doc.State;
@@ -37,109 +38,108 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class DebugRenderer {
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    public static void render(
-            JavaInput javaInput, OpsOutput opsOutput, Level doc, State finalState, JavaOutput javaOutput) {
-
+    static void render(JavaInput javaInput, OpsOutput opsOutput, Level _doc, State _finalState, JavaOutput javaOutput) {
         StringBuilder sb = new StringBuilder();
 
         sb.append("<html>\n");
         sb.append("<head>\n");
-        sb.append("<meta charset=\"utf-8\">");
+        sb.append("<meta charset=\"utf-8\">\n");
+        // TODO(dfox): import the script built by App.tsx?
+        sb.append("<script type=\"text/javascript\">\n");
 
-        sb.append("<link href=\"https://unpkg.com/normalize.css@^7.0.0\" rel=\"stylesheet\" />\n");
-        sb.append("<link href=\"https://unpkg.com/@blueprintjs/icons@^3.4.0/lib/css/blueprint-icons.css\" "
-                + "rel=\"stylesheet\" />\n");
-        sb.append("<link href=\"https://unpkg.com/@blueprintjs/core@^3.10.0/lib/css/blueprint.css\" "
-                + "rel=\"stylesheet\" />");
+        sb.append(String.format(
+                "window.palantirJavaFormat = {\njavaInput: %s,\nops: %s,\ndoc: {},\njavaOutput: %s\n};\n",
+                jsonEscapedString(javaInput.getText()),
+                opsJson(opsOutput),
+                jsonEscapedString(outputAsString(javaOutput))));
 
-        sb.append("<style type=\"text/css\">"
-                + "span.token:hover { outline: 1px solid black; } "
-                + "span.token:hover span.token-body { text-decoration: underline; }"
-                + "span.open-op, span.close-op, span.break-tag { position: relative;width: 3px;height: 1em;display: "
-                + "inline-block; margin: 0 1px;}"
-                + "span.open-op { background: green;}"
-                + "span.close-op { background: red;}"
-                + "span.break-tag.FillMode-UNIFIED { background: #777;}"
-                + "span.break-tag.FillMode-INDEPENDENT { background: #333;}"
-                + "span.break-tag.FillMode-FORCED { background: #000; width: 5px;}"
-                + "span.break-tag.conditional { height: 0.4em; width: 0.4em; vertical-align:middle;}"
-                + "</style>");
-        sb.append("</head>");
-
-        sb.append("<body>");
-
-        sb.append("<div style=\"white-space: pre; font-family: monospace; line-height: 1em;\">");
-
-        sb.append("<h1>javaInput</h1>");
-        sb.append("<code>");
-        sb.append(javaInput.getText());
-        sb.append("</code>");
-
-        sb.append("<h1>List&lt;Op&gt;</h1>");
-        sb.append("<p><i>Note: Comment and NonBreakingSpaces are not rendered here. Columns may be misaligned"
-                + ".</i></p>");
-
-        ImmutableList<Op> ops = opsOutput.ops();
-        for (Op op : ops) {
-            if (op instanceof Token) {
-                sb.append(String.format("<span class=\"token\" style=\"%s\">", backgroundColor((Doc) op)));
-                Input.Token foo = ((Token) op).getToken();
-                foo.getToksBefore().forEach(before -> {
-                    sb.append(before.getText());
-                });
-
-                sb.append("<span class=\"token-body\">");
-                sb.append(foo.getTok().getText());
-                sb.append("</span>");
-
-                foo.getToksAfter().forEach(before -> {
-                    sb.append(before.getText());
-                });
-                sb.append("</span>");
-            }
-            if (op instanceof Break) {
-                Optional<BreakTag> breakTag = ((Break) op).optTag();
-                String conditional = breakTag.isPresent() ? "conditional" : "";
-                FillMode fillMode = ((Break) op).fillMode();
-                sb.append(String.format(
-                        "<span class=\"tooltip break-tag %s FillMode-%s\" title=\"%s\"></span>",
-                        conditional, fillMode, op.toString()));
-            }
-            if (op instanceof NonBreakingSpace) {}
-            if (op instanceof Comment) {}
-
-            if (op instanceof OpenOp) {
-                sb.append("<span class=\"tooltip open-op\" title=\"" + op.toString() + "\"></span>");
-            }
-            if (op instanceof CloseOp) {
-                sb.append("<span class=\"tooltip close-op\" title=\"" + op.toString() + "\"></span>");
-            }
-        }
-
-        sb.append("<h1>Doc</h1>");
-        sb.append("<code>");
-        sb.append(new HtmlDocVisitor(finalState).visit(doc));
-        sb.append("</code>");
-
-        sb.append("<h1>javaOutput</h1>");
-        sb.append("<code>");
-        for (int i = 0; i < javaOutput.getLineCount(); ++i) {
-            sb.append(javaOutput.getLine(i));
-            sb.append("\n");
-        }
-        sb.append("</code>");
-
-        sb.append("</div>");
+        sb.append("</script>\n");
+        sb.append("</head>\n");
+        sb.append("<body><div id=\"root\"></div></body>\n");
+        sb.append("</html>\n");
 
         try {
             Files.write(
                     Paths.get(System.getProperty("user.home")).resolve("Desktop/output.html"),
                     sb.toString().getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static String outputAsString(JavaOutput javaOutput) {
+        StringBuilder output = new StringBuilder();
+        for (int i = 0; i < javaOutput.getLineCount(); ++i) {
+            output.append(javaOutput.getLine(i));
+            output.append("\n");
+        }
+        return output.toString();
+    }
+
+    private static String opsJson(OpsOutput opsOutput) {
+        ArrayNode arrayNode = OBJECT_MAPPER.createArrayNode();
+
+        ImmutableList<Op> ops = opsOutput.ops();
+        for (Op op : ops) {
+            if (op instanceof Token) {
+                Input.Token token = ((Token) op).getToken();
+
+                ObjectNode json = arrayNode.addObject();
+                json.put("type", "token");
+                json.put(
+                        "beforeText",
+                        token.getToksBefore().stream().map(Input.Tok::getText).collect(Collectors.joining()));
+                json.put("text", token.getTok().getText());
+                json.put(
+                        "afterText",
+                        token.getToksAfter().stream().map(Input.Tok::getText).collect(Collectors.joining()));
+            }
+            if (op instanceof Break) {
+                Break breakOp = (Break) op;
+
+                ObjectNode json = arrayNode.addObject();
+                json.put("type", "break");
+                json.put("fillMode", breakOp.fillMode().toString());
+                json.put("toString", op.toString());
+                breakOp.optTag().ifPresent(tag -> json.put("breakTag", tag.uniqueId));
+            }
+            if (op instanceof NonBreakingSpace) {
+                ObjectNode json = arrayNode.addObject();
+                json.put("type", "nonBreakingSpace");
+                json.put("toString", op.toString());
+            }
+            if (op instanceof Comment) {
+                ObjectNode json = arrayNode.addObject();
+                json.put("type", "comment");
+                json.put("toString", op.toString());
+            }
+            if (op instanceof OpenOp) {
+                ObjectNode json = arrayNode.addObject();
+                json.put("type", "openOp");
+                json.put("toString", op.toString());
+            }
+            if (op instanceof CloseOp) {
+                ObjectNode json = arrayNode.addObject();
+                json.put("type", "closeOp");
+                json.put("toString", op.toString());
+            }
+        }
+        try {
+            return OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(arrayNode);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static String jsonEscapedString(String javaInput) {
+        try {
+            return OBJECT_MAPPER.writeValueAsString(javaInput);
+        } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
