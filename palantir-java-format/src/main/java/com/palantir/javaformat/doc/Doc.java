@@ -92,7 +92,11 @@ public abstract class Doc extends HasUniqueId {
      * @param state the current output state
      * @return the new output state
      */
-    public abstract State computeBreaks(CommentsHelper commentsHelper, int maxWidth, State state);
+    public abstract State computeBreaks(
+            CommentsHelper commentsHelper,
+            int maxWidth,
+            State state,
+            ObservationNode observer);
 
     /** Write a {@code Doc} to an {@link Output}, after breaking decisions have been made. */
     public abstract void write(State state, Output output);

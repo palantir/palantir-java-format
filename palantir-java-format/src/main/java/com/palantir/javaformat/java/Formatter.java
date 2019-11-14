@@ -32,6 +32,7 @@ import com.palantir.javaformat.Utils;
 import com.palantir.javaformat.doc.Doc;
 import com.palantir.javaformat.doc.DocBuilder;
 import com.palantir.javaformat.doc.Level;
+import com.palantir.javaformat.doc.ObservationNode;
 import com.palantir.javaformat.doc.State;
 import java.io.IOError;
 import java.io.IOException;
@@ -158,7 +159,11 @@ public final class Formatter {
         OpsOutput opsOutput = opsBuilder.build();
 
         Level doc = new DocBuilder().withOps(opsOutput.ops()).build();
-        State finalState = doc.computeBreaks(commentsHelper, options.maxLineLength(), State.startingState());
+
+        ObservationNode observationNode = ObservationNode.createRoot();
+        State finalState = doc.computeBreaks(commentsHelper, options.maxLineLength(), State.startingState(),
+                observationNode);
+
         JavaOutput javaOutput = new JavaOutput(javaInput, opsOutput.inputMetadata());
         doc.write(finalState, javaOutput);
         javaOutput.flush();

@@ -55,7 +55,11 @@ public final class NonBreakingSpace extends Doc implements Op {
     }
 
     @Override
-    public State computeBreaks(CommentsHelper commentsHelper, int maxWidth, State state) {
+    public State computeBreaks(
+            CommentsHelper commentsHelper,
+            int maxWidth,
+            State state,
+            ObservationNode observationNode) {
         return state.withColumn(state.column() + 1);
     }
 

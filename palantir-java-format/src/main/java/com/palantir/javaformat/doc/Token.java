@@ -120,7 +120,11 @@ public final class Token extends Doc implements Op {
     }
 
     @Override
-    public State computeBreaks(CommentsHelper commentsHelper, int maxWidth, State state) {
+    public State computeBreaks(
+            CommentsHelper commentsHelper,
+            int maxWidth,
+            State state,
+            ObservationNode observationNode) {
         String text = token.getTok().getOriginalText();
         return state.withColumn(state.column() + text.length());
     }
