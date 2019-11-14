@@ -31,7 +31,6 @@ import com.palantir.javaformat.OpsBuilder.OpsOutput;
 import com.palantir.javaformat.Utils;
 import com.palantir.javaformat.doc.Doc;
 import com.palantir.javaformat.doc.DocBuilder;
-import com.palantir.javaformat.doc.Level;
 import com.palantir.javaformat.doc.State;
 import java.io.IOError;
 import java.io.IOException;
@@ -149,17 +148,13 @@ public final class Formatter {
         if (!Iterables.isEmpty(errorDiagnostics)) {
             throw FormatterExceptions.fromJavacDiagnostics(errorDiagnostics);
         }
-
         OpsBuilder opsBuilder = new OpsBuilder(javaInput);
         // Output the compilation unit.
         new JavaInputAstVisitor(opsBuilder, options.indentationMultiplier()).scan(unit, null);
         opsBuilder.sync(javaInput.getText().length());
         opsBuilder.drain();
         OpsOutput opsOutput = opsBuilder.build();
-
-        DebugRenderer.render(javaInput, opsOutput);
-
-        Level doc = new DocBuilder().withOps(opsOutput.ops()).build();
+        Doc doc = new DocBuilder().withOps(opsOutput.ops()).build();
         State finalState = doc.computeBreaks(commentsHelper, options.maxLineLength(), State.startingState());
         JavaOutput javaOutput = new JavaOutput(javaInput, opsOutput.inputMetadata());
         doc.write(finalState, javaOutput);
