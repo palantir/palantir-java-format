@@ -30,8 +30,13 @@ public interface Obs {
     interface Sink {
         void startExplorationNode(int exporationId, OptionalInt parentLevelId, String humanDescription);
 
+        /**
+         * @param levelNodeId the unique ID of the {@link LevelNode}. There can be multiple LevelNodes per {@link
+         *     Level}.
+         * @param parentExplorationId what exploration is this {@link LevelNode} a part of
+         */
         @CheckReturnValue
-        FinishLevelNode writeLevelNode(int levelId, int parentExplorationId, State incomingState, Level level);
+        FinishLevelNode writeLevelNode(int levelNodeId, int parentExplorationId, State incomingState, Level level);
 
         String getOutput();
     }
@@ -53,7 +58,7 @@ public interface Obs {
         State finishLevel(State state);
     }
 
-    class LevelNodeImpl implements LevelNode {
+    class LevelNodeImpl extends HasUniqueId implements LevelNode {
         private final Level level;
         private final Sink sink;
         private final FinishLevelNode finisher;
@@ -112,7 +117,7 @@ public interface Obs {
 
         @Override
         public int id() {
-            return level.uniqueId;
+            return uniqueId;
         }
 
         @Override

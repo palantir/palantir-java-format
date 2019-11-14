@@ -34,15 +34,16 @@ public final class JsonSink implements Sink {
     }
 
     @Override
-    public FinishLevelNode writeLevelNode(int levelId, int parentExplorationId, State incomingState, Level level) {
+    public FinishLevelNode writeLevelNode(int levelNodeId, int parentExplorationId, State incomingState, Level level) {
         ObjectNode json = childrenMap.get(parentExplorationId).addObject();
         json.put("type", "level");
-        json.put("id", levelId);
+        json.put("id", levelNodeId);
+        json.put("levelId", level.uniqueId);
         json.put("parentId", parentExplorationId);
         json.put("debugName", level.getDebugName().orElse(null));
         json.put("flat", level.getFlat());
         json.put("toString", level.toString());
-        createChildrenNode(levelId, json);
+        createChildrenNode(levelNodeId, json);
         return acceptedExplorationId -> json.put("acceptedExplorationId", acceptedExplorationId);
     }
 
