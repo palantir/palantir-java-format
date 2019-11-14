@@ -99,7 +99,7 @@ export class DecisionTree extends React.Component<{ formatterDecisions: Formatte
         return {
             id: node.id,
             childNodes: node.children.map(DecisionTree.createLevelNode),
-            label: node.humanDescription,
+            label: <Tooltip content={node.id.toString()}>{node.humanDescription}</Tooltip>,
             isExpanded: !parent || parent.acceptedExplorationId === node.id,
         };
     }
@@ -110,8 +110,10 @@ export class DecisionTree extends React.Component<{ formatterDecisions: Formatte
             childNodes: node.children.length > 0
                     ? node.children.map(child => DecisionTree.createExplorationNode(child, node))
                     : undefined,
-            label: node.debugName || "-",
-            secondaryLabel: node.toString,
+            label: (
+                <Tooltip content={node.id.toString()}>{node.debugName || node.id}</Tooltip>
+            ),
+            // secondaryLabel: node.toString,
             isExpanded: true,
         };
     }
