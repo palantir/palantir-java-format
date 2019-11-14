@@ -30,6 +30,7 @@ import com.palantir.javaformat.Indent;
 import com.palantir.javaformat.LastLevelBreakability;
 import com.palantir.javaformat.OpenOp;
 import com.palantir.javaformat.Output;
+import com.palantir.javaformat.doc.Obs.ExplorationNode;
 import com.palantir.javaformat.doc.StartsWithBreakVisitor.Result;
 import java.util.ArrayList;
 import java.util.List;
@@ -153,20 +154,16 @@ public final class Level extends Doc {
             this.levelNode = levelNode;
         }
 
-        private State breakNormally(State state) {
-            return levelNode
-                    .explore("(trivial) breakNormally", explorationNode ->
-                            computeBroken(
-                                    commentsHelper,
-                                    maxWidth,
-                                    state.withIndentIncrementedBy(getPlusIndent()),
-                                    explorationNode))
-                    .markAccepted();
+        private State breakNormally(State state, ExplorationNode explorationNode) {
+            return computeBroken(
+                    commentsHelper, maxWidth, state.withIndentIncrementedBy(getPlusIndent()), explorationNode);
         }
 
         @Override
         public State breakThisLevel() {
-            return breakNormally(this.state);
+            return levelNode
+                    .explore("breakThisLevel", explorationNode -> breakNormally(state, explorationNode))
+                    .markAccepted();
         }
 
         @Override
@@ -175,8 +172,8 @@ public final class Level extends Doc {
             // breaks if the outcome is the same.
             State state = this.state.withNewBranch();
 
-            Obs.Exploration broken =
-                    levelNode.explore("breaking normally", (explorationNode) -> breakNormally(this.state));
+            Obs.Exploration broken = levelNode.explore(
+                    "breaking normally", (explorationNode) -> breakNormally(this.state, explorationNode));
 
             if (state.branchingCoefficient() < MAX_BRANCHING_COEFFICIENT) {
                 Optional<Obs.Exploration> lastLevelBroken = levelNode.maybeExplore(
@@ -195,7 +192,7 @@ public final class Level extends Doc {
         @Override
         public State breakOnlyIfInnerLevelsThenFitOnOneLine(boolean keepIndentWhenInlined) {
             Obs.Exploration broken =
-                    levelNode.explore("breaking normally", explorationNode -> breakNormally(this.state));
+                    levelNode.explore("breaking normally", explorationNode -> breakNormally(this.state, explorationNode));
 
             Optional<Obs.Exploration> maybeInlined = levelNode.maybeExplore(
                     "handleBreakOnlyIfInnerLevelsThenFitOnOneLine", (explorationNode) ->
