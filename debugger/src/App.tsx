@@ -1,10 +1,11 @@
 import React, { CSSProperties } from 'react';
 import './App.css';
+import { Tooltip } from "@blueprintjs/core";
 
-type Op = { type: 'break', conditional: boolean, fillMode: 'UNIFIED' | 'INDEPENDENT' | 'FORCED' } & HasId
+type Op = { type: 'break', conditional: boolean, fillMode: 'UNIFIED' | 'INDEPENDENT' | 'FORCED', toString: string } & HasId
     | { type: 'token', beforeText: string, afterText: string, text: string } & HasId
-    | { type: 'openOp', title: string } & HasId
-    | { type: 'closeOp', title: string }
+    | { type: 'openOp', toString: string } & HasId
+    | { type: 'closeOp' }
 
 interface DebugData {
     javaInput: string,
@@ -45,7 +46,7 @@ function renderOps(ops: Array<Op>) {
                 if (op.conditional) {
                     classes.push('conditional')
                 }
-                return <span className={classes.join(" ")}/>;
+                return <Tooltip content={op.toString}><span className={classes.join(" ")}/></Tooltip>;
             case "token":
                 return <span className={"token"} style={backgroundColor(op)}>
                         {op.beforeText}
@@ -53,7 +54,9 @@ function renderOps(ops: Array<Op>) {
                     {op.afterText}
                     </span>;
             case "openOp":
-                return <span className={"open-op"} key={op.id}/>;
+                return <Tooltip content={op.toString}>
+                    <span className={"open-op"} key={op.id}/>
+                </Tooltip>;
             case "closeOp":
                 return <span className={"close-op"}/>;
         }
