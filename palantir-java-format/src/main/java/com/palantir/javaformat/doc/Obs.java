@@ -17,18 +17,30 @@
 package com.palantir.javaformat.doc;
 
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.function.Function;
 
 public interface Obs {
 
-    static ExplorationNode createRoot() {
-        return new ExplorationNodeImpl();
+    interface Sink {
+        void writeExplorationNode(int exporationId, OptionalInt parentLevelId, String humanDescription);
+
+        void writeLevelNode(
+                int levelId, int parentExplorationId, State incomingState, Level level, int acceptedExplorationId);
+
+        String getOutput();
+    }
+
+    static ExplorationNode createRoot(Sink sink) {
+        return ExplorationNodeImpl.createAndWrite(null, "(initial node)", sink);
     }
 
     /** At a single level, you can explore various options for how to break lines and then accept one. */
     interface LevelNode {
 
         Exploration explore(String humanDescription, Function<ExplorationNode, State> supplier);
+
+        int id();
 
         Optional<Exploration> maybeExplore(
                 String humanDescription, Function<ExplorationNode, Optional<State>> supplier);
@@ -37,17 +49,28 @@ public interface Obs {
     }
 
     class LevelNodeImpl implements LevelNode {
+        private final Level level;
+        private final State incomingState;
+        private final int parentExplorationId;
+        private final Sink sink;
+
+        public LevelNodeImpl(Level level, State incomingState, int parentExplorationId, Sink sink) {
+            this.level = level;
+            this.incomingState = incomingState;
+            this.parentExplorationId = parentExplorationId;
+            this.sink = sink;
+        }
 
         @Override
         public Exploration explore(String humanDescription, Function<ExplorationNode, State> explorationFunc) {
 
-            ExplorationNode explorationNode = new ExplorationNodeImpl();
+            ExplorationNode explorationNode = ExplorationNodeImpl.createAndWrite(this, humanDescription, sink);
             State newState = explorationFunc.apply(explorationNode);
 
             return new Exploration() {
                 @Override
                 public State markAccepted() {
-                    // System.out.println("accepted exploration " + humanDescription);
+                    sink.writeLevelNode(id(), parentExplorationId, incomingState, level, explorationNode.id());
                     return newState;
                 }
 
@@ -62,7 +85,7 @@ public interface Obs {
         public Optional<Exploration> maybeExplore(
                 String humanDescription, Function<ExplorationNode, Optional<State>> explorationFunc) {
 
-            ExplorationNode explorationNode = new ExplorationNodeImpl();
+            ExplorationNode explorationNode = ExplorationNodeImpl.createAndWrite(this, humanDescription, sink);
             Optional<State> maybeNewState = explorationFunc.apply(explorationNode);
 
             if (!maybeNewState.isPresent()) {
@@ -85,6 +108,11 @@ public interface Obs {
         }
 
         @Override
+        public int id() {
+            return level.uniqueId;
+        }
+
+        @Override
         public State finishLevel(State state) {
             // this final state will be different from the 'accepted' state
             return state;
@@ -101,12 +129,32 @@ public interface Obs {
     /** Within an 'exploration', allows you to descend into child levels. */
     interface ExplorationNode {
         LevelNode newChildNode(Level level, State state);
+
+        int id();
     }
 
-    class ExplorationNodeImpl implements ExplorationNode {
+    class ExplorationNodeImpl extends HasUniqueId implements ExplorationNode {
+        private final Sink sink;
+
+        public ExplorationNodeImpl(Sink sink) {
+            this.sink = sink;
+        }
+
+        static ExplorationNode createAndWrite(LevelNode parent, String humanDescription, Sink sink) {
+            ExplorationNodeImpl node = new ExplorationNodeImpl(sink);
+            sink.writeExplorationNode(
+                    node.id(), parent != null ? OptionalInt.of(parent.id()) : OptionalInt.empty(), humanDescription);
+            return node;
+        }
+
         @Override
         public LevelNode newChildNode(Level level, State state) {
-            return new LevelNodeImpl();
+            return new LevelNodeImpl(level, state, id(), sink);
+        }
+
+        @Override
+        public int id() {
+            return uniqueId;
         }
     }
 }

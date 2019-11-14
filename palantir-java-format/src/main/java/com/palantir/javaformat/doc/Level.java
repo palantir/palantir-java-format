@@ -541,7 +541,6 @@ public final class Level extends Doc {
                 .add("plusIndent", getPlusIndent())
                 .add("breakBehaviour", getBreakBehaviour())
                 .add("breakabilityIfLastLevel", getBreakabilityIfLastLevel())
-                .add("docs", docs)
                 .toString();
     }
 

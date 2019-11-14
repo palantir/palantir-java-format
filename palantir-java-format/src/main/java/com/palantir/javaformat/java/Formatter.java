@@ -33,6 +33,7 @@ import com.palantir.javaformat.doc.Doc;
 import com.palantir.javaformat.doc.DocBuilder;
 import com.palantir.javaformat.doc.Level;
 import com.palantir.javaformat.doc.Obs;
+import com.palantir.javaformat.doc.Obs.Sink;
 import com.palantir.javaformat.doc.State;
 import java.io.IOError;
 import java.io.IOException;
@@ -160,7 +161,8 @@ public final class Formatter {
 
         Level doc = new DocBuilder().withOps(opsOutput.ops()).build();
 
-        Obs.ExplorationNode observationNode = Obs.createRoot();
+        Sink sink = new JsonSink();
+        Obs.ExplorationNode observationNode = Obs.createRoot(sink);
         State finalState = doc.computeBreaks(commentsHelper, options.maxLineLength(), State.startingState(),
                 observationNode);
 
@@ -168,7 +170,7 @@ public final class Formatter {
         doc.write(finalState, javaOutput);
         javaOutput.flush();
 
-        DebugRenderer.render(javaInput, opsOutput, doc, finalState, javaOutput);
+        DebugRenderer.render(javaInput, opsOutput, doc, finalState, javaOutput, sink.getOutput());
         return javaOutput;
     }
 

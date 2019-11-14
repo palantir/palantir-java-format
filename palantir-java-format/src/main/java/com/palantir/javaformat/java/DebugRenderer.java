@@ -44,7 +44,13 @@ import java.util.stream.Collectors;
 public class DebugRenderer {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    static void render(JavaInput javaInput, OpsOutput opsOutput, Level _doc, State _finalState, JavaOutput javaOutput) {
+    static void render(
+            JavaInput javaInput,
+            OpsOutput opsOutput,
+            Level _doc,
+            State _finalState,
+            JavaOutput javaOutput,
+            String formatterDecisionsJson) {
         StringBuilder sb = new StringBuilder();
 
         sb.append("<html>\n");
@@ -54,10 +60,12 @@ public class DebugRenderer {
         sb.append("<script type=\"text/javascript\">\n");
 
         String javascript = String.format(
-                "window.palantirJavaFormat = {\njavaInput: %s,\nops: %s,\ndoc: {},\njavaOutput: %s\n};\n",
+                "window.palantirJavaFormat = {\njavaInput: %s,\nops: %s,\ndoc: {},\njavaOutput: %s,\n"
+                + "formatterDecisions: %s\n};\n",
                 jsonEscapedString(javaInput.getText()),
                 opsJson(opsOutput),
-                jsonEscapedString(outputAsString(javaOutput)));
+                jsonEscapedString(outputAsString(javaOutput)),
+                formatterDecisionsJson);
         sb.append(javascript);
 
         sb.append("</script>\n");
