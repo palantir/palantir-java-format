@@ -22,10 +22,10 @@ import java.util.function.Function;
 public interface Obs {
 
     static ExplorationNode createRoot() {
-        return null;
+        return new ExplorationNodeImpl();
     }
 
-    /** At a single level, you can expore various options for how to break lines and then accept one. */
+    /** At a single level, you can explore various options for how to break lines and then accept one. */
     interface LevelNode {
 
         Exploration explore(String humanDescription, Function<ExplorationNode, State> supplier);
@@ -33,47 +33,80 @@ public interface Obs {
         Optional<Exploration> maybeExplore(
                 String humanDescription, Function<ExplorationNode, Optional<State>> supplier);
 
-        default State finishLevel(State state) {
+        State finishLevel(State state);
+    }
+
+    class LevelNodeImpl implements LevelNode {
+
+        @Override
+        public Exploration explore(String humanDescription, Function<ExplorationNode, State> explorationFunc) {
+
+            ExplorationNode explorationNode = new ExplorationNodeImpl();
+            State newState = explorationFunc.apply(explorationNode);
+
+            return new Exploration() {
+                @Override
+                public State markAccepted() {
+                    // System.out.println("accepted exploration " + humanDescription);
+                    return newState;
+                }
+
+                @Override
+                public State state() {
+                    return newState;
+                }
+            };
+        }
+
+        @Override
+        public Optional<Exploration> maybeExplore(
+                String humanDescription, Function<ExplorationNode, Optional<State>> explorationFunc) {
+
+            ExplorationNode explorationNode = new ExplorationNodeImpl();
+            Optional<State> maybeNewState = explorationFunc.apply(explorationNode);
+
+            if (!maybeNewState.isPresent()) {
+                return Optional.empty();
+            }
+
+            State newState = maybeNewState.get();
+            return Optional.of(new Exploration() {
+                @Override
+                public State markAccepted() {
+                    // System.out.println("accepted exploration " + humanDescription);
+                    return newState;
+                }
+
+                @Override
+                public State state() {
+                    return newState;
+                }
+            });
+        }
+
+        @Override
+        public State finishLevel(State state) {
+            // this final state will be different from the 'accepted' state
             return state;
         }
     }
 
+    /** A handle that lets you accept exactly one 'exploration' of how to format a level. */
     interface Exploration {
         State markAccepted();
+
         State state();
     }
 
+    /** Within an 'exploration', allows you to descend into child levels. */
     interface ExplorationNode {
+        LevelNode newChildNode(Level level, State state);
+    }
 
-        default LevelNode newChildNode(Level level, State state) {
-            return new LevelNode() {
-                @Override
-                public Exploration explore(
-                        String humanDescription, Function<ExplorationNode, State> exploreFunction) {
-
-                    ExplorationNode todo = null;
-                    State applied = exploreFunction.apply(todo);
-
-                    return new Exploration() {
-                        @Override
-                        public State markAccepted() {
-                            System.out.println("accepted " + humanDescription);
-                            return applied;
-                        }
-
-                        @Override
-                        public State state() {
-                            return applied;
-                        }
-                    };
-                }
-
-                @Override
-                public Optional<Exploration> maybeExplore(
-                        String humanDescription, Function<ExplorationNode, Optional<State>> supplier) {
-                    return Optional.empty();
-                }
-            };
+    class ExplorationNodeImpl implements ExplorationNode {
+        @Override
+        public LevelNode newChildNode(Level level, State state) {
+            return new LevelNodeImpl();
         }
     }
 }

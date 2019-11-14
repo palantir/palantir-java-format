@@ -179,10 +179,9 @@ public final class Level extends Doc {
                     levelNode.explore("breaking normally", (explorationNode) -> breakNormally(this.state));
 
             if (state.branchingCoefficient() < MAX_BRANCHING_COEFFICIENT) {
-                State state1 = state.withNoIndent();
                 Optional<Obs.Exploration> lastLevelBroken = levelNode.maybeExplore(
-                        "tryBreakLastLevel",
-                        (explorationNode) -> tryBreakLastLevel(commentsHelper, maxWidth, state1, explorationNode));
+                        "tryBreakLastLevel", (explorationNode) ->
+                                tryBreakLastLevel(commentsHelper, maxWidth, state.withNoIndent(), explorationNode));
 
                 if (lastLevelBroken.isPresent()) {
                     if (lastLevelBroken.get().state().numLines() < broken.state().numLines()) {
