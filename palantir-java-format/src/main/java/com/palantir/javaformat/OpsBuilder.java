@@ -636,10 +636,7 @@ public final class OpsBuilder {
                 afterForcedBreak = isForcedBreak(op);
             }
         }
-        return ImmutableOpsOutput.builder()
-                .ops(newOps.build())
-                .inputMetadata(inputMetadataBuilder.build())
-                .build();
+        return ImmutableOpsOutput.builder().ops(newOps.build()).inputMetadata(inputMetadataBuilder.build()).build();
     }
 
     private static boolean isNonNlsComment(Input.Tok tokAfter) {

@@ -22,7 +22,6 @@ import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.CommentsHelper;
 import com.palantir.javaformat.Op;
 import com.palantir.javaformat.Output;
-import sun.jvm.hotspot.gc.shared.Space;
 
 /** A Leaf node in a {@link Doc} for a non-breaking space. */
 @Immutable
