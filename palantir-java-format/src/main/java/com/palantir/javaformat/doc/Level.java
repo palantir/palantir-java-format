@@ -168,8 +168,7 @@ public final class Level extends Doc {
             if (state.branchingCoefficient() < MAX_BRANCHING_COEFFICIENT) {
                 // No plusIndent the first time around, since we expect this whole level (except part of the last inner
                 // level) to be on the first line.
-                Optional<State> lastLevelBroken =
-                        tryBreakLastLevel(commentsHelper, maxWidth, state.withNoIndent(), false);
+                Optional<State> lastLevelBroken = tryBreakLastLevel(commentsHelper, maxWidth, state.withNoIndent());
 
                 if (lastLevelBroken.isPresent()) {
                     if (lastLevelBroken.get().numLines() < broken.numLines()) {
@@ -240,8 +239,7 @@ public final class Level extends Doc {
         return Optional.empty();
     }
 
-    private Optional<State> tryBreakLastLevel(
-            CommentsHelper commentsHelper, int maxWidth, State state, boolean recursive) {
+    private Optional<State> tryBreakLastLevel(CommentsHelper commentsHelper, int maxWidth, State state) {
         if (docs.isEmpty() || !(getLast(docs) instanceof Level)) {
             return Optional.empty();
         }
@@ -282,7 +280,7 @@ public final class Level extends Doc {
                         if (keepIndentWhenInlined) {
                             state2 = state2.withIndentIncrementedBy(lastLevel.getPlusIndent());
                         }
-                        return lastLevel.tryBreakLastLevel(commentsHelper, maxWidth, state2, true);
+                        return lastLevel.tryBreakLastLevel(commentsHelper, maxWidth, state2);
                     })
                     // We don't know how to fit the inner level on the same line, so bail out.
                     .otherwise_(Optional.empty());
