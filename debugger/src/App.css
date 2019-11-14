@@ -1,22 +1,42 @@
-.App {
-  text-align: center;
+span.token:hover {
+    outline: 1px solid black;
 }
 
-.App-logo {
-  height: 40vmin;
+span.token:hover span.token-body {
+    text-decoration: underline;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+span.open-op, span.close-op, span.break-tag {
+    position: relative;
+    width: 3px;
+    height: 1em;
+    display: inline-block;
+    margin: 0 1px;
 }
 
-.App-link {
-  color: #09d3ac;
+span.open-op {
+    background: green;
+}
+
+span.close-op {
+    background: red;
+}
+
+span.break-tag.FillMode-UNIFIED {
+    background: #777;
+}
+
+span.break-tag.FillMode-INDEPENDENT {
+    background: #333;
+}
+
+span.break-tag.FillMode-FORCED {
+    background: #000;
+    width: 5px;
+}
+
+span.break-tag.conditional {
+    height: 0.4em;
+    width: 0.4em;
+    vertical-align: middle;
 }

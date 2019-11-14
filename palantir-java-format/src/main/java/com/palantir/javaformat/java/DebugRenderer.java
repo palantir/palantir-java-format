@@ -135,29 +135,6 @@ public class DebugRenderer {
 
         sb.append("</div>");
 
-        // All the react scripts go at the end, right before </body>
-        // See https://reactjs.org/docs/add-react-to-a-website.html#step-2-add-the-script-tags
-        sb.append("<!-- Blueprint dependencies -->\n"
-                + "<script src=\"https://unpkg.com/classnames@^2.2\"></script>\n"
-                + "<script src=\"https://unpkg.com/dom4@^1.8\"></script>\n"
-                + "<script src=\"https://unpkg.com/tslib@^1.9.0\"></script>\n"
-                + "<script src=\"https://unpkg.com/react@^16.2.0/umd/react.development.js\"></script>\n"
-                + "<script src=\"https://unpkg.com/react-dom@^16.11.0/umd/react-dom.development.js\"></script>\n"
-                // TODO requires commonsJS, accesses exports??
-                // + "<script src=\"https://unpkg.com/create-react-context@^0.3.0\"></script>\n"
-                + "<script src=\"https://unpkg.com/react-transition-group@^2.2.1/dist/react-transition-group.min.js\"/>\n"
-                + "<script src=\"https://unpkg.com/popper.js@^1.14.1/dist/umd/popper.js\"></script>\n"
-                + "<script src=\"https://unpkg.com/react-popper@^1.3.3/dist/index.umd.js\"></script>\n"
-                // + "<script src=\"https://unpkg.com/react-popper@^1.3.3/dist/index.umd.min.js\"></script>\n"
-                + "<script src=\"https://unpkg.com/resize-observer-polyfill@^1.5.0\"></script>\n"
-                + "<!-- Blueprint packages (note: icons script must come first) -->\n"
-                + "<script src=\"https://unpkg.com/@blueprintjs/icons@^3.4.0\"></script>\n"
-                + "<script src=\"https://unpkg.com/@blueprintjs/core@^3.10.0\"></script>\n");
-        sb.append(String.format(
-                "<script src=\"%s\"></script>\n",
-                Paths.get("src/main/resources/custom.js").toAbsolutePath().toUri()));
-        sb.append("</body>");
-        sb.append("</html>");
         try {
             Files.write(
                     Paths.get(System.getProperty("user.home")).resolve("Desktop/output.html"),
