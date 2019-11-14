@@ -124,7 +124,7 @@ public final class Token extends Doc implements Op {
             CommentsHelper commentsHelper,
             int maxWidth,
             State state,
-            ObservationNode observationNode) {
+            Obs.ExplorationNode observationNode) {
         String text = token.getTok().getOriginalText();
         return state.withColumn(state.column() + text.length());
     }

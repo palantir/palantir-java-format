@@ -59,7 +59,7 @@ public final class NonBreakingSpace extends Doc implements Op {
             CommentsHelper commentsHelper,
             int maxWidth,
             State state,
-            ObservationNode observationNode) {
+            Obs.ExplorationNode observationNode) {
         return state.withColumn(state.column() + 1);
     }
 

@@ -96,7 +96,7 @@ public abstract class Doc extends HasUniqueId {
             CommentsHelper commentsHelper,
             int maxWidth,
             State state,
-            ObservationNode observer);
+            Obs.ExplorationNode explorationNode);
 
     /** Write a {@code Doc} to an {@link Output}, after breaking decisions have been made. */
     public abstract void write(State state, Output output);
