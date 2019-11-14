@@ -1,8 +1,9 @@
 import React, { CSSProperties } from 'react';
 import './App.css';
-import { Tooltip } from "@blueprintjs/core";
+import { Classes, ITreeNode, Tooltip, Tree } from "@blueprintjs/core";
 
-type Op = { type: 'break', conditional: boolean, fillMode: 'UNIFIED' | 'INDEPENDENT' | 'FORCED', toString: string } & HasId
+type Op =
+    { type: 'break', conditional: boolean, fillMode: 'UNIFIED' | 'INDEPENDENT' | 'FORCED', toString: string } & HasId
     | { type: 'token', beforeText: string, afterText: string, text: string } & HasId
     | { type: 'openOp', toString: string } & HasId
     | { type: 'closeOp' }
@@ -11,15 +12,27 @@ interface DebugData {
     javaInput: string,
     ops: Array<Op>,
     doc: any,
+    formatterDecisions: FormatterDecisions,
     javaOutput: string,
 }
+
+type ExplorationNode = {
+    type: "exploration", parentId?: Id, id: Id, humanDescription: string, children: ReadonlyArray<LevelNode> };
+type LevelNode = {
+    type: "level", id: Id, parentId: Id, debugName?: string, flat: string, toString: string, acceptedExplorationId: Id,
+    children: ReadonlyArray<ExplorationNode>
+};
+
+type FormatterDecisions = ExplorationNode;
 
 interface Props {
     debugData: DebugData
 }
 
+type Id = number;
+
 interface HasId {
-    id: number
+    id: Id
 }
 
 const App: React.FC<Props> = ({debugData}) => {
@@ -32,6 +45,8 @@ const App: React.FC<Props> = ({debugData}) => {
             <code>{renderOps(debugData.ops)}</code>
             <h1>Doc</h1>
             <code></code>
+            <h1>Exploration</h1>
+            <DecisionTree formatterDecisions={debugData.formatterDecisions}/>
             <h1>javaOutput</h1>
             <code>{debugData.javaOutput}</code>
         </div>
@@ -61,6 +76,78 @@ function renderOps(ops: Array<Op>) {
                 return <span className={"close-op"}/>;
         }
     })
+}
+
+export interface ITreeState {
+    nodes: ITreeNode[];
+}
+
+export class DecisionTree extends React.Component<{ formatterDecisions: FormatterDecisions }, ITreeState> {
+    public state: ITreeState = { nodes: Array(DecisionTree.createExplorationNode(this.props.formatterDecisions)) };
+
+    public render() {
+        return <Tree
+            contents={this.state.nodes}
+            onNodeClick={this.handleNodeClick}
+            onNodeCollapse={this.handleNodeCollapse}
+            onNodeExpand={this.handleNodeExpand}
+            className={Classes.ELEVATION_0}
+        />;
+    }
+
+    private static createExplorationNode(node: ExplorationNode, parent?: LevelNode): ITreeNode {
+        return {
+            id: node.id,
+            childNodes: node.children.map(DecisionTree.createLevelNode),
+            label: node.humanDescription,
+            isExpanded: !parent || parent.acceptedExplorationId === node.id,
+        };
+    }
+
+    private static createLevelNode(node: LevelNode): ITreeNode {
+        return {
+            id: node.id,
+            childNodes: node.children.length > 0
+                    ? node.children.map(child => DecisionTree.createExplorationNode(child, node))
+                    : undefined,
+            label: node.debugName || "-",
+            secondaryLabel: node.toString,
+            isExpanded: true,
+        };
+    }
+
+    private handleNodeClick = (nodeData: ITreeNode, _nodePath: number[], e: React.MouseEvent<HTMLElement>) => {
+        const originallySelected = nodeData.isSelected;
+        if (!e.shiftKey) {
+            this.forEachNode(this.state.nodes, n => (n.isSelected = false));
+        }
+        nodeData.isSelected = originallySelected == null ? true : !originallySelected;
+        this.setState(this.state);
+    };
+
+    private handleNodeCollapse = (nodeData: ITreeNode) => {
+        nodeData.isExpanded = false;
+        this.setState(this.state);
+    };
+
+    private handleNodeExpand = (nodeData: ITreeNode) => {
+        nodeData.isExpanded = true;
+        this.setState(this.state);
+    };
+
+    private forEachNode(nodes: ITreeNode[], callback: (node: ITreeNode) => void) {
+        if (nodes == null) {
+            return;
+        }
+
+        for (const node of nodes) {
+            callback(node);
+            if (node.childNodes === undefined) {
+                return;
+            }
+            this.forEachNode(node.childNodes, callback);
+        }
+    }
 }
 
 function backgroundColor(item: HasId): CSSProperties {

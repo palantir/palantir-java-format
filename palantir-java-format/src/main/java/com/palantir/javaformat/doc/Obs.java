@@ -19,20 +19,25 @@ package com.palantir.javaformat.doc;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.Function;
+import javax.annotation.CheckReturnValue;
 
 public interface Obs {
 
-    interface Sink {
-        void writeExplorationNode(int exporationId, OptionalInt parentLevelId, String humanDescription);
+    interface FinishLevelNode {
+        void finishNode(int acceptedExplorationId);
+    }
 
-        void writeLevelNode(
-                int levelId, int parentExplorationId, State incomingState, Level level, int acceptedExplorationId);
+    interface Sink {
+        void startExplorationNode(int exporationId, OptionalInt parentLevelId, String humanDescription);
+
+        @CheckReturnValue
+        FinishLevelNode writeLevelNode(int levelId, int parentExplorationId, State incomingState, Level level);
 
         String getOutput();
     }
 
     static ExplorationNode createRoot(Sink sink) {
-        return ExplorationNodeImpl.createAndWrite(null, "(initial node)", sink);
+        return new ExplorationNodeImpl(null, "(initial node)", sink);
     }
 
     /** At a single level, you can explore various options for how to break lines and then accept one. */
@@ -50,27 +55,25 @@ public interface Obs {
 
     class LevelNodeImpl implements LevelNode {
         private final Level level;
-        private final State incomingState;
-        private final int parentExplorationId;
         private final Sink sink;
+        private final FinishLevelNode finisher;
+        private int acceptedExplorationId;
 
         public LevelNodeImpl(Level level, State incomingState, int parentExplorationId, Sink sink) {
             this.level = level;
-            this.incomingState = incomingState;
-            this.parentExplorationId = parentExplorationId;
             this.sink = sink;
+            this.finisher = sink.writeLevelNode(id(), parentExplorationId, incomingState, level);
         }
 
         @Override
         public Exploration explore(String humanDescription, Function<ExplorationNode, State> explorationFunc) {
-
-            ExplorationNode explorationNode = ExplorationNodeImpl.createAndWrite(this, humanDescription, sink);
+            ExplorationNode explorationNode = new ExplorationNodeImpl(this, humanDescription, sink);
             State newState = explorationFunc.apply(explorationNode);
 
             return new Exploration() {
                 @Override
                 public State markAccepted() {
-                    sink.writeLevelNode(id(), parentExplorationId, incomingState, level, explorationNode.id());
+                    acceptedExplorationId = explorationNode.id();
                     return newState;
                 }
 
@@ -85,7 +88,7 @@ public interface Obs {
         public Optional<Exploration> maybeExplore(
                 String humanDescription, Function<ExplorationNode, Optional<State>> explorationFunc) {
 
-            ExplorationNode explorationNode = ExplorationNodeImpl.createAndWrite(this, humanDescription, sink);
+            ExplorationNode explorationNode = new ExplorationNodeImpl(this, humanDescription, sink);
             Optional<State> maybeNewState = explorationFunc.apply(explorationNode);
 
             if (!maybeNewState.isPresent()) {
@@ -96,7 +99,7 @@ public interface Obs {
             return Optional.of(new Exploration() {
                 @Override
                 public State markAccepted() {
-                    // System.out.println("accepted exploration " + humanDescription);
+                    acceptedExplorationId = explorationNode.id();
                     return newState;
                 }
 
@@ -114,6 +117,7 @@ public interface Obs {
 
         @Override
         public State finishLevel(State state) {
+            finisher.finishNode(acceptedExplorationId);
             // this final state will be different from the 'accepted' state
             return state;
         }
@@ -136,15 +140,10 @@ public interface Obs {
     class ExplorationNodeImpl extends HasUniqueId implements ExplorationNode {
         private final Sink sink;
 
-        public ExplorationNodeImpl(Sink sink) {
+        public ExplorationNodeImpl(LevelNode parent, String humanDescription, Sink sink) {
             this.sink = sink;
-        }
-
-        static ExplorationNode createAndWrite(LevelNode parent, String humanDescription, Sink sink) {
-            ExplorationNodeImpl node = new ExplorationNodeImpl(sink);
-            sink.writeExplorationNode(
-                    node.id(), parent != null ? OptionalInt.of(parent.id()) : OptionalInt.empty(), humanDescription);
-            return node;
+            sink.startExplorationNode(
+                    id(), parent != null ? OptionalInt.of(parent.id()) : OptionalInt.empty(), humanDescription);
         }
 
         @Override
