@@ -123,11 +123,8 @@ export class DecisionTree extends React.Component<{ formatterDecisions: Formatte
 
     private handleNodeClick = (nodeData: ITreeNode, nodePath: number[], e: React.MouseEvent<HTMLElement>) => {
         DecisionTree.toaster.show({message: `Clicked on ${nodePath}`});
-        const originallySelected = nodeData.isSelected;
-        if (!e.shiftKey) {
-            this.forEachNode(this.state.nodes, n => (n.isSelected = false));
-        }
-        nodeData.isSelected = originallySelected == null ? true : !originallySelected;
+        const originallyExpanded = nodeData.isExpanded;
+        nodeData.isExpanded = originallyExpanded == null ? true : !originallyExpanded;
         this.setState(this.state);
     };
 
