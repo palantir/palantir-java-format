@@ -1,6 +1,6 @@
 import React, { CSSProperties } from 'react';
 import './App.css';
-import { Classes, ITreeNode, Tooltip, Tree } from "@blueprintjs/core";
+import { Callout, Classes, ITreeNode, Toaster, Tooltip, Tree } from "@blueprintjs/core";
 
 type Op =
     { type: 'break', conditional: boolean, fillMode: 'UNIFIED' | 'INDEPENDENT' | 'FORCED', toString: string } & HasId
@@ -84,6 +84,7 @@ export interface ITreeState {
 
 export class DecisionTree extends React.Component<{ formatterDecisions: FormatterDecisions }, ITreeState> {
     public state: ITreeState = { nodes: DecisionTree.createExplorationNode(this.props.formatterDecisions).childNodes!! };
+    private static toaster = Toaster.create();
 
     public render() {
         return <Tree
@@ -118,7 +119,8 @@ export class DecisionTree extends React.Component<{ formatterDecisions: Formatte
         };
     }
 
-    private handleNodeClick = (nodeData: ITreeNode, _nodePath: number[], e: React.MouseEvent<HTMLElement>) => {
+    private handleNodeClick = (nodeData: ITreeNode, nodePath: number[], e: React.MouseEvent<HTMLElement>) => {
+        DecisionTree.toaster.show({message: `Clicked on ${nodePath}`});
         const originallySelected = nodeData.isSelected;
         if (!e.shiftKey) {
             this.forEachNode(this.state.nodes, n => (n.isSelected = false));
