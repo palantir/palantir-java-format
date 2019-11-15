@@ -41,7 +41,9 @@ const App: React.FC<Props> = ({debugData}) => {
             <h1>javaInput</h1>
             <code>{debugData.javaInput}</code>
             <h1>{"List<Op>"}</h1>
-            <p><i>Note: Comment and NonBreakingSpaces are not rendered here. Columns may be misaligned</i></p>
+            <Callout title="Note">
+                Comment and NonBreakingSpaces are not rendered here. Columns may be misaligned
+            </Callout>
             <code>{renderOps(debugData.ops)}</code>
             <h1>Doc</h1>
             <code></code>
