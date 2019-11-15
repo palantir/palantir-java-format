@@ -1,6 +1,6 @@
 import React, { CSSProperties } from 'react';
 import './App.css';
-import { Callout, Classes, ITreeNode, Toaster, Tooltip, Tree } from "@blueprintjs/core";
+import { Callout, Classes, H1, ITreeNode, Pre, Toaster, Tooltip, Tree } from "@blueprintjs/core";
 
 type Op =
     { type: 'break', conditional: boolean, fillMode: 'UNIFIED' | 'INDEPENDENT' | 'FORCED', toString: string } & HasId
@@ -38,19 +38,19 @@ interface HasId {
 const App: React.FC<Props> = ({debugData}) => {
     return (
         <div className="App">
-            <h1>javaInput</h1>
-            <code>{debugData.javaInput}</code>
-            <h1>{"List<Op>"}</h1>
+            <H1>javaInput</H1>
+            <Pre>{debugData.javaInput}</Pre>
+            <H1>{"List<Op>"}</H1>
             <Callout title="Note">
                 Comment and NonBreakingSpaces are not rendered here. Columns may be misaligned
             </Callout>
-            <code>{renderOps(debugData.ops)}</code>
-            <h1>Doc</h1>
-            <code></code>
-            <h1>Exploration</h1>
+            <Pre>{renderOps(debugData.ops)}</Pre>
+            <H1>Doc</H1>
+            <Pre></Pre>
+            <H1>Exploration</H1>
             <DecisionTree formatterDecisions={debugData.formatterDecisions}/>
-            <h1>javaOutput</h1>
-            <code>{debugData.javaOutput}</code>
+            <H1>javaOutput</H1>
+            <Pre>{debugData.javaOutput}</Pre>
         </div>
     );
 };
