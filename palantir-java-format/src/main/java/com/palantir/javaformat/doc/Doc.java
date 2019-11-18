@@ -29,9 +29,9 @@ import com.palantir.javaformat.Output;
  * {@link com.palantir.javaformat.java.JavaInputAstVisitor JavaInputAstVisitor} outputs a sequence of {@link Op}s using
  * {@link OpsBuilder}. This linear sequence is then transformed by {@link DocBuilder} into a tree-structured {@code
  * Doc}. The top-level {@code Doc} is a {@link Level}, which contains a sequence of {@code Doc}s, including other {@link
- * Level}s. Leaf {@code Doc}s are {@link Token}s, representing language-level tokens; {@link Tok}s, which may also
- * represent non-token {@link Input.Tok}s, including comments and other white-space; {@link Space}s, representing single
- * spaces; and {@link Break}s, which represent optional line-breaks.
+ * Level}s. Leaf {@code Doc}s are {@link Token}s, representing language-level tokens; {@link Comment}s, which may also
+ * represent non-token {@link Input.Tok}s, including comments and other white-space; {@link NonBreakingSpace}s,
+ * representing single spaces; and {@link Break}s, which represent optional line-breaks.
  */
 public abstract class Doc extends HasUniqueId {
     static final Range<Integer> EMPTY_RANGE = Range.closedOpen(-1, -1);

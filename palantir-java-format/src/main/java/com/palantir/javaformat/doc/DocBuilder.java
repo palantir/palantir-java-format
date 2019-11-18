@@ -100,7 +100,7 @@ public final class DocBuilder {
      *
      * @return the {@link Doc}
      */
-    public Doc build() {
+    public Level build() {
         return base;
     }
 

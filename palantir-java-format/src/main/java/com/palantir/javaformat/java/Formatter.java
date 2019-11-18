@@ -148,15 +148,15 @@ public final class Formatter {
         if (!Iterables.isEmpty(errorDiagnostics)) {
             throw FormatterExceptions.fromJavacDiagnostics(errorDiagnostics);
         }
-        OpsBuilder builder = new OpsBuilder(javaInput);
+        OpsBuilder opsBuilder = new OpsBuilder(javaInput);
         // Output the compilation unit.
-        new JavaInputAstVisitor(builder, options.indentationMultiplier()).scan(unit, null);
-        builder.sync(javaInput.getText().length());
-        builder.drain();
-        OpsOutput opsOutput = builder.build();
+        new JavaInputAstVisitor(opsBuilder, options.indentationMultiplier()).scan(unit, null);
+        opsBuilder.sync(javaInput.getText().length());
+        opsBuilder.drain();
+        OpsOutput opsOutput = opsBuilder.build();
         Doc doc = new DocBuilder().withOps(opsOutput.ops()).build();
         State finalState = doc.computeBreaks(commentsHelper, options.maxLineLength(), State.startingState());
-        JavaOutput javaOutput = new JavaOutput(javaInput, opsOutput.inputPreservingState());
+        JavaOutput javaOutput = new JavaOutput(javaInput, opsOutput.inputMetadata());
         doc.write(finalState, javaOutput);
         javaOutput.flush();
         return javaOutput;

@@ -54,10 +54,10 @@ public abstract class State {
     protected abstract TreeMap<Level, LevelState> levelStates();
 
     /**
-     * Keep track of how each {@link Tok} was written (these are mostly comments), which can differ depending on the
+     * Keep track of how each {@link Comment} was written (these are mostly comments), which can differ depending on the
      * starting column and the maxLength.
      */
-    protected abstract TreeMap<Tok, TokState> tokStates();
+    protected abstract TreeMap<Comment, TokState> tokStates();
 
     public static State startingState() {
         return builder()
@@ -87,8 +87,9 @@ public abstract class State {
         return levelState != null && levelState.oneLine();
     }
 
-    String getTokText(Tok tok) {
-        return Preconditions.checkNotNull(tokStates().get(tok).toNull(), "Expected Tok state to exist for: %s", tok)
+    String getTokText(Comment comment) {
+        return Preconditions.checkNotNull(
+                        tokStates().get(comment).toNull(), "Expected Tok state to exist for: %s", comment)
                 .text();
     }
 
@@ -183,8 +184,8 @@ public abstract class State {
         return builder().from(this).levelStates(levelStates().set(level, levelState)).build();
     }
 
-    State withTokState(Tok tok, TokState tokState) {
-        return builder().from(this).tokStates(tokStates().set(tok, tokState)).build();
+    State withTokState(Comment comment, TokState tokState) {
+        return builder().from(this).tokStates(tokStates().set(comment, tokState)).build();
     }
 
     public static class Builder extends ImmutableState.Builder {}
