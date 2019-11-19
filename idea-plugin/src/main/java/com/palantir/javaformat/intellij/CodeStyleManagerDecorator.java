@@ -65,10 +65,9 @@ class CodeStyleManagerDecorator extends CodeStyleManager implements FormattingMo
     }
 
     @Override
-    public final PsiElement reformatRange(PsiElement element, int startOffset, int endOffset)
+    public PsiElement reformatRange(PsiElement element, int startOffset, int endOffset)
             throws IncorrectOperationException {
-        // Preserve the fallback defined in CodeStyleManagerImpl
-        return reformatRange(element, startOffset, endOffset, false);
+        return delegate.reformatRange(element, startOffset, endOffset);
     }
 
     @Override
