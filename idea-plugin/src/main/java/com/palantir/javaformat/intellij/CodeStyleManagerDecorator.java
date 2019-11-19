@@ -48,10 +48,6 @@ class CodeStyleManagerDecorator extends CodeStyleManager implements FormattingMo
         this.delegate = delegate;
     }
 
-    CodeStyleManager getDelegate() {
-        return delegate;
-    }
-
     @Override
     public Project getProject() {
         return delegate.getProject();
@@ -115,6 +111,11 @@ class CodeStyleManagerDecorator extends CodeStyleManager implements FormattingMo
     @Override
     public int adjustLineIndent(Document document, int offset) {
         return delegate.adjustLineIndent(document, offset);
+    }
+
+    @Override
+    public void scheduleIndentAdjustment(Document document, int offset) {
+        delegate.scheduleIndentAdjustment(document, offset);
     }
 
     @Override

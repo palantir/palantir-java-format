@@ -34,12 +34,15 @@ import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.fileTypes.StdFileTypes;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.impl.CheckUtil;
+import com.intellij.psi.impl.source.codeStyle.CodeStyleManagerImpl;
+import com.intellij.serviceContainer.NonInjectable;
 import com.intellij.util.IncorrectOperationException;
 import com.palantir.javaformat.java.FormatterException;
 import com.palantir.javaformat.java.FormatterService;
@@ -67,7 +70,7 @@ import org.slf4j.LoggerFactory;
  * A {@link CodeStyleManager} implementation which formats .java files with palantir-java-format. Formatting of all
  * other types of files is delegated to IJ's default implementation.
  */
-class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
+final class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
     private static final Logger log = LoggerFactory.getLogger(PalantirCodeStyleManager.class);
     private static final String PLUGIN_ID = "palantir-java-format";
     private static final IdeaPluginDescriptor PLUGIN = Preconditions.checkNotNull(
@@ -77,7 +80,12 @@ class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
     private final LoadingCache<Optional<List<URI>>, FormatterService> implementationCache =
             Caffeine.newBuilder().maximumSize(1).build(PalantirCodeStyleManager::createFormatter);
 
-    public PalantirCodeStyleManager(@NotNull CodeStyleManager original) {
+    public PalantirCodeStyleManager(@NotNull Project project) {
+        super(new CodeStyleManagerImpl(project));
+    }
+
+    @NonInjectable
+    PalantirCodeStyleManager(@NotNull CodeStyleManager original) {
         super(original);
     }
 
