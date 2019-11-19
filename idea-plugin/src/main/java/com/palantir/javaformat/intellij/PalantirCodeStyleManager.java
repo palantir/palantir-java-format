@@ -39,7 +39,6 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.codeStyle.ChangedRangesInfo;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.impl.CheckUtil;
 import com.intellij.psi.impl.source.codeStyle.CodeStyleManagerImpl;
@@ -134,25 +133,12 @@ final class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
     }
 
     @Override
-    public void reformatTextWithContext(PsiFile psiFile, ChangedRangesInfo changedRangesInfo)
-            throws IncorrectOperationException {
-        reformatTextWithContext(psiFile, changedRangesInfo.allChangedRanges);
-    }
-
-    @Override
     public void reformatTextWithContext(PsiFile file, Collection<TextRange> ranges) {
         if (overrideFormatterForFile(file)) {
             formatInternal(file, ranges);
         } else {
             super.reformatTextWithContext(file, ranges);
         }
-    }
-
-    @Override
-    public PsiElement reformatRange(PsiElement element, int startOffset, int endOffset)
-            throws IncorrectOperationException {
-        // Preserve the fallback defined in CodeStyleManagerImpl
-        return reformatRange(element, startOffset, endOffset, false);
     }
 
     @Override
