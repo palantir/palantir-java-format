@@ -46,32 +46,39 @@ public class SnippetFormatterTest {
     @Test
     public void classMember() throws FormatterException {
         String input = "void f() {\n}";
-        List<Replacement> replacements = new SnippetFormatter().format(
-                SnippetKind.CLASS_BODY_DECLARATIONS,
-                input,
-                ImmutableList.of(Range.closedOpen(0, input.length())),
-                4,
-                false);
+        List<Replacement> replacements = new SnippetFormatter()
+                .format(
+                        SnippetKind.CLASS_BODY_DECLARATIONS,
+                        input,
+                        ImmutableList.of(Range.closedOpen(0, input.length())),
+                        4,
+                        false);
         assertThat(replacements).containsExactly(Replacement.create(10, 11, ""));
     }
 
     @Test
     public void compilation() throws FormatterException {
         String input = "/** a\nb*/\nclass Test {\n}";
-        List<Replacement> replacements = new SnippetFormatter().format(
-                SnippetKind.COMPILATION_UNIT,
-                input,
-                ImmutableList.of(Range.closedOpen(input.indexOf("class"), input.length())),
-                4,
-                false);
+        List<Replacement> replacements = new SnippetFormatter()
+                .format(
+                        SnippetKind.COMPILATION_UNIT,
+                        input,
+                        ImmutableList.of(Range.closedOpen(input.indexOf("class"), input.length())),
+                        4,
+                        false);
         assertThat(replacements).containsExactly(Replacement.create(22, 23, ""));
     }
 
     @Test
     public void compilationWithComments() throws FormatterException {
         String input = "/** a\nb*/\nclass Test {\n}";
-        List<Replacement> replacements = new SnippetFormatter().format(
-                SnippetKind.COMPILATION_UNIT, input, ImmutableList.of(Range.closedOpen(0, input.length())), 4, true);
+        List<Replacement> replacements = new SnippetFormatter()
+                .format(
+                        SnippetKind.COMPILATION_UNIT,
+                        input,
+                        ImmutableList.of(Range.closedOpen(0, input.length())),
+                        4,
+                        true);
         assertThat(replacements).containsExactly(Replacement.create(0, 24, "/** a b */\nclass Test {}\n"));
     }
 }

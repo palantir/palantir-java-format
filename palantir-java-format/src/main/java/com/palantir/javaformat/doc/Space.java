@@ -18,11 +18,13 @@ package com.palantir.javaformat.doc;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Range;
+import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.CommentsHelper;
 import com.palantir.javaformat.Op;
 import com.palantir.javaformat.Output;
 
 /** A Leaf node in a {@link Doc} for a non-breaking space. */
+@Immutable
 public final class Space extends Doc implements Op {
     private static final Space SPACE = new Space();
 
@@ -43,28 +45,28 @@ public final class Space extends Doc implements Op {
     }
 
     @Override
-    float computeWidth() {
+    protected float computeWidth() {
         return 1.0F;
     }
 
     @Override
-    String computeFlat() {
+    protected String computeFlat() {
         return " ";
     }
 
     @Override
-    Range<Integer> computeRange() {
+    protected Range<Integer> computeRange() {
         return Doc.EMPTY_RANGE;
     }
 
     @Override
     public State computeBreaks(CommentsHelper commentsHelper, int maxWidth, State state) {
-        return state.withColumn(state.column + 1);
+        return state.withColumn(state.column() + 1);
     }
 
     @Override
-    public void write(Output output) {
-        output.append(" ", range());
+    public void write(State state, Output output) {
+        output.append(state, " ", range());
     }
 
     @Override

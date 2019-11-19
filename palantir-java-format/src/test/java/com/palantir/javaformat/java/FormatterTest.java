@@ -45,16 +45,17 @@ public final class FormatterTest {
         // don't forget to misspell "long", or you will be mystified for a while
         String input = "class A{void b(){while(true){weCanBeCertainThatThisWillEndUpGettingWrapped("
                 + "because, it, is, just, so, very, very, very, very, looong);}}}";
-        String expectedOutput = Joiner.on("\n").join(
-                "class A {",
-                "    void b() {",
-                "        while (true) {",
-                "            weCanBeCertainThatThisWillEndUpGettingWrapped(",
-                "                    because, it, is, just, so, very, very, very, very, looong);",
-                "        }",
-                "    }",
-                "}",
-                "");
+        String expectedOutput = Joiner.on("\n")
+                .join(
+                        "class A {",
+                        "    void b() {",
+                        "        while (true) {",
+                        "            weCanBeCertainThatThisWillEndUpGettingWrapped(",
+                        "                    because, it, is, just, so, very, very, very, very, looong);",
+                        "        }",
+                        "    }",
+                        "}",
+                        "");
 
         Path path = testFolder.resolve("A.java");
         Files.write(path, input.getBytes(StandardCharsets.UTF_8));
@@ -216,18 +217,19 @@ public final class FormatterTest {
         assertThat(output).isEqualTo(expect);
     }
 
-    private static final String UNORDERED_IMPORTS = Joiner.on('\n').join(
-            "import com.google.common.base.Preconditions;",
-            "",
-            "import static org.junit.Assert.fail;",
-            "import static com.google.truth.Truth.assertThat;",
-            "",
-            "import org.junit.runners.JUnit4;",
-            "import org.junit.runner.RunWith;",
-            "",
-            "import java.util.List;",
-            "",
-            "import javax.annotations.Nullable;");
+    private static final String UNORDERED_IMPORTS = Joiner.on('\n')
+            .join(
+                    "import com.google.common.base.Preconditions;",
+                    "",
+                    "import static org.junit.Assert.fail;",
+                    "import static com.google.truth.Truth.assertThat;",
+                    "",
+                    "import org.junit.runners.JUnit4;",
+                    "import org.junit.runner.RunWith;",
+                    "",
+                    "import java.util.List;",
+                    "",
+                    "import javax.annotations.Nullable;");
 
     @Test
     public void importsNotReorderedByDefault() throws FormatterException {
@@ -267,13 +269,15 @@ public final class FormatterTest {
     @Test
     public void formattingWithoutImportOrdering() throws IOException, UsageException {
         importOrdering(
-        "--skip-sorting-imports", "com/palantir/javaformat/java/testimports/A.formatting-and-unused-import-removal");
+                "--skip-sorting-imports",
+                "com/palantir/javaformat/java/testimports/A.formatting-and-unused-import-removal");
     }
 
     @Test
     public void formattingWithoutRemovingUnusedImports() throws IOException, UsageException {
         importOrdering(
-        "--skip-removing-unused-imports", "com/palantir/javaformat/java/testimports/A.formatting-and-import-sorting");
+                "--skip-removing-unused-imports",
+                "com/palantir/javaformat/java/testimports/A.formatting-and-import-sorting");
     }
 
     private void importOrdering(String sortArg, String outputResourceName) throws IOException, UsageException {
@@ -324,62 +328,56 @@ public final class FormatterTest {
 
     @Test
     public void wrapLineComment() throws Exception {
-        assertThat(Formatter.create().formatSource(
-                        "class T {\n"
-                                + "  public static void main(String[] args) { // one long incredibly"
-                                + " unbroken sentence moving from topic to topic so that no-one had a"
-                                + " chance to interrupt;\n"
-                                + "  }\n"
-                                + "}\n"))
-                .isEqualTo(
-                        "class T {\n"
-                                + "  public static void main(\n"
-                                + "      String[]\n"
-                                + "          args) { // one long incredibly unbroken sentence moving"
-                                + " from topic to topic so that no-one\n"
-                                + "                  // had a chance to interrupt;\n"
-                                + "  }\n"
-                                + "}\n");
+        assertThat(Formatter.create().formatSource("class T {\n"
+                        + "  public static void main(String[] args) { // one long incredibly"
+                        + " unbroken sentence moving from topic to topic so that no-one had a"
+                        + " chance to interrupt;\n"
+                        + "  }\n"
+                        + "}\n"))
+                .isEqualTo("class T {\n"
+                        + "  public static void main(\n"
+                        + "      String[]\n"
+                        + "          args) { // one long incredibly unbroken sentence moving"
+                        + " from topic to topic so that no-one\n"
+                        + "                  // had a chance to interrupt;\n"
+                        + "  }\n"
+                        + "}\n");
     }
 
     @Test
     public void onlyWrapLineCommentOnWhitespace() throws Exception {
-        assertThat(Formatter.create().formatSource(
-                        "class T {\n"
-                                + "  public static void main(String[] args) { // one_long_incredibly"
-                                + "_unbroken_sentence_moving_from_topic_to_topic_so_that_no-one_had_a"
-                                + "_chance_to_interrupt;\n"
-                                + "  }\n"
-                                + "}\n"))
-                .isEqualTo(
-                        "class T {\n"
-                                + "  public static void main(\n"
-                                + "      String[]\n"
-                                + "          args) { // one_long_incredibly"
-                                + "_unbroken_sentence_moving_from_topic_to_topic_so_that_no-one_had_a"
-                                + "_chance_to_interrupt;\n"
-                                + "  }\n"
-                                + "}\n");
+        assertThat(Formatter.create().formatSource("class T {\n"
+                        + "  public static void main(String[] args) { // one_long_incredibly"
+                        + "_unbroken_sentence_moving_from_topic_to_topic_so_that_no-one_had_a"
+                        + "_chance_to_interrupt;\n"
+                        + "  }\n"
+                        + "}\n"))
+                .isEqualTo("class T {\n"
+                        + "  public static void main(\n"
+                        + "      String[]\n"
+                        + "          args) { // one_long_incredibly"
+                        + "_unbroken_sentence_moving_from_topic_to_topic_so_that_no-one_had_a"
+                        + "_chance_to_interrupt;\n"
+                        + "  }\n"
+                        + "}\n");
     }
 
     @Test
     public void onlyWrapLineCommentOnWhitespace_noLeadingWhitespace() throws Exception {
-        assertThat(Formatter.create().formatSource(
-                        "class T {\n"
-                                + "  public static void main(String[] args) { //one_long_incredibly"
-                                + "_unbroken_sentence_moving_from_topic_to_topic_so_that_no-one_had_a"
-                                + "_chance_to_interrupt;\n"
-                                + "  }\n"
-                                + "}\n"))
-                .isEqualTo(
-                        "class T {\n"
-                                + "  public static void main(\n"
-                                + "      String[]\n"
-                                + "          args) { // one_long_incredibly"
-                                + "_unbroken_sentence_moving_from_topic_to_topic_so_that_no-one_had_a"
-                                + "_chance_to_interrupt;\n"
-                                + "  }\n"
-                                + "}\n");
+        assertThat(Formatter.create().formatSource("class T {\n"
+                        + "  public static void main(String[] args) { //one_long_incredibly"
+                        + "_unbroken_sentence_moving_from_topic_to_topic_so_that_no-one_had_a"
+                        + "_chance_to_interrupt;\n"
+                        + "  }\n"
+                        + "}\n"))
+                .isEqualTo("class T {\n"
+                        + "  public static void main(\n"
+                        + "      String[]\n"
+                        + "          args) { // one_long_incredibly"
+                        + "_unbroken_sentence_moving_from_topic_to_topic_so_that_no-one_had_a"
+                        + "_chance_to_interrupt;\n"
+                        + "  }\n"
+                        + "}\n");
     }
 
     @Test
@@ -420,17 +418,15 @@ public final class FormatterTest {
 
     @Test
     public void dontWrapMoeLineComments() throws Exception {
-        assertThat(Formatter.create().formatSource(
-                        "class T {\n"
-                                + "  // MOE: one long incredibly"
-                                + " unbroken sentence moving from topic to topic so that no-one had a"
-                                + " chance to interrupt;\n"
-                                + "}\n"))
-                .isEqualTo(
-                        "class T {\n"
-                                + "  // MOE: one long incredibly"
-                                + " unbroken sentence moving from topic to topic so that no-one had a"
-                                + " chance to interrupt;\n"
-                                + "}\n");
+        assertThat(Formatter.create().formatSource("class T {\n"
+                        + "  // MOE: one long incredibly"
+                        + " unbroken sentence moving from topic to topic so that no-one had a"
+                        + " chance to interrupt;\n"
+                        + "}\n"))
+                .isEqualTo("class T {\n"
+                        + "  // MOE: one long incredibly"
+                        + " unbroken sentence moving from topic to topic so that no-one had a"
+                        + " chance to interrupt;\n"
+                        + "}\n");
     }
 }

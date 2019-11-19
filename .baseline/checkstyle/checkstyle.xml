@@ -53,6 +53,9 @@
         <property name="optional" value="true"/>
     </module>
     <module name="SuppressWarningsFilter"/> <!-- baseline-gradle: README.md -->
+    <module name="BeforeExecutionExclusionFileFilter">
+        <property name="fileNamePattern" value="module\-info\.java$"/>
+    </module>
     <module name="TreeWalker">
         <module name="SuppressionCommentFilter"/> <!-- baseline-gradle: README.md -->
         <module name="SuppressionCommentFilter">
@@ -112,7 +115,6 @@
         <module name="EmptyStatement"/> <!-- Java Style Guide: One statement per line -->
         <module name="EqualsHashCode"/>
         <module name="FallThrough"/> <!-- Java Style Guide: Fall-through: commented -->
-        <module name="FinalClass"/> <!-- Java Coding Guidelines: Private constructors -->
         <module name="GenericWhitespace"> <!-- Java Style Guide: Horizontal whitespace -->
             <message key="ws.followed" value="GenericWhitespace ''{0}'' is followed by whitespace."/>
             <message key="ws.preceded" value="GenericWhitespace ''{0}'' is preceded with whitespace."/>
@@ -198,10 +200,6 @@
             <property name="option" value="top"/>
             <property name="separated" value="true"/>
             <property name="sortStaticImportsAlphabetically" value="true"/>
-        </module>
-        <module name="Indentation"> <!-- Java Style Guide: Block indentation: +4 spaces -->
-            <property name="arrayInitIndent" value="8"/>
-            <property name="lineWrappingIndentation" value="8"/>
         </module>
         <module name="InnerAssignment"/> <!-- Java Coding Guidelines: Inner assignments: Not used -->
         <module name="LeftCurly"/> <!-- Java Style Guide: Nonempty blocks: K & R style -->
@@ -370,10 +368,6 @@
         <module name="RegexpSinglelineJava">
             <property name="format" value="\bIOUtils\.toString\("/>
             <property name="message" value="Prefer Guava''s [CharStreams,Files,Resources].toString to avoid charset/stream closing issues."/>
-        </module>
-        <module name="RegexpSinglelineJava">
-            <property name="format" value="static enum"/>
-            <property name="message" value="Redundant ''static'' modifier."/>
         </module>
         <module name="RegexpSinglelineJava">
             <property name="format" value="\/\/TODO|\/\/ TODO(?!\([^()\s]+\): )"/>

@@ -18,6 +18,7 @@ package com.palantir.javaformat.doc;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Range;
+import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.CommentsHelper;
 import com.palantir.javaformat.Indent;
 import com.palantir.javaformat.Input;
@@ -26,6 +27,7 @@ import com.palantir.javaformat.Output;
 import java.util.Optional;
 
 /** A leaf {@link Doc} for a token. */
+@Immutable
 public final class Token extends Doc implements Op {
     /** Is a Token a real token, or imaginary (e.g., a token generated incorrectly, or an EOF)? */
     public enum RealOrImaginary {
@@ -103,30 +105,30 @@ public final class Token extends Doc implements Op {
     }
 
     @Override
-    float computeWidth() {
+    protected float computeWidth() {
         return token.getTok().length();
     }
 
     @Override
-    String computeFlat() {
+    protected String computeFlat() {
         return token.getTok().getOriginalText();
     }
 
     @Override
-    Range<Integer> computeRange() {
+    protected Range<Integer> computeRange() {
         return Range.singleton(token.getTok().getIndex()).canonical(INTEGERS);
     }
 
     @Override
     public State computeBreaks(CommentsHelper commentsHelper, int maxWidth, State state) {
         String text = token.getTok().getOriginalText();
-        return state.withColumn(state.column + text.length());
+        return state.withColumn(state.column() + text.length());
     }
 
     @Override
-    public void write(Output output) {
+    public void write(State state, Output output) {
         String text = token.getTok().getOriginalText();
-        output.append(text, range());
+        output.append(state, text, range());
     }
 
     @Override

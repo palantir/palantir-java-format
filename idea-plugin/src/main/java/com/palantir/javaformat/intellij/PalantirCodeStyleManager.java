@@ -215,8 +215,8 @@ class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
         URL[] implementationUrls = implementationClassPath
                 .map(implementationUris -> {
                     log.debug("Using palantir-java-format implementation defined by URIs: {}", implementationUris);
-                    return implementationUris.stream().map(PalantirCodeStyleManager::toUrlUnchecked).toArray(
-                            URL[]::new);
+                    return implementationUris.stream().map(PalantirCodeStyleManager::toUrlUnchecked).toArray(URL[]
+                            ::new);
                 })
                 .orElseGet(() -> {
                     // Load from the jars bundled with the plugin.

@@ -868,7 +868,11 @@ class M {
 
     void f(int... x) {
         M m = null;
-        ((m.identity().identity().identity().identity()).identity().identity().identity().identity())
+        ((m.identity().identity().identity().identity())
+                        .identity()
+                        .identity()
+                        .identity()
+                        .identity())
                 .identity()
                 .identity()
                 .identity()
@@ -932,13 +936,16 @@ class M {
                 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0
                         + 0 + 0 + 0 + 0 + 0 + 0);
         Xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.ffffffffff(0);
-        Xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.fff(0).fff(0);
-        Xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.fff(0 + 0).fff(0);
+        Xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.fff(0)
+                .fff(0);
+        Xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.fff(0 + 0)
+                .fff(0);
         Xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.fff(
                         0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0
                                 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0)
                 .fff(0);
-        Xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.ffffffffff(0).fff(0);
+        Xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.ffffffffff(0)
+                .fff(0);
         return this;
     }
 
@@ -951,9 +958,14 @@ class M {
         ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff(0);
         ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff(0 + 0 + 0 + 0 + 0 + 0 + 0 + 0
                 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0 + 0);
-        ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff(0).f(0);
-        ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff(0).fff(0).fff(0).f(0);
-        ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff(0).ffffffffff(0);
+        ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff(0)
+                .f(0);
+        ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff(0)
+                .fff(0)
+                .fff(0)
+                .f(0);
+        ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff(0)
+                .ffffffffff(0);
         return this;
     }
 

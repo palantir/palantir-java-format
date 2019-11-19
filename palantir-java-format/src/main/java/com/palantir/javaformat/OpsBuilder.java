@@ -20,18 +20,22 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import com.palantir.javaformat.Indent.Const;
-import com.palantir.javaformat.Output.BreakTag;
 import com.palantir.javaformat.doc.Break;
+import com.palantir.javaformat.doc.BreakTag;
 import com.palantir.javaformat.doc.Doc;
 import com.palantir.javaformat.doc.DocBuilder;
 import com.palantir.javaformat.doc.FillMode;
 import com.palantir.javaformat.doc.Space;
+import com.palantir.javaformat.doc.State;
 import com.palantir.javaformat.doc.Tok;
 import com.palantir.javaformat.doc.Token;
 import com.palantir.javaformat.java.FormatterDiagnostic;
+import com.palantir.javaformat.java.InputMetadata;
+import com.palantir.javaformat.java.InputMetadataBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.immutables.value.Value;
 
 /** An {@code OpsBuilder} creates a list of {@link Op}s, which is turned into a {@link Doc} by {@link DocBuilder}. */
 public final class OpsBuilder {
@@ -87,7 +91,7 @@ public final class OpsBuilder {
         public static final BlankLineWanted PRESERVE = new SimpleBlankLine(/* wanted= */ Optional.empty());
 
         /** Is the blank line wanted? */
-        public abstract Optional<Boolean> wanted();
+        public abstract Optional<Boolean> wanted(State state);
 
         /** Merge this blank line request with another. */
         public abstract BlankLineWanted merge(BlankLineWanted wanted);
@@ -105,7 +109,7 @@ public final class OpsBuilder {
             }
 
             @Override
-            public Optional<Boolean> wanted() {
+            public Optional<Boolean> wanted(State _state) {
                 return wanted;
             }
 
@@ -124,9 +128,9 @@ public final class OpsBuilder {
             }
 
             @Override
-            public Optional<Boolean> wanted() {
+            public Optional<Boolean> wanted(State state) {
                 for (BreakTag tag : tags) {
-                    if (tag.wasBreakTaken()) {
+                    if (state.wasBreakTaken(tag)) {
                         return Optional.of(true);
                     }
                 }
@@ -145,7 +149,9 @@ public final class OpsBuilder {
 
     private final Input input;
     private final List<Op> ops = new ArrayList<>();
-    private final Output output;
+    /** Used to record blank-line information. */
+    private final InputMetadataBuilder inputMetadataBuilder = new InputMetadataBuilder();
+
     private static final Const ZERO = Const.ZERO;
 
     private int tokenI = 0;
@@ -168,7 +174,7 @@ public final class OpsBuilder {
     }
 
     /** Add a list of {@link Op}s. */
-    public final void addAll(List<Op> ops) {
+    public void addAll(List<Op> ops) {
         for (Op op : ops) {
             add(op);
         }
@@ -178,15 +184,13 @@ public final class OpsBuilder {
      * The {@code OpsBuilder} constructor.
      *
      * @param input the {@link Input}, used for retrieve information from the AST
-     * @param output the {@link Output}, used here only to record blank-line information
      */
-    public OpsBuilder(Input input, Output output) {
+    public OpsBuilder(Input input) {
         this.input = input;
-        this.output = output;
     }
 
     /** Get the {@code OpsBuilder}'s {@link Input}. */
-    public final Input getInput() {
+    public Input getInput() {
         return input;
     }
 
@@ -217,7 +221,7 @@ public final class OpsBuilder {
      *
      * @param inputPosition the {@code 0}-based input position
      */
-    public final void sync(int inputPosition) {
+    public void sync(int inputPosition) {
         if (inputPosition > this.inputPosition) {
             ImmutableList<? extends Input.Token> tokens = input.getTokens();
             int tokensN = tokens.size();
@@ -232,7 +236,7 @@ public final class OpsBuilder {
     }
 
     /** Output any remaining tokens from the input stream (e.g. terminal whitespace). */
-    public final void drain() {
+    public void drain() {
         int inputPosition = input.getText().length() + 1;
         if (inputPosition > this.inputPosition) {
             ImmutableList<? extends Input.Token> tokens = input.getTokens();
@@ -255,7 +259,7 @@ public final class OpsBuilder {
      *
      * @param plusIndent the extra indent for the new level
      */
-    public final void open(Indent plusIndent) {
+    public void open(Indent plusIndent) {
         add(OpenOp.make(plusIndent));
     }
 
@@ -265,7 +269,7 @@ public final class OpsBuilder {
      * @param debugName a representative name for this lambda
      * @param plusIndent the extra indent for the new level
      */
-    public final void open(String debugName, Indent plusIndent) {
+    public void open(String debugName, Indent plusIndent) {
         add(OpenOp.builder().plusIndent(plusIndent).debugName(debugName).build());
     }
 
@@ -276,8 +280,7 @@ public final class OpsBuilder {
      * @param breakBehaviour how to decide whether to break this level or not
      * @param breakabilityIfLastLevel if last level, when to break this rather than parent
      */
-    public final void open(
-            Indent plusIndent, BreakBehaviour breakBehaviour, LastLevelBreakability breakabilityIfLastLevel) {
+    public void open(Indent plusIndent, BreakBehaviour breakBehaviour, LastLevelBreakability breakabilityIfLastLevel) {
         add(OpenOp.builder()
                 .plusIndent(plusIndent)
                 .breakBehaviour(breakBehaviour)
@@ -285,22 +288,22 @@ public final class OpsBuilder {
                 .build());
     }
 
-    public final void open(OpenOp openOp) {
+    public void open(OpenOp openOp) {
         add(openOp);
     }
 
     /** Close the current level, by emitting a {@link CloseOp}. */
-    public final void close() {
+    public void close() {
         add(CloseOp.make());
     }
 
     /** Return the text of the next {@link Input.Token}, or absent if there is none. */
-    public final Optional<String> peekToken() {
+    public Optional<String> peekToken() {
         return peekToken(0);
     }
 
     /** Return the text of an upcoming {@link Input.Token}, or absent if there is none. */
-    public final Optional<String> peekToken(int skip) {
+    public Optional<String> peekToken(int skip) {
         ImmutableList<? extends Input.Token> tokens = input.getTokens();
         int idx = tokenI + skip;
         return idx < tokens.size() ? Optional.of(tokens.get(idx).getTok().getOriginalText()) : Optional.empty();
@@ -312,11 +315,11 @@ public final class OpsBuilder {
      *
      * @param token the optional token
      */
-    public final void guessToken(String token) {
+    public void guessToken(String token) {
         token(token, Token.RealOrImaginary.IMAGINARY, ZERO, /* breakAndIndentTrailingComment=  */ Optional.empty());
     }
 
-    public final void token(
+    public void token(
             String token,
             Token.RealOrImaginary realOrImaginary,
             Indent plusIndentCommentsBefore,
@@ -334,8 +337,8 @@ public final class OpsBuilder {
              * (for example) we're guessing at an optional token.
              */
             if (realOrImaginary == Token.RealOrImaginary.REAL) {
-                throw new FormattingError(diagnostic(
-                        String.format("expected token: '%s'; generated %s instead", peekToken().orElse(null), token)));
+                throw new FormattingError(diagnostic(String.format(
+                        "expected token: '%s'; generated %s instead", peekToken().orElse(null), token)));
             }
         }
     }
@@ -345,7 +348,7 @@ public final class OpsBuilder {
      *
      * @param op the operator to emit
      */
-    public final void op(String op) {
+    public void op(String op) {
         int opN = op.length();
         for (int i = 0; i < opN; i++) {
             token(
@@ -357,12 +360,12 @@ public final class OpsBuilder {
     }
 
     /** Emit a {@link Space}. */
-    public final void space() {
+    public void space() {
         add(Space.make());
     }
 
     /** Emit a {@link Break}. */
-    public final void breakOp() {
+    public void breakOp() {
         breakOp(FillMode.UNIFIED, "", ZERO);
     }
 
@@ -371,17 +374,17 @@ public final class OpsBuilder {
      *
      * @param plusIndent extra indent if taken
      */
-    public final void breakOp(Indent plusIndent) {
+    public void breakOp(Indent plusIndent) {
         breakOp(FillMode.UNIFIED, "", plusIndent);
     }
 
     /** Emit a filled {@link Break}. */
-    public final void breakToFill() {
+    public void breakToFill() {
         breakOp(FillMode.INDEPENDENT, "", ZERO);
     }
 
     /** Emit a forced {@link Break}. */
-    public final void forcedBreak() {
+    public void forcedBreak() {
         breakOp(FillMode.FORCED, "", ZERO);
     }
 
@@ -390,7 +393,7 @@ public final class OpsBuilder {
      *
      * @param plusIndent extra indent if taken
      */
-    public final void forcedBreak(Indent plusIndent) {
+    public void forcedBreak(Indent plusIndent) {
         breakOp(FillMode.FORCED, "", plusIndent);
     }
 
@@ -399,7 +402,7 @@ public final class OpsBuilder {
      *
      * @param flat the {@link Break} when not broken
      */
-    public final void breakOp(String flat) {
+    public void breakOp(String flat) {
         breakOp(FillMode.UNIFIED, flat, ZERO);
     }
 
@@ -408,7 +411,7 @@ public final class OpsBuilder {
      *
      * @param flat the {@link Break} when not broken
      */
-    public final void breakToFill(String flat) {
+    public void breakToFill(String flat) {
         breakOp(FillMode.INDEPENDENT, flat, ZERO);
     }
 
@@ -419,7 +422,7 @@ public final class OpsBuilder {
      * @param flat the {@link Break} when not broken
      * @param plusIndent extra indent if taken
      */
-    public final void breakOp(FillMode fillMode, String flat, Indent plusIndent) {
+    public void breakOp(FillMode fillMode, String flat, Indent plusIndent) {
         breakOp(fillMode, flat, plusIndent, /* optionalTag=  */ Optional.empty());
     }
 
@@ -431,7 +434,7 @@ public final class OpsBuilder {
      * @param plusIndent extra indent if taken
      * @param optionalTag an optional tag for remembering whether the break was taken
      */
-    public final void breakOp(FillMode fillMode, String flat, Indent plusIndent, Optional<BreakTag> optionalTag) {
+    public void breakOp(FillMode fillMode, String flat, Indent plusIndent, Optional<BreakTag> optionalTag) {
         add(Break.make(fillMode, flat, plusIndent, optionalTag));
     }
 
@@ -451,7 +454,7 @@ public final class OpsBuilder {
         }
         Input.Token start = input.getTokens().get(lastPartialFormatBoundary);
         Input.Token end = input.getTokens().get(tokenI - 1);
-        output.markForPartialFormat(start, end);
+        inputMetadataBuilder.markForPartialFormat(start, end);
         lastPartialFormatBoundary = tokenI;
     }
 
@@ -460,8 +463,8 @@ public final class OpsBuilder {
      *
      * @param wanted whether to force ({@code true}) or suppress {@code false}) the blank line
      */
-    public final void blankLineWanted(BlankLineWanted wanted) {
-        output.blankLine(getI(input.getTokens().get(tokenI)), wanted);
+    public void blankLineWanted(BlankLineWanted wanted) {
+        inputMetadataBuilder.blankLine(getI(input.getTokens().get(tokenI)), wanted);
     }
 
     private static int getI(Input.Token token) {
@@ -475,12 +478,16 @@ public final class OpsBuilder {
 
     private static final Space SPACE = Space.make();
 
-    /**
-     * Build a list of {@link Op}s from the {@code OpsBuilder}.
-     *
-     * @return the list of {@link Op}s
-     */
-    public final ImmutableList<Op> build() {
+    @Value.Immutable
+    @Value.Style(overshadowImplementation = true)
+    public interface OpsOutput {
+        ImmutableList<Op> ops();
+
+        InputMetadata inputPreservingState();
+    }
+
+    /** Build a list of {@link Op}s from the {@code OpsBuilder}. */
+    public OpsOutput build() {
         markForPartialFormat();
         // Rewrite the ops to insert comments.
         Multimap<Integer, Op> tokOps = ArrayListMultimap.create();
@@ -533,7 +540,7 @@ public final class OpsBuilder {
                     }
                     if (allowBlankAfterLastComment && newlines > 1) {
                         // Force a line break after two newlines in a row following a line or block comment
-                        output.blankLine(token.getTok().getIndex(), BlankLineWanted.YES);
+                        inputMetadataBuilder.blankLine(token.getTok().getIndex(), BlankLineWanted.YES);
                     }
                     if (lastWasComment && newlines > 0) {
                         tokOps.put(j, Break.makeForced());
@@ -559,8 +566,9 @@ public final class OpsBuilder {
                                             && tokenOp.breakAndIndentTrailingComment().isPresent());
                             if (breakAfter) {
                                 tokOps.put(tokAfterPos, Break.make(
-                                        FillMode.FORCED, "", tokenOp.breakAndIndentTrailingComment().orElse(
-                                                        Const.ZERO)));
+                                        FillMode.FORCED,
+                                        "",
+                                        tokenOp.breakAndIndentTrailingComment().orElse(Const.ZERO)));
                             } else {
                                 tokOps.put(tokAfterPos, SPACE);
                             }
@@ -613,7 +621,7 @@ public final class OpsBuilder {
             if (afterForcedBreak
                     && (op instanceof Space
                             || (op instanceof Break
-                                    && ((Break) op).evalPlusIndent() == 0
+                                    && ((Break) op).evalPlusIndent(State.startingState()) == 0
                                     && " ".equals(((Doc) op).getFlat())))) {
                 continue;
             }
@@ -628,7 +636,10 @@ public final class OpsBuilder {
                 afterForcedBreak = isForcedBreak(op);
             }
         }
-        return newOps.build();
+        return ImmutableOpsOutput.builder()
+                .ops(newOps.build())
+                .inputPreservingState(inputMetadataBuilder.build())
+                .build();
     }
 
     private static boolean isNonNlsComment(Input.Tok tokAfter) {
@@ -646,11 +657,10 @@ public final class OpsBuilder {
     }
 
     @Override
-    public final String toString() {
+    public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("input", input)
                 .add("ops", ops)
-                .add("output", output)
                 .add("tokenI", tokenI)
                 .add("inputPosition", inputPosition)
                 .toString();

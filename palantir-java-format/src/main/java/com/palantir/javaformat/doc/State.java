@@ -16,39 +16,96 @@
 
 package com.palantir.javaformat.doc;
 
-import com.google.common.base.MoreObjects;
+import com.google.common.base.Preconditions;
+import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.Indent;
+import fj.data.Set;
+import fj.data.TreeMap;
+import org.immutables.value.Value;
+import org.immutables.value.Value.Parameter;
 
 /** State for writing. */
-public final class State {
+@Value.Immutable
+@Value.Style(overshadowImplementation = true)
+@Immutable
+public abstract class State {
     /** Last indent that was actually taken. */
-    final int lastIndent;
+    public abstract int lastIndent();
     /** Next indent, if the level is about to be broken. */
-    final int indent;
+    public abstract int indent();
 
-    final int column;
-    final boolean mustBreak;
+    public abstract int column();
+
+    public abstract boolean mustBreak();
     /** Counts how many lines a particular formatting took. */
-    final int numLines;
+    public abstract int numLines();
     /**
      * Counts how many times reached a branch, where multiple formattings would be considered. Expected runtime is
      * exponential in this number.
      *
      * @see State#withNewBranch()
      */
-    final int branchingCoefficient;
+    public abstract int branchingCoefficient();
 
-    State(int lastIndent, int indent, int column, boolean mustBreak, int numLines, int branchingCoefficient) {
-        this.lastIndent = lastIndent;
-        this.indent = indent;
-        this.column = column;
-        this.mustBreak = mustBreak;
-        this.numLines = numLines;
-        this.branchingCoefficient = branchingCoefficient;
+    protected abstract Set<BreakTag> breakTagsTaken();
+
+    protected abstract TreeMap<Break, BreakState> breakStates();
+
+    protected abstract TreeMap<Level, LevelState> levelStates();
+
+    /**
+     * Keep track of how each {@link Tok} was written (these are mostly comments), which can differ depending on the
+     * starting column and the maxLength.
+     */
+    protected abstract TreeMap<Tok, TokState> tokStates();
+
+    public static State startingState() {
+        return builder()
+                .lastIndent(0)
+                .indent(0)
+                .column(0)
+                .mustBreak(false)
+                .numLines(0)
+                .branchingCoefficient(0)
+                .breakTagsTaken(Set.empty(HasUniqueId.ord()))
+                .breakStates(TreeMap.empty(HasUniqueId.ord()))
+                .levelStates(TreeMap.empty(HasUniqueId.ord()))
+                .tokStates(TreeMap.empty(HasUniqueId.ord()))
+                .build();
     }
 
-    public State(int indent0, int column0) {
-        this(indent0, indent0, column0, false, 0, 0);
+    public BreakState getBreakState(Break brk) {
+        return breakStates().get(brk).orSome(ImmutableBreakState.of(false, -1));
+    }
+
+    public boolean wasBreakTaken(BreakTag breakTag) {
+        return breakTagsTaken().member(breakTag);
+    }
+
+    boolean isOneLine(Level level) {
+        LevelState levelState = levelStates().get(level).toNull();
+        return levelState != null && levelState.oneLine();
+    }
+
+    String getTokText(Tok tok) {
+        return Preconditions.checkNotNull(tokStates().get(tok).toNull(), "Expected Tok state to exist for: %s", tok)
+                .text();
+    }
+
+    /** Record whether break was taken. */
+    State breakTaken(BreakTag breakTag, boolean broken) {
+        boolean currentlyBroken = breakTagsTaken().member(breakTag);
+        // TODO(dsanduleac): is the opposite ever a valid state?
+        if (currentlyBroken != broken) {
+            Set<BreakTag> newSet;
+            if (broken) {
+                newSet = breakTagsTaken().insert(breakTag);
+            } else {
+                newSet = breakTagsTaken().delete(breakTag);
+            }
+            return builder().from(this).breakTagsTaken(newSet).build();
+        }
+        return this;
     }
 
     /**
@@ -56,53 +113,108 @@ public final class State {
      * not commit to the indent just yet though, so lastIndent stays the same.
      */
     State withIndentIncrementedBy(Indent plusIndent) {
-        return new State(lastIndent, indent + plusIndent.eval(), column, false, numLines, branchingCoefficient);
+        return builder().from(this).indent(indent() + plusIndent.eval(this)).mustBreak(false).build();
     }
 
     /** Reset any accumulated indent to the same value as {@code lastIndent}. */
     State withNoIndent() {
-        return new State(lastIndent, lastIndent, column, false, numLines, branchingCoefficient);
+        return builder().from(this).indent(lastIndent()).mustBreak(false).build();
     }
 
     /** The current level is being broken and it has breaks in it. Commit to the indent. */
     State withBrokenLevel() {
-        return new State(indent, indent, column, mustBreak, numLines, branchingCoefficient);
+        return builder().from(this).lastIndent(indent()).build();
     }
 
-    State withBreak(Break brk) {
-        int newColumn = Math.max(indent + brk.evalPlusIndent(), 0);
-        // lastIndent = indent -- we've proven that we wrote some stuff at the new 'indent' so commit
-        // to it
-        return new State(indent, indent, newColumn, mustBreak, numLines + 1, branchingCoefficient);
+    State withBreak(Break brk, boolean broken) {
+        Builder builder = builder().from(this);
+
+        if (broken) {
+            int newColumn = Math.max(indent() + brk.evalPlusIndent(this), 0);
+
+            return builder
+                    // lastIndent = indent -- we've proven that we wrote some stuff at the new 'indent'
+                    .lastIndent(indent())
+                    .column(newColumn)
+                    .numLines(numLines() + 1)
+                    .breakStates(breakStates().set(brk, ImmutableBreakState.of(true, newColumn)))
+                    .build();
+        } else {
+            return builder.column(column() + brk.getFlat().length()).build();
+        }
     }
 
-    State updateAfterLevel(State state) {
-        return new State(lastIndent, indent, state.column, mustBreak, state.numLines, branchingCoefficient);
+    /** Update the current state after having processed an _inner_ level. */
+    State updateAfterLevel(State afterInnerLevel) {
+        return builder()
+                // Inherited current state
+                .lastIndent(lastIndent())
+                .indent(indent())
+                .branchingCoefficient(branchingCoefficient())
+                .mustBreak(mustBreak())
+                // Overridden state
+                .column(afterInnerLevel.column())
+                .numLines(afterInnerLevel.numLines())
+                // TODO(dsanduleac): put these behind a "GlobalState"
+                .breakTagsTaken(afterInnerLevel.breakTagsTaken())
+                .breakStates(afterInnerLevel.breakStates())
+                .levelStates(afterInnerLevel.levelStates())
+                .tokStates(afterInnerLevel.tokStates())
+                .build();
     }
 
     State addNewLines(int extraNewlines) {
-        return new State(lastIndent, indent, column, mustBreak, numLines + extraNewlines, branchingCoefficient);
+        return builder().from(this).numLines(numLines() + extraNewlines).build();
     }
 
     State withColumn(int column) {
-        return new State(lastIndent, indent, column, mustBreak, numLines, branchingCoefficient);
+        return builder().from(this).column(column).build();
     }
 
     State withMustBreak(boolean mustBreak) {
-        return new State(lastIndent, indent, column, mustBreak, numLines, branchingCoefficient);
+        return builder().from(this).mustBreak(mustBreak).build();
     }
 
     State withNewBranch() {
-        return new State(lastIndent, indent, column, mustBreak, numLines, branchingCoefficient + 1);
+        return builder().from(this).branchingCoefficient(branchingCoefficient() + 1).build();
     }
 
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("lastIndent", lastIndent)
-                .add("indent", indent)
-                .add("column", column)
-                .add("mustBreak", mustBreak)
-                .toString();
+    State withLevelState(Level level, LevelState levelState) {
+        return builder().from(this).levelStates(levelStates().set(level, levelState)).build();
+    }
+
+    State withTokState(Tok tok, TokState tokState) {
+        return builder().from(this).tokStates(tokStates().set(tok, tokState)).build();
+    }
+
+    public static class Builder extends ImmutableState.Builder {}
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    @Value.Immutable
+    @Value.Style(overshadowImplementation = true)
+    interface BreakState {
+        @Parameter
+        boolean broken();
+
+        @Parameter
+        int newIndent();
+    }
+
+    @Value.Immutable
+    @Value.Style(overshadowImplementation = true)
+    interface LevelState {
+        /** True if the entire {@link Level} fits on one line. */
+        @Parameter
+        boolean oneLine();
+    }
+
+    @Value.Immutable
+    @Value.Style(overshadowImplementation = true)
+    interface TokState {
+        @Parameter
+        String text();
     }
 }

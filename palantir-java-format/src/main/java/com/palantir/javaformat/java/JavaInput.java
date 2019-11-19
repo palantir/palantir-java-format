@@ -19,6 +19,7 @@ import static com.google.common.collect.Iterables.getLast;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Suppliers;
 import com.google.common.base.Verify;
 import com.google.common.collect.DiscreteDomain;
 import com.google.common.collect.ImmutableCollection;
@@ -30,6 +31,7 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
+import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.Input;
 import com.palantir.javaformat.Newlines;
 import com.palantir.javaformat.java.JavacTokens.RawTok;
@@ -39,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Supplier;
 import org.openjdk.javax.tools.Diagnostic;
 import org.openjdk.javax.tools.DiagnosticCollector;
 import org.openjdk.javax.tools.DiagnosticListener;
@@ -65,6 +68,7 @@ public final class JavaInput extends Input {
      * <p>A {@code /*} comment possibly contains newlines; a {@code //} comment does not contain the terminating newline
      * character, but is followed by a newline {@link Tok}.
      */
+    @Immutable
     static final class Tok implements Input.Tok {
         private final int index;
         private final String originalText;
@@ -177,6 +181,7 @@ public final class JavaInput extends Input {
      * Tok}s, each preceded by the texts of its {@code toksBefore} and followed by the texts of its {@code toksAfter},
      * equals the input.
      */
+    @Immutable
     static final class Token implements Input.Token {
         private final Tok tok;
         private final ImmutableList<Tok> toksBefore;
@@ -236,6 +241,7 @@ public final class JavaInput extends Input {
     }
 
     private final String text; // The input.
+    private final Supplier<String> lineSeparator = Suppliers.memoize(() -> Newlines.guessLineSeparator(getText()));
     private int kN; // The number of numbered toks (tokens or comments), excluding the EOF.
 
     /*
@@ -316,6 +322,10 @@ public final class JavaInput extends Input {
     @Override
     public ImmutableMap<Integer, Integer> getPositionToColumnMap() {
         return positionToColumnMap;
+    }
+
+    public String getLineSeparator() {
+        return lineSeparator.get();
     }
 
     /** Lex the input and build the list of toks. */
@@ -629,8 +639,8 @@ public final class JavaInput extends Input {
         RangeSet<Integer> tokenRangeSet = TreeRangeSet.create();
         for (Range<Integer> characterRange0 : characterRanges) {
             Range<Integer> characterRange = characterRange0.canonical(DiscreteDomain.integers());
-            tokenRangeSet.add(characterRangeToTokenRange(
-                    characterRange.lowerEndpoint(), characterRange.upperEndpoint() - characterRange.lowerEndpoint()));
+            tokenRangeSet.add(characterRangeToTokenRange(characterRange.lowerEndpoint(), characterRange.upperEndpoint()
+                    - characterRange.lowerEndpoint()));
         }
         return tokenRangeSet;
     }

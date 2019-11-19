@@ -39,7 +39,7 @@ public final class Main {
     private static final int MAX_THREADS = 20;
     private static final String STDIN_FILENAME = "<stdin>";
 
-    static final String versionString() {
+    static String versionString() {
         return "palantir-java-format: Version " + Main.class.getPackage().getImplementationVersion();
     }
 

@@ -19,6 +19,7 @@ package com.palantir.javaformat.doc;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Range;
+import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.CommentsHelper;
 import com.palantir.javaformat.Input;
 import com.palantir.javaformat.Newlines;
@@ -26,9 +27,9 @@ import com.palantir.javaformat.Op;
 import com.palantir.javaformat.Output;
 
 /** A leaf node in a {@link Doc} for a non-token. */
+@Immutable
 public final class Tok extends Doc implements Op {
     private final Input.Tok tok;
-    String text;
 
     private Tok(Input.Tok tok) {
         this.tok = tok;
@@ -50,7 +51,7 @@ public final class Tok extends Doc implements Op {
     }
 
     @Override
-    float computeWidth() {
+    protected float computeWidth() {
         int idx = Newlines.firstBreak(tok.getOriginalText());
         // only count the first line of multi-line block comments
         if (tok.isComment()) {
@@ -67,7 +68,7 @@ public final class Tok extends Doc implements Op {
     }
 
     @Override
-    String computeFlat() {
+    protected String computeFlat() {
         // TODO(cushon): commentsHelper.rewrite doesn't get called for spans that fit in a single
         // line. That's fine for multi-line comment reflowing, but problematic for adding missing
         // spaces in line comments.
@@ -78,21 +79,22 @@ public final class Tok extends Doc implements Op {
     }
 
     @Override
-    Range<Integer> computeRange() {
+    protected Range<Integer> computeRange() {
         return Range.singleton(tok.getIndex()).canonical(INTEGERS);
     }
 
     @Override
     public State computeBreaks(CommentsHelper commentsHelper, int maxWidth, State state) {
-        text = commentsHelper.rewrite(tok, maxWidth, state.column);
+        String text = commentsHelper.rewrite(tok, maxWidth, state.column());
         int firstLineLength = text.length() - Iterators.getLast(Newlines.lineOffsetIterator(text));
-        return state.withColumn(state.column + firstLineLength)
-                .addNewLines(Iterators.size(Newlines.lineOffsetIterator(text)));
+        return state.withColumn(state.column() + firstLineLength)
+                .addNewLines(Iterators.size(Newlines.lineOffsetIterator(text)))
+                .withTokState(this, ImmutableTokState.of(text));
     }
 
     @Override
-    public void write(Output output) {
-        output.append(text, range());
+    public void write(State state, Output output) {
+        output.append(state, state.getTokText(this), range());
     }
 
     @Override

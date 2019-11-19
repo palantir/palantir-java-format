@@ -24,7 +24,6 @@ import com.palantir.javaformat.Input;
 import com.palantir.javaformat.Op;
 import com.palantir.javaformat.OpsBuilder;
 import com.palantir.javaformat.Output;
-import java.util.function.Supplier;
 
 /**
  * {@link com.palantir.javaformat.java.JavaInputAstVisitor JavaInputAstVisitor} outputs a sequence of {@link Op}s using
@@ -34,14 +33,13 @@ import java.util.function.Supplier;
  * represent non-token {@link Input.Tok}s, including comments and other white-space; {@link Space}s, representing single
  * spaces; and {@link Break}s, which represent optional line-breaks.
  */
-public abstract class Doc {
-
+public abstract class Doc extends HasUniqueId {
     static final Range<Integer> EMPTY_RANGE = Range.closedOpen(-1, -1);
     static final DiscreteDomain<Integer> INTEGERS = DiscreteDomain.integers();
 
-    private final Supplier<Float> memoizedWidth = Suppliers.memoize(this::computeWidth);
-    private final Supplier<String> memoizedFlat = Suppliers.memoize(this::computeFlat);
-    private final Supplier<Range<Integer>> memoizedRange = Suppliers.memoize(this::computeRange);
+    private final ImmutableSupplier<Float> memoizedWidth = Suppliers.memoize(this::computeWidth)::get;
+    private final ImmutableSupplier<String> memoizedFlat = Suppliers.memoize(this::computeFlat)::get;
+    private final ImmutableSupplier<Range<Integer>> memoizedRange = Suppliers.memoize(this::computeRange)::get;
 
     /**
      * Return the width of a {@code Doc}, or {@code Float.POSITIVE_INFINITY} if it must be broken.
@@ -71,21 +69,21 @@ public abstract class Doc {
      *
      * @return the width, or {@code Float.POSITIVE_INFINITY} if it must be broken
      */
-    abstract float computeWidth();
+    protected abstract float computeWidth();
 
     /**
      * Compute the {@code Doc}'s flat value. Not defined (and never called) if contains forced breaks.
      *
      * @return the flat value
      */
-    abstract String computeFlat();
+    protected abstract String computeFlat();
 
     /**
      * Compute the {@code Doc}'s {@link Range} of {@link Input.Token}s.
      *
      * @return the {@link Range}
      */
-    abstract Range<Integer> computeRange();
+    protected abstract Range<Integer> computeRange();
 
     /**
      * Make breaking decisions for a {@code Doc}.
@@ -97,5 +95,5 @@ public abstract class Doc {
     public abstract State computeBreaks(CommentsHelper commentsHelper, int maxWidth, State state);
 
     /** Write a {@code Doc} to an {@link Output}, after breaking decisions have been made. */
-    public abstract void write(Output output);
+    public abstract void write(State state, Output output);
 }

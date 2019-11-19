@@ -1,11 +1,13 @@
 package com.palantir.javaformat;
 
+import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.doc.Doc;
 import com.palantir.javaformat.doc.Level;
 import org.derive4j.ArgOption;
 import org.derive4j.Data;
 
 @Data(arguments = ArgOption.checkedNotNull)
+@Immutable
 public abstract class BreakBehaviour {
     public interface Cases<R> {
 

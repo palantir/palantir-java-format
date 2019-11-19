@@ -23,10 +23,11 @@ import com.google.common.collect.RangeSet;
 import com.google.common.io.CharSink;
 import com.google.common.io.CharSource;
 import com.google.errorprone.annotations.Immutable;
+import com.palantir.javaformat.CommentsHelper;
 import com.palantir.javaformat.FormattingError;
-import com.palantir.javaformat.Newlines;
 import com.palantir.javaformat.Op;
 import com.palantir.javaformat.OpsBuilder;
+import com.palantir.javaformat.OpsBuilder.OpsOutput;
 import com.palantir.javaformat.Utils;
 import com.palantir.javaformat.doc.Doc;
 import com.palantir.javaformat.doc.DocBuilder;
@@ -105,11 +106,13 @@ public final class Formatter {
      * corresponding {@link JavaOutput}.
      *
      * @param javaInput the input, a Java compilation unit
-     * @param javaOutput the {@link JavaOutput}
      * @param options the {@link JavaFormatterOptions}
+     * @param commentsHelper the {@link CommentsHelper}, used to rewrite comments
+     * @return javaOutput the output produced
      */
-    static void format(final JavaInput javaInput, JavaOutput javaOutput, JavaFormatterOptions options)
+    static JavaOutput format(final JavaInput javaInput, JavaFormatterOptions options, CommentsHelper commentsHelper)
             throws FormatterException {
+
         Context context = new Context();
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
         context.put(DiagnosticListener.class, diagnostics);
@@ -145,15 +148,18 @@ public final class Formatter {
         if (!Iterables.isEmpty(errorDiagnostics)) {
             throw FormatterExceptions.fromJavacDiagnostics(errorDiagnostics);
         }
-        OpsBuilder builder = new OpsBuilder(javaInput, javaOutput);
+        OpsBuilder builder = new OpsBuilder(javaInput);
         // Output the compilation unit.
         new JavaInputAstVisitor(builder, options.indentationMultiplier()).scan(unit, null);
         builder.sync(javaInput.getText().length());
         builder.drain();
-        Doc doc = new DocBuilder().withOps(builder.build()).build();
-        doc.computeBreaks(javaOutput.getCommentsHelper(), options.maxLineLength(), new State(+0, 0));
-        doc.write(javaOutput);
+        OpsOutput opsOutput = builder.build();
+        Doc doc = new DocBuilder().withOps(opsOutput.ops()).build();
+        State finalState = doc.computeBreaks(commentsHelper, options.maxLineLength(), State.startingState());
+        JavaOutput javaOutput = new JavaOutput(javaInput, opsOutput.inputPreservingState());
+        doc.write(finalState, javaOutput);
         javaOutput.flush();
+        return javaOutput;
     }
 
     static boolean errorDiagnostic(Diagnostic<?> input) {
@@ -244,11 +250,10 @@ public final class Formatter {
         // 'de-linting' changes (e.g. import ordering).
         javaInput = ModifierOrderer.reorderModifiers(javaInput, characterRanges);
 
-        String lineSeparator = Newlines.guessLineSeparator(input);
-        JavaOutput javaOutput =
-                new JavaOutput(lineSeparator, javaInput, new JavaCommentsHelper(lineSeparator, options));
+        JavaCommentsHelper commentsHelper = new JavaCommentsHelper(javaInput.getLineSeparator(), options);
+        JavaOutput javaOutput;
         try {
-            format(javaInput, javaOutput, options);
+            javaOutput = format(javaInput, options, commentsHelper);
         } catch (FormattingError e) {
             throw new FormatterException(e.diagnostics());
         }
