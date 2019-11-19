@@ -5,10 +5,10 @@
     Palantir
   </vendor>
 
-  <!-- Mark it as available on all JetBrains IDEs. It's really only useful in
-       IDEA and Android Studio, but there's no way to specify that for some
-       reason. It won't crash PyCharm or anything, so whatever. -->
-  <depends>com.intellij.modules.lang</depends>
+  <!-- Mark it as available on JetBrains IDEs that have the Java plugin.
+       See https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html#modules-specific-to-functionality
+   -->
+  <depends>com.intellij.modules.java</depends>
 
   <project-components>
     <component>
