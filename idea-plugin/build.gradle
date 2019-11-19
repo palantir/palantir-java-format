@@ -26,6 +26,11 @@ intellij {
     plugins = ['java']
 }
 
+tasks.runIde {
+    // Allow debugging
+    jvmArgs '--add-exports=java.base/jdk.internal.vm=ALL-UNNAMED'
+}
+
 patchPluginXml {
     pluginDescription = "Formats source code using the palantir-java-format tool."
     version = project.version
