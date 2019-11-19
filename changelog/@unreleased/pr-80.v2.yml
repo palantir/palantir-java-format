@@ -1,0 +1,6 @@
+type: fix
+fix:
+  description: '"Before commit -> Reformat code" now correctly uses the PJF formatter
+    if it is enabled, rather than the IntelliJ default formatter.'
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/80
