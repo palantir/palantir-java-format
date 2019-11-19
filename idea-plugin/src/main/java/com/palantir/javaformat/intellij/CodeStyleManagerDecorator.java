@@ -48,10 +48,6 @@ class CodeStyleManagerDecorator extends CodeStyleManager implements FormattingMo
         this.delegate = delegate;
     }
 
-    CodeStyleManager getDelegate() {
-        return delegate;
-    }
-
     @Override
     public Project getProject() {
         return delegate.getProject();
@@ -69,9 +65,10 @@ class CodeStyleManagerDecorator extends CodeStyleManager implements FormattingMo
     }
 
     @Override
-    public PsiElement reformatRange(PsiElement element, int startOffset, int endOffset)
+    public final PsiElement reformatRange(PsiElement element, int startOffset, int endOffset)
             throws IncorrectOperationException {
-        return delegate.reformatRange(element, startOffset, endOffset);
+        // Preserve the fallback defined in CodeStyleManagerImpl
+        return reformatRange(element, startOffset, endOffset, false);
     }
 
     @Override
