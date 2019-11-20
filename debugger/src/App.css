@@ -14,7 +14,7 @@
     outline: 1px solid black;
 }
 
-.Ops span.token:hover span.token-body {
+.Ops span.token:hover span.tokenBody {
     text-decoration: underline;
 }
 
