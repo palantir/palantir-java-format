@@ -10,15 +10,15 @@
     outline: 1px solid black;
 }
 
-span.token:hover {
+.Ops span.token:hover {
     outline: 1px solid black;
 }
 
-span.token:hover span.token-body {
+.Ops span.token:hover span.token-body {
     text-decoration: underline;
 }
 
-span.open-op, span.close-op, span.break-tag {
+.Ops span.open-op, .Ops span.close-op, .Ops span.break {
     position: relative;
     width: 3px;
     height: 1em;
@@ -26,28 +26,28 @@ span.open-op, span.close-op, span.break-tag {
     margin: 0 1px;
 }
 
-span.open-op {
+.Ops span.open-op {
     background: green;
 }
 
-span.close-op {
+.Ops span.close-op {
     background: red;
 }
 
-span.break-tag.FillMode-UNIFIED {
+.Ops span.break.FillMode-UNIFIED {
     background: #777;
 }
 
-span.break-tag.FillMode-INDEPENDENT {
+.Ops span.break.FillMode-INDEPENDENT {
     background: #333;
 }
 
-span.break-tag.FillMode-FORCED {
+.Ops span.break.FillMode-FORCED {
     background: #000;
     width: 5px;
 }
 
-span.break-tag.conditional {
+.Ops span.break.conditional {
     height: 0.4em;
     width: 0.4em;
     vertical-align: middle;

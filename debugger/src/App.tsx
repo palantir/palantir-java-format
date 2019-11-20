@@ -118,7 +118,7 @@ const Ops: React.FC<{ops: Array<Op>}> = ({ops}) => {
     const renderOps = ops.map(op => {
         switch (op.type) {
             case "break":
-                const classes = ["break-tag", `FillMode-${op.fillMode}`];
+                const classes = ["break", `FillMode-${op.fillMode}`];
                 if (op.conditional) {
                     classes.push('conditional')
                 }
@@ -138,7 +138,7 @@ const Ops: React.FC<{ops: Array<Op>}> = ({ops}) => {
         }
     });
 
-    return <Pre>{renderOps}</Pre>;
+    return <Pre className={"Ops"}>{renderOps}</Pre>;
 };
 
 export interface ITreeState {
