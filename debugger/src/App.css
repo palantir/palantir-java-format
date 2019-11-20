@@ -2,6 +2,14 @@
     white-space: pre; font-family: monospace; line-height: 1em;
 }
 
+.App .doc-level {
+    margin-left: 20px;
+}
+
+.App .doc-level:hover {
+    outline: 1px solid black;
+}
+
 span.token:hover {
     outline: 1px solid black;
 }

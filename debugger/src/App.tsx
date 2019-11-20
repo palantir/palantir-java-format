@@ -2,19 +2,44 @@ import React, { CSSProperties } from 'react';
 import './App.css';
 import { Callout, Classes, H1, ITreeNode, Pre, Toaster, Tooltip, Tree } from "@blueprintjs/core";
 
+interface DebugData {
+    javaInput: string,
+    ops: Array<Op>,
+    doc: Doc,
+    formatterDecisions: FormatterDecisions,
+    javaOutput: string,
+}
+
+// Op stuff
+
 type Op =
+    // TODO associated BreakTag id if conditional
     { type: 'break', conditional: boolean, fillMode: 'UNIFIED' | 'INDEPENDENT' | 'FORCED', toString: string } & HasId
     | { type: 'token', beforeText: string, afterText: string, text: string } & HasId
     | { type: 'openOp', toString: string } & HasId
     | { type: 'closeOp' }
 
-interface DebugData {
-    javaInput: string,
-    ops: Array<Op>,
-    doc: any,
-    formatterDecisions: FormatterDecisions,
-    javaOutput: string,
-}
+// Doc stuff
+
+type Doc = Break | Level | Comment | Space | Token;
+
+type Token = { type: "token", flat: string };
+type Space = { type: "space" };
+type Break = { type: "break", flat: string, breakState: { broken: boolean, newIndent: number }, optTag: HasId };
+type Comment = { type: "comment", /** Original text */ flat: string, /** Text as rendered */ text: string };
+type Level = {
+    type: "level",
+    openOp: OpenOp,
+    id: Id,
+    docs: ReadonlyArray<Doc>,
+};
+type OpenOp = {
+    id: Id, plusIndent: Indent, breakBehaviour: any, breakabilityIfLastLevel: any, columnLimitBeforeLastBreak?: any,
+    debugName?: string
+};
+type Indent = { type: "const", amount: number } | { type: "if", condition: Id, thenIndent: Indent, elseIndent: Indent }
+
+// FormatterDecisions formatting stuff
 
 type ExplorationNode = {
     type: "exploration", parentId?: Id, id: Id, humanDescription: string, children: ReadonlyArray<LevelNode> };
@@ -24,6 +49,8 @@ type LevelNode = {
 };
 
 type FormatterDecisions = ExplorationNode;
+
+// Main inputs and types
 
 interface Props {
     debugData: DebugData
@@ -46,13 +73,45 @@ const App: React.FC<Props> = ({debugData}) => {
             </Callout>
             <Ops ops={debugData.ops}/>
             <H1>Doc</H1>
-            <Pre></Pre>
+            <DocComponent doc={debugData.doc}/>
             <H1>Exploration</H1>
             <DecisionTree formatterDecisions={debugData.formatterDecisions}/>
             <H1>javaOutput</H1>
             <Pre>{debugData.javaOutput}</Pre>
         </div>
     );
+};
+
+const DocComponent: React.FC<{doc: Doc}> = ({doc}) => {
+    function renderDoc(doc: Doc) {
+        switch (doc.type) {
+            case "break":
+                // TODO add breakToken in here
+                if (doc.breakState.broken) {
+                    return <br className={"doc doc-break"}/>;
+                } else {
+                    return <span className={"doc doc-break"}>{doc.flat}</span>
+                }
+            case "level":
+                // TODO other information about the doc
+                return <div className={"doc doc-level"}>
+                    {doc.docs.map(renderDoc)}
+                </div>;
+            case "comment":
+                // TODO maybe display original on hover?
+                return <span className={"doc doc-comment"}>{doc.text}</span>;
+            case "space":
+                return <span className={"doc doc-space"}>&nbsp;</span>;
+            case "token":
+                return <span className="doc-token">{doc.flat}</span>;
+
+        }
+    }
+
+    return (
+        <Pre>{renderDoc(doc)}</Pre>
+    );
+
 };
 
 const Ops: React.FC<{ops: Array<Op>}> = ({ops}) => {
