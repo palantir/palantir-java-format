@@ -44,7 +44,7 @@ const App: React.FC<Props> = ({debugData}) => {
             <Callout title="Note">
                 Comment and NonBreakingSpaces are not rendered here. Columns may be misaligned
             </Callout>
-            <Pre>{renderOps(debugData.ops)}</Pre>
+            <Ops ops={debugData.ops}/>
             <H1>Doc</H1>
             <Pre></Pre>
             <H1>Exploration</H1>
@@ -55,8 +55,8 @@ const App: React.FC<Props> = ({debugData}) => {
     );
 };
 
-function renderOps(ops: Array<Op>) {
-    return ops.map(op => {
+const Ops: React.FC<{ops: Array<Op>}> = ({ops}) => {
+    const renderOps = ops.map(op => {
         switch (op.type) {
             case "break":
                 const classes = ["break-tag", `FillMode-${op.fillMode}`];
@@ -77,8 +77,10 @@ function renderOps(ops: Array<Op>) {
             case "closeOp":
                 return <span className={"close-op"}/>;
         }
-    })
-}
+    });
+
+    return <Pre>{renderOps}</Pre>;
+};
 
 export interface ITreeState {
     nodes: ITreeNode[];
