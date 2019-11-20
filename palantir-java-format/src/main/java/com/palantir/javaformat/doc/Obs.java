@@ -116,11 +116,6 @@ public interface Obs {
         }
 
         @Override
-        public int id() {
-            return uniqueId;
-        }
-
-        @Override
         public State finishLevel(State state) {
             finisher.finishNode(acceptedExplorationId);
             // this final state will be different from the 'accepted' state
@@ -154,11 +149,6 @@ public interface Obs {
         @Override
         public LevelNode newChildNode(Level level, State state) {
             return new LevelNodeImpl(level, state, id(), sink);
-        }
-
-        @Override
-        public int id() {
-            return uniqueId;
         }
     }
 }

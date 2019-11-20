@@ -504,6 +504,10 @@ public final class Level extends Doc {
         return openOp.debugName();
     }
 
+    OpenOp getOpenOp() {
+        return openOp;
+    }
+
     public OptionalInt getColumnLimitBeforeLastBreak() {
         return openOp.columnLimitBeforeLastBreak();
     }

@@ -14,6 +14,10 @@
 
 package com.palantir.javaformat;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.common.base.MoreObjects;
 import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.doc.Break;
@@ -26,12 +30,15 @@ import com.palantir.javaformat.doc.State;
  * expression whose value depends on whether or not a {@link Break} has been broken.
  */
 @Immutable
+@JsonTypeInfo(use = Id.NAME, property = "type")
 public abstract class Indent {
 
     public abstract int eval(State state);
 
     /** A constant function, returning a constant indent. */
+    @JsonTypeName("const")
     public static final class Const extends Indent {
+        @JsonProperty("amount")
         private final int n;
 
         public static final Const ZERO = new Const(+0);
@@ -56,10 +63,11 @@ public abstract class Indent {
     }
 
     /** A conditional function, whose value depends on whether a break was taken. */
+    @JsonTypeName("if")
     public static final class If extends Indent {
-        private final BreakTag condition;
-        private final Indent thenIndent;
-        private final Indent elseIndent;
+        @JsonProperty private final BreakTag condition;
+        @JsonProperty private final Indent thenIndent;
+        @JsonProperty private final Indent elseIndent;
 
         private If(BreakTag condition, Indent thenIndent, Indent elseIndent) {
             this.condition = condition;

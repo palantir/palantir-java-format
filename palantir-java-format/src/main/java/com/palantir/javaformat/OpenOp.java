@@ -14,8 +14,10 @@
 
 package com.palantir.javaformat;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.palantir.javaformat.doc.Doc;
 import com.palantir.javaformat.doc.DocBuilder;
+import com.palantir.javaformat.doc.HasUniqueId;
 import com.palantir.javaformat.doc.Level;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -28,7 +30,8 @@ import org.immutables.value.Value.Default;
  * OpenOp}-{@link CloseOp} pairs turn into nested {@link Level}s.
  */
 @Value.Immutable
-public abstract class OpenOp implements Op {
+@JsonSerialize(as = ImmutableOpenOp.class)
+public abstract class OpenOp extends HasUniqueId implements Op {
     /** The extra indent inside this level. */
     public abstract Indent plusIndent();
 

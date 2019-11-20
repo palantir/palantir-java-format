@@ -16,6 +16,7 @@
 
 package com.palantir.javaformat.doc;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.Indent;
@@ -199,6 +200,7 @@ public abstract class State {
 
     @Value.Immutable
     @Value.Style(overshadowImplementation = true)
+    @JsonSerialize(as = ImmutableBreakState.class)
     interface BreakState {
         @Parameter
         boolean broken();

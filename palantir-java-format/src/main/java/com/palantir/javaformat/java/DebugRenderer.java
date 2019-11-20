@@ -30,6 +30,7 @@ import com.palantir.javaformat.OpsBuilder.OpsOutput;
 import com.palantir.javaformat.doc.Break;
 import com.palantir.javaformat.doc.Comment;
 import com.palantir.javaformat.doc.Doc;
+import com.palantir.javaformat.doc.JsonDocVisitor;
 import com.palantir.javaformat.doc.Level;
 import com.palantir.javaformat.doc.NonBreakingSpace;
 import com.palantir.javaformat.doc.State;
@@ -47,31 +48,19 @@ public class DebugRenderer {
     static void render(
             JavaInput javaInput,
             OpsOutput opsOutput,
-            Level _doc,
-            State _finalState,
+            Level doc,
+            State finalState,
             JavaOutput javaOutput,
             String formatterDecisionsJson) {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("<html>\n");
-        sb.append("<head>\n");
-        sb.append("<meta charset=\"utf-8\">\n");
-        // TODO(dfox): import the script built by App.tsx?
-        sb.append("<script type=\"text/javascript\">\n");
 
         String javascript = String.format(
-                "window.palantirJavaFormat = {\njavaInput: %s,\nops: %s,\ndoc: {},\njavaOutput: %s,\n"
+                "window.palantirJavaFormat = {\njavaInput: %s,\nops: %s,\ndoc: %s,\njavaOutput: %s,\n"
                 + "formatterDecisions: %s\n};\n",
                 jsonEscapedString(javaInput.getText()),
                 opsJson(opsOutput),
+                new JsonDocVisitor(finalState).visit(doc),
                 jsonEscapedString(outputAsString(javaOutput)),
                 formatterDecisionsJson);
-        sb.append(javascript);
-
-        sb.append("</script>\n");
-        sb.append("</head>\n");
-        sb.append("<body><div id=\"root\"></div></body>\n");
-        sb.append("</html>\n");
 
         Path publicDir = Paths.get("../debugger/public");
         try {
@@ -115,7 +104,7 @@ public class DebugRenderer {
                 json.put("type", "break");
                 json.put("fillMode", breakOp.fillMode().toString());
                 json.put("toString", op.toString());
-                breakOp.optTag().ifPresent(tag -> json.put("breakTag", tag.uniqueId));
+                breakOp.optTag().ifPresent(tag -> json.put("breakTag", tag.id()));
             }
             if (op instanceof NonBreakingSpace) {
                 ObjectNode json = arrayNode.addObject();
@@ -154,7 +143,7 @@ public class DebugRenderer {
     }
 
     public static String backgroundColor(Doc op) {
-        long hue = Hashing.adler32().hashInt(op.uniqueId).padToLong() % 360;
+        long hue = Hashing.adler32().hashInt(op.id()).padToLong() % 360;
         return String.format("background: hsl(%d, 60%%, 90%%)", hue);
     }
 }
