@@ -37,9 +37,13 @@ type Level = {
     isOneLine: boolean,
 };
 type OpenOp = {
-    id: Id, plusIndent: Indent, breakBehaviour: any, breakabilityIfLastLevel: any, columnLimitBeforeLastBreak?: any,
-    debugName?: string
+    id: Id, plusIndent: Indent, breakBehaviour: BreakBehaviour, breakabilityIfLastLevel: string,
+    columnLimitBeforeLastBreak?: any, debugName?: string
 };
+type BreakBehaviour =
+    { type: "breakThisLevel" }
+    | { type: "preferBreakingLastInnerLevel" }
+    | { type: "breakOnlyIfInnerLevelsThenFitOnOneLine" }
 type Indent = { type: "const", amount: number } | { type: "if", condition: HasId, thenIndent: Indent, elseIndent: Indent }
 
 // FormatterDecisions formatting stuff
@@ -180,7 +184,7 @@ const TreeDocComponent: React.FC<{doc: Doc}> = ({doc}) => {
                         <br/>
                     ];
                 } else {
-                    return <span className={clazz + " doc doc-break highlight"}>{doc.flat}</span>
+                    return <span className={clazz + " doc doc-break highlight"}>{doc.flat || "⏎"}</span>
                 }
             case "level":
                 // Skip levels without any contents
@@ -189,10 +193,19 @@ const TreeDocComponent: React.FC<{doc: Doc}> = ({doc}) => {
                 }
                 const plusIndent = doc.openOp.plusIndent;
                 const indent = renderIndentTag(plusIndent, doc.evalPlusIndent);
+                const debugName = (doc.openOp.debugName !== null)
+                    ? <span>"{doc.openOp.debugName}"</span> : null;
+                const breakBehaviour = (doc.openOp.breakBehaviour.type !== "breakThisLevel")
+                    ? <Tag intent={"primary"}>{doc.openOp.breakBehaviour.type}</Tag> : null;
+                const breakabilityIfLastLevel = (doc.openOp.breakabilityIfLastLevel !== "ABORT")
+                    ? <Tag intent={"none"}>{doc.openOp.breakabilityIfLastLevel}</Tag> : null;
                 // TODO other information about the doc
                 return <div className={"doc doc-level"}>
                         <div className={"banner"}>
                             {indent}
+                            {debugName}
+                            {breakBehaviour}
+                            {breakabilityIfLastLevel}
                         </div>
                         {doc.docs.map(renderDoc)}
                     </div>;

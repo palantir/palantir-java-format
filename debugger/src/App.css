@@ -38,6 +38,15 @@
     background: hsl(60, 100%, 78%);
 }
 
+.TreeDoc .banner {
+    background-color: rgba(138, 155, 168, 0.15);
+}
+
+/* Collapse empty level banner */
+.TreeDoc .banner:empty {
+    display: none;
+}
+
 .Ops span.token:hover {
     outline: 1px solid black;
 }
