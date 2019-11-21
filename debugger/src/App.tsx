@@ -210,8 +210,10 @@ const TreeDocComponent: React.FC<{doc: Doc}> = ({doc}) => {
                         {doc.docs.map(renderDoc)}
                     </div>;
             case "comment":
-                // TODO maybe display original on hover?
-                return <span className={"doc doc-comment highlight"}>{doc.text}</span>;
+                // Displaying original comment on hover (before formatting / reflowing)
+                return <Tooltip content={<div>Original: <Pre>{doc.flat}</Pre></div>}>
+                    <span className={"doc doc-comment highlight"}>{doc.text}</span>
+                </Tooltip>;
             case "space":
                 return <span className={"doc doc-space highlight"}>&nbsp;</span>;
             case "token":
