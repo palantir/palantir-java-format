@@ -563,7 +563,8 @@ public final class OpsBuilder {
                         if (tokAfter.isComment()) {
                             boolean breakAfter = tokAfter.isJavadocComment()
                                     || (tokAfter.isSlashStarComment()
-                                            && tokenOp.breakAndIndentTrailingComment().isPresent());
+                                            && tokenOp.breakAndIndentTrailingComment()
+                                                    .isPresent());
                             if (breakAfter) {
                                 tokOps.put(tokAfterPos, Break.make(
                                         FillMode.FORCED,
@@ -636,7 +637,10 @@ public final class OpsBuilder {
                 afterForcedBreak = isForcedBreak(op);
             }
         }
-        return ImmutableOpsOutput.builder().ops(newOps.build()).inputMetadata(inputMetadataBuilder.build()).build();
+        return ImmutableOpsOutput.builder()
+                .ops(newOps.build())
+                .inputMetadata(inputMetadataBuilder.build())
+                .build();
     }
 
     private static boolean isNonNlsComment(Input.Tok tokAfter) {

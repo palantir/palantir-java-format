@@ -114,7 +114,11 @@ public abstract class State {
      * not commit to the indent just yet though, so lastIndent stays the same.
      */
     State withIndentIncrementedBy(Indent plusIndent) {
-        return builder().from(this).indent(indent() + plusIndent.eval(this)).mustBreak(false).build();
+        return builder()
+                .from(this)
+                .indent(indent() + plusIndent.eval(this))
+                .mustBreak(false)
+                .build();
     }
 
     /** Reset any accumulated indent to the same value as {@code lastIndent}. */
@@ -177,15 +181,24 @@ public abstract class State {
     }
 
     State withNewBranch() {
-        return builder().from(this).branchingCoefficient(branchingCoefficient() + 1).build();
+        return builder()
+                .from(this)
+                .branchingCoefficient(branchingCoefficient() + 1)
+                .build();
     }
 
     State withLevelState(Level level, LevelState levelState) {
-        return builder().from(this).levelStates(levelStates().set(level, levelState)).build();
+        return builder()
+                .from(this)
+                .levelStates(levelStates().set(level, levelState))
+                .build();
     }
 
     State withTokState(Comment comment, TokState tokState) {
-        return builder().from(this).tokStates(tokStates().set(comment, tokState)).build();
+        return builder()
+                .from(this)
+                .tokStates(tokStates().set(comment, tokState))
+                .build();
     }
 
     public static class Builder extends ImmutableState.Builder {}

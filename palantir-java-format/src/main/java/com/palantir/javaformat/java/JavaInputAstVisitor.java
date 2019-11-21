@@ -2403,7 +2403,9 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             for (DirectiveTree directiveTree : node.getDirectives()) {
                 markForPartialFormat();
                 builder.blankLineWanted(
-                        previousDirective.map(k -> !k.equals(directiveTree.getKind())).orElse(false)
+                        previousDirective
+                                        .map(k -> !k.equals(directiveTree.getKind()))
+                                        .orElse(false)
                                 ? BlankLineWanted.YES
                                 : BlankLineWanted.NO);
                 builder.forcedBreak();

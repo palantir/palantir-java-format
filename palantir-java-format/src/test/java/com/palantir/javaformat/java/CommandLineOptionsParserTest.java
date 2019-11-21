@@ -71,12 +71,14 @@ public class CommandLineOptionsParserTest {
 
     @Test
     public void aosp() {
-        assertThat(CommandLineOptionsParser.parse(Arrays.asList("-aosp")).aosp()).isTrue();
+        assertThat(CommandLineOptionsParser.parse(Arrays.asList("-aosp")).aosp())
+                .isTrue();
     }
 
     @Test
     public void help() {
-        assertThat(CommandLineOptionsParser.parse(Arrays.asList("-help")).help()).isTrue();
+        assertThat(CommandLineOptionsParser.parse(Arrays.asList("-help")).help())
+                .isTrue();
     }
 
     @Test
@@ -104,17 +106,20 @@ public class CommandLineOptionsParserTest {
 
     @Test
     public void inPlace() {
-        assertThat(CommandLineOptionsParser.parse(Arrays.asList("-i", "A.java")).inPlace()).isTrue();
+        assertThat(CommandLineOptionsParser.parse(Arrays.asList("-i", "A.java")).inPlace())
+                .isTrue();
     }
 
     @Test
     public void version() {
-        assertThat(CommandLineOptionsParser.parse(Arrays.asList("-v")).version()).isTrue();
+        assertThat(CommandLineOptionsParser.parse(Arrays.asList("-v")).version())
+                .isTrue();
     }
 
     @Test
     public void skipSortingImports() {
-        assertThat(CommandLineOptionsParser.parse(Arrays.asList("--skip-sorting-imports")).sortImports()).isFalse();
+        assertThat(CommandLineOptionsParser.parse(Arrays.asList("--skip-sorting-imports")).sortImports())
+                .isFalse();
     }
 
     @Test
@@ -126,13 +131,15 @@ public class CommandLineOptionsParserTest {
 
     @Test
     public void dryRun() {
-        assertThat(CommandLineOptionsParser.parse(Arrays.asList("--dry-run")).dryRun()).isTrue();
+        assertThat(CommandLineOptionsParser.parse(Arrays.asList("--dry-run")).dryRun())
+                .isTrue();
         assertThat(CommandLineOptionsParser.parse(Arrays.asList("-n")).dryRun()).isTrue();
     }
 
     @Test
     public void setExitIfChanged() {
-        assertThat(CommandLineOptionsParser.parse(Arrays.asList("--set-exit-if-changed")).setExitIfChanged()).isTrue();
+        assertThat(CommandLineOptionsParser.parse(Arrays.asList("--set-exit-if-changed")).setExitIfChanged())
+                .isTrue();
     }
 
     // TODO(cushon): consider handling this in the parser and reporting a more detailed error
@@ -166,7 +173,8 @@ public class CommandLineOptionsParserTest {
     public void assumeFilename() {
         assertThat(CommandLineOptionsParser.parse(Arrays.asList("--assume-filename", "Foo.java")).assumeFilename())
                 .hasValue("Foo.java");
-        assertThat(CommandLineOptionsParser.parse(Arrays.asList("Foo.java")).assumeFilename()).isEmpty();
+        assertThat(CommandLineOptionsParser.parse(Arrays.asList("Foo.java")).assumeFilename())
+                .isEmpty();
     }
 
     @Test

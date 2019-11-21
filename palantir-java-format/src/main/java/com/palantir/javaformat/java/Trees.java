@@ -56,7 +56,8 @@ class Trees {
         } catch (IOException e) {
             throw new IOError(e);
         }
-        return source.subSequence(getStartPosition(node), getEndPosition(node, path)).toString();
+        return source.subSequence(getStartPosition(node), getEndPosition(node, path))
+                .toString();
     }
 
     /** Returns the simple name of a (possibly qualified) method invocation expression. */
