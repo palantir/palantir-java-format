@@ -2,12 +2,40 @@
     white-space: pre; font-family: monospace; line-height: 1em;
 }
 
-.App .doc-level {
+.TreeDoc .doc-level {
     margin-left: 20px;
 }
 
-.App .doc-level:hover {
-    outline: 1px solid black;
+.InlineDoc .doc-level {
+    background: hsla(0, 40%, 50%, 0.1);
+    outline: 2px solid hsla(0, 40%, 0%, 0.3);
+}
+
+/* TreeDoc */
+
+.TreeDoc {
+    width: 1600px;
+}
+
+.TreeDoc .doc-level {
+    outline: 1px dotted lightgrey;
+}
+
+.TreeDoc .doc-level:hover {
+    outline: 1px solid grey;
+}
+
+.TreeDoc .doc-level:hover > .highlight {
+    background-color: hsl(120, 61%, 80%);
+}
+
+.TreeDoc .doc-break {
+    background: hsl(0, 60%, 90%);
+}
+
+/** these are breaks being referenced by a conditional indent when you hover over it */
+.TreeDoc .doc-break.referenced {
+    background: hsl(60, 100%, 78%);
 }
 
 .Ops span.token:hover {

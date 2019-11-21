@@ -54,6 +54,7 @@ public final class JsonDocVisitor implements DocVisitor<JsonNode> {
                 .put("flat", doc.getFlat())
                 .<ObjectNode>set("breakState", MAPPER.valueToTree(state.getBreakState(doc)))
                 .<ObjectNode>set("plusIndent", MAPPER.valueToTree(doc.plusIndent()))
+                .<ObjectNode>set("optTag", MAPPER.valueToTree(doc.optTag()))
                 .put("evalPlusIndent", doc.evalPlusIndent(state));
     }
 
@@ -64,7 +65,6 @@ public final class JsonDocVisitor implements DocVisitor<JsonNode> {
         node.put("flat", level.getFlat());
         node.set("openOp", MAPPER.valueToTree(level.getOpenOp()));
         node.put("isOneLine", state.isOneLine(level));
-        node.set("plusIndent", MAPPER.valueToTree(level.getPlusIndent()));
         node.put("evalPlusIndent", level.getPlusIndent().eval(state));
         node.set("docs", MAPPER.valueToTree(level.getDocs().stream().map(this::visit)));
         return node;
