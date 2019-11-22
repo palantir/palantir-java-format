@@ -11,7 +11,8 @@
     "react-dom": "^16.11.0",
     "react-scripts": "3.2.0",
     "typescript": "3.7.2",
-    "@blueprintjs/core": "^3.20.0"
+    "@blueprintjs/core": "^3.20.0",
+    "react-treebeard": "^3.2.4"
   },
   "scripts": {
     "start": "react-scripts start",

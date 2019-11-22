@@ -1,6 +1,8 @@
 import React, { CSSProperties } from 'react';
 import './App.css';
-import { Callout, Classes, H1, ITreeNode, Pre, Tag, Toaster, Tooltip, Tree } from "@blueprintjs/core";
+import { Callout, Classes, H1, Pre, Tag, Toaster, Tooltip } from "@blueprintjs/core";
+// @ts-ignore
+import { Treebeard } from 'react-treebeard';
 
 interface DebugData {
     javaInput: string,
@@ -82,7 +84,7 @@ const App: React.FC<Props> = ({debugData}) => {
             <H1>Doc</H1>
             <TreeDocComponent doc={debugData.doc}/>
             <H1>Exploration</H1>
-            <DecisionTree formatterDecisions={debugData.formatterDecisions}/>
+            <TreeAndDoc formatterDecisions={debugData.formatterDecisions} doc={debugData.doc}/>
             <H1>javaOutput</H1>
             <Pre>{debugData.javaOutput}</Pre>
         </div>
@@ -255,76 +257,104 @@ const Ops: React.FC<{ops: Array<Op>}> = ({ops}) => {
 };
 
 export interface ITreeState {
-    nodes: ITreeNode[];
+    nodes: TreeNode[];
 }
 
+/** Treebeard doesn't have typescript bindings, so have to manually specify them. */
+interface TreeNode {
+    id?: string,
+    name: JSX.Element | string,
+    children?: Array<TreeNode>,
+    toggled?: boolean,
+    active?: boolean,
+    loading?: boolean,
+}
+
+const TreeAndDoc: React.FC<{ formatterDecisions: FormatterDecisions, doc: Doc }> = props => {
+    return <div className={"TreeAndDoc"}>
+        <DecisionTree formatterDecisions={props.formatterDecisions}/>
+        <InlineDocComponent doc={props.doc}/>
+    </div>
+};
+
+
+
 export class DecisionTree extends React.Component<{ formatterDecisions: FormatterDecisions }, ITreeState> {
-    public state: ITreeState = { nodes: DecisionTree.createExplorationNode(this.props.formatterDecisions).childNodes!! };
+    public state: ITreeState = { nodes: DecisionTree.createExplorationNode(this.props.formatterDecisions).children!! };
     private static toaster = Toaster.create();
 
+    private static readonly duration = 50;
+    /** Default TreeBeard animations are too slow (300), sadly have to reimplement this to get a shorter duration. */
+    static Animations = {
+        toggle: function(_ref: {node: { toggled: boolean }}): { duration: number; animation: { rotateZ: number } } {
+            const toggled = _ref.node.toggled;
+            const duration = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : DecisionTree.duration;
+            return {
+                animation: {
+                    rotateZ: toggled ? 90 : 0
+                },
+                duration: duration
+            };
+        },
+        drawer: function() {
+            return (
+                /* props */
+                {
+                    enter: {
+                        animation: 'slideDown',
+                        duration: DecisionTree.duration
+                    },
+                    leave: {
+                        animation: 'slideUp',
+                        duration: DecisionTree.duration
+                    }
+                }
+            );
+        }
+    };
+
     public render() {
-        return <Tree
-            contents={this.state.nodes}
-            onNodeClick={this.handleNodeClick}
-            onNodeCollapse={this.handleNodeCollapse}
-            onNodeExpand={this.handleNodeExpand}
-            className={Classes.ELEVATION_0}
-        />;
+        return <div className={`${Classes.ELEVATION_0} DecisionTree`}>
+            <Treebeard
+                data={this.state.nodes}
+                onToggle={this.onToggle}
+                animations={DecisionTree.Animations}
+            />
+        </div>;
     }
 
-    private static createExplorationNode(node: ExplorationNode, parent?: LevelNode): ITreeNode {
+    private static createExplorationNode(node: ExplorationNode, parent?: LevelNode): TreeNode {
+        const onAcceptedPath = !parent || parent.acceptedExplorationId === node.id;
         return {
-            id: node.id,
-            childNodes: node.children.map(DecisionTree.createLevelNode),
-            label: <Tooltip content={node.id.toString()}>{node.humanDescription}</Tooltip>,
-            isExpanded: !parent || parent.acceptedExplorationId === node.id,
+            id: node.id.toString(),
+            children: node.children.length > 0
+                ? node.children.map(child => DecisionTree.createLevelNode(child, onAcceptedPath))
+                : undefined,
+            name: <Tooltip content={node.id.toString()}>{node.humanDescription}</Tooltip>,
+            toggled: onAcceptedPath,
+            active: onAcceptedPath,
         };
     }
 
-    private static createLevelNode(node: LevelNode): ITreeNode {
+    private static createLevelNode(node: LevelNode, parentAccepted: boolean): TreeNode {
         return {
-            id: node.id,
-            childNodes: node.children.length > 0
-                    ? node.children.map(child => DecisionTree.createExplorationNode(child, node))
-                    : undefined,
-            label: (
+            id: node.id.toString(),
+            children: node.children.length > 0
+                ? node.children.map(child => DecisionTree.createExplorationNode(child, node))
+                : undefined,
+            name: (
                 <Tooltip content={node.id.toString()}>{node.debugName || node.id}</Tooltip>
             ),
             // secondaryLabel: node.toString,
-            isExpanded: true,
+            toggled: true,
+            active: parentAccepted,
         };
     }
 
-    private handleNodeClick = (nodeData: ITreeNode, nodePath: number[], e: React.MouseEvent<HTMLElement>) => {
-        DecisionTree.toaster.show({message: `Clicked on ${nodePath}`});
-        const originallyExpanded = nodeData.isExpanded;
-        nodeData.isExpanded = originallyExpanded == null ? true : !originallyExpanded;
+    private onToggle = (nodeData: TreeNode, toggled: boolean) => {
+        nodeData.toggled = toggled;
         this.setState(this.state);
     };
-
-    private handleNodeCollapse = (nodeData: ITreeNode) => {
-        nodeData.isExpanded = false;
-        this.setState(this.state);
-    };
-
-    private handleNodeExpand = (nodeData: ITreeNode) => {
-        nodeData.isExpanded = true;
-        this.setState(this.state);
-    };
-
-    private forEachNode(nodes: ITreeNode[], callback: (node: ITreeNode) => void) {
-        if (nodes == null) {
-            return;
-        }
-
-        for (const node of nodes) {
-            callback(node);
-            if (node.childNodes === undefined) {
-                return;
-            }
-            this.forEachNode(node.childNodes, callback);
-        }
-    }
 }
 
 function backgroundColor(item: HasId): CSSProperties {

@@ -47,6 +47,21 @@
     display: none;
 }
 
+/* DecisionTree */
+
+.TreeAndDoc {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.TreeAndDoc > * {
+    flex-grow: 1;
+    flex-basis: 50%;
+}
+
+/* Ops */
+
 .Ops span.token:hover {
     outline: 1px solid black;
 }
