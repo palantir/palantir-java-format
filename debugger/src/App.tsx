@@ -1,8 +1,7 @@
-import React, { CSSProperties } from 'react';
+import React, { CSSProperties, MouseEvent } from 'react';
 import './App.css';
 import { Callout, Classes, H1, Pre, Tag, Toaster, Tooltip } from "@blueprintjs/core";
-// @ts-ignore
-import { Treebeard } from 'react-treebeard';
+import { decorators as TreebeardDecorators, Treebeard } from 'react-treebeard';
 
 interface DebugData {
     javaInput: string,
@@ -278,7 +277,6 @@ const TreeAndDoc: React.FC<{ formatterDecisions: FormatterDecisions, doc: Doc }>
 };
 
 
-
 export class DecisionTree extends React.Component<{ formatterDecisions: FormatterDecisions }, ITreeState> {
     public state: ITreeState = { nodes: DecisionTree.createExplorationNode(this.props.formatterDecisions).children!! };
     private static toaster = Toaster.create();
@@ -318,7 +316,11 @@ export class DecisionTree extends React.Component<{ formatterDecisions: Formatte
             <Treebeard
                 data={this.state.nodes}
                 onToggle={this.onToggle}
+                // TODO these don't propagate to children elements like the DecisionTree.Container
+                // onMouseEnter={this.onMouseEnter}
+                // onMouseLeave={this.onMouseLeave}
                 animations={DecisionTree.Animations}
+                decorators={DecisionTree.Decorators}
             />
         </div>;
     }
@@ -355,6 +357,35 @@ export class DecisionTree extends React.Component<{ formatterDecisions: Formatte
         nodeData.toggled = toggled;
         this.setState(this.state);
     };
+
+    private onMouseEnter = (nodeData: TreeNode, e: MouseEvent) => {
+        // TODO
+    };
+
+    private onMouseLeave = (nodeData: TreeNode, e: MouseEvent) => {
+        // TODO
+    };
+
+    static Container = class extends TreebeardDecorators.Container {
+        render() {
+            const {style, decorators, terminal, onClick, node} = this.props;
+            return (
+                <div
+                    onClick={onClick}
+                    style={node.active ? {...style.container} : {...style.link}}
+                    // onMouseEnter={e => onMouseEnter(node, e)}
+                    // onMouseLeave={e => onMouseLeave(node, e)}
+                >
+                    {!terminal ? this.renderToggle() : null}
+                    <decorators.Header node={node} style={style.header}/>
+                </div>
+            );
+        }
+    };
+
+    static Decorators = Object.assign({}, TreebeardDecorators, {
+        Container: DecisionTree.Container
+    });
 }
 
 function backgroundColor(item: HasId): CSSProperties {
