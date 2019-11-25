@@ -60,7 +60,12 @@ public abstract class Break extends Doc implements Op {
      * @return the new {@code Break}
      */
     public static Break make(FillMode fillMode, String flat, Indent plusIndent, Optional<BreakTag> optTag) {
-        return builder().fillMode(fillMode).flat(flat).plusIndent(plusIndent).optTag(optTag).build();
+        return builder()
+                .fillMode(fillMode)
+                .flat(flat)
+                .plusIndent(plusIndent)
+                .optTag(optTag)
+                .build();
     }
 
     /**
@@ -69,7 +74,11 @@ public abstract class Break extends Doc implements Op {
      * @return the new forced {@code Break}
      */
     public static Break makeForced() {
-        return builder().fillMode(FillMode.FORCED).flat("").plusIndent(Indent.Const.ZERO).build();
+        return builder()
+                .fillMode(FillMode.FORCED)
+                .flat("")
+                .plusIndent(Indent.Const.ZERO)
+                .build();
     }
 
     /**

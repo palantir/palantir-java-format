@@ -468,7 +468,6 @@
             <property name="format" value="^_?[a-z][a-zA-Z0-9]+$"/>
             <message key="name.invalidPattern" value="Parameter name ''{0}'' must match pattern ''{1}''."/>
         </module>
-        <module name="SingleLineJavadoc"/> <!-- Java Style Guide: General form -->
         <module name="SummaryJavadocCheck"> <!-- Java Coding Guidelines: Javadoc -->
             <property name="forbiddenSummaryFragments" value="^@return the *|^This method returns |^A [{]@code [a-zA-Z0-9]+[}]( is a )"/>
         </module>

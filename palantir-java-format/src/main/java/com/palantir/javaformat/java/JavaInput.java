@@ -561,8 +561,10 @@ public final class JavaInput extends Input {
             // 0 stands for "format the line under the cursor"
             length = 1;
         }
-        ImmutableCollection<Token> enclosed =
-                getPositionTokenMap().subRangeMap(Range.closedOpen(offset, offset + length)).asMapOfRanges().values();
+        ImmutableCollection<Token> enclosed = getPositionTokenMap()
+                .subRangeMap(Range.closedOpen(offset, offset + length))
+                .asMapOfRanges()
+                .values();
         if (enclosed.isEmpty()) {
             return EMPTY_RANGE;
         }
@@ -611,7 +613,10 @@ public final class JavaInput extends Input {
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this).add("tokens", tokens).add("super", super.toString()).toString();
+        return MoreObjects.toStringHelper(this)
+                .add("tokens", tokens)
+                .add("super", super.toString())
+                .toString();
     }
 
     private JCCompilationUnit unit;
