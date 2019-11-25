@@ -93,8 +93,7 @@ public abstract class State {
 
     String getTokText(Comment comment) {
         return Preconditions.checkNotNull(
-                        tokStates().get(comment).toNull(), "Expected Tok state to exist for: %s",
-                comment)
+                        tokStates().get(comment).toNull(), "Expected Tok state to exist for: %s", comment)
                 .text();
     }
 

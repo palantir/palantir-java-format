@@ -49,8 +49,8 @@ public abstract class BreakBehaviour {
     static class Json extends JsonSerializer<BreakBehaviour> {
 
         @Override
-        public void serialize(
-                BreakBehaviour value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+        public void serialize(BreakBehaviour value, JsonGenerator gen, SerializerProvider serializers)
+                throws IOException {
             gen.writeStartObject();
             BreakBehaviours.caseOf(value)
                     .breakThisLevel(() -> {

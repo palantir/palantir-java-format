@@ -191,8 +191,8 @@ public final class Level extends Doc {
 
         @Override
         public State breakOnlyIfInnerLevelsThenFitOnOneLine(boolean keepIndentWhenInlined) {
-            Obs.Exploration broken =
-                    levelNode.explore("breaking normally", explorationNode -> breakNormally(this.state, explorationNode));
+            Obs.Exploration broken = levelNode.explore(
+                    "breaking normally", explorationNode -> breakNormally(this.state, explorationNode));
 
             Optional<Obs.Exploration> maybeInlined = levelNode.maybeExplore(
                     "handleBreakOnlyIfInnerLevelsThenFitOnOneLine", (explorationNode) ->

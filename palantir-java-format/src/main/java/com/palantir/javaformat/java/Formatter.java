@@ -163,8 +163,8 @@ public final class Formatter {
 
         Sink sink = new JsonSink();
         Obs.ExplorationNode observationNode = Obs.createRoot(sink);
-        State finalState = doc.computeBreaks(commentsHelper, options.maxLineLength(), State.startingState(),
-                observationNode);
+        State finalState =
+                doc.computeBreaks(commentsHelper, options.maxLineLength(), State.startingState(), observationNode);
 
         JavaOutput javaOutput = new JavaOutput(javaInput, opsOutput.inputMetadata());
         doc.write(finalState, javaOutput);

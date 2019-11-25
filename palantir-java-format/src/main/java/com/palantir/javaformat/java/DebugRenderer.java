@@ -55,7 +55,7 @@ public class DebugRenderer {
 
         String javascript = String.format(
                 "window.palantirJavaFormat = {\njavaInput: %s,\nops: %s,\ndoc: %s,\njavaOutput: %s,\n"
-                + "formatterDecisions: %s\n};\n",
+                        + "formatterDecisions: %s\n};\n",
                 jsonEscapedString(javaInput.getText()),
                 opsJson(opsOutput),
                 new JsonDocVisitor(finalState).visit(doc),

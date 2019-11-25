@@ -63,8 +63,7 @@ public final class HtmlDocVisitor implements DocVisitor<String> {
         StringBuilder builder = new StringBuilder();
         String titleStr = computeTitle(level, state);
         builder.append(String.format(
-                "<span class=\"level\" style=\"%s\" title=\"%s\">",
-                DebugRenderer.backgroundColor(level), titleStr));
+                "<span class=\"level\" style=\"%s\" title=\"%s\">", DebugRenderer.backgroundColor(level), titleStr));
 
         // References break tag
 
