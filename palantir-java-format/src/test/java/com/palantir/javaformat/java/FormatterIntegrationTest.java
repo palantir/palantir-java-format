@@ -50,6 +50,18 @@ public class FormatterIntegrationTest {
         this.separator = isRecreate() ? null : Newlines.getLineEnding(expected);
     }
 
+    /**
+     * If enabled, then {@link DebugRenderer} will produce an output at {@link DebugRenderer#getOutputFile()}. This can
+     * then be viewed in a browser by running the following once (after which it will auto-reload whenever the debug
+     * output file changes):
+     *
+     * <pre>
+     * cd debugger
+     * yarn start
+     * </pre>
+     *
+     * <p>Warning: don't turn this on for all tests. The debugger will always write to the same file.
+     */
     private static boolean isDebugMode() {
         return Boolean.getBoolean("debugOutput");
     }

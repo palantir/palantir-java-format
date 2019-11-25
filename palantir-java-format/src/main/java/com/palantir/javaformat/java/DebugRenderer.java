@@ -44,6 +44,11 @@ import java.util.stream.Collectors;
 
 public class DebugRenderer {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static Path publicDir = Paths.get("../debugger/public");
+
+    static Path getOutputFile() {
+        return publicDir.resolve("output.js");
+    }
 
     static void render(
             JavaInput javaInput,
@@ -62,9 +67,8 @@ public class DebugRenderer {
                 jsonEscapedString(outputAsString(javaOutput)),
                 formatterDecisionsJson);
 
-        Path publicDir = Paths.get("../debugger/public");
         try {
-            Files.write(publicDir.resolve("output.js"), javascript.getBytes(StandardCharsets.UTF_8));
+            Files.write(getOutputFile(), javascript.getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
