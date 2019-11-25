@@ -26,27 +26,38 @@ import org.junit.jupiter.api.Test;
 public class NewlinesTest {
     @Test
     public void offsets() {
-        Truth.assertThat(ImmutableList.copyOf(Newlines.lineOffsetIterator("foo\nbar\n"))).containsExactly(0, 4, 8);
-        Truth.assertThat(ImmutableList.copyOf(Newlines.lineOffsetIterator("foo\nbar"))).containsExactly(0, 4);
+        Truth.assertThat(ImmutableList.copyOf(Newlines.lineOffsetIterator("foo\nbar\n")))
+                .containsExactly(0, 4, 8);
+        Truth.assertThat(ImmutableList.copyOf(Newlines.lineOffsetIterator("foo\nbar")))
+                .containsExactly(0, 4);
 
-        Truth.assertThat(ImmutableList.copyOf(Newlines.lineOffsetIterator("foo\rbar\r"))).containsExactly(0, 4, 8);
-        Truth.assertThat(ImmutableList.copyOf(Newlines.lineOffsetIterator("foo\rbar"))).containsExactly(0, 4);
+        Truth.assertThat(ImmutableList.copyOf(Newlines.lineOffsetIterator("foo\rbar\r")))
+                .containsExactly(0, 4, 8);
+        Truth.assertThat(ImmutableList.copyOf(Newlines.lineOffsetIterator("foo\rbar")))
+                .containsExactly(0, 4);
 
-        Truth.assertThat(ImmutableList.copyOf(Newlines.lineOffsetIterator("foo\r\nbar\r\n"))).containsExactly(0, 5, 10);
-        Truth.assertThat(ImmutableList.copyOf(Newlines.lineOffsetIterator("foo\r\nbar"))).containsExactly(0, 5);
+        Truth.assertThat(ImmutableList.copyOf(Newlines.lineOffsetIterator("foo\r\nbar\r\n")))
+                .containsExactly(0, 5, 10);
+        Truth.assertThat(ImmutableList.copyOf(Newlines.lineOffsetIterator("foo\r\nbar")))
+                .containsExactly(0, 5);
     }
 
     @Test
     public void lines() {
-        Truth.assertThat(ImmutableList.copyOf(Newlines.lineIterator("foo\nbar\n"))).containsExactly("foo\n", "bar\n");
-        Truth.assertThat(ImmutableList.copyOf(Newlines.lineIterator("foo\nbar"))).containsExactly("foo\n", "bar");
+        Truth.assertThat(ImmutableList.copyOf(Newlines.lineIterator("foo\nbar\n")))
+                .containsExactly("foo\n", "bar\n");
+        Truth.assertThat(ImmutableList.copyOf(Newlines.lineIterator("foo\nbar")))
+                .containsExactly("foo\n", "bar");
 
-        Truth.assertThat(ImmutableList.copyOf(Newlines.lineIterator("foo\rbar\r"))).containsExactly("foo\r", "bar\r");
-        Truth.assertThat(ImmutableList.copyOf(Newlines.lineIterator("foo\rbar"))).containsExactly("foo\r", "bar");
+        Truth.assertThat(ImmutableList.copyOf(Newlines.lineIterator("foo\rbar\r")))
+                .containsExactly("foo\r", "bar\r");
+        Truth.assertThat(ImmutableList.copyOf(Newlines.lineIterator("foo\rbar")))
+                .containsExactly("foo\r", "bar");
 
         Truth.assertThat(ImmutableList.copyOf(Newlines.lineIterator("foo\r\nbar\r\n")))
                 .containsExactly("foo\r\n", "bar\r\n");
-        Truth.assertThat(ImmutableList.copyOf(Newlines.lineIterator("foo\r\nbar"))).containsExactly("foo\r\n", "bar");
+        Truth.assertThat(ImmutableList.copyOf(Newlines.lineIterator("foo\r\nbar")))
+                .containsExactly("foo\r\n", "bar");
     }
 
     @Test

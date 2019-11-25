@@ -103,7 +103,9 @@ public class MainTest {
     @Test
     public void testMain() throws Exception {
         Process process = new ProcessBuilder(ImmutableList.of(
-                        Paths.get(System.getProperty("java.home")).resolve("bin/java").toString(),
+                        Paths.get(System.getProperty("java.home"))
+                                .resolve("bin/java")
+                                .toString(),
                         "-cp",
                         System.getProperty("java.class.path"),
                         Main.class.getName()))
@@ -400,7 +402,9 @@ public class MainTest {
         Path path = Files.createFile(testFolder.resolve("Test.java"));
         Files.write(path, "class Test {\n}\n".getBytes(UTF_8));
         Process process = new ProcessBuilder(ImmutableList.of(
-                        Paths.get(System.getProperty("java.home")).resolve("bin/java").toString(),
+                        Paths.get(System.getProperty("java.home"))
+                                .resolve("bin/java")
+                                .toString(),
                         "-cp",
                         System.getProperty("java.class.path"),
                         Main.class.getName(),
@@ -423,7 +427,9 @@ public class MainTest {
         Path path = Files.createFile(testFolder.resolve("Test.java"));
         Files.write(path, "class Test {\n}\n".getBytes(UTF_8));
         Process process = new ProcessBuilder(ImmutableList.of(
-                        Paths.get(System.getProperty("java.home")).resolve("bin/java").toString(),
+                        Paths.get(System.getProperty("java.home"))
+                                .resolve("bin/java")
+                                .toString(),
                         "-cp",
                         System.getProperty("java.class.path"),
                         Main.class.getName(),
