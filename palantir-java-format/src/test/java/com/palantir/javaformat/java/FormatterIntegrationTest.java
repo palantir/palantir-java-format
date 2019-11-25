@@ -50,6 +50,10 @@ public class FormatterIntegrationTest {
         this.separator = isRecreate() ? null : Newlines.getLineEnding(expected);
     }
 
+    private static boolean isDebugMode() {
+        return Boolean.getBoolean("debugOutput");
+    }
+
     @TestTemplate
     public void format() {
         try {
@@ -65,8 +69,8 @@ public class FormatterIntegrationTest {
     }
 
     private static Formatter createFormatter() {
-        return Formatter.createFormatter(
-                JavaFormatterOptions.builder().style(JavaFormatterOptions.Style.PALANTIR).build());
+        return new Formatter(
+                JavaFormatterOptions.builder().style(JavaFormatterOptions.Style.PALANTIR).build(), isDebugMode());
     }
 
     @TestTemplate

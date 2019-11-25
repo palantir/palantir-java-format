@@ -16,6 +16,7 @@ package com.palantir.javaformat.java;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Range;
@@ -32,6 +33,7 @@ import com.palantir.javaformat.Utils;
 import com.palantir.javaformat.doc.Doc;
 import com.palantir.javaformat.doc.DocBuilder;
 import com.palantir.javaformat.doc.Level;
+import com.palantir.javaformat.doc.NoopSink;
 import com.palantir.javaformat.doc.Obs;
 import com.palantir.javaformat.doc.Obs.Sink;
 import com.palantir.javaformat.doc.State;
@@ -90,18 +92,21 @@ public final class Formatter {
     static final Range<Integer> EMPTY_RANGE = Range.closedOpen(-1, -1);
 
     private final JavaFormatterOptions options;
+    private final boolean debugMode;
 
-    private Formatter(JavaFormatterOptions options) {
+    @VisibleForTesting
+    Formatter(JavaFormatterOptions options, boolean debugMode) {
         this.options = options;
+        this.debugMode = debugMode;
     }
 
     /** A new Formatter instance with default options. */
     public static Formatter create() {
-        return new Formatter(JavaFormatterOptions.defaultOptions());
+        return new Formatter(JavaFormatterOptions.defaultOptions(), false);
     }
 
     public static Formatter createFormatter(JavaFormatterOptions options) {
-        return new Formatter(options);
+        return new Formatter(options, false);
     }
 
     /**
@@ -111,9 +116,11 @@ public final class Formatter {
      * @param javaInput the input, a Java compilation unit
      * @param options the {@link JavaFormatterOptions}
      * @param commentsHelper the {@link CommentsHelper}, used to rewrite comments
+     * @param debugMode whether to produce debugging output via {@link DebugRenderer}
      * @return javaOutput the output produced
      */
-    static JavaOutput format(final JavaInput javaInput, JavaFormatterOptions options, CommentsHelper commentsHelper)
+    static JavaOutput format(
+            final JavaInput javaInput, JavaFormatterOptions options, CommentsHelper commentsHelper, boolean debugMode)
             throws FormatterException {
 
         Context context = new Context();
@@ -161,7 +168,9 @@ public final class Formatter {
 
         Level doc = new DocBuilder().withOps(opsOutput.ops()).build();
 
-        Sink sink = new JsonSink();
+        // Don't even allocate all those JSON nodes if we're not going to write it out
+        Sink sink = debugMode ? new JsonSink() : new NoopSink();
+
         Obs.ExplorationNode observationNode = Obs.createRoot(sink);
         State finalState =
                 doc.computeBreaks(commentsHelper, options.maxLineLength(), State.startingState(), observationNode);
@@ -170,7 +179,9 @@ public final class Formatter {
         doc.write(finalState, javaOutput);
         javaOutput.flush();
 
-        DebugRenderer.render(javaInput, opsOutput, doc, finalState, javaOutput, sink.getOutput());
+        if (debugMode) {
+            DebugRenderer.render(javaInput, opsOutput, doc, finalState, javaOutput, sink.getOutput());
+        }
         return javaOutput;
     }
 
@@ -265,7 +276,7 @@ public final class Formatter {
         JavaCommentsHelper commentsHelper = new JavaCommentsHelper(javaInput.getLineSeparator(), options);
         JavaOutput javaOutput;
         try {
-            javaOutput = format(javaInput, options, commentsHelper);
+            javaOutput = format(javaInput, options, commentsHelper, debugMode);
         } catch (FormattingError e) {
             throw new FormatterException(e.diagnostics());
         }
