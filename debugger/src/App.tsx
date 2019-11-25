@@ -322,9 +322,6 @@ export class DecisionTree extends React.Component<{ formatterDecisions: Formatte
             <Treebeard
                 data={this.state.nodes}
                 onToggle={this.onToggle}
-                // TODO these don't propagate to children elements like the DecisionTree.Container
-                // onMouseEnter={this.onMouseEnter}
-                // onMouseLeave={this.onMouseLeave}
                 animations={DecisionTree.Animations}
                 decorators={this.Decorators}
             />
