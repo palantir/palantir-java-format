@@ -53,7 +53,7 @@ type ExplorationNode = {
     type: "exploration", parentId?: Id, id: Id, humanDescription: string, children: ReadonlyArray<LevelNode> };
 type LevelNode = {
     type: "level", id: Id, parentId: Id, debugName?: string, flat: string, toString: string, acceptedExplorationId: Id,
-    children: ReadonlyArray<ExplorationNode>
+    levelId: Id, children: ReadonlyArray<ExplorationNode>,
 };
 
 type FormatterDecisions = ExplorationNode;
@@ -97,24 +97,28 @@ const InlineDocComponent: React.FC<{doc: Doc}> = ({doc}) => {
             case "break":
                 // TODO add breakToken in here
                 if (doc.breakState.broken) {
-                    return <span className={"doc doc-break taken"}><br/>{' '.repeat(doc.breakState.newIndent)}</span>;
+                    return <span className={"doc doc-break taken highlight"}><br/>{' '.repeat(doc.breakState.newIndent)}</span>;
                 } else {
-                    return <span className={"doc doc-break"}>{doc.flat}</span>
+                    return <span className={"doc doc-break highlight"}>{doc.flat}</span>
                 }
             case "level":
                 // TODO other information about the doc
-                return <span className={"doc doc-level"}>
+                return <span className={`doc doc-level ${classForLevelId(doc.id)}`}>
                     {doc.docs.map(renderDoc)}
                 </span>;
             case "comment":
                 // TODO maybe display original on hover?
-                return <span className={"doc doc-comment"}>{doc.text}</span>;
+                return <span className={"doc doc-comment highlight"}>{doc.text}</span>;
             case "space":
-                return <span className={"doc doc-space"}>&nbsp;</span>;
+                return <span className={"doc doc-space highlight"}>&nbsp;</span>;
             case "token":
-                return <span className="doc-token">{doc.flat}</span>;
+                return <span className={"doc-token highlight"}>{doc.flat}</span>;
 
         }
+    }
+
+    function classForLevelId(id: Id) {
+        return `doc-level-${id}`;
     }
 
     return (
@@ -169,7 +173,7 @@ const TreeDocComponent: React.FC<{doc: Doc}> = ({doc}) => {
         }
     }
 
-    function classForBreakTagId(id: number) {
+    function classForBreakTagId(id: Id) {
         return `break-tag-${id}`;
     }
 
@@ -267,6 +271,8 @@ interface TreeNode {
     toggled?: boolean,
     active?: boolean,
     loading?: boolean,
+    // Custom
+    levelId?: Id,
 }
 
 const TreeAndDoc: React.FC<{ formatterDecisions: FormatterDecisions, doc: Doc }> = props => {
@@ -320,7 +326,7 @@ export class DecisionTree extends React.Component<{ formatterDecisions: Formatte
                 // onMouseEnter={this.onMouseEnter}
                 // onMouseLeave={this.onMouseLeave}
                 animations={DecisionTree.Animations}
-                decorators={DecisionTree.Decorators}
+                decorators={this.Decorators}
             />
         </div>;
     }
@@ -350,6 +356,7 @@ export class DecisionTree extends React.Component<{ formatterDecisions: Formatte
             // secondaryLabel: node.toString,
             toggled: true,
             active: parentAccepted,
+            levelId: node.levelId,
         };
     }
 
@@ -358,23 +365,46 @@ export class DecisionTree extends React.Component<{ formatterDecisions: Formatte
         this.setState(this.state);
     };
 
+    private static highlightBreaksForBreakTag(id: Id, highlight: boolean) {
+        // console.log("getting elements for class", (DecisionTree.classForLevelId(id)));
+        const nodes = document.getElementsByClassName(DecisionTree.classForLevelId(id));
+        // @ts-ignore
+        for (let item of nodes) {
+            if (highlight) {
+                item.classList.add('referenced')
+            } else {
+                item.classList.remove('referenced')
+            }
+        }
+    }
+
+    /** TODO this has to match the method on {@link InlineDocComponent} */
+    private static classForLevelId(id: Id): string {
+        return `doc-level-${id}`;
+    }
+
     private onMouseEnter = (nodeData: TreeNode, e: MouseEvent) => {
-        // TODO
+        if (nodeData.levelId !== undefined) {
+            DecisionTree.highlightBreaksForBreakTag(nodeData.levelId, true)
+        }
     };
 
     private onMouseLeave = (nodeData: TreeNode, e: MouseEvent) => {
-        // TODO
+        if (nodeData.levelId !== undefined) {
+            DecisionTree.highlightBreaksForBreakTag(nodeData.levelId, false)
+        }
     };
 
-    static Container = class extends TreebeardDecorators.Container {
+    private Container = (outer: DecisionTree) => class extends TreebeardDecorators.Container {
+
         render() {
             const {style, decorators, terminal, onClick, node} = this.props;
             return (
                 <div
                     onClick={onClick}
                     style={node.active ? {...style.container} : {...style.link}}
-                    // onMouseEnter={e => onMouseEnter(node, e)}
-                    // onMouseLeave={e => onMouseLeave(node, e)}
+                    onMouseEnter={e => outer.onMouseEnter(node, e)}
+                    onMouseLeave={e => outer.onMouseLeave(node, e)}
                 >
                     {!terminal ? this.renderToggle() : null}
                     <decorators.Header node={node} style={style.header}/>
@@ -383,8 +413,8 @@ export class DecisionTree extends React.Component<{ formatterDecisions: Formatte
         }
     };
 
-    static Decorators = Object.assign({}, TreebeardDecorators, {
-        Container: DecisionTree.Container
+    private Decorators = Object.assign({}, TreebeardDecorators, {
+        Container: this.Container(this)
     });
 }
 

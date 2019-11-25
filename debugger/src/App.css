@@ -2,16 +2,11 @@
     white-space: pre; font-family: monospace; line-height: 1em;
 }
 
+/* TreeDoc */
+
 .TreeDoc .doc-level {
     margin-left: 20px;
 }
-
-.InlineDoc .doc-level {
-    background: hsla(0, 40%, 50%, 0.1);
-    outline: 2px solid hsla(0, 40%, 0%, 0.3);
-}
-
-/* TreeDoc */
 
 .TreeDoc {
     width: 1600px;
@@ -58,6 +53,24 @@
 .TreeAndDoc > * {
     flex-grow: 1;
     flex-basis: 50%;
+}
+
+/* InlineDoc */
+
+.InlineDoc .doc-level.referenced {
+    border-radius: 2px;
+    background-color: hsla(56, 100%, 51%, 0.4);
+}
+
+/** Inside a referenced level, highlight direct children very specifically. */
+.InlineDoc .doc-level.referenced > .highlight {
+    background-color: hsl(120, 61%, 80%);
+}
+
+/** Inside a referenced level, highlight nested inner levels with progressively more red to indicate depth. */
+.InlineDoc .doc-level.referenced .doc-level {
+    background: hsla(0, 40%, 50%, 0.15);
+    /*outline: 2px solid hsla(0, 40%, 0%, 0.3);*/
 }
 
 /* Ops */

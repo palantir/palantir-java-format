@@ -63,6 +63,7 @@ public final class JsonDocVisitor implements DocVisitor<JsonNode> {
         ObjectNode node = MAPPER.createObjectNode();
         node.put("type", "level");
         node.put("flat", level.getFlat());
+        node.put("id", level.id());
         node.set("openOp", MAPPER.valueToTree(level.getOpenOp()));
         node.put("isOneLine", state.isOneLine(level));
         node.put("evalPlusIndent", level.getPlusIndent().eval(state));
