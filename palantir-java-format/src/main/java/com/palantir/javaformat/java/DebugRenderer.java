@@ -29,7 +29,7 @@ import com.palantir.javaformat.OpenOp;
 import com.palantir.javaformat.OpsBuilder.OpsOutput;
 import com.palantir.javaformat.doc.Break;
 import com.palantir.javaformat.doc.Comment;
-import com.palantir.javaformat.doc.Doc;
+import com.palantir.javaformat.doc.HasUniqueId;
 import com.palantir.javaformat.doc.JsonDocVisitor;
 import com.palantir.javaformat.doc.Level;
 import com.palantir.javaformat.doc.NonBreakingSpace;
@@ -85,17 +85,19 @@ public class DebugRenderer {
         ImmutableList<Op> ops = opsOutput.ops();
         for (Op op : ops) {
             if (op instanceof Token) {
-                Input.Token token = ((Token) op).getToken();
+                Token token = (Token) op;
+                Input.Token inputToken = token.getToken();
 
                 ObjectNode json = arrayNode.addObject();
                 json.put("type", "token");
                 json.put(
                         "beforeText",
-                        token.getToksBefore().stream().map(Input.Tok::getText).collect(Collectors.joining()));
-                json.put("text", token.getTok().getText());
+                        inputToken.getToksBefore().stream().map(Input.Tok::getText).collect(Collectors.joining()));
+                json.put("text", inputToken.getTok().getText());
                 json.put(
                         "afterText",
-                        token.getToksAfter().stream().map(Input.Tok::getText).collect(Collectors.joining()));
+                        inputToken.getToksAfter().stream().map(Input.Tok::getText).collect(Collectors.joining()));
+                json.put("hue", computeHue(token));
             }
             if (op instanceof Break) {
                 Break breakOp = (Break) op;
@@ -142,8 +144,7 @@ public class DebugRenderer {
         }
     }
 
-    public static String backgroundColor(Doc op) {
-        long hue = Hashing.adler32().hashInt(op.id()).padToLong() % 360;
-        return String.format("background: hsl(%d, 60%%, 90%%)", hue);
+    private static long computeHue(HasUniqueId op) {
+        return Hashing.adler32().hashInt(op.id()).padToLong() % 360;
     }
 }
