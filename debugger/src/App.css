@@ -53,6 +53,8 @@
 .TreeAndDoc > * {
     flex-grow: 1;
     flex-basis: 50%;
+    /** necessary to prevent overflow */
+    max-width: 50%;
 }
 
 /* InlineDoc */
