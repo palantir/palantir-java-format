@@ -27,8 +27,13 @@ public interface Obs {
         void finishNode(int acceptedExplorationId);
     }
 
+    interface FinishExplorationNode {
+        void finishNode(Optional<State> newState);
+    }
+
     interface Sink {
-        void startExplorationNode(int exporationId, OptionalInt parentLevelId, String humanDescription);
+        FinishExplorationNode startExplorationNode(
+                int exporationId, OptionalInt parentLevelId, String humanDescription);
 
         /**
          * @param levelNodeId the unique ID of the {@link LevelNode}. There can be multiple LevelNodes per {@link
@@ -72,8 +77,9 @@ public interface Obs {
 
         @Override
         public Exploration explore(String humanDescription, Function<ExplorationNode, State> explorationFunc) {
-            ExplorationNode explorationNode = new ExplorationNodeImpl(this, humanDescription, sink);
+            ExplorationNodeImpl explorationNode = new ExplorationNodeImpl(this, humanDescription, sink);
             State newState = explorationFunc.apply(explorationNode);
+            explorationNode.recordNewState(Optional.of(newState));
 
             return new Exploration() {
                 @Override
@@ -92,9 +98,9 @@ public interface Obs {
         @Override
         public Optional<Exploration> maybeExplore(
                 String humanDescription, Function<ExplorationNode, Optional<State>> explorationFunc) {
-
-            ExplorationNode explorationNode = new ExplorationNodeImpl(this, humanDescription, sink);
+            ExplorationNodeImpl explorationNode = new ExplorationNodeImpl(this, humanDescription, sink);
             Optional<State> maybeNewState = explorationFunc.apply(explorationNode);
+            explorationNode.recordNewState(maybeNewState);
 
             if (!maybeNewState.isPresent()) {
                 return Optional.empty();
@@ -139,16 +145,21 @@ public interface Obs {
 
     class ExplorationNodeImpl extends HasUniqueId implements ExplorationNode {
         private final Sink sink;
+        private final FinishExplorationNode finishExplorationNode;
 
         public ExplorationNodeImpl(LevelNode parent, String humanDescription, Sink sink) {
             this.sink = sink;
-            sink.startExplorationNode(
+            finishExplorationNode = sink.startExplorationNode(
                     id(), parent != null ? OptionalInt.of(parent.id()) : OptionalInt.empty(), humanDescription);
         }
 
         @Override
         public LevelNode newChildNode(Level level, State state) {
             return new LevelNodeImpl(level, state, id(), sink);
+        }
+
+        void recordNewState(Optional<State> maybeNewState) {
+            finishExplorationNode.finishNode(maybeNewState);
         }
     }
 }

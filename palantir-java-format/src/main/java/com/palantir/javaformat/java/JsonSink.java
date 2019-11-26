@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.palantir.javaformat.doc.Level;
+import com.palantir.javaformat.doc.Obs.FinishExplorationNode;
 import com.palantir.javaformat.doc.Obs.FinishLevelNode;
 import com.palantir.javaformat.doc.Obs.Sink;
 import com.palantir.javaformat.doc.State;
@@ -13,13 +15,13 @@ import java.util.Map;
 import java.util.OptionalInt;
 
 public final class JsonSink implements Sink {
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().registerModule(new Jdk8Module());
 
     private final Map<Integer, ArrayNode> childrenMap = new HashMap<>();
     private ObjectNode rootNode;
 
     @Override
-    public void startExplorationNode(int explorationId, OptionalInt parentLevelId, String humanDescription) {
+    public FinishExplorationNode startExplorationNode(int explorationId, OptionalInt parentLevelId, String humanDescription) {
         ObjectNode json;
         if (parentLevelId.isPresent()) {
             json = childrenMap.get(parentLevelId.getAsInt()).addObject();
@@ -31,6 +33,7 @@ public final class JsonSink implements Sink {
         parentLevelId.ifPresent(id -> json.put("parentId", id));
         json.put("humanDescription", humanDescription);
         createChildrenNode(explorationId, json);
+        return newState -> json.set("newState", OBJECT_MAPPER.valueToTree(newState));
     }
 
     @Override
@@ -50,7 +53,7 @@ public final class JsonSink implements Sink {
     @Override
     public String getOutput() {
         try {
-            return OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(rootNode);
+            return OBJECT_MAPPER.writeValueAsString(rootNode);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

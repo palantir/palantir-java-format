@@ -1,12 +1,16 @@
 package com.palantir.javaformat.doc;
 
+import com.palantir.javaformat.doc.Obs.FinishExplorationNode;
 import com.palantir.javaformat.doc.Obs.FinishLevelNode;
 import com.palantir.javaformat.doc.Obs.Sink;
 import java.util.OptionalInt;
 
 public final class NoopSink implements Sink {
     @Override
-    public void startExplorationNode(int exporationId, OptionalInt parentLevelId, String humanDescription) {}
+    public FinishExplorationNode startExplorationNode(
+            int exporationId, OptionalInt parentLevelId, String humanDescription) {
+        return newState -> {};
+    }
 
     @Override
     public FinishLevelNode writeLevelNode(int levelNodeId, int parentExplorationId, State incomingState, Level level) {
