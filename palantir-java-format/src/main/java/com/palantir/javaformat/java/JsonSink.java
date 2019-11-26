@@ -19,7 +19,7 @@ public final class JsonSink implements Sink {
     private ObjectNode rootNode;
 
     @Override
-    public void startExplorationNode(int exporationId, OptionalInt parentLevelId, String humanDescription) {
+    public void startExplorationNode(int explorationId, OptionalInt parentLevelId, String humanDescription) {
         ObjectNode json;
         if (parentLevelId.isPresent()) {
             json = childrenMap.get(parentLevelId.getAsInt()).addObject();
@@ -27,10 +27,10 @@ public final class JsonSink implements Sink {
             json = rootNode = OBJECT_MAPPER.createObjectNode();
         }
         json.put("type", "exploration");
-        json.put("id", exporationId);
+        json.put("id", explorationId);
         parentLevelId.ifPresent(id -> json.put("parentId", id));
         json.put("humanDescription", humanDescription);
-        createChildrenNode(exporationId, json);
+        createChildrenNode(explorationId, json);
     }
 
     @Override
