@@ -33,18 +33,21 @@ public final class JsonDocVisitor implements DocVisitor<JsonNode> {
 
     @Override
     public JsonNode visitSpace(NonBreakingSpace doc) {
-        return MAPPER.createObjectNode().put("type", "space");
+        return MAPPER.createObjectNode().put("type", "space").put("id", doc.id());
     }
 
     @Override
     public JsonNode visitComment(Comment doc) {
-        return MAPPER.createObjectNode().put("type", "comment").put("flat", doc.getFlat()).put("text", state.getTokText(
-                doc));
+        return MAPPER.createObjectNode()
+                .put("type", "comment")
+                .put("flat", doc.getFlat())
+                .put("text", state.getTokText(doc))
+                .put("id", doc.id());
     }
 
     @Override
     public JsonNode visitToken(Token doc) {
-        return MAPPER.createObjectNode().put("type", "token").put("flat", doc.getFlat());
+        return MAPPER.createObjectNode().put("type", "token").put("flat", doc.getFlat()).put("id", doc.id());
     }
 
     @Override
@@ -55,7 +58,8 @@ public final class JsonDocVisitor implements DocVisitor<JsonNode> {
                 .<ObjectNode>set("breakState", MAPPER.valueToTree(state.getBreakState(doc)))
                 .<ObjectNode>set("plusIndent", MAPPER.valueToTree(doc.plusIndent()))
                 .<ObjectNode>set("optTag", MAPPER.valueToTree(doc.optTag()))
-                .put("evalPlusIndent", doc.evalPlusIndent(state));
+                .put("evalPlusIndent", doc.evalPlusIndent(state))
+                .put("id", doc.id());
     }
 
     @Override
