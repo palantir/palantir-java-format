@@ -1,6 +1,7 @@
 apply plugin: 'java-gradle-plugin'
 apply plugin: 'groovy'
 apply from: rootProject.file('gradle/publish-jar.gradle')
+apply plugin: 'com.palantir.revapi'
 
 dependencies {
     implementation gradleApi()
