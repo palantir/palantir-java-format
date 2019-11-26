@@ -34,7 +34,7 @@ public interface Obs {
 
     interface Sink {
         FinishExplorationNode startExplorationNode(
-                int exporationId, OptionalInt parentLevelId, String humanDescription);
+                int exporationId, OptionalInt parentLevelId, String humanDescription, int startColumn);
 
         /**
          * @param levelNodeId the unique ID of the {@link LevelNode}. There can be multiple LevelNodes per {@link
@@ -48,7 +48,7 @@ public interface Obs {
     }
 
     static ExplorationNode createRoot(Sink sink) {
-        return new ExplorationNodeImpl(null, "(initial node)", sink);
+        return new ExplorationNodeImpl(null, "(initial node)", sink, 0);
     }
 
     /** At a single level, you can explore various options for how to break lines and then accept one. */
@@ -68,17 +68,19 @@ public interface Obs {
         private final Level level;
         private final Sink sink;
         private final FinishLevelNode finisher;
+        private final int startColumn;
         private int acceptedExplorationId;
 
         public LevelNodeImpl(Level level, State incomingState, int parentExplorationId, Sink sink) {
             this.level = level;
             this.sink = sink;
             this.finisher = sink.writeLevelNode(id(), parentExplorationId, incomingState, level);
+            this.startColumn = incomingState.column();
         }
 
         @Override
         public Exploration explore(String humanDescription, Function<ExplorationNode, State> explorationFunc) {
-            ExplorationNodeImpl explorationNode = new ExplorationNodeImpl(this, humanDescription, sink);
+            ExplorationNodeImpl explorationNode = new ExplorationNodeImpl(this, humanDescription, sink, startColumn);
             State newState = explorationFunc.apply(explorationNode);
             explorationNode.recordNewState(Optional.of(newState));
 
@@ -99,7 +101,7 @@ public interface Obs {
         @Override
         public Optional<Exploration> maybeExplore(
                 String humanDescription, Function<ExplorationNode, Optional<State>> explorationFunc) {
-            ExplorationNodeImpl explorationNode = new ExplorationNodeImpl(this, humanDescription, sink);
+            ExplorationNodeImpl explorationNode = new ExplorationNodeImpl(this, humanDescription, sink, startColumn);
             Optional<State> maybeNewState = explorationFunc.apply(explorationNode);
             explorationNode.recordNewState(maybeNewState);
 
@@ -149,11 +151,14 @@ public interface Obs {
         private final FinishExplorationNode finishExplorationNode;
         private final Optional<Level> parentLevel;
 
-        public ExplorationNodeImpl(LevelNodeImpl parent, String humanDescription, Sink sink) {
-            parentLevel = Optional.ofNullable(parent).map(p -> p.level);
+        public ExplorationNodeImpl(LevelNodeImpl parent, String humanDescription, Sink sink, int startColumn) {
+            this.parentLevel = Optional.ofNullable(parent).map(p -> p.level);
             this.sink = sink;
-            finishExplorationNode = sink.startExplorationNode(
-                    id(), parent != null ? OptionalInt.of(parent.id()) : OptionalInt.empty(), humanDescription);
+            this.finishExplorationNode = sink.startExplorationNode(
+                    id(),
+                    parent != null ? OptionalInt.of(parent.id()) : OptionalInt.empty(),
+                    humanDescription,
+                    startColumn);
         }
 
         @Override

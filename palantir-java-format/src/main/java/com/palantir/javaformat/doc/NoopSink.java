@@ -8,7 +8,7 @@ import java.util.OptionalInt;
 public final class NoopSink implements Sink {
     @Override
     public FinishExplorationNode startExplorationNode(
-            int exporationId, OptionalInt parentLevelId, String humanDescription) {
+            int exporationId, OptionalInt parentLevelId, String humanDescription, int startColumn) {
         return (parentLevel, newState) -> {};
     }
 

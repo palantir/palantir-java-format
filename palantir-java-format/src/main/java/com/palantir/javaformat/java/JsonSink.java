@@ -22,7 +22,8 @@ public final class JsonSink implements Sink {
     private ObjectNode rootNode;
 
     @Override
-    public FinishExplorationNode startExplorationNode(int explorationId, OptionalInt parentLevelId, String humanDescription) {
+    public FinishExplorationNode startExplorationNode(
+            int explorationId, OptionalInt parentLevelId, String humanDescription, int startColumn) {
         ObjectNode json;
         if (parentLevelId.isPresent()) {
             json = childrenMap.get(parentLevelId.getAsInt()).addObject();
@@ -33,8 +34,12 @@ public final class JsonSink implements Sink {
         json.put("id", explorationId);
         parentLevelId.ifPresent(id -> json.put("parentId", id));
         json.put("humanDescription", humanDescription);
+        // The column where we started off this exploration. Necessary to correctly indent the level.
+        json.put("startColumn", startColumn);
         createChildrenNode(explorationId, json);
-        return (parentLevel, newState) -> json.set("outputLevel", new JsonDocVisitor(newState).visit(parentLevel));
+        return (parentLevel, newState) -> {
+            json.set("outputLevel", new JsonDocVisitor(newState).visit(parentLevel));
+        };
     }
 
     @Override
