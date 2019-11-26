@@ -26,12 +26,10 @@ import com.palantir.javaformat.Output;
 /** A Leaf node in a {@link Doc} for a non-breaking space. */
 @Immutable
 public final class NonBreakingSpace extends Doc implements Op {
-    private static final NonBreakingSpace SPACE = new NonBreakingSpace();
-
     private NonBreakingSpace() {}
 
     public static NonBreakingSpace make() {
-        return SPACE;
+        return new NonBreakingSpace();
     }
 
     @Override
