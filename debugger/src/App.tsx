@@ -279,13 +279,14 @@ interface TreeNode {
     data: NodeData,
 }
 
-type ExplorationNodeData = { outputLevel?: DisplayableLevel };
+type ExplorationNodeData = { outputLevel?: DisplayableLevel, parentLevelId?: Id };
 type LevelNodeData = { levelId: Id };
 type NodeData = LevelNodeData | ExplorationNodeData;
 
 /** A doc that should be displayed because it's currently being highlighted in the {@link DecisionTree}. */
 type DisplayableLevel = { level: Level, startingColumn: number };
 type Highlighted = DisplayableLevel | undefined;
+
 
 const TreeAndDoc: React.FC<{ formatterDecisions: FormatterDecisions, doc: Doc }> = props => {
     const [highlighted, setHighlighted] = useState<Highlighted>();
@@ -364,8 +365,10 @@ export class DecisionTree extends React.Component<{
             data: {
                 outputLevel: node.outputLevel !== undefined ? {
                     level: node.outputLevel,
+                    // TODO probably makes sense to steal startColumn from the `parent` too (needs change to JsonSink)
                     startingColumn: node.startColumn,
-                } : undefined
+                } : undefined,
+                parentLevelId: parent !== undefined ? parent.levelId : undefined
             },
         };
     }
@@ -413,17 +416,23 @@ export class DecisionTree extends React.Component<{
 
     private onMouseEnter = (nodeData: TreeNode, e: MouseEvent) => {
         if ("levelId" in nodeData.data) {
-            DecisionTree.highlightBreaksForBreakTag(nodeData.data.levelId, true)
+            DecisionTree.highlightBreaksForBreakTag(nodeData.data.levelId, true);
         } else {
-            this.props.highlightDoc(nodeData.data.outputLevel)
+            if (nodeData.data.parentLevelId !== undefined) {
+                DecisionTree.highlightBreaksForBreakTag(nodeData.data.parentLevelId, true);
+            }
+            this.props.highlightDoc(nodeData.data.outputLevel);
         }
     };
 
     private onMouseLeave = (nodeData: TreeNode, e: MouseEvent) => {
         if ("levelId" in nodeData.data) {
-            DecisionTree.highlightBreaksForBreakTag(nodeData.data.levelId, false)
+            DecisionTree.highlightBreaksForBreakTag(nodeData.data.levelId, false);
         } else {
-            this.props.highlightDoc(undefined)
+            if (nodeData.data.parentLevelId !== undefined) {
+                DecisionTree.highlightBreaksForBreakTag(nodeData.data.parentLevelId, false);
+            }
+            this.props.highlightDoc(undefined);
         }
     };
 
