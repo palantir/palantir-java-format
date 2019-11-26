@@ -1,4 +1,4 @@
-import React, { CSSProperties, MouseEvent } from 'react';
+import React, { CSSProperties, Dispatch, MouseEvent, SetStateAction, useState } from 'react';
 import './App.css';
 import { Callout, Classes, H1, Pre, Tag, Toaster, Tooltip } from "@blueprintjs/core";
 import { decorators as TreebeardDecorators, Treebeard } from 'react-treebeard';
@@ -49,7 +49,8 @@ type Indent = { type: "const", amount: number } | { type: "if", condition: HasId
 // FormatterDecisions formatting stuff
 
 type ExplorationNode = {
-    type: "exploration", parentId?: Id, id: Id, humanDescription: string, children: ReadonlyArray<LevelNode> };
+    type: "exploration", parentId?: Id, id: Id, humanDescription: string, children: ReadonlyArray<LevelNode>,
+    outputLevel?: Level, startColumn: number };
 type LevelNode = {
     type: "level", id: Id, parentId: Id, debugName?: string, flat: string, toString: string, acceptedExplorationId: Id,
     levelId: Id, children: ReadonlyArray<ExplorationNode>,
@@ -90,7 +91,7 @@ const App: React.FC<Props> = ({debugData}) => {
 };
 
 /** Render a {@link Doc} with the same newlines as the final result. */
-const InlineDocComponent: React.FC<{doc: Doc}> = ({doc}) => {
+const InlineDocComponent: React.FC<{ doc: Doc, statingColumn: number, className: string }> = ({doc, statingColumn, className}) => {
     function renderDoc(doc: Doc) {
         switch (doc.type) {
             case "break":
@@ -122,7 +123,10 @@ const InlineDocComponent: React.FC<{doc: Doc}> = ({doc}) => {
     }
 
     return (
-        <Pre className="InlineDoc">{renderDoc(doc)}</Pre>
+        <Pre className={className}>
+            {' '.repeat(statingColumn)}
+            {renderDoc(doc)}
+        </Pre>
     );
 };
 
@@ -272,18 +276,36 @@ interface TreeNode {
     active?: boolean,
     loading?: boolean,
     // Custom
-    levelId?: Id,
+    data: NodeData,
 }
 
+type ExplorationNodeData = { outputLevel?: DisplayableLevel };
+type LevelNodeData = { levelId: Id };
+type NodeData = LevelNodeData | ExplorationNodeData;
+
+/** A doc that should be displayed because it's currently being highlighted in the {@link DecisionTree}. */
+type DisplayableLevel = { level: Level, startingColumn: number };
+type Highlighted = DisplayableLevel | undefined;
+
 const TreeAndDoc: React.FC<{ formatterDecisions: FormatterDecisions, doc: Doc }> = props => {
+    const [highlighted, setHighlighted] = useState<Highlighted>();
+
     return <div className={"TreeAndDoc"}>
-        <DecisionTree formatterDecisions={props.formatterDecisions}/>
-        <InlineDocComponent doc={props.doc}/>
+        <DecisionTree formatterDecisions={props.formatterDecisions} highlightDoc={setHighlighted}/>
+        <div className={"InlineDocs"}>
+            <InlineDocComponent key={"entire-doc"} doc={props.doc} statingColumn={0} className={"InlineDoc"}/>
+            {highlighted !== undefined ? (
+                <InlineDocComponent key={"exploration"} doc={highlighted.level} statingColumn={highlighted.startingColumn} className={"HighlightInlineDoc"}/>
+            ) : null}
+        </div>
     </div>
 };
 
 
-export class DecisionTree extends React.Component<{ formatterDecisions: FormatterDecisions }, ITreeState> {
+export class DecisionTree extends React.Component<{
+            formatterDecisions: FormatterDecisions,
+            highlightDoc: Dispatch<SetStateAction<Highlighted>>
+        }, ITreeState> {
     public state: ITreeState = { nodes: DecisionTree.createExplorationNode(this.props.formatterDecisions).children!! };
     private static toaster = Toaster.create();
 
@@ -338,6 +360,13 @@ export class DecisionTree extends React.Component<{ formatterDecisions: Formatte
             name: <Tooltip content={node.id.toString()}>{node.humanDescription}</Tooltip>,
             toggled: onAcceptedPath,
             active: onAcceptedPath,
+            // Store the output level so we can display it
+            data: {
+                outputLevel: node.outputLevel !== undefined ? {
+                    level: node.outputLevel,
+                    startingColumn: node.startColumn,
+                } : undefined
+            },
         };
     }
 
@@ -353,7 +382,9 @@ export class DecisionTree extends React.Component<{ formatterDecisions: Formatte
             // secondaryLabel: node.toString,
             toggled: true,
             active: parentAccepted,
-            levelId: node.levelId,
+            data: {
+                levelId: node.levelId,
+            },
         };
     }
 
@@ -381,14 +412,18 @@ export class DecisionTree extends React.Component<{ formatterDecisions: Formatte
     }
 
     private onMouseEnter = (nodeData: TreeNode, e: MouseEvent) => {
-        if (nodeData.levelId !== undefined) {
-            DecisionTree.highlightBreaksForBreakTag(nodeData.levelId, true)
+        if ("levelId" in nodeData.data) {
+            DecisionTree.highlightBreaksForBreakTag(nodeData.data.levelId, true)
+        } else {
+            this.props.highlightDoc(nodeData.data.outputLevel)
         }
     };
 
     private onMouseLeave = (nodeData: TreeNode, e: MouseEvent) => {
-        if (nodeData.levelId !== undefined) {
-            DecisionTree.highlightBreaksForBreakTag(nodeData.levelId, false)
+        if ("levelId" in nodeData.data) {
+            DecisionTree.highlightBreaksForBreakTag(nodeData.data.levelId, false)
+        } else {
+            this.props.highlightDoc(undefined)
         }
     };
 

@@ -61,6 +61,21 @@
     margin: 10px 0;
 }
 
+.TreeAndDoc .InlineDocs {
+    display: flex;
+    flex-direction: column;
+}
+
+.TreeAndDoc .InlineDocs > * {
+    flex-grow: 1;
+    flex-basis: auto;
+}
+
+.HighlightInlineDoc {
+    flex-grow: 0;
+    flex-shrink: 1;
+}
+
 /* InlineDoc */
 
 .InlineDoc .doc-level.referenced {
