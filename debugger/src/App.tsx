@@ -392,8 +392,11 @@ export class DecisionTree extends React.Component<{ formatterDecisions: Formatte
         }
     };
 
+    /**
+     * This is a hack to override the Container of {@link TreebeardDecorators} and still have access to the main
+     * component object, because we don't control what gets passed to this inner component via props.
+     */
     private Container = (outer: DecisionTree) => class extends TreebeardDecorators.Container {
-
         render() {
             const {style, decorators, terminal, onClick, node} = this.props;
             return (
