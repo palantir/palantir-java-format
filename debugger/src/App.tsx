@@ -397,8 +397,10 @@ export class DecisionTree extends React.Component<{
         this.setState(this.state);
     };
 
-    private static highlightBreaksForBreakTag(id: Id, highlight: boolean) {
-        // console.log("getting elements for class", (DecisionTree.classForLevelId(id)));
+    private static highlightInlineDocLevel(id: Id, highlight: boolean) {
+        // TODO first get DOM element of the .InlineDoc, then either
+        //    1. search for this class inside that, or
+        //    2. update its state, and then it renders itself according to that (preferrable)
         const nodes = document.getElementsByClassName(DecisionTree.classForLevelId(id));
         // @ts-ignore
         for (let item of nodes) {
@@ -415,26 +417,23 @@ export class DecisionTree extends React.Component<{
         return `doc-level-${id}`;
     }
 
-    private onMouseEnter = (nodeData: TreeNode, e: MouseEvent) => {
+    private highlightLevel(nodeData: TreeNode, highlight: boolean) {
         if ("levelId" in nodeData.data) {
-            DecisionTree.highlightBreaksForBreakTag(nodeData.data.levelId, true);
+            DecisionTree.highlightInlineDocLevel(nodeData.data.levelId, highlight);
         } else {
             if (nodeData.data.parentLevelId !== undefined) {
-                DecisionTree.highlightBreaksForBreakTag(nodeData.data.parentLevelId, true);
+                DecisionTree.highlightInlineDocLevel(nodeData.data.parentLevelId, highlight);
             }
             this.props.highlightDoc(nodeData.data.outputLevel);
         }
+    }
+
+    private onMouseEnter = (nodeData: TreeNode, e: MouseEvent) => {
+        this.highlightLevel(nodeData, true);
     };
 
     private onMouseLeave = (nodeData: TreeNode, e: MouseEvent) => {
-        if ("levelId" in nodeData.data) {
-            DecisionTree.highlightBreaksForBreakTag(nodeData.data.levelId, false);
-        } else {
-            if (nodeData.data.parentLevelId !== undefined) {
-                DecisionTree.highlightBreaksForBreakTag(nodeData.data.parentLevelId, false);
-            }
-            this.props.highlightDoc(undefined);
-        }
+        this.highlightLevel(nodeData, false);
     };
 
     /**
