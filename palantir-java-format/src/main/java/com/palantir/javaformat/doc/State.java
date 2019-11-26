@@ -16,24 +16,18 @@
 
 package com.palantir.javaformat.doc;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.Indent;
-import fj.P2;
 import fj.data.Set;
 import fj.data.TreeMap;
-import java.io.IOException;
 import org.immutables.value.Value;
 import org.immutables.value.Value.Parameter;
 
 /** State for writing. */
 @Value.Immutable
 @Value.Style(overshadowImplementation = true)
-@JsonSerialize(as = ImmutableState.class)
 @Immutable
 public abstract class State {
     /** Last indent that was actually taken. */
@@ -55,22 +49,18 @@ public abstract class State {
     public abstract int branchingCoefficient();
 
     @Value.Auxiliary
-    @JsonSerialize(using = SetSerializer.class)
     protected abstract Set<BreakTag> breakTagsTaken();
 
     @Value.Auxiliary
-    @JsonSerialize(using = TreeMapSerializer.class)
     protected abstract TreeMap<Break, BreakState> breakStates();
 
     @Value.Auxiliary
-    @JsonSerialize(using = TreeMapSerializer.class)
     protected abstract TreeMap<Level, LevelState> levelStates();
 
     /**
      * Keep track of how each {@link Comment} was written (these are mostly comments), which can differ depending on the
      * starting column and the maxLength.
      */
-    @JsonSerialize(using = TreeMapSerializer.class)
     protected abstract TreeMap<Comment, TokState> tokStates();
 
     public static State startingState() {
@@ -234,7 +224,6 @@ public abstract class State {
 
     @Value.Immutable
     @Value.Style(overshadowImplementation = true)
-    @JsonSerialize(as = ImmutableLevelState.class)
     interface LevelState {
         /** True if the entire {@link Level} fits on one line. */
         @Parameter
@@ -243,33 +232,8 @@ public abstract class State {
 
     @Value.Immutable
     @Value.Style(overshadowImplementation = true)
-    @JsonSerialize(as = ImmutableTokState.class)
     interface TokState {
         @Parameter
         String text();
-    }
-
-    static class TreeMapSerializer<K extends HasUniqueId, V> extends JsonSerializer<TreeMap<K, V>> {
-        @Override
-        public void serialize(
-                TreeMap<K, V> value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-            gen.writeStartObject(value, value.size());
-            for (P2<K, V> pair : value) {
-                gen.writeObjectField(Integer.toString(pair._1().id()), pair._2());
-            }
-            gen.writeEndObject();
-        }
-    }
-
-    static class SetSerializer<T extends HasUniqueId> extends JsonSerializer<Set<T>> {
-        @Override
-        public void serialize(
-                Set<T> value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-            gen.writeStartArray(value.size());
-            for (T item : value) {
-                gen.writeObject(item);
-            }
-            gen.writeEndArray();
-        }
     }
 }
