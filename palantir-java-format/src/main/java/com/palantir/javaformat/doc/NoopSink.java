@@ -9,7 +9,7 @@ public final class NoopSink implements Sink {
     @Override
     public FinishExplorationNode startExplorationNode(
             int exporationId, OptionalInt parentLevelId, String humanDescription) {
-        return newState -> {};
+        return (parentLevel, newState) -> {};
     }
 
     @Override

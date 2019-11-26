@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.palantir.javaformat.doc.JsonDocVisitor;
 import com.palantir.javaformat.doc.Level;
 import com.palantir.javaformat.doc.Obs.FinishExplorationNode;
 import com.palantir.javaformat.doc.Obs.FinishLevelNode;
@@ -33,7 +34,7 @@ public final class JsonSink implements Sink {
         parentLevelId.ifPresent(id -> json.put("parentId", id));
         json.put("humanDescription", humanDescription);
         createChildrenNode(explorationId, json);
-        return newState -> json.set("newState", OBJECT_MAPPER.valueToTree(newState));
+        return (parentLevel, newState) -> json.set("outputLevel", new JsonDocVisitor(newState).visit(parentLevel));
     }
 
     @Override

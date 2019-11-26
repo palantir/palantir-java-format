@@ -28,7 +28,8 @@ public interface Obs {
     }
 
     interface FinishExplorationNode {
-        void finishNode(Optional<State> newState);
+        /** Indicate that the exploration node was successful and produced this {@code newState} */
+        void finishNode(Level parentLevel, State newState);
     }
 
     interface Sink {
@@ -146,8 +147,10 @@ public interface Obs {
     class ExplorationNodeImpl extends HasUniqueId implements ExplorationNode {
         private final Sink sink;
         private final FinishExplorationNode finishExplorationNode;
+        private final Optional<Level> parentLevel;
 
-        public ExplorationNodeImpl(LevelNode parent, String humanDescription, Sink sink) {
+        public ExplorationNodeImpl(LevelNodeImpl parent, String humanDescription, Sink sink) {
+            parentLevel = Optional.ofNullable(parent).map(p -> p.level);
             this.sink = sink;
             finishExplorationNode = sink.startExplorationNode(
                     id(), parent != null ? OptionalInt.of(parent.id()) : OptionalInt.empty(), humanDescription);
@@ -159,7 +162,8 @@ public interface Obs {
         }
 
         void recordNewState(Optional<State> maybeNewState) {
-            finishExplorationNode.finishNode(maybeNewState);
+            maybeNewState.ifPresent(
+                    newState -> parentLevel.ifPresent(parent -> finishExplorationNode.finishNode(parent, newState)));
         }
     }
 }
