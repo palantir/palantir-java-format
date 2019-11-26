@@ -295,9 +295,10 @@ const TreeAndDoc: React.FC<{ formatterDecisions: FormatterDecisions, doc: Doc }>
         <DecisionTree formatterDecisions={props.formatterDecisions} highlightDoc={setHighlighted}/>
         <div className={"InlineDocs"}>
             <InlineDocComponent key={"entire-doc"} doc={props.doc} statingColumn={0} className={"InlineDoc"}/>
-            {highlighted !== undefined ? (
+            {highlighted !== undefined ? ([
+                <Callout intent={"primary"} title={"Rendered exploration output"}/>,
                 <InlineDocComponent key={"exploration"} doc={highlighted.level} statingColumn={highlighted.startingColumn} className={"HighlightInlineDoc"}/>
-            ) : null}
+            ]) : null}
         </div>
     </div>
 };
