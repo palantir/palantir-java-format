@@ -24,19 +24,18 @@ type Op =
 
 type Doc = Break | Level | Comment | Space | Token;
 
-type Token = { type: "token", flat: string };
-type Space = { type: "space" };
-type Break = { type: "break", flat: string, breakState: { broken: boolean, newIndent: number }, optTag: HasId };
-type Comment = { type: "comment", /** Original text */ flat: string, /** Text as rendered */ text: string };
+type Token = { type: "token", flat: string } & HasId;
+type Space = { type: "space" } & HasId;
+type Break = { type: "break", flat: string, breakState: { broken: boolean, newIndent: number }, optTag: HasId } & HasId;
+type Comment = { type: "comment", /** Original text */ flat: string, /** Text as rendered */ text: string } & HasId;
 type Level = {
     type: "level",
     openOp: OpenOp,
-    id: Id,
     docs: ReadonlyArray<Doc>,
     flat: string,
     evalPlusIndent: number,
     isOneLine: boolean,
-};
+} & HasId;
 type OpenOp = {
     id: Id, plusIndent: Indent, breakBehaviour: BreakBehaviour, breakabilityIfLastLevel: string,
     columnLimitBeforeLastBreak?: any, debugName?: string
@@ -97,23 +96,24 @@ const InlineDocComponent: React.FC<{doc: Doc}> = ({doc}) => {
             case "break":
                 // TODO add breakToken in here
                 if (doc.breakState.broken) {
-                    return <span className={"doc doc-break taken highlight"}><br/>{' '.repeat(doc.breakState.newIndent)}</span>;
+                    return <span key={doc.id} className={"doc doc-break taken highlight"}>
+                        <br/>{' '.repeat(doc.breakState.newIndent)}
+                    </span>;
                 } else {
-                    return <span className={"doc doc-break highlight"}>{doc.flat}</span>
+                    return <span key={doc.id} className={"doc doc-break highlight"}>{doc.flat}</span>
                 }
             case "level":
                 // TODO other information about the doc
-                return <span className={`doc doc-level ${classForLevelId(doc.id)}`}>
+                return <span key={doc.id} className={`doc doc-level ${classForLevelId(doc.id)}`}>
                     {doc.docs.map(renderDoc)}
                 </span>;
             case "comment":
                 // TODO maybe display original on hover?
-                return <span className={"doc doc-comment highlight"}>{doc.text}</span>;
+                return <span key={doc.id} className={"doc doc-comment highlight"}>{doc.text}</span>;
             case "space":
-                return <span className={"doc doc-space highlight"}>&nbsp;</span>;
+                return <span key={doc.id} className={"doc doc-space highlight"}>&nbsp;</span>;
             case "token":
-                return <span className={"doc-token highlight"}>{doc.flat}</span>;
-
+                return <span key={doc.id} className={"doc-token highlight"}>{doc.flat}</span>;
         }
     }
 
@@ -182,14 +182,14 @@ const TreeDocComponent: React.FC<{doc: Doc}> = ({doc}) => {
             case "break":
                 const clazz = (doc.optTag !== null) ? `conditional ${classForBreakTagId(doc.optTag.id)}` : '';
                 if (doc.breakState.broken) {
-                    return [
+                    return <span key={doc.id}>
                         <Tooltip content={`New indent: ${doc.breakState.newIndent}`}>
                             <span className={clazz + " doc doc-break taken"}>⏎</span>
-                        </Tooltip>,
+                        </Tooltip>
                         <br/>
-                    ];
+                    </span>;
                 } else {
-                    return <span className={clazz + " doc doc-break highlight"}>{doc.flat || "⏎"}</span>
+                    return <span key={doc.id} className={clazz + " doc doc-break highlight"}>{doc.flat || "⏎"}</span>
                 }
             case "level":
                 // Skip levels without any contents
@@ -205,7 +205,7 @@ const TreeDocComponent: React.FC<{doc: Doc}> = ({doc}) => {
                 const breakabilityIfLastLevel = (doc.openOp.breakabilityIfLastLevel !== "ABORT")
                     ? <Tag intent={"none"}>{doc.openOp.breakabilityIfLastLevel}</Tag> : null;
                 // TODO other information about the doc
-                return <div className={"doc doc-level"}>
+                return <div className={"doc doc-level"} key={doc.id}>
                         <div className={"banner"}>
                             {indent}
                             {debugName}
@@ -216,13 +216,13 @@ const TreeDocComponent: React.FC<{doc: Doc}> = ({doc}) => {
                     </div>;
             case "comment":
                 // Displaying original comment on hover (before formatting / reflowing)
-                return <Tooltip content={<div>Original: <Pre>{doc.flat}</Pre></div>}>
+                return <Tooltip key={doc.id} content={<div>Original: <Pre>{doc.flat}</Pre></div>}>
                     <span className={"doc doc-comment highlight"}>{doc.text}</span>
                 </Tooltip>;
             case "space":
-                return <span className={"doc doc-space highlight"}>&nbsp;</span>;
+                return <span key={doc.id} className={"doc doc-space highlight"}>&nbsp;</span>;
             case "token":
-                return <span className={"doc-token highlight"}>{doc.flat}</span>;
+                return <span key={doc.id} className={"doc-token highlight"}>{doc.flat}</span>;
 
         }
     }
