@@ -57,6 +57,10 @@
     max-width: 50%;
 }
 
+.TreeAndDoc .DecisionTree {
+    margin: 10px 0;
+}
+
 /* InlineDoc */
 
 .InlineDoc .doc-level.referenced {
