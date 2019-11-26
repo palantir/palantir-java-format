@@ -63,6 +63,14 @@
     overflow: scroll;
 }
 
+/**
+ * Since the Treebeard tree has a different background, we want to make sure it always takes up the space or else
+ * it looks ugly.
+ */
+.TreeAndDoc .DecisionTree > ul {
+    min-height: 100%;
+}
+
 .TreeAndDoc .InlineDocs {
     display: flex;
     flex-direction: column;
