@@ -1,4 +1,4 @@
-import React, { CSSProperties, Dispatch, MouseEvent, SetStateAction, useState } from 'react';
+import React, { CSSProperties, Dispatch, MouseEvent, useState } from 'react';
 import './App.css';
 import { Callout, Classes, H1, Pre, Tag, Toaster, Tooltip } from "@blueprintjs/core";
 import { decorators as TreebeardDecorators, Treebeard } from 'react-treebeard';
@@ -91,7 +91,12 @@ const App: React.FC<Props> = ({debugData}) => {
 };
 
 /** Render a {@link Doc} with the same newlines as the final result. */
-const InlineDocComponent: React.FC<{ doc: Doc, statingColumn: number, className: string }> = ({doc, statingColumn, className}) => {
+const InlineDocComponent: React.FC<{
+    doc: Doc,
+    statingColumn: number,
+    className: string,
+    highlightedLevelId?: Id
+}> = ({doc, statingColumn, className, highlightedLevelId}) => {
     function renderDoc(doc: Doc) {
         switch (doc.type) {
             case "break":
@@ -105,7 +110,7 @@ const InlineDocComponent: React.FC<{ doc: Doc, statingColumn: number, className:
                 }
             case "level":
                 // TODO other information about the doc
-                return <span key={doc.id} className={`doc doc-level ${classForLevelId(doc.id)}`}>
+                return <span key={doc.id} className={`doc doc-level ${doc.id === highlightedLevelId ? "referenced" : ""}`}>
                     {doc.docs.map(renderDoc)}
                 </span>;
             case "comment":
@@ -116,10 +121,6 @@ const InlineDocComponent: React.FC<{ doc: Doc, statingColumn: number, className:
             case "token":
                 return <span key={doc.id} className={"doc-token highlight"}>{doc.flat}</span>;
         }
-    }
-
-    function classForLevelId(id: Id) {
-        return `doc-level-${id}`;
     }
 
     return (
@@ -290,11 +291,16 @@ type Highlighted = DisplayableLevel | undefined;
 
 const TreeAndDoc: React.FC<{ formatterDecisions: FormatterDecisions, doc: Doc }> = props => {
     const [highlighted, setHighlighted] = useState<Highlighted>();
+    const [highlightedLevelId, setHighlightedLevelId] = useState<Id>();
 
     return <div className={"TreeAndDoc"}>
-        <DecisionTree formatterDecisions={props.formatterDecisions} highlightDoc={setHighlighted}/>
+        <DecisionTree
+                formatterDecisions={props.formatterDecisions}
+                highlightDoc={setHighlighted}
+                highlightLevelId={setHighlightedLevelId}/>
         <div className={"InlineDocs"}>
-            <InlineDocComponent key={"entire-doc"} doc={props.doc} statingColumn={0} className={"InlineDoc"}/>
+            <InlineDocComponent key={"entire-doc"} doc={props.doc} statingColumn={0} className={"InlineDoc"}
+                highlightedLevelId={highlightedLevelId}/>
             {highlighted !== undefined ? ([
                 <Callout intent={"primary"} title={"Rendered exploration output"}/>,
                 <InlineDocComponent key={"exploration"} doc={highlighted.level} statingColumn={highlighted.startingColumn} className={"HighlightInlineDoc"}/>
@@ -306,7 +312,8 @@ const TreeAndDoc: React.FC<{ formatterDecisions: FormatterDecisions, doc: Doc }>
 
 export class DecisionTree extends React.Component<{
             formatterDecisions: FormatterDecisions,
-            highlightDoc: Dispatch<SetStateAction<Highlighted>>
+            highlightDoc: Dispatch<Highlighted>,
+            highlightLevelId: Dispatch<Id | undefined>,
         }, ITreeState> {
     public state: ITreeState = { nodes: DecisionTree.createExplorationNode(this.props.formatterDecisions).children!! };
     private static toaster = Toaster.create();
@@ -397,43 +404,28 @@ export class DecisionTree extends React.Component<{
         this.setState(this.state);
     };
 
-    private static highlightInlineDocLevel(id: Id, highlight: boolean) {
-        // TODO first get DOM element of the .InlineDoc, then either
-        //    1. search for this class inside that, or
-        //    2. update its state, and then it renders itself according to that (preferrable)
-        const nodes = document.getElementsByClassName(DecisionTree.classForLevelId(id));
-        // @ts-ignore
-        for (let item of nodes) {
-            if (highlight) {
-                item.classList.add('referenced')
-            } else {
-                item.classList.remove('referenced')
-            }
-        }
+    private highlightInlineDocLevel(id: Id) {
+        this.props.highlightLevelId(id);
     }
 
-    /** TODO this has to match the method on {@link InlineDocComponent} */
-    private static classForLevelId(id: Id): string {
-        return `doc-level-${id}`;
-    }
-
-    private highlightLevel(nodeData: TreeNode, highlight: boolean) {
+    private highlightLevel(nodeData: TreeNode) {
         if ("levelId" in nodeData.data) {
-            DecisionTree.highlightInlineDocLevel(nodeData.data.levelId, highlight);
+            this.highlightInlineDocLevel(nodeData.data.levelId);
         } else {
             if (nodeData.data.parentLevelId !== undefined) {
-                DecisionTree.highlightInlineDocLevel(nodeData.data.parentLevelId, highlight);
+                this.highlightInlineDocLevel(nodeData.data.parentLevelId);
             }
-            this.props.highlightDoc(nodeData.data.outputLevel);
+            if (nodeData === this.state.nodes[0]) {
+                this.props.highlightDoc(undefined); // no point highlighting the root
+            } else {
+                this.props.highlightDoc(nodeData.data.outputLevel);
+            }
         }
     }
 
     private onMouseEnter = (nodeData: TreeNode, e: MouseEvent) => {
-        this.highlightLevel(nodeData, true);
-    };
-
-    private onMouseLeave = (nodeData: TreeNode, e: MouseEvent) => {
-        this.highlightLevel(nodeData, false);
+        // TODO select this node somehow so it's obvious that it's highlighted
+        this.highlightLevel(nodeData);
     };
 
     /**
@@ -448,7 +440,6 @@ export class DecisionTree extends React.Component<{
                     onClick={onClick}
                     style={node.active ? {...style.container} : {...style.link}}
                     onMouseEnter={e => outer.onMouseEnter(node, e)}
-                    onMouseLeave={e => outer.onMouseLeave(node, e)}
                 >
                     {!terminal ? this.renderToggle() : null}
                     <decorators.Header node={node} style={style.header}/>
