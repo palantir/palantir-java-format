@@ -72,7 +72,6 @@ public abstract class State {
                 .mustBreak(false)
                 .numLines(0)
                 .branchingCoefficient(0)
-                .depth(0)
                 .breakTagsTaken(Set.empty(HasUniqueId.ord()))
                 .breakStates(TreeMap.empty(HasUniqueId.ord()))
                 .levelStates(TreeMap.empty(HasUniqueId.ord()))
@@ -163,7 +162,6 @@ public abstract class State {
                 .indent(indent())
                 .branchingCoefficient(branchingCoefficient())
                 .mustBreak(mustBreak())
-                .depth(depth())
                 // Overridden state
                 .column(afterInnerLevel.column())
                 .numLines(afterInnerLevel.numLines())
@@ -206,10 +204,6 @@ public abstract class State {
                 .from(this)
                 .tokStates(tokStates().set(comment, tokState))
                 .build();
-    }
-
-    State increaseDepth() {
-        return State.builder().from(this).depth(depth() + 1).build();
     }
 
     public static class Builder extends ImmutableState.Builder {}
