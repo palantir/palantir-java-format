@@ -21,18 +21,30 @@ import java.util.OptionalInt;
 import java.util.function.Function;
 import javax.annotation.CheckReturnValue;
 
-public interface Obs {
+/**
+ * These classes exist purely for observing the operation of {@link Doc#computeBreaks}, including all the alternative
+ * hypotheses it has considered and rejected before deciding on the final formatting.
+ */
+public final class Obs {
+    private Obs() {}
 
-    interface FinishLevelNode {
+    public interface FinishLevelNode {
         void finishNode(int acceptedExplorationId);
     }
 
-    interface FinishExplorationNode {
+    public interface FinishExplorationNode {
         /** Indicate that the exploration node was successful and produced this {@code newState} */
         void finishNode(Level parentLevel, State newState);
     }
 
-    interface Sink {
+    /** Within an 'exploration', allows you to descend into child levels. */
+    public interface ExplorationNode {
+        LevelNode newChildNode(Level level, State state);
+
+        int id();
+    }
+
+    public interface Sink {
         FinishExplorationNode startExplorationNode(
                 int exporationId, OptionalInt parentLevelId, String humanDescription, int startColumn);
 
@@ -47,7 +59,7 @@ public interface Obs {
         String getOutput();
     }
 
-    static ExplorationNode createRoot(Sink sink) {
+    public static ExplorationNode createRoot(Sink sink) {
         return new ExplorationNodeImpl(null, "(initial node)", sink, 0);
     }
 
@@ -64,7 +76,14 @@ public interface Obs {
         State finishLevel(State state);
     }
 
-    class LevelNodeImpl extends HasUniqueId implements LevelNode {
+    /** A handle that lets you accept exactly one 'exploration' of how to format a level. */
+    interface Exploration {
+        State markAccepted();
+
+        State state();
+    }
+
+    private static class LevelNodeImpl extends HasUniqueId implements LevelNode {
         private final Level level;
         private final Sink sink;
         private final FinishLevelNode finisher;
@@ -132,21 +151,7 @@ public interface Obs {
         }
     }
 
-    /** A handle that lets you accept exactly one 'exploration' of how to format a level. */
-    interface Exploration {
-        State markAccepted();
-
-        State state();
-    }
-
-    /** Within an 'exploration', allows you to descend into child levels. */
-    interface ExplorationNode {
-        LevelNode newChildNode(Level level, State state);
-
-        int id();
-    }
-
-    class ExplorationNodeImpl extends HasUniqueId implements ExplorationNode {
+    private static class ExplorationNodeImpl extends HasUniqueId implements ExplorationNode {
         private final Sink sink;
         private final FinishExplorationNode finishExplorationNode;
         private final Optional<Level> parentLevel;
