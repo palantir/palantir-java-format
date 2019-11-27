@@ -1,4 +1,9 @@
 # Run ./gradlew --write-locks to regenerate this file
+com.fasterxml.jackson.core:jackson-annotations:2.10.1 (1 constraints: 84122d21)
+com.fasterxml.jackson.core:jackson-core:2.10.1 (3 constraints: 5b41901b)
+com.fasterxml.jackson.core:jackson-databind:2.10.1 (3 constraints: 0d344066)
+com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.10.1 (1 constraints: 3605303b)
+com.fasterxml.jackson.module:jackson-module-parameter-names:2.10.1 (1 constraints: 3605303b)
 com.google.auto:auto-common:0.10 (2 constraints: 29219941)
 com.google.auto.service:auto-service:1.0-rc6 (1 constraints: dd05b441)
 com.google.auto.service:auto-service-annotations:1.0-rc6 (1 constraints: 741058a7)

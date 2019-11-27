@@ -10,6 +10,9 @@ dependencies {
     api 'com.google.guava:guava'
     implementation 'com.google.errorprone:javac-shaded'
     implementation 'org.functionaljava:functionaljava'
+    implementation 'com.fasterxml.jackson.core:jackson-databind' // purely for the debugger
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8'
+    implementation 'com.fasterxml.jackson.module:jackson-module-parameter-names'
 
     testCompile 'com.google.guava:guava-testlib'
     testCompile 'com.google.truth:truth'

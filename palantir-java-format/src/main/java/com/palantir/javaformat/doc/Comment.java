@@ -84,7 +84,8 @@ public final class Comment extends Doc implements Op {
     }
 
     @Override
-    public State computeBreaks(CommentsHelper commentsHelper, int maxWidth, State state) {
+    public State computeBreaks(
+            CommentsHelper commentsHelper, int maxWidth, State state, Obs.ExplorationNode observationNode) {
         String text = commentsHelper.rewrite(tok, maxWidth, state.column());
         int firstLineLength = text.length() - Iterators.getLast(Newlines.lineOffsetIterator(text));
         return state.withColumn(state.column() + firstLineLength)

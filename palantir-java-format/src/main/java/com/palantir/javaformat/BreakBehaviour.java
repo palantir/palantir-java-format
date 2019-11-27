@@ -1,13 +1,19 @@
 package com.palantir.javaformat;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.doc.Doc;
 import com.palantir.javaformat.doc.Level;
+import java.io.IOException;
 import org.derive4j.ArgOption;
 import org.derive4j.Data;
 
 @Data(arguments = ArgOption.checkedNotNull)
 @Immutable
+@JsonSerialize(using = BreakBehaviour.Json.class)
 public abstract class BreakBehaviour {
     public interface Cases<R> {
 
@@ -35,4 +41,45 @@ public abstract class BreakBehaviour {
     /** For {@link com.palantir.javaformat.doc.LevelDelimitedFlatValueDocVisitor}. */
     @Override
     public abstract String toString();
+
+    /**
+     * This is gross but just wanted to get something working. See https://github.com/derive4j/derive4j/issues/51 for a
+     * potential better implementation.
+     */
+    static class Json extends JsonSerializer<BreakBehaviour> {
+
+        @Override
+        public void serialize(BreakBehaviour value, JsonGenerator gen, SerializerProvider serializers)
+                throws IOException {
+            gen.writeStartObject();
+            BreakBehaviours.caseOf(value)
+                    .breakThisLevel(() -> {
+                        try {
+                            gen.writeObjectField("type", "breakThisLevel");
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        return null;
+                    })
+                    .preferBreakingLastInnerLevel((keepIndentWhenInlined) -> {
+                        try {
+                            gen.writeObjectField("type", "preferBreakingLastInnerLevel");
+                            gen.writeObjectField("keepIndentWhenInlined", keepIndentWhenInlined);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        return null;
+                    })
+                    .breakOnlyIfInnerLevelsThenFitOnOneLine((keepIndentWhenInlined) -> {
+                        try {
+                            gen.writeObjectField("type", "breakOnlyIfInnerLevelsThenFitOnOneLine");
+                            gen.writeObjectField("keepIndentWhenInlined", keepIndentWhenInlined);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        return null;
+                    });
+            gen.writeEndObject();
+        }
+    }
 }

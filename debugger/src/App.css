@@ -1,0 +1,152 @@
+.App code {
+    white-space: pre; font-family: monospace; line-height: 1em;
+}
+
+/* TreeDoc */
+
+.TreeDoc .doc-level {
+    margin-left: 20px;
+}
+
+.TreeDoc {
+    width: 1600px;
+}
+
+.TreeDoc .doc-level {
+    outline: 1px dotted lightgrey;
+}
+
+.TreeDoc .doc-level:hover {
+    outline: 1px solid grey;
+}
+
+.TreeDoc .doc-level:hover > .highlight {
+    background-color: hsl(120, 61%, 80%);
+}
+
+.TreeDoc .doc-break {
+    background: hsl(0, 60%, 90%);
+}
+
+/** these are breaks being referenced by a conditional indent when you hover over it */
+.TreeDoc .doc-break.referenced {
+    background: hsl(60, 100%, 78%);
+}
+
+.TreeDoc .banner {
+    background-color: rgba(138, 155, 168, 0.15);
+}
+
+/* Collapse empty level banner */
+.TreeDoc .banner:empty {
+    display: none;
+}
+
+/* DecisionTree */
+
+.TreeAndDoc {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 1000px;
+    max-height: 1000px;
+}
+
+.TreeAndDoc > * {
+    flex-grow: 1;
+    flex-basis: 50%;
+    /** necessary to prevent overflow */
+    max-width: 50%;
+}
+
+.TreeAndDoc .DecisionTree {
+    margin: 10px 0;
+    overflow: scroll;
+}
+
+/**
+ * Since the Treebeard tree has a different background, we want to make sure it always takes up the space or else
+ * it looks ugly.
+ */
+.TreeAndDoc .DecisionTree > ul {
+    min-height: 100%;
+}
+
+.TreeAndDoc .InlineDocs {
+    display: flex;
+    flex-direction: column;
+    overflow: scroll;
+}
+
+.TreeAndDoc .InlineDocs .InlineDoc {
+    flex-grow: 1;
+    flex-basis: auto;
+}
+
+.HighlightInlineDoc {
+    flex-grow: 0;
+    flex-shrink: 1;
+}
+
+/* InlineDoc */
+
+.InlineDoc .doc-level.referenced {
+    border-radius: 2px;
+    background-color: hsla(56, 100%, 51%, 0.4);
+}
+
+/** Inside a referenced level, highlight direct children very specifically. */
+.InlineDoc .doc-level.referenced > .highlight {
+    background-color: hsl(120, 61%, 80%);
+}
+
+/** Inside a referenced level, highlight nested inner levels with progressively more red to indicate depth. */
+.InlineDoc .doc-level.referenced .doc-level {
+    background: hsla(0, 40%, 50%, 0.15);
+    /*outline: 2px solid hsla(0, 40%, 0%, 0.3);*/
+}
+
+/* Ops */
+
+.Ops span.token:hover {
+    outline: 1px solid black;
+}
+
+.Ops span.token:hover span.tokenBody {
+    text-decoration: underline;
+}
+
+.Ops span.open-op, .Ops span.close-op, .Ops span.break {
+    position: relative;
+    width: 3px;
+    height: 1em;
+    display: inline-block;
+    margin: 0 1px;
+}
+
+.Ops span.open-op {
+    background: green;
+}
+
+.Ops span.close-op {
+    background: red;
+}
+
+.Ops span.break.FillMode-UNIFIED {
+    background: #777;
+}
+
+.Ops span.break.FillMode-INDEPENDENT {
+    background: #333;
+}
+
+.Ops span.break.FillMode-FORCED {
+    background: #000;
+    width: 5px;
+}
+
+.Ops span.break.conditional {
+    height: 0.4em;
+    width: 0.4em;
+    vertical-align: middle;
+}

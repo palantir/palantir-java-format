@@ -125,7 +125,8 @@ public abstract class Break extends Doc implements Op {
     }
 
     @Override
-    public State computeBreaks(CommentsHelper commentsHelper, int maxWidth, State state) {
+    public State computeBreaks(
+            CommentsHelper commentsHelper, int maxWidth, State state, Obs.ExplorationNode observationNode) {
         // Updating the state for {@link Break}s requires deciding if the break
         // should be taken.
         // TODO(cushon): this hierarchy is wrong, create a separate interface

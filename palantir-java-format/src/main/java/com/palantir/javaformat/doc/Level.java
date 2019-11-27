@@ -30,6 +30,7 @@ import com.palantir.javaformat.Indent;
 import com.palantir.javaformat.LastLevelBreakability;
 import com.palantir.javaformat.OpenOp;
 import com.palantir.javaformat.Output;
+import com.palantir.javaformat.doc.Obs.ExplorationNode;
 import com.palantir.javaformat.doc.StartsWithBreakVisitor.Result;
 import java.util.ArrayList;
 import java.util.List;
@@ -101,10 +102,12 @@ public final class Level extends Doc {
     }
 
     @Override
-    public State computeBreaks(CommentsHelper commentsHelper, int maxWidth, State state) {
+    public State computeBreaks(CommentsHelper commentsHelper, int maxWidth, State state, Obs.ExplorationNode observer) {
         return tryToFitOnOneLine(maxWidth, state).orElseGet(() -> {
-            State newState = getBreakBehaviour().match(new BreakImpl(commentsHelper, maxWidth, state));
-            return state.updateAfterLevel(newState);
+            Obs.LevelNode childLevel = observer.newChildNode(this, state);
+            State newState = getBreakBehaviour().match(new BreakImpl(commentsHelper, maxWidth, state, childLevel));
+
+            return childLevel.finishLevel(state.updateAfterLevel(newState));
         });
     }
 
@@ -142,20 +145,25 @@ public final class Level extends Doc {
         private final CommentsHelper commentsHelper;
         private final int maxWidth;
         private final State state;
+        private final Obs.LevelNode levelNode;
 
-        public BreakImpl(CommentsHelper commentsHelper, int maxWidth, State state) {
+        public BreakImpl(CommentsHelper commentsHelper, int maxWidth, State state, Obs.LevelNode levelNode) {
             this.commentsHelper = commentsHelper;
             this.maxWidth = maxWidth;
             this.state = state;
+            this.levelNode = levelNode;
         }
 
-        private State breakNormally(State state) {
-            return computeBroken(commentsHelper, maxWidth, state.withIndentIncrementedBy(getPlusIndent()));
+        private State breakNormally(State state, ExplorationNode explorationNode) {
+            return computeBroken(
+                    commentsHelper, maxWidth, state.withIndentIncrementedBy(getPlusIndent()), explorationNode);
         }
 
         @Override
         public State breakThisLevel() {
-            return breakNormally(this.state);
+            return levelNode
+                    .explore("breakThisLevel", explorationNode -> breakNormally(state, explorationNode))
+                    .markAccepted();
         }
 
         @Override
@@ -164,32 +172,53 @@ public final class Level extends Doc {
             // breaks if the outcome is the same.
             State state = this.state.withNewBranch();
 
-            State broken = breakNormally(state);
+            Obs.Exploration broken = levelNode.explore(
+                    "breaking normally", (explorationNode) -> breakNormally(this.state, explorationNode));
+
             if (state.branchingCoefficient() < MAX_BRANCHING_COEFFICIENT) {
-                // No plusIndent the first time around, since we expect this whole level (except part of the last inner
-                // level) to be on the first line.
-                Optional<State> lastLevelBroken = tryBreakLastLevel(commentsHelper, maxWidth, state.withNoIndent());
+                Optional<Obs.Exploration> lastLevelBroken = levelNode.maybeExplore(
+                        "tryBreakLastLevel", (explorationNode) ->
+                                tryBreakLastLevel(commentsHelper, maxWidth, state.withNoIndent(), explorationNode));
 
                 if (lastLevelBroken.isPresent()) {
-                    if (lastLevelBroken.get().numLines() < broken.numLines()) {
-                        return lastLevelBroken.get();
+                    if (lastLevelBroken.get().state().numLines() < broken.state().numLines()) {
+                        return lastLevelBroken.get().markAccepted();
                     }
                 }
             }
-            return broken;
+            return broken.markAccepted();
         }
 
         @Override
         public State breakOnlyIfInnerLevelsThenFitOnOneLine(boolean keepIndentWhenInlined) {
-            State broken = breakNormally(this.state);
-            Optional<State> maybeInlined = handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
-                    commentsHelper, maxWidth, this.state, broken, keepIndentWhenInlined);
-            return maybeInlined.orElse(broken);
+            Obs.Exploration broken = levelNode.explore(
+                    "breaking normally", explorationNode -> breakNormally(this.state, explorationNode));
+
+            Optional<Obs.Exploration> maybeInlined = levelNode.maybeExplore(
+                    "handleBreakOnlyIfInnerLevelsThenFitOnOneLine", (explorationNode) ->
+                            handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
+                                    commentsHelper,
+                                    maxWidth,
+                                    this.state,
+                                    broken.state(),
+                                    keepIndentWhenInlined,
+                                    explorationNode));
+
+            if (maybeInlined.isPresent()) {
+                return maybeInlined.get().markAccepted();
+            } else {
+                return broken.markAccepted();
+            }
         }
     }
 
     private Optional<State> handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
-            CommentsHelper commentsHelper, int maxWidth, State state, State brokenState, boolean keepIndent) {
+            CommentsHelper commentsHelper,
+            int maxWidth,
+            State state,
+            State brokenState,
+            boolean keepIndent,
+            Obs.ExplorationNode explorationNode) {
         List<Level> innerLevels = this.docs.stream()
                 .filter(doc -> doc instanceof Level)
                 .map(doc -> ((Level) doc))
@@ -234,12 +263,14 @@ public final class Level extends Doc {
                 newState = newState.withIndentIncrementedBy(getPlusIndent());
             }
             return Optional.of(
-                    tryToLayOutLevelOnOneLine(commentsHelper, maxWidth, newState, memoizedSplitsBreaks.get()));
+                    tryToLayOutLevelOnOneLine(
+                            commentsHelper, maxWidth, newState, memoizedSplitsBreaks.get(), explorationNode));
         }
         return Optional.empty();
     }
 
-    private Optional<State> tryBreakLastLevel(CommentsHelper commentsHelper, int maxWidth, State state) {
+    private Optional<State> tryBreakLastLevel(
+            CommentsHelper commentsHelper, int maxWidth, State state, Obs.ExplorationNode explorationNode) {
         if (docs.isEmpty() || !(getLast(docs) instanceof Level)) {
             return Optional.empty();
         }
@@ -263,7 +294,7 @@ public final class Level extends Doc {
 
         SplitsBreaks prefixSplitsBreaks = splitByBreaks(leadingDocs);
 
-        State state1 = tryToLayOutLevelOnOneLine(commentsHelper, maxWidth, state, prefixSplitsBreaks);
+        State state1 = tryToLayOutLevelOnOneLine(commentsHelper, maxWidth, state, prefixSplitsBreaks, explorationNode);
         Preconditions.checkState(
                 !state1.mustBreak(), "We messed up, it wants to break a bunch of splits that shouldn't be broken");
 
@@ -280,7 +311,12 @@ public final class Level extends Doc {
                         if (keepIndentWhenInlined) {
                             state2 = state2.withIndentIncrementedBy(lastLevel.getPlusIndent());
                         }
-                        return lastLevel.tryBreakLastLevel(commentsHelper, maxWidth, state2);
+                        State state3 = state2;
+                        return explorationNode
+                                .newChildNode(lastLevel, state2)
+                                .maybeExplore("recurse into inner tryBreakLastLevel", exp ->
+                                        lastLevel.tryBreakLastLevel(commentsHelper, maxWidth, state3, exp))
+                                .map(expl -> expl.markAccepted()); // collapse??
                     })
                     // We don't know how to fit the inner level on the same line, so bail out.
                     .otherwise_(Optional.empty());
@@ -307,7 +343,12 @@ public final class Level extends Doc {
 
         // Note: computeBreaks, not computeBroken, so it can try to do this logic recursively for the
         // lastLevel
-        return Optional.of(lastLevel.computeBreaks(commentsHelper, maxWidth, state1));
+        return Optional.of(
+                explorationNode
+                        .newChildNode(lastLevel, state1)
+                        .explore("end tryBreakLastLevel chain", exp ->
+                                lastLevel.computeBreaks(commentsHelper, maxWidth, state1, exp))
+                        .markAccepted());
     }
 
     private static void assertStartsWithBreakOrEmpty(State state, Doc doc) {
@@ -323,7 +364,11 @@ public final class Level extends Doc {
      * line.
      */
     private State tryToLayOutLevelOnOneLine(
-            CommentsHelper commentsHelper, int maxWidth, State state, SplitsBreaks splitsBreaks) {
+            CommentsHelper commentsHelper,
+            int maxWidth,
+            State state,
+            SplitsBreaks splitsBreaks,
+            Obs.ExplorationNode explorationNode) {
 
         for (int i = 0; i < splitsBreaks.splits().size(); ++i) {
             if (i > 0) {
@@ -333,7 +378,7 @@ public final class Level extends Doc {
             List<Doc> split = splitsBreaks.splits().get(i);
             float splitWidth = getWidth(split);
             boolean enoughRoom = state.column() + splitWidth <= maxWidth;
-            state = computeSplit(commentsHelper, maxWidth, split, state.withMustBreak(false));
+            state = computeSplit(commentsHelper, maxWidth, split, state.withMustBreak(false), explorationNode);
             if (!enoughRoom) {
                 state = state.withMustBreak(true);
             }
@@ -358,15 +403,17 @@ public final class Level extends Doc {
     }
 
     /** Compute breaks for a {@link Level} that spans multiple lines. */
-    private State computeBroken(CommentsHelper commentsHelper, int maxWidth, State state) {
+    private State computeBroken(
+            CommentsHelper commentsHelper, int maxWidth, State state, Obs.ExplorationNode explorationNode) {
         SplitsBreaks splitsBreaks = memoizedSplitsBreaks.get();
 
         if (!splitsBreaks.breaks().isEmpty()) {
             state = state.withBrokenLevel();
         }
 
+        ImmutableList<Doc> splitDocs = splitsBreaks.splits().get(0);
         state = computeBreakAndSplit(
-                commentsHelper, maxWidth, state, /* optBreakDoc= */ Optional.empty(), splitsBreaks.splits().get(0));
+                commentsHelper, maxWidth, state, /* optBreakDoc= */ Optional.empty(), splitDocs, explorationNode);
 
         // Handle following breaks and split.
         for (int i = 0; i < splitsBreaks.breaks().size(); i++) {
@@ -375,14 +422,20 @@ public final class Level extends Doc {
                     maxWidth,
                     state,
                     Optional.of(splitsBreaks.breaks().get(i)),
-                    splitsBreaks.splits().get(i + 1));
+                    splitsBreaks.splits().get(i + 1),
+                    explorationNode);
         }
         return state;
     }
 
     /** Lay out a Break-separated group of Docs in the current Level. */
     private static State computeBreakAndSplit(
-            CommentsHelper commentsHelper, int maxWidth, State state, Optional<Break> optBreakDoc, List<Doc> split) {
+            CommentsHelper commentsHelper,
+            int maxWidth,
+            State state,
+            Optional<Break> optBreakDoc,
+            List<Doc> split,
+            Obs.ExplorationNode explorationNode) {
         float breakWidth = optBreakDoc.isPresent() ? optBreakDoc.get().getWidth() : 0.0F;
         float splitWidth = getWidth(split);
         boolean shouldBreak = (optBreakDoc.isPresent() && optBreakDoc.get().fillMode() == FillMode.UNIFIED)
@@ -393,16 +446,21 @@ public final class Level extends Doc {
             state = optBreakDoc.get().computeBreaks(state, shouldBreak);
         }
         boolean enoughRoom = state.column() + splitWidth <= maxWidth;
-        state = computeSplit(commentsHelper, maxWidth, split, state.withMustBreak(false));
+        state = computeSplit(commentsHelper, maxWidth, split, state.withMustBreak(false), explorationNode);
         if (!enoughRoom) {
             state = state.withMustBreak(true); // Break after, too.
         }
         return state;
     }
 
-    private static State computeSplit(CommentsHelper commentsHelper, int maxWidth, List<Doc> docs, State state) {
+    private static State computeSplit(
+            CommentsHelper commentsHelper,
+            int maxWidth,
+            List<Doc> docs,
+            State state,
+            Obs.ExplorationNode explorationNode) {
         for (Doc doc : docs) {
-            state = doc.computeBreaks(commentsHelper, maxWidth, state);
+            state = doc.computeBreaks(commentsHelper, maxWidth, state, explorationNode);
         }
         return state;
     }
@@ -451,12 +509,16 @@ public final class Level extends Doc {
         return openOp.debugName();
     }
 
+    OpenOp getOpenOp() {
+        return openOp;
+    }
+
     public OptionalInt getColumnLimitBeforeLastBreak() {
         return openOp.columnLimitBeforeLastBreak();
     }
 
     /** An indented representation of this level and all nested levels inside it. */
-    String representation(State state) {
+    public String representation(State state) {
         return new LevelDelimitedFlatValueDocVisitor(state).visit(this);
     }
 
@@ -485,7 +547,6 @@ public final class Level extends Doc {
                 .add("plusIndent", getPlusIndent())
                 .add("breakBehaviour", getBreakBehaviour())
                 .add("breakabilityIfLastLevel", getBreakabilityIfLastLevel())
-                .add("docs", docs)
                 .toString();
     }
 

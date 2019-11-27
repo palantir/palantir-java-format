@@ -16,6 +16,7 @@
 
 package com.palantir.javaformat.doc;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.Indent;
@@ -47,10 +48,13 @@ public abstract class State {
      */
     public abstract int branchingCoefficient();
 
+    @Value.Auxiliary
     protected abstract Set<BreakTag> breakTagsTaken();
 
+    @Value.Auxiliary
     protected abstract TreeMap<Break, BreakState> breakStates();
 
+    @Value.Auxiliary
     protected abstract TreeMap<Level, LevelState> levelStates();
 
     /**
@@ -209,6 +213,7 @@ public abstract class State {
 
     @Value.Immutable
     @Value.Style(overshadowImplementation = true)
+    @JsonSerialize(as = ImmutableBreakState.class)
     interface BreakState {
         @Parameter
         boolean broken();
