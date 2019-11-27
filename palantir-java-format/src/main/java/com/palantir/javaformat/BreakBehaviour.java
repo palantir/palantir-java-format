@@ -61,19 +61,21 @@ public abstract class BreakBehaviour {
                         }
                         return null;
                     })
-                    .preferBreakingLastInnerLevel((keepIndentWhenInlined) -> {
+                    .preferBreakingLastInnerLevel((keepIndentWhenInlined, replaceIndent) -> {
                         try {
                             gen.writeObjectField("type", "preferBreakingLastInnerLevel");
                             gen.writeObjectField("keepIndentWhenInlined", keepIndentWhenInlined);
+                            gen.writeObjectField("replaceIndent", replaceIndent);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
                         return null;
                     })
-                    .breakOnlyIfInnerLevelsThenFitOnOneLine((keepIndentWhenInlined) -> {
+                    .breakOnlyIfInnerLevelsThenFitOnOneLine((keepIndentWhenInlined, replaceIndent) -> {
                         try {
                             gen.writeObjectField("type", "breakOnlyIfInnerLevelsThenFitOnOneLine");
                             gen.writeObjectField("keepIndentWhenInlined", keepIndentWhenInlined);
+                            gen.writeObjectField("replaceIndent", replaceIndent);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
