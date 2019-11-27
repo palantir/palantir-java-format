@@ -134,7 +134,7 @@ const InlineDocComponent: React.FC<{
 /** Render a {@link Doc} as a "tree" of nested levels. */
 const TreeDocComponent: React.FC<{doc: Doc}> = ({doc}) => {
 
-    const [highlightedBreakId, setHighlightedBreakId] = useState<Id>();
+    const [highlightedBreakTag, setHighlightedBreakTag] = useState<Id>();
 
     function renderConstIndent(indent: Indent) {
         switch (indent.type) {
@@ -160,8 +160,8 @@ const TreeDocComponent: React.FC<{doc: Doc}> = ({doc}) => {
                         elseIndent={renderConstIndent(indent.elseIndent)}
                     </span>}>
                     <Tag intent={"warning"}
-                            onMouseEnter={() => setHighlightedBreakId(indent.condition.id)}
-                            onMouseLeave={() => setHighlightedBreakId(undefined)}>
+                            onMouseEnter={() => setHighlightedBreakTag(indent.condition.id)}
+                            onMouseLeave={() => setHighlightedBreakTag(undefined)}>
                         +{evaluatedIndent}
                     </Tag>
                 </Tooltip>
@@ -177,7 +177,7 @@ const TreeDocComponent: React.FC<{doc: Doc}> = ({doc}) => {
             case "break":
                 const clazz = doc.optTag !== null
                         ? (`conditional ${classForBreakTagId(doc.optTag.id)}`
-                            + (highlightedBreakId === doc.optTag.id ? ' referenced' : ''))
+                            + (highlightedBreakTag === doc.optTag.id ? ' referenced' : ''))
                         : '';
                 if (doc.breakState.broken) {
                     return <span key={doc.id}>
