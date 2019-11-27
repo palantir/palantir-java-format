@@ -438,7 +438,7 @@ export class DecisionTree extends React.Component<{
                 <div
                     onClick={onClick}
                     style={outer.state.selectedNodeId === node.id
-                        ? {backgroundColor: '#2B95D6'}
+                        ? {backgroundColor: '#2B95D6', ...style.link}
                         : (node.active ? {...style.container} : {...style.link})
                     }
                     onMouseEnter={() => outer.onMouseEnter(node)}
