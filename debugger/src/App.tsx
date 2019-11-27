@@ -1,4 +1,4 @@
-import React, { CSSProperties, Dispatch, MouseEvent, useState } from 'react';
+import React, { CSSProperties, Dispatch, useState } from 'react';
 import './App.css';
 import { Callout, Classes, H1, Pre, Tag, Toaster, Tooltip } from "@blueprintjs/core";
 import { decorators as TreebeardDecorators, Treebeard } from 'react-treebeard';
@@ -266,11 +266,12 @@ const Ops: React.FC<{ops: Array<Op>}> = ({ops}) => {
 
 export interface ITreeState {
     nodes: TreeNode[];
+    selectedNodeId?: string,
 }
 
 /** Treebeard doesn't have typescript bindings, so have to manually specify them. */
 interface TreeNode {
-    id?: string,
+    id: string,
     name: JSX.Element | string,
     children?: Array<TreeNode>,
     toggled?: boolean,
@@ -423,9 +424,11 @@ export class DecisionTree extends React.Component<{
         }
     }
 
-    private onMouseEnter = (nodeData: TreeNode, e: MouseEvent) => {
+    private onMouseEnter = (nodeData: TreeNode) => {
+        this.state.selectedNodeId = nodeData.id;
         // TODO select this node somehow so it's obvious that it's highlighted
         this.highlightLevel(nodeData);
+        this.setState(this.state);
     };
 
     /**
@@ -433,13 +436,17 @@ export class DecisionTree extends React.Component<{
      * component object, because we don't control what gets passed to this inner component via props.
      */
     private Container = (outer: DecisionTree) => class extends TreebeardDecorators.Container {
+
         render() {
             const {style, decorators, terminal, onClick, node} = this.props;
             return (
                 <div
                     onClick={onClick}
-                    style={node.active ? {...style.container} : {...style.link}}
-                    onMouseEnter={e => outer.onMouseEnter(node, e)}
+                    style={outer.state.selectedNodeId === node.id
+                        ? {backgroundColor: '#2B95D6'}
+                        : (node.active ? {...style.container} : {...style.link})
+                    }
+                    onMouseEnter={() => outer.onMouseEnter(node)}
                 >
                     {!terminal ? this.renderToggle() : null}
                     <decorators.Header node={node} style={style.header}/>
