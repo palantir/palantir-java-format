@@ -88,7 +88,6 @@ public final class Obs {
         private final Sink sink;
         private final FinishLevelNode finisher;
         private final int startColumn;
-        private int acceptedExplorationId;
 
         public LevelNodeImpl(Level level, State incomingState, int parentExplorationId, Sink sink) {
             this.level = level;
@@ -106,7 +105,7 @@ public final class Obs {
             return new Exploration() {
                 @Override
                 public State markAccepted() {
-                    acceptedExplorationId = explorationNode.id();
+                    finisher.finishNode(explorationNode.id());
                     return newState;
                 }
 
@@ -132,7 +131,7 @@ public final class Obs {
             return Optional.of(new Exploration() {
                 @Override
                 public State markAccepted() {
-                    acceptedExplorationId = explorationNode.id();
+                    finisher.finishNode(explorationNode.id());
                     return newState;
                 }
 
@@ -145,7 +144,7 @@ public final class Obs {
 
         @Override
         public State finishLevel(State state) {
-            finisher.finishNode(acceptedExplorationId);
+            // TODO save the state somehow
             // this final state will be different from the 'accepted' state
             return state;
         }
