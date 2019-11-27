@@ -26,7 +26,7 @@ type Doc = Break | Level | Comment | Space | Token;
 
 type Token = { type: "token", flat: string } & HasId;
 type Space = { type: "space" } & HasId;
-type Break = { type: "break", flat: string, breakState: { broken: boolean, newIndent: number }, optTag: HasId } & HasId;
+type Break = { type: "break", flat: string, breakState: { broken: boolean, newIndent: number }, optTag: HasId | null } & HasId;
 type Comment = { type: "comment", /** Original text */ flat: string, /** Text as rendered */ text: string } & HasId;
 type Level = {
     type: "level",
@@ -134,17 +134,7 @@ const InlineDocComponent: React.FC<{
 /** Render a {@link Doc} as a "tree" of nested levels. */
 const TreeDocComponent: React.FC<{doc: Doc}> = ({doc}) => {
 
-    function highlightBreaksForBreakTag(id: Id, highlight: boolean) {
-        const nodes = document.getElementsByClassName(classForBreakTagId(id));
-        // @ts-ignore
-        for (let item of nodes) {
-            if (highlight) {
-                item.classList.add('referenced')
-            } else {
-                item.classList.remove('referenced')
-            }
-        }
-    }
+    const [highlightedBreakId, setHighlightedBreakId] = useState<Id>();
 
     function renderConstIndent(indent: Indent) {
         switch (indent.type) {
@@ -170,8 +160,8 @@ const TreeDocComponent: React.FC<{doc: Doc}> = ({doc}) => {
                         elseIndent={renderConstIndent(indent.elseIndent)}
                     </span>}>
                     <Tag intent={"warning"}
-                            onMouseEnter={() => highlightBreaksForBreakTag(indent.condition.id, true)}
-                            onMouseLeave={() => highlightBreaksForBreakTag(indent.condition.id, false)}>
+                            onMouseEnter={() => setHighlightedBreakId(indent.condition.id)}
+                            onMouseLeave={() => setHighlightedBreakId(undefined)}>
                         +{evaluatedIndent}
                     </Tag>
                 </Tooltip>
@@ -185,7 +175,10 @@ const TreeDocComponent: React.FC<{doc: Doc}> = ({doc}) => {
     function renderDoc(doc: Doc) {
         switch (doc.type) {
             case "break":
-                const clazz = (doc.optTag !== null) ? `conditional ${classForBreakTagId(doc.optTag.id)}` : '';
+                const clazz = doc.optTag !== null
+                        ? (`conditional ${classForBreakTagId(doc.optTag.id)}`
+                            + (highlightedBreakId === doc.optTag.id ? ' referenced' : ''))
+                        : '';
                 if (doc.breakState.broken) {
                     return <span key={doc.id}>
                         <Tooltip content={`New indent: ${doc.breakState.newIndent}`}>
