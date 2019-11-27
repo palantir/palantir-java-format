@@ -102,11 +102,11 @@ const InlineDocComponent: React.FC<{
             case "break":
                 // TODO add breakToken in here
                 if (doc.breakState.broken) {
-                    return <span key={doc.id} className={"doc doc-break taken highlight"}>
+                    return <span key={doc.id} className={"doc doc-break taken"}>
                         <br/>{' '.repeat(doc.breakState.newIndent)}
                     </span>;
                 } else {
-                    return <span key={doc.id} className={"doc doc-break highlight"}>{doc.flat}</span>
+                    return <span key={doc.id} className={"doc doc-break"}>{doc.flat}</span>
                 }
             case "level":
                 // TODO other information about the doc
@@ -115,11 +115,11 @@ const InlineDocComponent: React.FC<{
                 </span>;
             case "comment":
                 // TODO maybe display original on hover?
-                return <span key={doc.id} className={"doc doc-comment highlight"}>{doc.text}</span>;
+                return <span key={doc.id} className={"doc doc-comment"}>{doc.text}</span>;
             case "space":
-                return <span key={doc.id} className={"doc doc-space highlight"}>&nbsp;</span>;
+                return <span key={doc.id} className={"doc doc-space"}>&nbsp;</span>;
             case "token":
-                return <span key={doc.id} className={"doc-token highlight"}>{doc.flat}</span>;
+                return <span key={doc.id} className={"doc-token"}>{doc.flat}</span>;
         }
     }
 
