@@ -343,7 +343,12 @@ public final class Level extends Doc {
 
         // Note: computeBreaks, not computeBroken, so it can try to do this logic recursively for the
         // lastLevel
-        return Optional.of(lastLevel.computeBreaks(commentsHelper, maxWidth, state1, explorationNode));
+        return Optional.of(
+                explorationNode
+                        .newChildNode(lastLevel, state1)
+                        .explore("end tryBreakLastLevel chain", exp ->
+                                lastLevel.computeBreaks(commentsHelper, maxWidth, state1, exp))
+                        .markAccepted());
     }
 
     private static void assertStartsWithBreakOrEmpty(State state, Doc doc) {
