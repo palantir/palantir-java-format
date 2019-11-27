@@ -1,0 +1,11 @@
+type: fix
+fix:
+  description: "When inlining a level's leading docs, check that no breaks were introduced
+    more robustly.\n\nWe already did some validation that the leading docs \n (1)
+    don't contain forced breaks, and\n (2) can fit onto the current line\nHowever
+    with the new logic added in #71, inner levels might decide to break even when
+    the above two conditions are satisfied.\n\nWe guard against this by checking whether
+    the state after the inlining of leading docs has recorded new lines, which would
+    be caused by an inner break being taken."
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/85
