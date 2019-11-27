@@ -18,7 +18,7 @@ import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.base.Joiner;
 
-public class ImportOrdererUtils {
+public final class ImportOrdererUtils {
     public static Object[] createRow(String[][] inputAndOutput) {
         assertThat(inputAndOutput).hasLength(2);
         String[] input = inputAndOutput[0];

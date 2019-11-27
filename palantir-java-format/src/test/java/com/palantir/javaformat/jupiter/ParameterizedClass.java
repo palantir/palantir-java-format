@@ -211,7 +211,9 @@ public final class ParameterizedClass implements TestTemplateInvocationContextPr
 
                             Method method = methods.get(0);
 
-                            return AnnotationUtils.findAnnotation(method, Parameters.class).get().name();
+                            return AnnotationUtils.findAnnotation(method, Parameters.class)
+                                    .get()
+                                    .name();
                         },
                         String.class);
     }

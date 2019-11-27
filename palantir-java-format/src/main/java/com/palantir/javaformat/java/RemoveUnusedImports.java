@@ -88,7 +88,7 @@ public class RemoveUnusedImports {
     // This is still reasonably effective in practice because type names differ
     // from other kinds of names in casing convention, and simple name
     // clashes between imported and declared types are rare.
-    private static class UnusedImportScanner extends TreePathScanner<Void, Void> {
+    private static final class UnusedImportScanner extends TreePathScanner<Void, Void> {
 
         private final Set<String> usedNames = new LinkedHashSet<>();
         private final Multimap<String, Range<Integer>> usedInJavadoc = HashMultimap.create();
@@ -247,7 +247,9 @@ public class RemoveUnusedImports {
             endPosition = Math.max(CharMatcher.isNot(' ').indexIn(contents, endPosition), endPosition);
             String sep = Newlines.guessLineSeparator(contents);
             if (endPosition + sep.length() < contents.length()
-                    && contents.subSequence(endPosition, endPosition + sep.length()).toString().equals(sep)) {
+                    && contents.subSequence(endPosition, endPosition + sep.length())
+                            .toString()
+                            .equals(sep)) {
                 endPosition += sep.length();
             }
             replacements.put(Range.closedOpen(importTree.getStartPosition(), endPosition), "");
@@ -258,7 +260,9 @@ public class RemoveUnusedImports {
     private static String getSimpleName(JCImport importTree) {
         return importTree.getQualifiedIdentifier() instanceof JCIdent
                 ? ((JCIdent) importTree.getQualifiedIdentifier()).getName().toString()
-                : ((JCFieldAccess) importTree.getQualifiedIdentifier()).getIdentifier().toString();
+                : ((JCFieldAccess) importTree.getQualifiedIdentifier())
+                        .getIdentifier()
+                        .toString();
     }
 
     private static boolean isUnused(
@@ -275,7 +279,9 @@ public class RemoveUnusedImports {
             return true;
         }
         if (importTree.getQualifiedIdentifier() instanceof JCFieldAccess
-                && ((JCFieldAccess) importTree.getQualifiedIdentifier()).getIdentifier().contentEquals("*")) {
+                && ((JCFieldAccess) importTree.getQualifiedIdentifier())
+                        .getIdentifier()
+                        .contentEquals("*")) {
             return false;
         }
 

@@ -105,22 +105,23 @@ public final class Token extends Doc implements Op {
     }
 
     @Override
-    float computeWidth() {
+    protected float computeWidth() {
         return token.getTok().length();
     }
 
     @Override
-    String computeFlat() {
+    protected String computeFlat() {
         return token.getTok().getOriginalText();
     }
 
     @Override
-    Range<Integer> computeRange() {
+    protected Range<Integer> computeRange() {
         return Range.singleton(token.getTok().getIndex()).canonical(INTEGERS);
     }
 
     @Override
-    public State computeBreaks(CommentsHelper commentsHelper, int maxWidth, State state) {
+    public State computeBreaks(
+            CommentsHelper commentsHelper, int maxWidth, State state, Obs.ExplorationNode observationNode) {
         String text = token.getTok().getOriginalText();
         return state.withColumn(state.column() + text.length());
     }

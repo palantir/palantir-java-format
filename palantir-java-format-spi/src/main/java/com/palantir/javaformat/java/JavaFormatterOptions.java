@@ -26,7 +26,7 @@ import com.google.errorprone.annotations.Immutable;
  * directly against our primary goals.
  */
 @Immutable
-public class JavaFormatterOptions {
+public final class JavaFormatterOptions {
 
     public enum Style {
         /** The default Palantir Java Style configuration. */
@@ -86,7 +86,7 @@ public class JavaFormatterOptions {
     }
 
     /** A builder for {@link JavaFormatterOptions}. */
-    public static class Builder {
+    public static final class Builder {
         // default is still GOOGLE just because lots of hand-rolled tests rely on this behaviour
         private Style style = Style.GOOGLE;
 

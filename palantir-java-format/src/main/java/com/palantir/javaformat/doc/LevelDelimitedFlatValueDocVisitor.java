@@ -31,12 +31,12 @@ public final class LevelDelimitedFlatValueDocVisitor implements DocVisitor<Strin
     }
 
     @Override
-    public String visitSpace(Space doc) {
+    public String visitSpace(NonBreakingSpace doc) {
         return doc.getFlat();
     }
 
     @Override
-    public String visitTok(Tok doc) {
+    public String visitComment(Comment doc) {
         return doc.getFlat();
     }
 
@@ -49,7 +49,7 @@ public final class LevelDelimitedFlatValueDocVisitor implements DocVisitor<Strin
     public String visitBreak(Break doc) {
         StringBuilder sb =
                 new StringBuilder().append("⏎").append(doc.getFlat().isEmpty() ? "" : "(" + doc.getFlat() + ")");
-        if (!doc.getPlusIndent().equals(Indent.Const.ZERO)) {
+        if (!doc.plusIndent().equals(Indent.Const.ZERO)) {
             sb.append(" +" + doc.evalPlusIndent(state));
         }
         return sb.toString();

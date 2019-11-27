@@ -39,7 +39,7 @@ public final class Main {
     private static final int MAX_THREADS = 20;
     private static final String STDIN_FILENAME = "<stdin>";
 
-    static final String versionString() {
+    static String versionString() {
         return "palantir-java-format: Version " + Main.class.getPackage().getImplementationVersion();
     }
 
@@ -95,8 +95,9 @@ public final class Main {
         }
 
         // TODO(someone): update this to always use Style.PALANTIR
-        JavaFormatterOptions options =
-                JavaFormatterOptions.builder().style(parameters.aosp() ? Style.AOSP : Style.GOOGLE).build();
+        JavaFormatterOptions options = JavaFormatterOptions.builder()
+                .style(parameters.aosp() ? Style.AOSP : Style.GOOGLE)
+                .build();
 
         if (parameters.stdin()) {
             return formatStdin(parameters, options);

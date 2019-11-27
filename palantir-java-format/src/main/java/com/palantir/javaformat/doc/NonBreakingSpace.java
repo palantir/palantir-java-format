@@ -25,18 +25,11 @@ import com.palantir.javaformat.Output;
 
 /** A Leaf node in a {@link Doc} for a non-breaking space. */
 @Immutable
-public final class Space extends Doc implements Op {
-    private static final Space SPACE = new Space();
+public final class NonBreakingSpace extends Doc implements Op {
+    private NonBreakingSpace() {}
 
-    private Space() {}
-
-    /**
-     * Factor method for {@code Space}.
-     *
-     * @return the new {@code Space}
-     */
-    public static Space make() {
-        return SPACE;
+    public static NonBreakingSpace make() {
+        return new NonBreakingSpace();
     }
 
     @Override
@@ -45,22 +38,23 @@ public final class Space extends Doc implements Op {
     }
 
     @Override
-    float computeWidth() {
+    protected float computeWidth() {
         return 1.0F;
     }
 
     @Override
-    String computeFlat() {
+    protected String computeFlat() {
         return " ";
     }
 
     @Override
-    Range<Integer> computeRange() {
+    protected Range<Integer> computeRange() {
         return Doc.EMPTY_RANGE;
     }
 
     @Override
-    public State computeBreaks(CommentsHelper commentsHelper, int maxWidth, State state) {
+    public State computeBreaks(
+            CommentsHelper commentsHelper, int maxWidth, State state, Obs.ExplorationNode observationNode) {
         return state.withColumn(state.column() + 1);
     }
 

@@ -29,9 +29,9 @@ import com.palantir.javaformat.Output;
  * {@link com.palantir.javaformat.java.JavaInputAstVisitor JavaInputAstVisitor} outputs a sequence of {@link Op}s using
  * {@link OpsBuilder}. This linear sequence is then transformed by {@link DocBuilder} into a tree-structured {@code
  * Doc}. The top-level {@code Doc} is a {@link Level}, which contains a sequence of {@code Doc}s, including other {@link
- * Level}s. Leaf {@code Doc}s are {@link Token}s, representing language-level tokens; {@link Tok}s, which may also
- * represent non-token {@link Input.Tok}s, including comments and other white-space; {@link Space}s, representing single
- * spaces; and {@link Break}s, which represent optional line-breaks.
+ * Level}s. Leaf {@code Doc}s are {@link Token}s, representing language-level tokens; {@link Comment}s, which may also
+ * represent non-token {@link Input.Tok}s, including comments and other white-space; {@link NonBreakingSpace}s,
+ * representing single spaces; and {@link Break}s, which represent optional line-breaks.
  */
 public abstract class Doc extends HasUniqueId {
     static final Range<Integer> EMPTY_RANGE = Range.closedOpen(-1, -1);
@@ -69,21 +69,21 @@ public abstract class Doc extends HasUniqueId {
      *
      * @return the width, or {@code Float.POSITIVE_INFINITY} if it must be broken
      */
-    abstract float computeWidth();
+    protected abstract float computeWidth();
 
     /**
      * Compute the {@code Doc}'s flat value. Not defined (and never called) if contains forced breaks.
      *
      * @return the flat value
      */
-    abstract String computeFlat();
+    protected abstract String computeFlat();
 
     /**
      * Compute the {@code Doc}'s {@link Range} of {@link Input.Token}s.
      *
      * @return the {@link Range}
      */
-    abstract Range<Integer> computeRange();
+    protected abstract Range<Integer> computeRange();
 
     /**
      * Make breaking decisions for a {@code Doc}.
@@ -92,7 +92,8 @@ public abstract class Doc extends HasUniqueId {
      * @param state the current output state
      * @return the new output state
      */
-    public abstract State computeBreaks(CommentsHelper commentsHelper, int maxWidth, State state);
+    public abstract State computeBreaks(
+            CommentsHelper commentsHelper, int maxWidth, State state, Obs.ExplorationNode explorationNode);
 
     /** Write a {@code Doc} to an {@link Output}, after breaking decisions have been made. */
     public abstract void write(State state, Output output);

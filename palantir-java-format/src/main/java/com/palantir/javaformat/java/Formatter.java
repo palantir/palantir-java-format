@@ -16,6 +16,7 @@ package com.palantir.javaformat.java;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Range;
@@ -23,13 +24,18 @@ import com.google.common.collect.RangeSet;
 import com.google.common.io.CharSink;
 import com.google.common.io.CharSource;
 import com.google.errorprone.annotations.Immutable;
+import com.palantir.javaformat.CommentsHelper;
 import com.palantir.javaformat.FormattingError;
-import com.palantir.javaformat.Newlines;
 import com.palantir.javaformat.Op;
 import com.palantir.javaformat.OpsBuilder;
+import com.palantir.javaformat.OpsBuilder.OpsOutput;
 import com.palantir.javaformat.Utils;
 import com.palantir.javaformat.doc.Doc;
 import com.palantir.javaformat.doc.DocBuilder;
+import com.palantir.javaformat.doc.Level;
+import com.palantir.javaformat.doc.NoopSink;
+import com.palantir.javaformat.doc.Obs;
+import com.palantir.javaformat.doc.Obs.Sink;
 import com.palantir.javaformat.doc.State;
 import java.io.IOError;
 import java.io.IOException;
@@ -86,18 +92,21 @@ public final class Formatter {
     static final Range<Integer> EMPTY_RANGE = Range.closedOpen(-1, -1);
 
     private final JavaFormatterOptions options;
+    private final boolean debugMode;
 
-    private Formatter(JavaFormatterOptions options) {
+    @VisibleForTesting
+    Formatter(JavaFormatterOptions options, boolean debugMode) {
         this.options = options;
+        this.debugMode = debugMode;
     }
 
     /** A new Formatter instance with default options. */
     public static Formatter create() {
-        return new Formatter(JavaFormatterOptions.defaultOptions());
+        return new Formatter(JavaFormatterOptions.defaultOptions(), false);
     }
 
     public static Formatter createFormatter(JavaFormatterOptions options) {
-        return new Formatter(options);
+        return new Formatter(options, false);
     }
 
     /**
@@ -105,11 +114,15 @@ public final class Formatter {
      * corresponding {@link JavaOutput}.
      *
      * @param javaInput the input, a Java compilation unit
-     * @param javaOutput the {@link JavaOutput}
      * @param options the {@link JavaFormatterOptions}
+     * @param commentsHelper the {@link CommentsHelper}, used to rewrite comments
+     * @param debugMode whether to produce debugging output via {@link DebugRenderer}
+     * @return javaOutput the output produced
      */
-    static void format(final JavaInput javaInput, JavaOutput javaOutput, JavaFormatterOptions options)
+    static JavaOutput format(
+            final JavaInput javaInput, JavaFormatterOptions options, CommentsHelper commentsHelper, boolean debugMode)
             throws FormatterException {
+
         Context context = new Context();
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
         context.put(DiagnosticListener.class, diagnostics);
@@ -145,16 +158,31 @@ public final class Formatter {
         if (!Iterables.isEmpty(errorDiagnostics)) {
             throw FormatterExceptions.fromJavacDiagnostics(errorDiagnostics);
         }
-        OpsBuilder builder = new OpsBuilder(javaInput, javaOutput);
+
+        OpsBuilder opsBuilder = new OpsBuilder(javaInput);
         // Output the compilation unit.
-        new JavaInputAstVisitor(builder, options.indentationMultiplier()).scan(unit, null);
-        builder.sync(javaInput.getText().length());
-        builder.drain();
-        Doc doc = new DocBuilder().withOps(builder.build()).build();
+        new JavaInputAstVisitor(opsBuilder, options.indentationMultiplier()).scan(unit, null);
+        opsBuilder.sync(javaInput.getText().length());
+        opsBuilder.drain();
+        OpsOutput opsOutput = opsBuilder.build();
+
+        Level doc = new DocBuilder().withOps(opsOutput.ops()).build();
+
+        // Don't even allocate all those JSON nodes if we're not going to write it out
+        Sink sink = debugMode ? new JsonSink() : new NoopSink();
+
+        Obs.ExplorationNode observationNode = Obs.createRoot(sink);
         State finalState =
-                doc.computeBreaks(javaOutput.getCommentsHelper(), options.maxLineLength(), State.startingState());
+                doc.computeBreaks(commentsHelper, options.maxLineLength(), State.startingState(), observationNode);
+
+        JavaOutput javaOutput = new JavaOutput(javaInput, opsOutput.inputMetadata());
         doc.write(finalState, javaOutput);
         javaOutput.flush();
+
+        if (debugMode) {
+            DebugRenderer.render(javaInput, opsOutput, doc, finalState, javaOutput, sink.getOutput());
+        }
+        return javaOutput;
     }
 
     static boolean errorDiagnostic(Diagnostic<?> input) {
@@ -245,11 +273,10 @@ public final class Formatter {
         // 'de-linting' changes (e.g. import ordering).
         javaInput = ModifierOrderer.reorderModifiers(javaInput, characterRanges);
 
-        String lineSeparator = Newlines.guessLineSeparator(input);
-        JavaOutput javaOutput =
-                new JavaOutput(lineSeparator, javaInput, new JavaCommentsHelper(lineSeparator, options));
+        JavaCommentsHelper commentsHelper = new JavaCommentsHelper(javaInput.getLineSeparator(), options);
+        JavaOutput javaOutput;
         try {
-            format(javaInput, javaOutput, options);
+            javaOutput = format(javaInput, options, commentsHelper, debugMode);
         } catch (FormattingError e) {
             throw new FormatterException(e.diagnostics());
         }

@@ -7,9 +7,9 @@ buildscript {
 
     dependencies {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
-        classpath 'com.netflix.nebula:nebula-publishing-plugin:14.0.0'
-        classpath 'com.netflix.nebula:gradle-info-plugin:5.1.1'
-        classpath 'com.palantir.baseline:gradle-baseline-java:2.26.0'
+        classpath 'com.netflix.nebula:nebula-publishing-plugin:14.1.1'
+        classpath 'com.netflix.nebula:gradle-info-plugin:5.2.0'
+        classpath 'com.palantir.baseline:gradle-baseline-java:2.35.2'
         classpath 'gradle.plugin.org.inferred:gradle-processors:3.1.0'
         classpath 'com.palantir.gradle.gitversion:gradle-git-version:0.12.2'
         classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:1.12.4'
@@ -17,7 +17,7 @@ buildscript {
 }
 
 plugins {
-    id "org.jetbrains.intellij" version "0.4.10" apply false
+    id "org.jetbrains.intellij" version "0.4.13" apply false
 }
 
 apply plugin: 'com.palantir.git-version'

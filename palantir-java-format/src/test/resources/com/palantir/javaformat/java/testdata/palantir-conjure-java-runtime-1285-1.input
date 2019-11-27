@@ -1,0 +1,20 @@
+/**
+ * https://github.com/palantir/conjure-java-runtime/pull/1285/files/36e437737ed6650a9296ea0414e6d77d48bf0404#r345425759
+ */
+class PalantirConjureJavaRuntime1285_SslSocketFactories {
+    public static SSLContext createSslContext(SslConfiguration config) {
+        TrustManager[] trustManagers = createTrustManagers(config);
+
+        KeyManager[] keyManagers = null;
+        if (config.keyStorePath().isPresent()) {
+            keyManagers = createKeyManagerFactory(
+                            config.keyStorePath().get(),
+                            config.keyStorePassword().get(),
+                            config.keyStoreType(),
+                            config.keyStoreKeyAlias())
+                    .getKeyManagers();
+        }
+
+        return createSslContext(trustManagers, keyManagers);
+    }
+}

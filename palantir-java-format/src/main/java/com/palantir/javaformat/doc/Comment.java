@@ -28,10 +28,10 @@ import com.palantir.javaformat.Output;
 
 /** A leaf node in a {@link Doc} for a non-token. */
 @Immutable
-public final class Tok extends Doc implements Op {
+public final class Comment extends Doc implements Op {
     private final Input.Tok tok;
 
-    private Tok(Input.Tok tok) {
+    private Comment(Input.Tok tok) {
         this.tok = tok;
     }
 
@@ -41,8 +41,8 @@ public final class Tok extends Doc implements Op {
      * @param tok the {@link Input.Tok} to wrap
      * @return the new {@code Tok}
      */
-    public static Tok make(Input.Tok tok) {
-        return new Tok(tok);
+    public static Comment make(Input.Tok tok) {
+        return new Comment(tok);
     }
 
     @Override
@@ -51,7 +51,7 @@ public final class Tok extends Doc implements Op {
     }
 
     @Override
-    float computeWidth() {
+    protected float computeWidth() {
         int idx = Newlines.firstBreak(tok.getOriginalText());
         // only count the first line of multi-line block comments
         if (tok.isComment()) {
@@ -68,7 +68,7 @@ public final class Tok extends Doc implements Op {
     }
 
     @Override
-    String computeFlat() {
+    protected String computeFlat() {
         // TODO(cushon): commentsHelper.rewrite doesn't get called for spans that fit in a single
         // line. That's fine for multi-line comment reflowing, but problematic for adding missing
         // spaces in line comments.
@@ -79,12 +79,13 @@ public final class Tok extends Doc implements Op {
     }
 
     @Override
-    Range<Integer> computeRange() {
+    protected Range<Integer> computeRange() {
         return Range.singleton(tok.getIndex()).canonical(INTEGERS);
     }
 
     @Override
-    public State computeBreaks(CommentsHelper commentsHelper, int maxWidth, State state) {
+    public State computeBreaks(
+            CommentsHelper commentsHelper, int maxWidth, State state, Obs.ExplorationNode observationNode) {
         String text = commentsHelper.rewrite(tok, maxWidth, state.column());
         int firstLineLength = text.length() - Iterators.getLast(Newlines.lineOffsetIterator(text));
         return state.withColumn(state.column() + firstLineLength)

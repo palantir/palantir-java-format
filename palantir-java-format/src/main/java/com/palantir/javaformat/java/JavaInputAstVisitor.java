@@ -158,6 +158,13 @@ import org.openjdk.tools.javac.tree.TreeScanner;
 /** An AST visitor that builds a stream of {@link Op}s to format from the given {@link CompilationUnitTree}. */
 public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
 
+    /**
+     * Maximum column at which the last dot of a method chain may start. This exists in particular to improve
+     * readability of builder chains, but also in general to prevent hard to spot extra actions at the end of a method
+     * chain.
+     */
+    private static final int METHOD_CHAIN_COLUMN_LIMIT = 80;
+
     /** Direction for Annotations (usually VERTICAL). */
     enum Direction {
         VERTICAL,
@@ -279,16 +286,16 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     private final Indent.Const plusTwo;
     private final Indent.Const plusFour;
 
-    private static final ImmutableList<Op> breakList(Optional<BreakTag> breakTag) {
+    private static ImmutableList<Op> breakList(Optional<BreakTag> breakTag) {
         return ImmutableList.of(Break.make(FillMode.UNIFIED, " ", ZERO, breakTag));
     }
 
-    private static final ImmutableList<Op> breakFillList(Optional<BreakTag> breakTag) {
+    private static ImmutableList<Op> breakFillList(Optional<BreakTag> breakTag) {
         return ImmutableList.of(
                 OpenOp.make(ZERO), Break.make(FillMode.INDEPENDENT, " ", ZERO, breakTag), CloseOp.make());
     }
 
-    private static final ImmutableList<Op> forceBreakList(Optional<BreakTag> breakTag) {
+    private static ImmutableList<Op> forceBreakList(Optional<BreakTag> breakTag) {
         return ImmutableList.of(Break.make(FillMode.FORCED, "", Indent.Const.ZERO, breakTag));
     }
 
@@ -2398,7 +2405,9 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             for (DirectiveTree directiveTree : node.getDirectives()) {
                 markForPartialFormat();
                 builder.blankLineWanted(
-                        previousDirective.map(k -> !k.equals(directiveTree.getKind())).orElse(false)
+                        previousDirective
+                                        .map(k -> !k.equals(directiveTree.getKind()))
+                                        .orElse(false)
                                 ? BlankLineWanted.YES
                                 : BlankLineWanted.NO);
                 builder.forcedBreak();
@@ -2595,10 +2604,13 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 scan(getArrayBase(node), null);
                 token(".");
             } else {
-                builder.open(
-                        plusFour,
-                        BreakBehaviours.preferBreakingLastInnerLevel(true, true),
-                        LastLevelBreakability.BREAK_HERE);
+                builder.open(OpenOp.builder()
+                        .debugName("visitDot")
+                        .plusIndent(plusFour)
+                        .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(true, true))
+                        .breakabilityIfLastLevel(LastLevelBreakability.BREAK_HERE)
+                        .columnLimitBeforeLastBreak(METHOD_CHAIN_COLUMN_LIMIT)
+                        .build());
                 scan(getArrayBase(node), null);
                 builder.breakOp();
                 needDot = true;
@@ -2697,6 +2709,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                     .plusIndent(plusFour)
                     .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(true, true))
                     .breakabilityIfLastLevel(LastLevelBreakability.CHECK_INNER)
+                    .columnLimitBeforeLastBreak(METHOD_CHAIN_COLUMN_LIMIT)
                     .build());
         }
         // don't break after the first element if it is every small, unless the
@@ -2780,6 +2793,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(true, true))
                 .breakabilityIfLastLevel(LastLevelBreakability.CHECK_INNER)
                 .inlineability(Inlineability.IF_FIRST_LEVEL_FITS)
+                .columnLimitBeforeLastBreak(METHOD_CHAIN_COLUMN_LIMIT)
                 .build());
 
         for (int times = 0; times < prefixes.size(); times++) {
@@ -3608,7 +3622,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
      *
      * @param token the {@link String} to wrap in a {@link Token}
      */
-    final void token(String token) {
+    void token(String token) {
         builder.token(token, Token.RealOrImaginary.REAL, ZERO, /* breakAndIndentTrailingComment= */ Optional.empty());
     }
 
@@ -3618,7 +3632,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
      * @param token the {@link String} to wrap in a {@link Token}
      * @param plusIndentCommentsBefore extra indent for comments before this token
      */
-    final void token(String token, Indent plusIndentCommentsBefore) {
+    void token(String token, Indent plusIndentCommentsBefore) {
         builder.token(
                 token,
                 Token.RealOrImaginary.REAL,
@@ -3627,7 +3641,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     }
 
     /** Emit a {@link Token}, and breaks and indents trailing javadoc or block comments. */
-    final void tokenBreakTrailingComment(String token, Indent breakAndIndentTrailingComment) {
+    void tokenBreakTrailingComment(String token, Indent breakAndIndentTrailingComment) {
         builder.token(token, Token.RealOrImaginary.REAL, ZERO, Optional.of(breakAndIndentTrailingComment));
     }
 
@@ -3643,12 +3657,12 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
      *
      * @param node the ASTNode holding the input position
      */
-    final void sync(Tree node) {
+    void sync(Tree node) {
         builder.sync(((JCTree) node).getStartPosition());
     }
 
     @Override
-    public final String toString() {
+    public String toString() {
         return MoreObjects.toStringHelper(this).add("builder", builder).toString();
     }
 }

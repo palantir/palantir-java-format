@@ -19,6 +19,7 @@ import static com.google.common.collect.Iterables.getLast;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Suppliers;
 import com.google.common.base.Verify;
 import com.google.common.collect.DiscreteDomain;
 import com.google.common.collect.ImmutableCollection;
@@ -40,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Supplier;
 import org.openjdk.javax.tools.Diagnostic;
 import org.openjdk.javax.tools.DiagnosticCollector;
 import org.openjdk.javax.tools.DiagnosticListener;
@@ -239,6 +241,7 @@ public final class JavaInput extends Input {
     }
 
     private final String text; // The input.
+    private final Supplier<String> lineSeparator = Suppliers.memoize(() -> Newlines.guessLineSeparator(getText()));
     private int kN; // The number of numbered toks (tokens or comments), excluding the EOF.
 
     /*
@@ -319,6 +322,10 @@ public final class JavaInput extends Input {
     @Override
     public ImmutableMap<Integer, Integer> getPositionToColumnMap() {
         return positionToColumnMap;
+    }
+
+    public String getLineSeparator() {
+        return lineSeparator.get();
     }
 
     /** Lex the input and build the list of toks. */
@@ -554,8 +561,10 @@ public final class JavaInput extends Input {
             // 0 stands for "format the line under the cursor"
             length = 1;
         }
-        ImmutableCollection<Token> enclosed =
-                getPositionTokenMap().subRangeMap(Range.closedOpen(offset, offset + length)).asMapOfRanges().values();
+        ImmutableCollection<Token> enclosed = getPositionTokenMap()
+                .subRangeMap(Range.closedOpen(offset, offset + length))
+                .asMapOfRanges()
+                .values();
         if (enclosed.isEmpty()) {
             return EMPTY_RANGE;
         }
@@ -604,7 +613,10 @@ public final class JavaInput extends Input {
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this).add("tokens", tokens).add("super", super.toString()).toString();
+        return MoreObjects.toStringHelper(this)
+                .add("tokens", tokens)
+                .add("super", super.toString())
+                .toString();
     }
 
     private JCCompilationUnit unit;

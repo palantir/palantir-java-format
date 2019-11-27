@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Limit dotted chains for expressions starting with constructor.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/71

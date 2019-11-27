@@ -37,7 +37,7 @@ public class SnippetFormatter {
         EXPRESSION
     }
 
-    private class SnippetWrapper {
+    private final class SnippetWrapper {
         int offset;
         final StringBuilder contents = new StringBuilder();
 

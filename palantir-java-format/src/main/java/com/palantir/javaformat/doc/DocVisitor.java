@@ -24,17 +24,17 @@ public interface DocVisitor<T> {
             return visitBreak((Break) doc);
         } else if (doc instanceof Token) {
             return visitToken((Token) doc);
-        } else if (doc instanceof Tok) {
-            return visitTok((Tok) doc);
-        } else if (doc instanceof Space) {
-            return visitSpace((Space) doc);
+        } else if (doc instanceof Comment) {
+            return visitComment((Comment) doc);
+        } else if (doc instanceof NonBreakingSpace) {
+            return visitSpace((NonBreakingSpace) doc);
         }
         throw new RuntimeException();
     }
 
-    T visitSpace(Space doc);
+    T visitSpace(NonBreakingSpace doc);
 
-    T visitTok(Tok doc);
+    T visitComment(Comment doc);
 
     T visitToken(Token doc);
 

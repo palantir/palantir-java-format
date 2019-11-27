@@ -16,6 +16,7 @@
 
 package com.palantir.javaformat.doc;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.Indent;
@@ -47,8 +48,6 @@ public abstract class State {
      */
     public abstract int branchingCoefficient();
 
-    public abstract int depth();
-
     @Value.Auxiliary
     protected abstract Set<BreakTag> breakTagsTaken();
 
@@ -59,11 +58,11 @@ public abstract class State {
     protected abstract TreeMap<Level, LevelState> levelStates();
 
     /**
-     * Keep track of how each {@link Tok} was written (these are mostly comments), which can differ depending on the
+     * Keep track of how each {@link Comment} was written (these are mostly comments), which can differ depending on the
      * starting column and the maxLength.
      */
     @Value.Auxiliary
-    protected abstract TreeMap<Tok, TokState> tokStates();
+    protected abstract TreeMap<Comment, TokState> tokStates();
 
     public static State startingState() {
         return builder()
@@ -94,8 +93,9 @@ public abstract class State {
         return levelState != null && levelState.oneLine();
     }
 
-    String getTokText(Tok tok) {
-        return Preconditions.checkNotNull(tokStates().get(tok).toNull(), "Expected Tok state to exist for: %s", tok)
+    String getTokText(Comment comment) {
+        return Preconditions.checkNotNull(
+                        tokStates().get(comment).toNull(), "Expected Tok state to exist for: %s", comment)
                 .text();
     }
 
@@ -120,7 +120,11 @@ public abstract class State {
      * not commit to the indent just yet though, so lastIndent stays the same.
      */
     State withIndentIncrementedBy(Indent plusIndent) {
-        return builder().from(this).indent(indent() + plusIndent.eval(this)).mustBreak(false).build();
+        return builder()
+                .from(this)
+                .indent(indent() + plusIndent.eval(this))
+                .mustBreak(false)
+                .build();
     }
 
     /** Reset any accumulated indent to the same value as {@code lastIndent}. */
@@ -184,15 +188,24 @@ public abstract class State {
     }
 
     State withNewBranch() {
-        return builder().from(this).branchingCoefficient(branchingCoefficient() + 1).build();
+        return builder()
+                .from(this)
+                .branchingCoefficient(branchingCoefficient() + 1)
+                .build();
     }
 
     State withLevelState(Level level, LevelState levelState) {
-        return builder().from(this).levelStates(levelStates().set(level, levelState)).build();
+        return builder()
+                .from(this)
+                .levelStates(levelStates().set(level, levelState))
+                .build();
     }
 
-    State withTokState(Tok tok, TokState tokState) {
-        return builder().from(this).tokStates(tokStates().set(tok, tokState)).build();
+    State withTokState(Comment comment, TokState tokState) {
+        return builder()
+                .from(this)
+                .tokStates(tokStates().set(comment, tokState))
+                .build();
     }
 
     State increaseDepth() {
@@ -207,6 +220,7 @@ public abstract class State {
 
     @Value.Immutable
     @Value.Style(overshadowImplementation = true)
+    @JsonSerialize(as = ImmutableBreakState.class)
     interface BreakState {
         @Parameter
         boolean broken();
