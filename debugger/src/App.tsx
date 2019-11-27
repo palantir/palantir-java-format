@@ -187,7 +187,9 @@ const TreeDocComponent: React.FC<{doc: Doc}> = ({doc}) => {
                         <br/>
                     </span>;
                 } else {
-                    return <span key={doc.id} className={clazz + " doc doc-break highlight"}>{doc.flat || "⏎"}</span>
+                    return <span key={doc.id} className={clazz + " doc doc-break"}>
+                        ⏎{doc.flat ? `(${doc.flat})` : ''}
+                    </span>
                 }
             case "level":
                 // Skip levels without any contents
