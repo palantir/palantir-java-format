@@ -4,6 +4,7 @@ import React, { Dispatch, useState } from "react";
 import { InlineDocComponent } from "./InlineDoc";
 import { Callout, Classes, Toaster, Tooltip } from "@blueprintjs/core";
 import { decorators as TreebeardDecorators, Treebeard } from "react-treebeard";
+import { State } from "./state";
 
 // FormatterDecisions formatting stuff
 
@@ -12,7 +13,7 @@ type ExplorationNode = {
     outputLevel?: Level, startColumn: number };
 type LevelNode = {
     type: "level", id: Id, parentId: Id, debugName?: string, flat: string, toString: string, acceptedExplorationId: Id,
-    levelId: Id, children: ReadonlyArray<ExplorationNode>,
+    levelId: Id, children: ReadonlyArray<ExplorationNode>, incomingState: State
 };
 
 export type FormatterDecisions = ExplorationNode;
@@ -36,7 +37,7 @@ interface TreeNode {
 }
 
 type ExplorationNodeData = { outputLevel?: DisplayableLevel, parentLevelId?: Id };
-type LevelNodeData = { levelId: Id };
+type LevelNodeData = { levelId: Id, incomingState: State };
 type NodeData = LevelNodeData | ExplorationNodeData;
 
 /** A doc that should be displayed because it's currently being highlighted in the {@link DecisionTree}. */
@@ -47,15 +48,29 @@ type Highlighted = DisplayableLevel | undefined;
 export const TreeAndDoc: React.FC<{ formatterDecisions: FormatterDecisions, doc: Doc }> = props => {
     const [highlighted, setHighlighted] = useState<Highlighted>();
     const [highlightedLevelId, setHighlightedLevelId] = useState<Id>();
+    const [selected, setSelected] = useState<NodeData>();
+
+    function formatSelected(state: State) {
+        return <span>{JSON.stringify(state)}</span>
+    }
+
+    const selectedState = selected && ("levelId" in selected) ? formatSelected(selected.incomingState) : null;
 
     return <div className={"TreeAndDoc"}>
-        <DecisionTree
-            formatterDecisions={props.formatterDecisions}
-            highlightDoc={setHighlighted}
-            highlightLevelId={setHighlightedLevelId}/>
+        <div className={"column1"}>
+            <Callout intent={"none"} title={"Incoming state"} style={{minHeight: 80, maxHeight: 80}}>
+                {selectedState}
+            </Callout>
+            <DecisionTree
+                formatterDecisions={props.formatterDecisions}
+                highlightDoc={setHighlighted}
+                highlightLevelId={setHighlightedLevelId}
+                select={setSelected}/>
+        </div>
         <div className={"InlineDocs"}>
             <InlineDocComponent key={"entire-doc"} doc={props.doc} statingColumn={0} className={"InlineDoc"}
                                 highlightedLevelId={highlightedLevelId}/>
+            {/* TODO grab this from `selected` */}
             {highlighted !== undefined ? ([
                 <Callout intent={"primary"} title={"Rendered exploration output"}/>,
                 <InlineDocComponent key={"exploration"} doc={highlighted.level}
@@ -71,6 +86,7 @@ export class DecisionTree extends React.Component<{
     formatterDecisions: FormatterDecisions,
     highlightDoc: Dispatch<Highlighted>,
     highlightLevelId: Dispatch<Id | undefined>,
+    select: Dispatch<NodeData>,
 }, ITreeState> {
     public state: ITreeState = { nodes: DecisionTree.createExplorationNode(this.props.formatterDecisions).children!! };
     private static toaster = Toaster.create();
@@ -147,11 +163,11 @@ export class DecisionTree extends React.Component<{
             name: (
                 <Tooltip content={node.id.toString()}>{node.debugName || node.id}</Tooltip>
             ),
-            // secondaryLabel: node.toString,
             toggled: true,
             active: parentAccepted,
             data: {
                 levelId: node.levelId,
+                incomingState: node.incomingState,
             },
         };
     }
@@ -178,10 +194,10 @@ export class DecisionTree extends React.Component<{
                 this.props.highlightDoc(nodeData.data.outputLevel);
             }
         }
+        this.props.select(nodeData.data);
     }
 
     private onMouseEnter = (nodeData: TreeNode) => {
-        // TODO select this node somehow so it's obvious that it's highlighted
         this.highlightLevel(nodeData);
         this.setState({...this.state, selectedNodeId: nodeData.id});
     };
