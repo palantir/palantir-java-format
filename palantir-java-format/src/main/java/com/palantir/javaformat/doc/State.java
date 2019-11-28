@@ -16,6 +16,7 @@
 
 package com.palantir.javaformat.doc;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.Immutable;
@@ -28,6 +29,7 @@ import org.immutables.value.Value.Parameter;
 /** State for writing. */
 @Value.Immutable
 @Value.Style(overshadowImplementation = true)
+@JsonSerialize(as = ImmutableState.class)
 @Immutable
 public abstract class State {
     /** Last indent that was actually taken. */
@@ -49,12 +51,15 @@ public abstract class State {
     public abstract int branchingCoefficient();
 
     @Value.Auxiliary
+    @JsonIgnore
     protected abstract Set<BreakTag> breakTagsTaken();
 
     @Value.Auxiliary
+    @JsonIgnore
     protected abstract TreeMap<Break, BreakState> breakStates();
 
     @Value.Auxiliary
+    @JsonIgnore
     protected abstract TreeMap<Level, LevelState> levelStates();
 
     /**
@@ -62,6 +67,7 @@ public abstract class State {
      * starting column and the maxLength.
      */
     @Value.Auxiliary
+    @JsonIgnore
     protected abstract TreeMap<Comment, TokState> tokStates();
 
     public static State startingState() {

@@ -52,6 +52,7 @@ public final class JsonSink implements Sink {
         json.put("debugName", level.getDebugName().orElse(null));
         json.put("flat", level.getFlat());
         json.put("toString", level.toString());
+        json.set("incomingState", OBJECT_MAPPER.valueToTree(incomingState));
         createChildrenNode(levelNodeId, json);
         return acceptedExplorationId -> json.put("acceptedExplorationId", acceptedExplorationId);
     }
