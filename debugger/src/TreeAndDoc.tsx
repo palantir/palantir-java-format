@@ -1,9 +1,9 @@
-import { Id } from "./Data";
-import { Doc, Level } from "./Doc";
-import React, { Dispatch, useState } from "react";
-import { InlineDocComponent } from "./InlineDoc";
-import { Callout, Classes, Toaster, Tooltip } from "@blueprintjs/core";
-import { decorators as TreebeardDecorators, Treebeard } from "react-treebeard";
+import {Id} from "./Data";
+import {Doc, Level} from "./Doc";
+import React, {Dispatch, useState} from "react";
+import {InlineDocComponent} from "./InlineDoc";
+import {Callout, Classes, Toaster, Tooltip} from "@blueprintjs/core";
+import {decorators as TreebeardDecorators, Treebeard} from "react-treebeard";
 
 // FormatterDecisions formatting stuff
 
@@ -183,7 +183,7 @@ export class DecisionTree extends React.Component<{
     private onMouseEnter = (nodeData: TreeNode) => {
         // TODO select this node somehow so it's obvious that it's highlighted
         this.highlightLevel(nodeData);
-        this.setState({selectedNodeId: nodeData.id, ...this.state});
+        this.setState({...this.state, selectedNodeId: nodeData.id});
     };
 
     /**
