@@ -63,15 +63,18 @@ export const TreeAndDoc: React.FC<{ formatterDecisions: FormatterDecisions, doc:
     function formatNodeData(data: NodeData): JSX.Element | undefined {
         if ("levelId" in data) {
             return <table>
+                <tbody>
                 <tr>
                     <td><Tag intent={"primary"}>Incoming</Tag></td>
                     <td>{formatState(data.incomingState)}</td>
                 </tr>
+                </tbody>
             </table>
         }
         if (data.result) {
             // We always have an incoming state unless we're the root.
             return <table>
+                <tbody>
                 <tr>
                     <td><Tag intent={"primary"}>Incoming</Tag></td>
                     <td>{formatState(data.incomingState!!)}</td>
@@ -82,6 +85,7 @@ export const TreeAndDoc: React.FC<{ formatterDecisions: FormatterDecisions, doc:
                         <td>{formatState(data.result.finalState)}</td>
                     </tr>
                     : null}
+                </tbody>
             </table>;
         }
     }
