@@ -1,18 +1,20 @@
-import {Id} from "./Data";
-import {Doc, Level} from "./Doc";
-import React, {Dispatch, useState} from "react";
-import {InlineDocComponent} from "./InlineDoc";
-import {Callout, Classes, Toaster, Tooltip} from "@blueprintjs/core";
-import {decorators as TreebeardDecorators, Treebeard} from "react-treebeard";
+import { Id } from "./Data";
+import { Doc, Level } from "./Doc";
+import React, { Dispatch, useState } from "react";
+import { InlineDocComponent } from "./InlineDoc";
+import { Callout, Classes, Toaster, Tooltip } from "@blueprintjs/core";
+import { decorators as TreebeardDecorators, Treebeard } from "react-treebeard";
+import { State } from "./state";
 
 // FormatterDecisions formatting stuff
 
 type ExplorationNode = {
     type: "exploration", parentId?: Id, id: Id, humanDescription: string, children: ReadonlyArray<LevelNode>,
-    outputLevel?: Level, startColumn: number };
+    outputLevel?: Level, startColumn: number
+};
 type LevelNode = {
     type: "level", id: Id, parentId: Id, debugName?: string, flat: string, toString: string, acceptedExplorationId: Id,
-    levelId: Id, children: ReadonlyArray<ExplorationNode>,
+    levelId: Id, children: ReadonlyArray<ExplorationNode>, incomingState: State
 };
 
 export type FormatterDecisions = ExplorationNode;
@@ -36,7 +38,7 @@ interface TreeNode {
 }
 
 type ExplorationNodeData = { outputLevel?: DisplayableLevel, parentLevelId?: Id };
-type LevelNodeData = { levelId: Id };
+type LevelNodeData = { levelId: Id, incomingState: State };
 type NodeData = LevelNodeData | ExplorationNodeData;
 
 /** A doc that should be displayed because it's currently being highlighted in the {@link DecisionTree}. */
@@ -47,15 +49,29 @@ type Highlighted = DisplayableLevel | undefined;
 export const TreeAndDoc: React.FC<{ formatterDecisions: FormatterDecisions, doc: Doc }> = props => {
     const [highlighted, setHighlighted] = useState<Highlighted>();
     const [highlightedLevelId, setHighlightedLevelId] = useState<Id>();
+    const [selected, setSelected] = useState<NodeData>();
+
+    function formatSelected(state: State) {
+        return <span>{JSON.stringify(state)}</span>
+    }
+
+    const selectedState = selected && ("levelId" in selected) ? formatSelected(selected.incomingState) : null;
 
     return <div className={"TreeAndDoc"}>
-        <DecisionTree
-            formatterDecisions={props.formatterDecisions}
-            highlightDoc={setHighlighted}
-            highlightLevelId={setHighlightedLevelId}/>
+        <div className={"column1"}>
+            <Callout intent={"none"} title={"Incoming state"} style={{minHeight: 80, maxHeight: 80}}>
+                {selectedState}
+            </Callout>
+            <DecisionTree
+                formatterDecisions={props.formatterDecisions}
+                highlightDoc={setHighlighted}
+                highlightLevelId={setHighlightedLevelId}
+                select={setSelected}/>
+        </div>
         <div className={"InlineDocs"}>
             <InlineDocComponent key={"entire-doc"} doc={props.doc} statingColumn={0} className={"InlineDoc"}
                                 highlightedLevelId={highlightedLevelId}/>
+            {/* TODO grab this from `selected` */}
             {highlighted !== undefined ? ([
                 <Callout intent={"primary"} title={"Rendered exploration output"}/>,
                 <InlineDocComponent key={"exploration"} doc={highlighted.level}
@@ -71,48 +87,49 @@ export class DecisionTree extends React.Component<{
     formatterDecisions: FormatterDecisions,
     highlightDoc: Dispatch<Highlighted>,
     highlightLevelId: Dispatch<Id | undefined>,
+    select: Dispatch<NodeData>,
 }, ITreeState> {
-    public state: ITreeState = { nodes: DecisionTree.createExplorationNode(this.props.formatterDecisions).children!! };
+    public state: ITreeState = {nodes: DecisionTree.createExplorationNode(this.props.formatterDecisions).children!!};
     private static toaster = Toaster.create();
 
     private static readonly duration = 50;
     /** Default TreeBeard animations are too slow (300), sadly have to reimplement this to get a shorter duration. */
     static Animations = {
-        toggle: function(_ref: {node: { toggled: boolean }}): { duration: number; animation: { rotateZ: number } } {
+        toggle: function (_ref: { node: { toggled: boolean } }): { duration: number; animation: { rotateZ: number } } {
             const toggled = _ref.node.toggled;
             const duration = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : DecisionTree.duration;
             return {
                 animation: {
-                    rotateZ: toggled ? 90 : 0
+                    rotateZ: toggled ? 90 : 0,
                 },
-                duration: duration
+                duration: duration,
             };
         },
-        drawer: function() {
+        drawer: function () {
             return (
                 /* props */
                 {
                     enter: {
                         animation: 'slideDown',
-                        duration: DecisionTree.duration
+                        duration: DecisionTree.duration,
                     },
                     leave: {
                         animation: 'slideUp',
-                        duration: DecisionTree.duration
-                    }
+                        duration: DecisionTree.duration,
+                    },
                 }
             );
-        }
+        },
     };
 
     public render() {
         return <div className={`${Classes.ELEVATION_0} DecisionTree`}>
-        <Treebeard
-            data={this.state.nodes}
-        onToggle={this.onToggle}
-        animations={DecisionTree.Animations}
-        decorators={this.Decorators}
-        />
+            <Treebeard
+                data={this.state.nodes}
+                onToggle={this.onToggle}
+                animations={DecisionTree.Animations}
+                decorators={this.Decorators}
+            />
         </div>;
     }
 
@@ -133,7 +150,7 @@ export class DecisionTree extends React.Component<{
                     // TODO probably makes sense to steal startColumn from the `parent` too (needs change to JsonSink)
                     startingColumn: node.startColumn,
                 } : undefined,
-                parentLevelId: parent !== undefined ? parent.levelId : undefined
+                parentLevelId: parent !== undefined ? parent.levelId : undefined,
             },
         };
     }
@@ -147,11 +164,11 @@ export class DecisionTree extends React.Component<{
             name: (
                 <Tooltip content={node.id.toString()}>{node.debugName || node.id}</Tooltip>
             ),
-            // secondaryLabel: node.toString,
             toggled: true,
             active: parentAccepted,
             data: {
                 levelId: node.levelId,
+                incomingState: node.incomingState,
             },
         };
     }
@@ -178,10 +195,10 @@ export class DecisionTree extends React.Component<{
                 this.props.highlightDoc(nodeData.data.outputLevel);
             }
         }
+        this.props.select(nodeData.data);
     }
 
     private onMouseEnter = (nodeData: TreeNode) => {
-        // TODO select this node somehow so it's obvious that it's highlighted
         this.highlightLevel(nodeData);
         this.setState({...this.state, selectedNodeId: nodeData.id});
     };
@@ -197,20 +214,20 @@ export class DecisionTree extends React.Component<{
             return (
                 <div
                     onClick={onClick}
-            style={outer.state.selectedNodeId === node.id
-                    ? {backgroundColor: '#2B95D6', ...style.link}
-                    : (node.active ? {...style.container} : {...style.link})
-            }
-            onMouseEnter={() => outer.onMouseEnter(node)}
-        >
-            {!terminal ? this.renderToggle() : null}
-            <decorators.Header node={node} style={style.header}/>
-            </div>
-        );
+                    style={outer.state.selectedNodeId === node.id
+                        ? {backgroundColor: '#2B95D6', ...style.link}
+                        : (node.active ? {...style.container} : {...style.link})
+                    }
+                    onMouseEnter={() => outer.onMouseEnter(node)}
+                >
+                    {!terminal ? this.renderToggle() : null}
+                    <decorators.Header node={node} style={style.header}/>
+                </div>
+            );
         }
     };
 
     private Decorators = Object.assign({}, TreebeardDecorators, {
-        Container: this.Container(this)
+        Container: this.Container(this),
     });
 }

@@ -59,9 +59,15 @@
     max-width: 50%;
 }
 
-.TreeAndDoc .DecisionTree {
+.TreeAndDoc > .column1 {
     margin: 10px 0;
-    overflow: scroll;
+    display: flex;
+    flex-direction: column;
+}
+
+.TreeAndDoc .DecisionTree {
+    overflow-y: scroll;
+    flex-grow: 1;
 }
 
 /**
