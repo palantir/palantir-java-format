@@ -126,7 +126,7 @@ export class DecisionTree extends React.PureComponent<DecisionTreeProps, ITreeSt
     private static readonly duration = 50;
     /** Default TreeBeard animations are too slow (300), sadly have to reimplement this to get a shorter duration. */
     static Animations = {
-        toggle: function(_ref: {node: { toggled: boolean }}): { duration: number; animation: { rotateZ: number } } {
+        toggle: function (_ref: { node: { toggled: boolean } }): { duration: number; animation: { rotateZ: number } } {
             const toggled = _ref.node.toggled;
             const duration = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : DecisionTree.duration;
             return {
