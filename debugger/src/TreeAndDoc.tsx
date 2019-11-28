@@ -112,13 +112,15 @@ export const TreeAndDoc: React.FC<{ formatterDecisions: FormatterDecisions, doc:
 };
 
 
-export class DecisionTree extends React.Component<{
-    formatterDecisions: FormatterDecisions,
-    highlightDoc: Dispatch<Highlighted>,
-    highlightLevelId: Dispatch<Id | undefined>,
-    select: Dispatch<NodeData>,
-}, ITreeState> {
-    public state: ITreeState = { nodes: DecisionTree.createExplorationNode(this.props.formatterDecisions).children!! };
+interface DecisionTreeProps {
+    formatterDecisions: FormatterDecisions;
+    highlightDoc: Dispatch<Highlighted>;
+    highlightLevelId: Dispatch<Id | undefined>;
+    select: Dispatch<NodeData>;
+}
+
+export class DecisionTree extends React.PureComponent<DecisionTreeProps, ITreeState> {
+    public state: ITreeState = {nodes: DecisionTree.createExplorationNode(this.props.formatterDecisions).children!!};
     private static toaster = Toaster.create();
 
     private static readonly duration = 50;
@@ -153,12 +155,12 @@ export class DecisionTree extends React.Component<{
 
     public render() {
         return <div className={`${Classes.ELEVATION_0} DecisionTree`}>
-        <Treebeard
-            data={this.state.nodes}
-        onToggle={this.onToggle}
-        animations={DecisionTree.Animations}
-        decorators={this.Decorators}
-        />
+            <Treebeard
+                data={this.state.nodes}
+                onToggle={this.onToggle}
+                animations={DecisionTree.Animations}
+                decorators={this.Decorators}
+            />
         </div>;
     }
 
