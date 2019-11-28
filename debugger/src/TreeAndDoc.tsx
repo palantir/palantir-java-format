@@ -183,7 +183,7 @@ export class DecisionTree extends React.Component<{
     private onMouseEnter = (nodeData: TreeNode) => {
         // TODO select this node somehow so it's obvious that it's highlighted
         this.highlightLevel(nodeData);
-        this.setState({selectedNodeId: nodeData.id, ...this.state});
+        this.setState({...this.state, selectedNodeId: nodeData.id});
     };
 
     /**
