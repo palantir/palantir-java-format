@@ -39,6 +39,7 @@ public final class JsonSink implements Sink {
         createChildrenNode(explorationId, json);
         return (parentLevel, newState) -> {
             json.set("outputLevel", new JsonDocVisitor(newState).visit(parentLevel));
+            json.set("finalState", OBJECT_MAPPER.valueToTree(newState));
         };
     }
 
