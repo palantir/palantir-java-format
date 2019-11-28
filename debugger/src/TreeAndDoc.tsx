@@ -112,12 +112,14 @@ export const TreeAndDoc: React.FC<{ formatterDecisions: FormatterDecisions, doc:
 };
 
 
-export class DecisionTree extends React.Component<{
-    formatterDecisions: FormatterDecisions,
-    highlightDoc: Dispatch<Highlighted>,
-    highlightLevelId: Dispatch<Id | undefined>,
-    select: Dispatch<NodeData>,
-}, ITreeState> {
+interface DecisionTreeProps {
+    formatterDecisions: FormatterDecisions;
+    highlightDoc: Dispatch<Highlighted>;
+    highlightLevelId: Dispatch<Id | undefined>;
+    select: Dispatch<NodeData>;
+}
+
+export class DecisionTree extends React.PureComponent<DecisionTreeProps, ITreeState> {
     public state: ITreeState = {nodes: DecisionTree.createExplorationNode(this.props.formatterDecisions).children!!};
     private static toaster = Toaster.create();
 
