@@ -135,9 +135,9 @@ export class DecisionTree extends React.PureComponent<DecisionTreeProps, ITreeSt
             const duration = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : DecisionTree.duration;
             return {
                 animation: {
-                    rotateZ: toggled ? 90 : 0
+                    rotateZ: toggled ? 90 : 0,
                 },
-                duration: duration
+                duration: duration,
             };
         },
         drawer: function() {
@@ -150,8 +150,8 @@ export class DecisionTree extends React.PureComponent<DecisionTreeProps, ITreeSt
                     },
                     leave: {
                         animation: 'slideUp',
-                        duration: DecisionTree.duration
-                    }
+                        duration: DecisionTree.duration,
+                    },
                 }
             );
         }
@@ -255,15 +255,15 @@ export class DecisionTree extends React.PureComponent<DecisionTreeProps, ITreeSt
             return (
                 <div
                     onClick={onClick}
-            style={outer.state.selectedNodeId === node.id
-                    ? {backgroundColor: '#2B95D6', ...style.link}
-                    : (node.active ? {...style.container} : {...style.link})
-            }
-            onMouseEnter={() => outer.onMouseEnter(node)}
-        >
-            {!terminal ? this.renderToggle() : null}
-            <decorators.Header node={node} style={style.header}/>
-            </div>
+                    style={outer.state.selectedNodeId === node.id
+                        ? {backgroundColor: '#2B95D6', ...style.link}
+                        : (node.active ? {...style.container} : {...style.link})
+                    }
+                    onMouseEnter={() => outer.onMouseEnter(node)}
+                >
+                    {!terminal ? this.renderToggle() : null}
+                    <decorators.Header node={node} style={style.header}/>
+                </div>
         );
         }
     };
