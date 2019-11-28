@@ -2,7 +2,7 @@ import { Id } from "./Data";
 import { Doc, Level } from "./Doc";
 import React, { Dispatch, useState } from "react";
 import { InlineDocComponent } from "./InlineDoc";
-import { Callout, Classes, Toaster, Tooltip } from "@blueprintjs/core";
+import { Callout, Classes, Tag, Toaster, Tooltip } from "@blueprintjs/core";
 import { decorators as TreebeardDecorators, Treebeard } from "react-treebeard";
 import { State } from "./state";
 
@@ -10,12 +10,17 @@ import { State } from "./state";
 
 type ExplorationNode = {
     type: "exploration", parentId?: Id, id: Id, humanDescription: string, children: ReadonlyArray<LevelNode>,
-    outputLevel?: Level, startColumn: number
+    startColumn: number, result?: ExplorationResult
 };
 type LevelNode = {
     type: "level", id: Id, parentId: Id, debugName?: string, flat: string, toString: string, acceptedExplorationId: Id,
     levelId: Id, children: ReadonlyArray<ExplorationNode>, incomingState: State
 };
+
+interface ExplorationResult {
+    outputLevel: Level;
+    finalState: State;
+}
 
 export type FormatterDecisions = ExplorationNode;
 
@@ -37,7 +42,7 @@ interface TreeNode {
     data: NodeData,
 }
 
-type ExplorationNodeData = { outputLevel?: DisplayableLevel, parentLevelId?: Id };
+type ExplorationNodeData = { startColumn: number, result?: ExplorationResult, parentLevelId?: Id, incomingState?: State };
 type LevelNodeData = { levelId: Id, incomingState: State };
 type NodeData = LevelNodeData | ExplorationNodeData;
 
@@ -51,16 +56,40 @@ export const TreeAndDoc: React.FC<{ formatterDecisions: FormatterDecisions, doc:
     const [highlightedLevelId, setHighlightedLevelId] = useState<Id>();
     const [selected, setSelected] = useState<NodeData>();
 
-    function formatSelected(state: State) {
+    function formatState(state: State) {
         return <span>{JSON.stringify(state)}</span>
     }
 
-    const selectedState = selected && ("levelId" in selected) ? formatSelected(selected.incomingState) : null;
+    function formatNodeData(data: NodeData): JSX.Element | undefined {
+        if ("levelId" in data) {
+            return <table>
+                <tr>
+                    <td><Tag intent={"primary"}>Incoming</Tag></td>
+                    <td>{formatState(data.incomingState)}</td>
+                </tr>
+            </table>
+        }
+        if (data.result) {
+            // We always have an incoming state unless we're the root.
+            return <table>
+                <tr>
+                    <td><Tag intent={"primary"}>Incoming</Tag></td>
+                    <td>{formatState(data.incomingState!!)}</td>
+                </tr>
+                {data.result
+                    ? <tr>
+                        <td><Tag intent={"success"}>Result</Tag></td>
+                        <td>{formatState(data.result.finalState)}</td>
+                    </tr>
+                    : null}
+            </table>;
+        }
+    }
 
     return <div className={"TreeAndDoc"}>
         <div className={"column1"}>
-            <Callout intent={"none"} title={"Incoming state"} style={{minHeight: 80, maxHeight: 80}}>
-                {selectedState}
+            <Callout intent={"none"} title={"Node information"} className={"node-info"}>
+                {selected !== undefined ? formatNodeData(selected) : null}
             </Callout>
             <DecisionTree
                 formatterDecisions={props.formatterDecisions}
@@ -143,14 +172,12 @@ export class DecisionTree extends React.Component<{
             name: <Tooltip content={node.id.toString()}>{node.humanDescription}</Tooltip>,
             toggled: onAcceptedPath,
             active: onAcceptedPath,
-            // Store the output level so we can display it
             data: {
-                outputLevel: node.outputLevel !== undefined ? {
-                    level: node.outputLevel,
-                    // TODO probably makes sense to steal startColumn from the `parent` too (needs change to JsonSink)
-                    startingColumn: node.startColumn,
-                } : undefined,
+                // Store the output level so we can display it
+                result: node.result,
+                startColumn: node.startColumn,
                 parentLevelId: parent !== undefined ? parent.levelId : undefined,
+                incomingState: parent !== undefined ? parent.incomingState : undefined,
             },
         };
     }
@@ -183,19 +210,27 @@ export class DecisionTree extends React.Component<{
     }
 
     private highlightLevel(nodeData: TreeNode) {
-        if ("levelId" in nodeData.data) {
-            this.highlightInlineDocLevel(nodeData.data.levelId);
+        const data = nodeData.data;
+        if ("levelId" in data) {
+            this.highlightInlineDocLevel(data.levelId);
         } else {
-            if (nodeData.data.parentLevelId !== undefined) {
-                this.highlightInlineDocLevel(nodeData.data.parentLevelId);
+            // It's an ExplorationNodeData
+            if (data.parentLevelId !== undefined) {
+                this.highlightInlineDocLevel(data.parentLevelId);
             }
             if (nodeData === this.state.nodes[0]) {
                 this.props.highlightDoc(undefined); // no point highlighting the root
+            } else if (data.result) {
+                // The exploration had a result
+                this.props.highlightDoc({
+                    level: data.result.outputLevel,
+                    startingColumn: data.startColumn,
+                });
             } else {
-                this.props.highlightDoc(nodeData.data.outputLevel);
+                this.props.highlightDoc(undefined);
             }
         }
-        this.props.select(nodeData.data);
+        this.props.select(data);
     }
 
     private onMouseEnter = (nodeData: TreeNode) => {
