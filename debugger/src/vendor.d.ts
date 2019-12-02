@@ -6,6 +6,22 @@ declare module 'react-treebeard' {
 
     export let Treebeard: ReactComponentElement;
 
+    interface TreebeardProps<Node extends TreeNode> {
+        decorators: Decorators;
+        data: Node[];
+        onToggle: (node: Node, toggled: boolean) => void;
+        animations: any;
+    }
+
+    interface TreeNode {
+        id: string,
+        name: JSX.Element | string,
+        children?: Array<this>,
+        toggled?: boolean,
+        active?: boolean,
+        loading?: boolean,
+    }
+
     type Style = any;
 
     type ContainerProps = {
@@ -33,6 +49,8 @@ declare module 'react-treebeard' {
         // declaring it via `declare class Container extends React.Component` also doesn't seem to work
         Container: Container;
         Header: Header;
+        // Hack we added so we can control when treebeard refreshes
+        cacheBust: number,
     }
 
     interface Header extends PureComponent<{node: Object, style: CSSProperties}> {
