@@ -8,8 +8,10 @@ class PalantirConjureJavaRuntime1285_SslSocketFactories {
         KeyManager[] keyManagers = null;
         if (config.keyStorePath().isPresent()) {
             keyManagers = createKeyManagerFactory(
-                            config.keyStorePath().get(), config.keyStorePassword()
-                                    .get(), config.keyStoreType(), config.keyStoreKeyAlias())
+                            config.keyStorePath().get(),
+                            config.keyStorePassword().get(),
+                            config.keyStoreType(),
+                            config.keyStoreKeyAlias())
                     .getKeyManagers();
         }
 

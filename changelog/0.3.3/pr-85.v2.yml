@@ -1,0 +1,6 @@
+type: fix
+fix:
+  description: "When inlining a level's leading docs, check that no breaks were introduced
+    more robustly."
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/85
