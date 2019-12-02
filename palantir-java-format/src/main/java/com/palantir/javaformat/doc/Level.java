@@ -238,9 +238,8 @@ public final class Level extends Doc {
     private Optional<State> tryBreakOnlyIfInnerLevelsThenFitOnOneLine(
             CommentsHelper commentsHelper, int maxWidth, LevelNode levelNode, State state) {
 
-        State stateForBroken = state.withIndentIncrementedBy(getPlusIndent());
-        Obs.Exploration broken = levelNode.explore("breaking normally (as prereq)", stateForBroken, explorationNode ->
-                computeBroken(commentsHelper, maxWidth, stateForBroken, explorationNode));
+        Obs.Exploration broken = levelNode.explore("breaking normally (as prereq)", state, explorationNode ->
+                computeBroken(commentsHelper, maxWidth, state, explorationNode));
 
         return levelNode
                 .maybeExplore("trying to inline prefix only", state, (explorationNode) ->
