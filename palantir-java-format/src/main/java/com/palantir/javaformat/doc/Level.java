@@ -32,7 +32,6 @@ import com.palantir.javaformat.LastLevelBreakability;
 import com.palantir.javaformat.OpenOp;
 import com.palantir.javaformat.Output;
 import com.palantir.javaformat.doc.Obs.Exploration;
-import com.palantir.javaformat.doc.Obs.ExplorationNode;
 import com.palantir.javaformat.doc.Obs.LevelNode;
 import com.palantir.javaformat.doc.StartsWithBreakVisitor.Result;
 import java.util.ArrayList;
@@ -157,17 +156,16 @@ public final class Level extends Doc {
             this.levelNode = levelNode;
         }
 
-        private State breakNormally(State state, ExplorationNode explorationNode) {
+        private Exploration breakNormally(State state) {
             // TODO(dsanduleac): can't just do .withBrokenLevel()
-            return computeBroken(
-                    commentsHelper, maxWidth, state.withIndentIncrementedBy(getPlusIndent()), explorationNode);
+            State state1 = state.withIndentIncrementedBy(getPlusIndent());
+            return levelNode.explore("breaking normally", state1, explorationNode ->
+                    computeBroken(commentsHelper, maxWidth, state1, explorationNode));
         }
 
         @Override
         public State breakThisLevel() {
-            return levelNode
-                    .explore("breakThisLevel", state, explorationNode -> breakNormally(state, explorationNode))
-                    .markAccepted();
+            return breakNormally(state).markAccepted();
         }
 
         @Override
@@ -179,8 +177,7 @@ public final class Level extends Doc {
             // breaks if the outcome is the same.
             State state = this.state.withNewBranch();
 
-            Obs.Exploration broken = levelNode.explore(
-                    "breaking normally", this.state, (explorationNode) -> breakNormally(this.state, explorationNode));
+            Obs.Exploration broken = breakNormally(state);
 
             if (state.branchingCoefficient() < MAX_BRANCHING_COEFFICIENT) {
                 state = state.withNoIndent();
