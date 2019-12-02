@@ -359,8 +359,11 @@ public final class Level extends Doc {
         SplitsBreaks prefixSplitsBreaks = splitByBreaks(leadingDocs);
 
         State state1 = tryToLayOutLevelOnOneLine(commentsHelper, maxWidth, state, prefixSplitsBreaks, explorationNode);
-        Preconditions.checkState(
-                !state1.mustBreak(), "We messed up, it wants to break a bunch of splits that shouldn't be broken");
+        // If a break was still forced somehow even though we could fit the leadingWidth, then abort.
+        // This could happen if inner levels have set a `columnLimitBeforeLastBreak` or something like that.
+        if (state1.numLines() != state.numLines()) {
+            return Optional.empty();
+        }
 
         // Ok now how to handle the last level?
         // There are two options:
