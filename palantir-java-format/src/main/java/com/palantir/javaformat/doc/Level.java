@@ -20,7 +20,6 @@ import static com.google.common.collect.Iterables.getLast;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
@@ -32,7 +31,9 @@ import com.palantir.javaformat.Inlineability;
 import com.palantir.javaformat.LastLevelBreakability;
 import com.palantir.javaformat.OpenOp;
 import com.palantir.javaformat.Output;
+import com.palantir.javaformat.doc.Obs.Exploration;
 import com.palantir.javaformat.doc.Obs.ExplorationNode;
+import com.palantir.javaformat.doc.Obs.LevelNode;
 import com.palantir.javaformat.doc.StartsWithBreakVisitor.Result;
 import java.util.ArrayList;
 import java.util.List;
@@ -210,16 +211,12 @@ public final class Level extends Doc {
                 return broken.markAccepted();
             }
 
-            Optional<Obs.Exploration> maybeInlined = levelNode.maybeExplore(
-                    "handleBreakOnlyIfInnerLevelsThenFitOnOneLine", (explorationNode) ->
+            State state1 = adjustState(state, keepIndentWhenInlined, true);
+
+            Optional<Exploration> maybeInlined = levelNode.maybeExplore(
+                    "trying to inline prefix only", (explorationNode) ->
                             handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
-                                    commentsHelper,
-                                    maxWidth,
-                                    this.state,
-                                    broken.state(),
-                                    explorationNode,
-                                    keepIndentWhenInlined,
-                                    true));
+                                    commentsHelper, maxWidth, state1, broken.state(), explorationNode));
 
             if (maybeInlined.isPresent()) {
                 return maybeInlined.get().markAccepted();
@@ -229,14 +226,42 @@ public final class Level extends Doc {
         }
     }
 
+    /**
+     * This will only return if it could either:
+     *
+     * <ul>
+     *   <li>Lay out the entire level on the current line or on a new line, or
+     *   <li>Inline a prefix of the current level on the current line
+     * </ul>
+     */
+    private Optional<State> tryBreakOnlyIfInnerLevelsThenFitOnOneLine(
+            CommentsHelper commentsHelper, int maxWidth, LevelNode levelNode, State state) {
+
+        Obs.Exploration broken = levelNode.explore("breaking normally (as prereq)", explorationNode ->
+                computeBroken(
+                        commentsHelper, maxWidth, state.withIndentIncrementedBy(getPlusIndent()), explorationNode));
+
+        return levelNode
+                .maybeExplore("trying to inline prefix only", (explorationNode) ->
+                        handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
+                                commentsHelper, maxWidth, state, broken.state(), explorationNode))
+                .map(Exploration::markAccepted);
+    }
+
+    /**
+     * This will only return if it could either:
+     *
+     * <ul>
+     *   <li>Lay out the entire level on the current line or on a new line, or
+     *   <li>Inline a prefix of the current level on the current line
+     * </ul>
+     */
     private Optional<State> handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
             CommentsHelper commentsHelper,
             int maxWidth,
             State state,
             State brokenState,
-            Obs.ExplorationNode explorationNode,
-            boolean keepIndent,
-            boolean replaceIndent) {
+            Obs.ExplorationNode explorationNode) {
         List<Level> innerLevels = this.docs.stream()
                 .filter(doc -> doc instanceof Level)
                 .map(doc -> ((Level) doc))
@@ -257,17 +282,22 @@ public final class Level extends Doc {
                     .orElseThrow(() -> new IllegalStateException(
                             "Levels were broken so expected to find at least a non-empty level"));
 
-            if (replaceIndent) {
-                state = state.withNoIndent();
-            }
-            if (keepIndent) {
-                state = state.withIndentIncrementedBy(getPlusIndent());
-            }
-
-            return inlineUpToLastDocThatIsALevel(commentsHelper, maxWidth, state, lastLevel, explorationNode)
-                    .orElse(brokenState);
+            return inlineUpToLastDocThatIsALevel(commentsHelper, maxWidth, state, lastLevel, explorationNode);
         }
-        return brokenState;
+
+        // Otherwise, it means we ended up in jared-style (only _this_ level was broken, no inner levels did)
+        // Accept the broken state as part of this exploration.
+        return Optional.of(brokenState);
+    }
+
+    private State adjustState(State state, boolean keepIndent, boolean replaceIndent) {
+        if (replaceIndent) {
+            state = state.withNoIndent();
+        }
+        if (keepIndent) {
+            state = state.withIndentIncrementedBy(getPlusIndent());
+        }
+        return state;
     }
 
     private Optional<State> inlineUpToLastDocThatIsALevel(
@@ -343,39 +373,30 @@ public final class Level extends Doc {
                     .preferBreakingLastInnerLevel((keepIndentWhenInlined, replaceIndent) -> {
                         State state2 = state1;
                         // This is to break cycles of visitRegularDot -> ... -> visitRegularDot
-                        if (replaceIndent) {
-                            state2 = state2.withNoIndent();
-                        }
-                        if (keepIndentWhenInlined) {
-                            state2 = state2.withIndentIncrementedBy(lastLevel.getPlusIndent());
-                        }
+                        state2 = lastLevel.adjustState(state2, keepIndentWhenInlined, replaceIndent);
                         State state3 = state2;
                         return explorationNode
                                 .newChildNode(lastLevel, state2)
-                                .maybeExplore("recurse into inner tryBreakLastLevel", exp ->
-                                        lastLevel.tryBreakLastLevel(commentsHelper, maxWidth, state3, exp))
+                                .maybeExplore(
+                                        "recurse into inner tryBreakLastLevel", exp -> lastLevel.tryBreakLastLevel(
+                                                commentsHelper, maxWidth, state3, exp, canInlineSoFar))
                                 .map(expl -> expl.markAccepted()); // collapse??
                     })
-                    // This case always succeeds, but might not always allow inlining.
                     .breakOnlyIfInnerLevelsThenFitOnOneLine((keepIndentWhenInlined, replaceIndent) -> {
                         if (!canInline) {
                             return Optional.empty();
                         }
-                        State state2 = state1; // .withBrokenLevel(); // TODO why did we do this?
-                        return Optional.of(
-                                explorationNode
-                                        .newChildNode(lastLevel, state2)
-                                        .explore(
-                                                "recurse into inner handleBreakOnlyIfInnerLevelsThenFitOnOneLine",
-                                                exp -> lastLevel.handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
-                                                        commentsHelper,
-                                                        maxWidth,
-                                                        state2,
-                                                        null, // TODO brokenState
-                                                        exp,
-                                                        keepIndentWhenInlined,
-                                                        replaceIndent))
-                                        .markAccepted());
+                        State state2 = lastLevel.adjustState(state1, keepIndentWhenInlined, replaceIndent);
+                        return explorationNode
+                                .newChildNode(lastLevel, state2)
+                                .maybeExplore("recurse into inner handleBreakOnlyIfInnerLevelsThenFitOnOneLine", exp ->
+                                        lastLevel.tryBreakOnlyIfInnerLevelsThenFitOnOneLine(
+                                                commentsHelper,
+                                                maxWidth,
+                                                exp.newChildNode(lastLevel, state2),
+                                                // temporary
+                                                state2))
+                                .map(Exploration::markAccepted);
                     })
                     // We don't know how to fit the inner level on the same line, so bail out.
                     .otherwise_(Optional.empty());
