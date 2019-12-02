@@ -1,9 +1,14 @@
 import { Id } from "./Data";
 import { Doc, Level } from "./Doc";
-import React, { Dispatch, useState } from "react";
+import React, { Dispatch, FunctionComponent, useState } from "react";
 import { InlineDocComponent } from "./InlineDoc";
-import { Callout, Classes, Tag, Toaster, Tooltip } from "@blueprintjs/core";
-import { decorators as TreebeardDecorators, Treebeard } from "react-treebeard";
+import { Callout, Classes, Tag, Tooltip } from "@blueprintjs/core";
+import {
+    decorators as TreebeardDecorators,
+    Treebeard,
+    TreebeardProps,
+    TreeNode as TreebeardTreeNode,
+} from "react-treebeard";
 import { State } from "./state";
 
 // FormatterDecisions formatting stuff
@@ -28,16 +33,12 @@ export type FormatterDecisions = ExplorationNode;
 export interface ITreeState {
     nodes: TreeNode[];
     selectedNodeId?: string,
+    /** Treebeard's caching is broken as it mutates its props... Therefore, we force it to only render when we want it to. */
+    treeCacheBust: number,
 }
 
 /** Treebeard doesn't have typescript bindings, so have to manually specify them. */
-interface TreeNode {
-    id: string,
-    name: JSX.Element | string,
-    children?: Array<TreeNode>,
-    toggled?: boolean,
-    active?: boolean,
-    loading?: boolean,
+interface TreeNode extends TreebeardTreeNode {
     // Custom
     data: NodeData,
 }
@@ -124,8 +125,10 @@ interface DecisionTreeProps {
 }
 
 export class DecisionTree extends React.PureComponent<DecisionTreeProps, ITreeState> {
-    public state: ITreeState = {nodes: DecisionTree.createExplorationNode(this.props.formatterDecisions).children!!};
-    private static toaster = Toaster.create();
+    public state: ITreeState = {
+        nodes: DecisionTree.createExplorationNode(this.props.formatterDecisions).children!!,
+        treeCacheBust: 0,
+    };
 
     private static readonly duration = 50;
     /** Default TreeBeard animations are too slow (300), sadly have to reimplement this to get a shorter duration. */
@@ -146,7 +149,7 @@ export class DecisionTree extends React.PureComponent<DecisionTreeProps, ITreeSt
                 {
                     enter: {
                         animation: 'slideDown',
-                        duration: DecisionTree.duration
+                        duration: DecisionTree.duration,
                     },
                     leave: {
                         animation: 'slideUp',
@@ -157,13 +160,35 @@ export class DecisionTree extends React.PureComponent<DecisionTreeProps, ITreeSt
         }
     };
 
+    private static CastTreebeard<N extends TreeNode>(): FunctionComponent<TreebeardProps<N>> {
+        return Treebeard;
+    }
+
+    /**
+     * Treebeard isn't defined as a memoized thing so we need to.
+     * We use this memoization to indicate that only decorators.cacheBust should matter when determining up-to-dateness.
+     */
+    private static MemoTreebeard: React.NamedExoticComponent<TreebeardProps<TreeNode>> = React.memo(
+        DecisionTree.CastTreebeard<TreeNode>(),
+        (prevProps, nextProps) =>
+            prevProps.decorators.cacheBust === nextProps.decorators.cacheBust);
+
     public render() {
         return <div className={`${Classes.ELEVATION_0} DecisionTree`}>
-            <Treebeard
+            {/* Indicate which line is selected without refreshing the tree, because that is too slow. */}
+            {/* See https://medium.learnreact.com/the-style-tag-and-react-24d6dd3ca974 */}
+            <style dangerouslySetInnerHTML={{
+                __html: `
+                    .node-${this.state.selectedNodeId} {
+                        background-color: #2B95D6 !important
+                    }
+                `,
+            }}/>
+            <DecisionTree.MemoTreebeard
                 data={this.state.nodes}
                 onToggle={this.onToggle}
                 animations={DecisionTree.Animations}
-                decorators={this.Decorators}
+                decorators={this.Decorators()}
             />
         </div>;
     }
@@ -208,7 +233,7 @@ export class DecisionTree extends React.PureComponent<DecisionTreeProps, ITreeSt
 
     private onToggle = (nodeData: TreeNode, toggled: boolean) => {
         nodeData.toggled = toggled;
-        this.setState(this.state);
+        this.setState(prevState => ({...prevState, treeCacheBust: prevState.treeCacheBust + 1}));
     };
 
     private highlightInlineDocLevel(id: Id) {
@@ -241,34 +266,33 @@ export class DecisionTree extends React.PureComponent<DecisionTreeProps, ITreeSt
 
     private onMouseEnter = (nodeData: TreeNode) => {
         this.highlightLevel(nodeData);
-        this.setState({...this.state, selectedNodeId: nodeData.id});
+        this.setState(prevState => ({...prevState, selectedNodeId: nodeData.id}));
     };
 
     /**
      * This is a hack to override the Container of {@link TreebeardDecorators} and still have access to the main
      * component object, because we don't control what gets passed to this inner component via props.
      */
-    private Container = (outer: DecisionTree) => class extends TreebeardDecorators.Container {
-
+    private Container = ((outer: DecisionTree) => class extends TreebeardDecorators.Container {
         render() {
             const {style, decorators, terminal, onClick, node} = this.props;
             return (
                 <div
                     onClick={onClick}
-                    style={outer.state.selectedNodeId === node.id
-                        ? {backgroundColor: '#2B95D6', ...style.link}
-                        : (node.active ? {...style.container} : {...style.link})
-                    }
+                    className={`node-${node.id}`}
+                    style={node.active ? {...style.container} : {...style.link}}
                     onMouseEnter={() => outer.onMouseEnter(node)}
                 >
                     {!terminal ? this.renderToggle() : null}
                     <decorators.Header node={node} style={style.header}/>
                 </div>
-        );
+            );
         }
-    };
+    })(this);
 
-    private Decorators = Object.assign({}, TreebeardDecorators, {
-        Container: this.Container(this)
+    private Decorators = () => Object.assign({}, TreebeardDecorators, {
+        Container: this.Container,
+        // Force the tree to re-render
+        cacheBust: this.state.treeCacheBust,
     });
 }
