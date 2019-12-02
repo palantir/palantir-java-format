@@ -379,7 +379,7 @@ public final class Level extends Doc {
                                 .newChildNode(lastLevel, state2)
                                 .maybeExplore("recurse into inner tryBreakLastLevel", state3, exp ->
                                         lastLevel.tryBreakLastLevel(
-                                                commentsHelper, maxWidth, state3, exp, canInlineSoFar))
+                                                commentsHelper, maxWidth, state3, exp, canInline))
                                 .map(expl -> expl.markAccepted()); // collapse??
                     })
                     .breakOnlyIfInnerLevelsThenFitOnOneLine((keepIndentWhenInlined, replaceIndent) -> {
