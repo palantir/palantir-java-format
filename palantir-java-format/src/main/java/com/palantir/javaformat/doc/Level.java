@@ -204,8 +204,9 @@ public final class Level extends Doc {
 
         @Override
         public State breakOnlyIfInnerLevelsThenFitOnOneLine(boolean keepIndentWhenInlined, boolean replaceIndent) {
-            Obs.Exploration broken = levelNode.explore(
-                    "breaking normally", explorationNode -> breakNormally(this.state, explorationNode));
+            Exploration broken = levelNode.explore("breaking normally", explorationNode ->
+                    computeBroken(
+                            commentsHelper, maxWidth, state.withIndentIncrementedBy(getPlusIndent()), explorationNode));
 
             if (!replaceIndent) {
                 return broken.markAccepted();
