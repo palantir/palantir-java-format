@@ -15,7 +15,7 @@ import { State } from "./state";
 
 type ExplorationNode = {
     type: "exploration", parentId?: Id, id: Id, humanDescription: string, children: ReadonlyArray<LevelNode>,
-    startColumn: number, result?: ExplorationResult
+    startColumn: number, result?: ExplorationResult, incomingState?: State,
 };
 type LevelNode = {
     type: "level", id: Id, parentId: Id, debugName?: string, flat: string, toString: string, acceptedExplorationId: Id,
@@ -208,7 +208,7 @@ export class DecisionTree extends React.PureComponent<DecisionTreeProps, ITreeSt
                 result: node.result,
                 startColumn: node.startColumn,
                 parentLevelId: parent !== undefined ? parent.levelId : undefined,
-                incomingState: parent !== undefined ? parent.incomingState : undefined,
+                incomingState: node.incomingState,
             },
         };
     }

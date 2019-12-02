@@ -166,7 +166,7 @@ public final class Level extends Doc {
         @Override
         public State breakThisLevel() {
             return levelNode
-                    .explore("breakThisLevel", explorationNode -> breakNormally(state, explorationNode))
+                    .explore("breakThisLevel", state, explorationNode -> breakNormally(state, explorationNode))
                     .markAccepted();
         }
 
@@ -180,7 +180,7 @@ public final class Level extends Doc {
             State state = this.state.withNewBranch();
 
             Obs.Exploration broken = levelNode.explore(
-                    "breaking normally", (explorationNode) -> breakNormally(this.state, explorationNode));
+                    "breaking normally", this.state, (explorationNode) -> breakNormally(this.state, explorationNode));
 
             if (state.branchingCoefficient() < MAX_BRANCHING_COEFFICIENT) {
                 state = state.withNoIndent();
@@ -190,7 +190,7 @@ public final class Level extends Doc {
                 }
                 State state1 = state;
                 Optional<Obs.Exploration> lastLevelBroken = levelNode.maybeExplore(
-                        "tryBreakLastLevel", (explorationNode) ->
+                        "tryBreakLastLevel", state1, (explorationNode) ->
                                 tryBreakLastLevel(commentsHelper, maxWidth, state1, explorationNode, true));
 
                 if (lastLevelBroken.isPresent()) {
@@ -204,9 +204,9 @@ public final class Level extends Doc {
 
         @Override
         public State breakOnlyIfInnerLevelsThenFitOnOneLine(boolean keepIndentWhenInlined, boolean replaceIndent) {
-            Exploration broken = levelNode.explore("breaking normally", explorationNode ->
-                    computeBroken(
-                            commentsHelper, maxWidth, state.withIndentIncrementedBy(getPlusIndent()), explorationNode));
+            State stateForBroken = this.state.withIndentIncrementedBy(getPlusIndent());
+            Exploration broken = levelNode.explore("breaking normally", stateForBroken, explorationNode ->
+                    computeBroken(commentsHelper, maxWidth, stateForBroken, explorationNode));
 
             if (!replaceIndent) {
                 return broken.markAccepted();
@@ -215,7 +215,7 @@ public final class Level extends Doc {
             State state1 = adjustState(state, keepIndentWhenInlined, true);
 
             Optional<Exploration> maybeInlined = levelNode.maybeExplore(
-                    "trying to inline prefix only", (explorationNode) ->
+                    "trying to inline prefix only", state1, (explorationNode) ->
                             handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
                                     commentsHelper, maxWidth, state1, broken.state(), explorationNode));
 
@@ -238,12 +238,12 @@ public final class Level extends Doc {
     private Optional<State> tryBreakOnlyIfInnerLevelsThenFitOnOneLine(
             CommentsHelper commentsHelper, int maxWidth, LevelNode levelNode, State state) {
 
-        Obs.Exploration broken = levelNode.explore("breaking normally (as prereq)", explorationNode ->
-                computeBroken(
-                        commentsHelper, maxWidth, state.withIndentIncrementedBy(getPlusIndent()), explorationNode));
+        State stateForBroken = state.withIndentIncrementedBy(getPlusIndent());
+        Obs.Exploration broken = levelNode.explore("breaking normally (as prereq)", stateForBroken, explorationNode ->
+                computeBroken(commentsHelper, maxWidth, stateForBroken, explorationNode));
 
         return levelNode
-                .maybeExplore("trying to inline prefix only", (explorationNode) ->
+                .maybeExplore("trying to inline prefix only", state, (explorationNode) ->
                         handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
                                 commentsHelper, maxWidth, state, broken.state(), explorationNode))
                 .map(Exploration::markAccepted);
@@ -378,8 +378,8 @@ public final class Level extends Doc {
                         State state3 = state2;
                         return explorationNode
                                 .newChildNode(lastLevel, state2)
-                                .maybeExplore(
-                                        "recurse into inner tryBreakLastLevel", exp -> lastLevel.tryBreakLastLevel(
+                                .maybeExplore("recurse into inner tryBreakLastLevel", state3, exp ->
+                                        lastLevel.tryBreakLastLevel(
                                                 commentsHelper, maxWidth, state3, exp, canInlineSoFar))
                                 .map(expl -> expl.markAccepted()); // collapse??
                     })
@@ -390,12 +390,13 @@ public final class Level extends Doc {
                         State state2 = lastLevel.adjustState(state1, keepIndentWhenInlined, replaceIndent);
                         return explorationNode
                                 .newChildNode(lastLevel, state2)
-                                .maybeExplore("recurse into inner handleBreakOnlyIfInnerLevelsThenFitOnOneLine", exp ->
-                                        lastLevel.tryBreakOnlyIfInnerLevelsThenFitOnOneLine(
+                                .maybeExplore(
+                                        "recurse into inner handleBreakOnlyIfInnerLevelsThenFitOnOneLine",
+                                        state2,
+                                        exp -> lastLevel.tryBreakOnlyIfInnerLevelsThenFitOnOneLine(
                                                 commentsHelper,
                                                 maxWidth,
-                                                exp.newChildNode(lastLevel, state2),
-                                                // temporary
+                                                exp.newChildNode(lastLevel, state2), // temporary
                                                 state2))
                                 .map(Exploration::markAccepted);
                     })
@@ -442,7 +443,7 @@ public final class Level extends Doc {
         return Optional.of(
                 explorationNode
                         .newChildNode(lastLevel, state2)
-                        .explore("end tryBreakLastLevel chain", exp ->
+                        .explore("end tryBreakLastLevel chain", state2, exp ->
                                 lastLevel.computeBreaks(commentsHelper, maxWidth, state2, exp))
                         .markAccepted());
     }

@@ -13,6 +13,7 @@ import com.palantir.javaformat.doc.Obs.Sink;
 import com.palantir.javaformat.doc.State;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalInt;
 
 public final class JsonSink implements Sink {
@@ -23,7 +24,11 @@ public final class JsonSink implements Sink {
 
     @Override
     public FinishExplorationNode startExplorationNode(
-            int explorationId, OptionalInt parentLevelId, String humanDescription, int startColumn) {
+            int explorationId,
+            OptionalInt parentLevelId,
+            String humanDescription,
+            int startColumn,
+            Optional<State> incomingState) {
         ObjectNode json;
         if (parentLevelId.isPresent()) {
             json = childrenMap.get(parentLevelId.getAsInt()).addObject();
@@ -36,6 +41,7 @@ public final class JsonSink implements Sink {
         json.put("humanDescription", humanDescription);
         // The column where we started off this exploration. Necessary to correctly indent the level.
         json.put("startColumn", startColumn);
+        incomingState.ifPresent(state -> json.set("incomingState", OBJECT_MAPPER.valueToTree(state)));
         createChildrenNode(explorationId, json);
         return (parentLevel, newState) -> {
             ObjectNode resultNode = OBJECT_MAPPER.createObjectNode();
