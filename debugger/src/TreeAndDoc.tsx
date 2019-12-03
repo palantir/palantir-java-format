@@ -1,5 +1,5 @@
 import { Id } from "./Data";
-import { Doc, Level } from "./Doc";
+import { Doc, Indent, Level } from "./Doc";
 import React, { Dispatch, FunctionComponent, useState } from "react";
 import { InlineDocComponent } from "./InlineDoc";
 import { Callout, Classes, Tag, Tooltip } from "@blueprintjs/core";
@@ -195,12 +195,22 @@ export class DecisionTree extends React.PureComponent<DecisionTreeProps, ITreeSt
 
     private static createExplorationNode(node: ExplorationNode, parent?: LevelNode): TreeNode {
         const onAcceptedPath = !parent || parent.acceptedExplorationId === node.id;
+        const outputLevel = this.getOutputLevelForExploration(node);
+        const indent = outputLevel !== undefined
+            ? this.renderIndentTag(outputLevel.openOp.plusIndent, outputLevel.evalPlusIndent)
+            : null;
+
         return {
             id: node.id.toString(),
             children: node.children.length > 0
                 ? node.children.map(child => DecisionTree.createLevelNode(child, onAcceptedPath))
                 : undefined,
-            name: <Tooltip content={node.id.toString()}>{node.humanDescription}</Tooltip>,
+            name: <div>
+                <Tooltip content={node.id.toString()}>
+                    <span className={"explorationNode-description"}>{node.humanDescription}</span>
+                </Tooltip>
+                {" "}{indent}
+            </div>,
             toggled: onAcceptedPath,
             active: onAcceptedPath,
             data: {
@@ -213,6 +223,42 @@ export class DecisionTree extends React.PureComponent<DecisionTreeProps, ITreeSt
         };
     }
 
+    private static renderConstIndent(indent: Indent) {
+        switch (indent.type) {
+            case "const":
+                return <Tag intent={"success"}>+{indent.amount}</Tag>;
+            case "if":
+                throw Error(`Expected const indent but got ${indent}`)
+        }
+    }
+
+    /** Render an indent differently, depending on whether it was conditional or not. */
+    private static renderIndentTag(indent: Indent, evaluatedIndent?: number) {
+        switch (indent.type) {
+            case "const":
+                if (indent.amount === 0) {
+                    return;
+                }
+                return <Tag intent={"success"}>+{indent.amount}</Tag>;
+            case "if":
+                return <Tooltip position={"bottom-right"} content={
+                    <span>
+                        thenIndent={this.renderConstIndent(indent.thenIndent)}{" "}
+                        elseIndent={this.renderConstIndent(indent.elseIndent)}
+                    </span>}>
+                    <Tag intent={"warning"}>
+                        {evaluatedIndent !== undefined ? `+${evaluatedIndent}` : '(unknown)'}
+                    </Tag>
+                </Tooltip>
+        }
+    }
+
+    private static getOutputLevelForExploration(exploration: ExplorationNode): Level | undefined {
+        const result = exploration.result;
+        if (result === undefined) return;
+        return result.outputLevel;
+    }
+
     private static createLevelNode(node: LevelNode, parentAccepted: boolean): TreeNode {
         return {
             id: node.id.toString(),
@@ -223,8 +269,7 @@ export class DecisionTree extends React.PureComponent<DecisionTreeProps, ITreeSt
                 <div>
                     <Tooltip content={`Node ID: ${node.id.toString()}, Level ID: ${node.levelId.toString()}`}>
                         {node.debugName || node.id}
-                    </Tooltip>{" "}
-                    {indent}
+                    </Tooltip>
                 </div>
             ),
             toggled: true,
