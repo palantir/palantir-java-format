@@ -3073,10 +3073,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 .plusIndent(ZERO)
                 .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(true, false))
                 .breakabilityIfLastLevel(LastLevelBreakability.CHECK_INNER)
-                .inlineability(
-                        arguments.size() > 1
-                                ? Inlineability.NOT_INLINEABLE_AND_POISON_FUTURE_INLINING_ON_THIS_LINE
-                                : Inlineability.ALWAYS_INLINEABLE)
+                .inlineability(arguments.size() > 1 ? Inlineability.NOT_INLINEABLE : Inlineability.ALWAYS_INLINEABLE)
                 .build());
         boolean first = true;
         FillMode fillMode = hasOnlyShortItems(arguments) ? FillMode.INDEPENDENT : FillMode.UNIFIED;
