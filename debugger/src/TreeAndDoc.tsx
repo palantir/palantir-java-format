@@ -220,7 +220,12 @@ export class DecisionTree extends React.PureComponent<DecisionTreeProps, ITreeSt
                 ? node.children.map(child => DecisionTree.createExplorationNode(child, node))
                 : undefined,
             name: (
-                <Tooltip content={node.id.toString()}>{node.debugName || node.id}</Tooltip>
+                <div>
+                    <Tooltip content={`Node ID: ${node.id.toString()}, Level ID: ${node.levelId.toString()}`}>
+                        {node.debugName || node.id}
+                    </Tooltip>{" "}
+                    {indent}
+                </div>
             ),
             toggled: true,
             active: parentAccepted,
