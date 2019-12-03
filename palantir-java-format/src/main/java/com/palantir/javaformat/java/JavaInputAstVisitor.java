@@ -1367,7 +1367,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             dims = new ArrayDeque<>(extractedDims.dims);
         }
 
-        builder.open(plusFour);
+        builder.open("visitMethod", plusFour);
         BreakTag breakBeforeName = new BreakTag();
         BreakTag breakBeforeType = new BreakTag();
         builder.open(ZERO);
@@ -3499,7 +3499,11 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             if (braces.isYes()) {
                 builder.space();
                 tokenBreakTrailingComment("{", plusTwo);
-                builder.open(ZERO, BreakBehaviours.breakThisLevel(), LastLevelBreakability.BREAK_HERE);
+                builder.open(OpenOp.builder()
+                        .debugName("addBodyDeclarations (braces)")
+                        .plusIndent(ZERO)
+                        .breakabilityIfLastLevel(LastLevelBreakability.BREAK_HERE)
+                        .build());
             }
             builder.open(plusTwo);
             boolean first = first0.isYes();
