@@ -43,6 +43,11 @@ public abstract class State {
     /** Counts how many lines a particular formatting took. */
     public abstract int numLines();
     /**
+     * Have we partially inlined some parent level onto the current line, even though it doesn't fully fit onto one
+     * line.
+     */
+    public abstract boolean inlining();
+    /**
      * Counts how many times reached a branch, where multiple formattings would be considered. Expected runtime is
      * exponential in this number.
      *
@@ -78,6 +83,7 @@ public abstract class State {
                 .mustBreak(false)
                 .numLines(0)
                 .branchingCoefficient(0)
+                .inlining(false)
                 .breakTagsTaken(Set.empty(HasUniqueId.ord()))
                 .breakStates(TreeMap.empty(HasUniqueId.ord()))
                 .levelStates(TreeMap.empty(HasUniqueId.ord()))
@@ -139,7 +145,7 @@ public abstract class State {
 
     /** The current level is being broken and it has breaks in it. Commit to the indent. */
     State withBrokenLevel() {
-        return builder().from(this).lastIndent(indent()).build();
+        return builder().from(this).lastIndent(indent()).inlining(false).build();
     }
 
     State withBreak(Break brk, boolean broken) {
@@ -154,6 +160,7 @@ public abstract class State {
                     .column(newColumn)
                     .numLines(numLines() + 1)
                     .breakStates(breakStates().set(brk, ImmutableBreakState.of(true, newColumn)))
+                    .inlining(false)
                     .build();
         } else {
             return builder.column(column() + brk.getFlat().length()).build();
@@ -169,6 +176,7 @@ public abstract class State {
                 .branchingCoefficient(branchingCoefficient())
                 .mustBreak(mustBreak())
                 // Overridden state
+                .inlining(afterInnerLevel.inlining()) // TODO correct??
                 .column(afterInnerLevel.column())
                 .numLines(afterInnerLevel.numLines())
                 // TODO(dsanduleac): put these behind a "GlobalState"
@@ -185,6 +193,10 @@ public abstract class State {
 
     State withColumn(int column) {
         return builder().from(this).column(column).build();
+    }
+
+    State startInlining() {
+        return builder().from(this).inlining(true).build();
     }
 
     State withMustBreak(boolean mustBreak) {
