@@ -276,10 +276,8 @@ public final class Level extends Doc {
 
             // Last level because there might be other in-between levels after the initial break like `new int[] {`, and
             // we want to skip those.
-            Level lastLevel = innerLevels.stream()
-                    .collect(GET_LAST_COLLECTOR)
-                    .orElseThrow(() -> new IllegalStateException(
-                            "Levels were broken so expected to find at least a non-empty level"));
+            Level lastLevel = innerLevels.stream().collect(GET_LAST_COLLECTOR).orElseThrow(() ->
+                    new IllegalStateException("Levels were broken so expected to find at least a non-empty level"));
 
             return inlineUpToLastDocThatIsALevel(commentsHelper, maxWidth, state, lastLevel, explorationNode);
         }
