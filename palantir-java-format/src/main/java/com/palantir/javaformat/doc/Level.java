@@ -157,8 +157,11 @@ public final class Level extends Doc {
         }
 
         private Exploration breakNormally(State state) {
-            // TODO(dsanduleac): can't just do .withBrokenLevel()
-            State state1 = state.withIndentIncrementedBy(getPlusIndent());
+            // TODO make this better, a level should know its indent behaviour when inlined
+            State state1 = state.inlining()
+                            && Level.this.getBreakabilityIfLastLevel() == LastLevelBreakability.BREAK_HERE
+                    ? state.withNoIndent().withIndentIncrementedBy(getPlusIndent())
+                    : state.withIndentIncrementedBy(getPlusIndent());
             return levelNode.explore("breaking normally", state1, explorationNode ->
                     computeBroken(commentsHelper, maxWidth, state1, explorationNode));
         }
@@ -353,7 +356,8 @@ public final class Level extends Doc {
 
         SplitsBreaks prefixSplitsBreaks = splitByBreaks(leadingDocs);
 
-        State state1 = inlineThisLevel(commentsHelper, maxWidth, state, prefixSplitsBreaks, explorationNode);
+        State state1 = inlineThisLevel(commentsHelper, maxWidth, state, prefixSplitsBreaks, explorationNode)
+                .startInlining();
         // If a break was still forced somehow even though we could fit the leadingWidth, then abort.
         // This could happen if inner levels have set a `columnLimitBeforeLastBreak` or something like that.
         if (state1.numLines() != state.numLines()) {
@@ -376,8 +380,7 @@ public final class Level extends Doc {
                         return explorationNode
                                 .newChildNode(lastLevel, state2)
                                 .maybeExplore("recurse into inner tryBreakLastLevel", state3, exp ->
-                                        lastLevel.tryBreakLastLevel(
-                                                commentsHelper, maxWidth, state3, exp, canInline))
+                                        lastLevel.tryBreakLastLevel(commentsHelper, maxWidth, state3, exp, canInline))
                                 .map(expl -> expl.markAccepted()); // collapse??
                     })
                     .breakOnlyIfInnerLevelsThenFitOnOneLine((keepIndentWhenInlined, replaceIndent) -> {
@@ -387,10 +390,8 @@ public final class Level extends Doc {
                         State state2 = lastLevel.adjustState(state1, keepIndentWhenInlined, replaceIndent);
                         return explorationNode
                                 .newChildNode(lastLevel, state2)
-                                .maybeExplore(
-                                        "recurse into inner handleBreakOnlyIfInnerLevelsThenFitOnOneLine",
-                                        state2,
-                                        exp -> lastLevel.tryBreakOnlyIfInnerLevelsThenFitOnOneLine(
+                                .maybeExplore("end tryBreakLastLevel chain by inlining if prefix fits", state2, exp ->
+                                        lastLevel.tryBreakOnlyIfInnerLevelsThenFitOnOneLine(
                                                 commentsHelper,
                                                 maxWidth,
                                                 exp.newChildNode(lastLevel, state2), // temporary
@@ -407,11 +408,8 @@ public final class Level extends Doc {
 
         // Experimental: clear accumulated indent if level we are breaking at would prefer replacing indent
         State state2;
-        if (BreakBehaviours.getReplaceIndent(lastLevel.getBreakBehaviour()).orElse(false)) {
-            state2 = state1.withNoIndent();
-        } else {
-            state2 = state1;
-        }
+        // TODO is it correct to always reset indent upon BREAK_HERE???
+        state2 = state1.withNoIndent().withIndentIncrementedBy(lastLevel.getPlusIndent());
 
         // Ok then, we are allowed to break here, but first verify that we have enough room to inline this last
         // level's prefix.
