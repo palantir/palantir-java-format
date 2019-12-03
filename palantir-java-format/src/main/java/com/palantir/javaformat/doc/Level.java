@@ -330,8 +330,6 @@ public final class Level extends Doc {
             State state,
             Obs.ExplorationNode explorationNode,
             boolean canInlineSoFar) {
-        boolean canInline = canInlineSoFar
-                && inlineability() != Inlineability.NOT_INLINEABLE_AND_POISON_FUTURE_INLINING_ON_THIS_LINE;
 
         if (docs.isEmpty() || !(getLast(docs) instanceof Level)) {
             return Optional.empty();
@@ -355,6 +353,8 @@ public final class Level extends Doc {
         //       See computeBreakAndSplit -> shouldBreak
 
         SplitsBreaks prefixSplitsBreaks = splitByBreaks(leadingDocs);
+
+        boolean canInline = canInlineSoFar && isSimpleLevel(prefixSplitsBreaks);
 
         State state1 = inlineThisLevel(commentsHelper, maxWidth, state, prefixSplitsBreaks, explorationNode)
                 .startInlining();
@@ -441,6 +441,52 @@ public final class Level extends Doc {
                         .explore("end tryBreakLastLevel chain", state2, exp ->
                                 lastLevel.computeBreaks(commentsHelper, maxWidth, state2, exp))
                         .markAccepted());
+    }
+
+    /**
+     * A level is simple if it has at most one direct break in it.
+     *
+     * <p>This is used to poison the ability to partially inline method arguments down the line if a parent level was
+     * too complicated, so that you can't end up with this:
+     *
+     * <pre>
+     * method(arg1, arg2, arg3.foo().stream()
+     *         .filter(...)
+     *         .map(...));
+     * </pre>
+     *
+     * or
+     *
+     * <pre>
+     * log.info("Message", exception, SafeArg.of(
+     *         "foo", foo);
+     * </pre>
+     *
+     * But you can still get this (see test B20128760):
+     *
+     * <pre>
+     * Stream<ItemKey> itemIdsStream = stream(members).flatMap(m -> m.getFieldValues().entrySet().stream()
+     *         .filter(...)
+     *         .map(...));
+     * </pre>
+     *
+     * or this:
+     *
+     * <pre>
+     * method(anotherMethod(arg3.foo().stream()
+     *         .filter(...)
+     *         .map(...)));
+     * </pre>
+     *
+     * or this:
+     *
+     * <pre>
+     * method(anotherMethod(
+     *         ...)); // long arguments
+     * </pre>
+     */
+    private boolean isSimpleLevel(SplitsBreaks prefixSplitsBreaks) {
+        return prefixSplitsBreaks.breaks().size() < 2;
     }
 
     private static void assertStartsWithBreakOrEmpty(State state, Doc doc) {
