@@ -61,6 +61,7 @@ import com.palantir.javaformat.BreakBehaviours;
 import com.palantir.javaformat.CloseOp;
 import com.palantir.javaformat.FormattingError;
 import com.palantir.javaformat.Indent;
+import com.palantir.javaformat.InlineIndent;
 import com.palantir.javaformat.Inlineability;
 import com.palantir.javaformat.Input;
 import com.palantir.javaformat.LastLevelBreakability;
@@ -3015,7 +3016,10 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
 
         builder.open(OpenOp.builder()
                 .debugName("addArguments")
+                // Note: when called via dotExpressionArgsAndParen and this is the last level, and the current stuff
+                // has been inlineable so far, the plusIndent is always zero.
                 .plusIndent(plusIndent)
+                .inlineIndent(InlineIndent.RESET_AND_ADD_OWN)
                 .breakBehaviour(
                         arguments.size() == 1
                                 // jared style, or else inline

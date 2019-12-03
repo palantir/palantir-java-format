@@ -157,13 +157,24 @@ public final class Level extends Doc {
         }
 
         private Exploration breakNormally(State state) {
-            // TODO make this better, a level should know its indent behaviour when inlined
-            State state1 = state.inlining()
-                            && Level.this.getBreakabilityIfLastLevel() == LastLevelBreakability.BREAK_HERE
-                    ? state.withNoIndent().withIndentIncrementedBy(getPlusIndent())
-                    : state.withIndentIncrementedBy(getPlusIndent());
+            State state1 = computeNewIndent(state);
             return levelNode.explore("breaking normally", state1, explorationNode ->
                     computeBroken(commentsHelper, maxWidth, state1, explorationNode));
+        }
+
+        // TODO make this better, a level should know its indent behaviour when inlined
+        private State computeNewIndent(State state) {
+            if (state.inlining()) {
+                switch (openOp.inlineIndent()) {
+                    case RESET_AND_ADD_OWN:
+                        return state.withNoIndent().withIndentIncrementedBy(getPlusIndent());
+                    case AS_USUAL:
+                        break; // fall back
+                    default:
+                        throw new IllegalStateException("Unknown inlineIndent: " + openOp.inlineIndent());
+                }
+            }
+            return state.withIndentIncrementedBy(getPlusIndent());
         }
 
         @Override
@@ -212,7 +223,7 @@ public final class Level extends Doc {
                 return broken.markAccepted();
             }
 
-            State state1 = adjustState(state, keepIndentWhenInlined, true);
+            State state1 = adjustState(state, keepIndentWhenInlined, true).startInlining();
 
             Optional<Exploration> maybeInlined = levelNode.maybeExplore(
                     "trying to inline prefix only", state1, (explorationNode) ->

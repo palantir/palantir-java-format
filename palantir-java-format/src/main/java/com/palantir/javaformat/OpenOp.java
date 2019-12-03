@@ -35,6 +35,11 @@ public abstract class OpenOp extends HasUniqueId implements Op {
     /** The extra indent inside this level. */
     public abstract Indent plusIndent();
 
+    @Default
+    public InlineIndent inlineIndent() {
+        return InlineIndent.AS_USUAL;
+    }
+
     /**
      * When this level doesn't fit on one line, controls whether this level is to be broken (its breaks taken) or
      * partially inlined onto the current line.
