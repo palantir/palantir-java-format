@@ -3019,7 +3019,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 .breakBehaviour(
                         arguments.size() == 1
                                 // jared style, or else inline
-                                ? BreakBehaviours.breakOnlyIfInnerLevelsThenFitOnOneLine(false, false)
+                                ? BreakBehaviours.breakOnlyIfInnerLevelsThenFitOnOneLine(true, true)
                                 : BreakBehaviours.preferBreakingLastInnerLevel(false, false))
                 .breakabilityIfLastLevel(
                         // don't think we ever want BREAK_HERE.
