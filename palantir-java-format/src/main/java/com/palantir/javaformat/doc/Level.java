@@ -317,8 +317,7 @@ public final class Level extends Doc {
 
         if (fits) {
             return Optional.of(
-                    tryToLayOutLevelOnOneLine(
-                            commentsHelper, maxWidth, state, memoizedSplitsBreaks.get(), explorationNode));
+                    inlineThisLevel(commentsHelper, maxWidth, state, memoizedSplitsBreaks.get(), explorationNode));
         }
         return Optional.empty();
     }
@@ -355,7 +354,7 @@ public final class Level extends Doc {
 
         SplitsBreaks prefixSplitsBreaks = splitByBreaks(leadingDocs);
 
-        State state1 = tryToLayOutLevelOnOneLine(commentsHelper, maxWidth, state, prefixSplitsBreaks, explorationNode);
+        State state1 = inlineThisLevel(commentsHelper, maxWidth, state, prefixSplitsBreaks, explorationNode);
         // If a break was still forced somehow even though we could fit the leadingWidth, then abort.
         // This could happen if inner levels have set a `columnLimitBeforeLastBreak` or something like that.
         if (state1.numLines() != state.numLines()) {
@@ -456,10 +455,10 @@ public final class Level extends Doc {
 
     /**
      * Mark breaks in this level as not broken, but lay out the inner levels normally, according to their own {@link
-     * BreakBehaviour}. The resulting {@link State#mustBreak} will be true if this level did not fit on exactly one
-     * line.
+     * BreakBehaviour}. The resulting {@link State#numLines()} will be different if this level did not fit on exactly
+     * one line.
      */
-    private State tryToLayOutLevelOnOneLine(
+    private State inlineThisLevel(
             CommentsHelper commentsHelper,
             int maxWidth,
             State state,
