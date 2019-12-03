@@ -271,9 +271,8 @@ public final class Level extends Doc {
             // Find the last level, skipping empty levels (that contain nothing, or are made up
             // entirely of other empty levels).
 
-            // Last level because there might be other in-between levels after the initial break like `new
-            // int[]
-            // {`, and we want to skip those.
+            // Last level because there might be other in-between levels after the initial break like `new int[] {`, and
+            // we want to skip those.
             Level lastLevel = innerLevels.stream()
                     .collect(GET_LAST_COLLECTOR)
                     .orElseThrow(() -> new IllegalStateException(
