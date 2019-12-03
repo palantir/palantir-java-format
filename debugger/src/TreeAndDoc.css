@@ -6,3 +6,7 @@
 .TreeAndDoc .node-info td {
     padding: 0 5px;
 }
+
+.TreeAndDoc .explorationNode-description {
+    text-decoration: underline;
+}
