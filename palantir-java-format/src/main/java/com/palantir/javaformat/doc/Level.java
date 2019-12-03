@@ -261,6 +261,7 @@ public final class Level extends Doc {
             Obs.ExplorationNode explorationNode) {
         List<Level> innerLevels = this.docs.stream()
                 .filter(doc -> doc instanceof Level)
+                .filter(doc -> StartsWithBreakVisitor.INSTANCE.visit(doc) != Result.EMPTY)
                 .map(doc -> ((Level) doc))
                 .collect(Collectors.toList());
 
@@ -274,7 +275,6 @@ public final class Level extends Doc {
             // int[]
             // {`, and we want to skip those.
             Level lastLevel = innerLevels.stream()
-                    .filter(doc -> StartsWithBreakVisitor.INSTANCE.visit(doc) != Result.EMPTY)
                     .collect(GET_LAST_COLLECTOR)
                     .orElseThrow(() -> new IllegalStateException(
                             "Levels were broken so expected to find at least a non-empty level"));
