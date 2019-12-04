@@ -378,78 +378,84 @@ public final class Level extends Doc {
         //  * the lastLevel wants to be split, i.e. has Breakability.BREAK_HERE, then we continue
         //  * the lastLevel indicates we should check inside it for a potential split candidate.
         //    In this case, recurse rather than go into computeBreaks.
-        if (lastLevel.getBreakabilityIfLastLevel() == LastLevelBreakability.CHECK_INNER) {
-            // Try to fit the entire inner prefix if it's that kind of level.
-            return BreakBehaviours.caseOf(lastLevel.getBreakBehaviour())
-                    .preferBreakingLastInnerLevel((keepIndentWhenInlined, replaceIndent) -> {
-                        State state2 = state1;
-                        // This is to break cycles of visitRegularDot -> ... -> visitRegularDot
-                        state2 = lastLevel.adjustState(state2, keepIndentWhenInlined, replaceIndent);
-                        State state3 = state2;
-                        return explorationNode
+        switch (lastLevel.getBreakabilityIfLastLevel()) {
+            case CHECK_INNER:
+                // Try to fit the entire inner prefix if it's that kind of level.
+                return BreakBehaviours.caseOf(lastLevel.getBreakBehaviour())
+                        .preferBreakingLastInnerLevel((keepIndentWhenInlined, replaceIndent) -> {
+                            State state2 = state1;
+                            // This is to break cycles of visitRegularDot -> ... -> visitRegularDot
+                            state2 = lastLevel.adjustState(state2, keepIndentWhenInlined, replaceIndent);
+                            State state3 = state2;
+                            return explorationNode
+                                    .newChildNode(lastLevel, state2)
+                                    .maybeExplore("recurse into inner tryBreakLastLevel", state3, exp ->
+                                            lastLevel.tryBreakLastLevel(
+                                                    commentsHelper, maxWidth, state3, exp, canInline))
+                                    .map(expl -> expl.markAccepted()); // collapse??
+                        })
+                        .breakOnlyIfInnerLevelsThenFitOnOneLine((keepIndentWhenInlined, replaceIndent) -> {
+                            if (!canInline) {
+                                return Optional.empty();
+                            }
+                            State state2 = lastLevel.adjustState(state1, keepIndentWhenInlined, replaceIndent);
+                            return explorationNode
+                                    .newChildNode(lastLevel, state2)
+                                    .maybeExplore(
+                                            "end tryBreakLastLevel chain by inlining if prefix fits", state2, exp ->
+                                                    lastLevel.tryBreakOnlyIfInnerLevelsThenFitOnOneLine(
+                                                            commentsHelper,
+                                                            maxWidth,
+                                                            exp.newChildNode(lastLevel, state2), // temporary
+                                                            state2))
+                                    .map(Exploration::markAccepted);
+                        })
+                        // We don't know how to fit the inner level on the same line, so bail out.
+                        .otherwise_(Optional.empty());
+            case ACCEPT_INLINE_CHAIN:
+                // Ok then, we are allowed to break here, but first verify that we have enough room to inline this last
+                // level's prefix.
+                // Experimental: clear accumulated indent if level we are breaking at would prefer replacing indent
+                State state2;
+                // TODO is it correct to always reset indent upon BREAK_HERE???
+                state2 = state1.withNoIndent().withIndentIncrementedBy(lastLevel.getPlusIndent());
+
+                // Ok then, we are allowed to break here, but first verify that we have enough room to inline this last
+                // level's prefix.
+                if (lastLevel.inlineability() == Inlineability.IF_FIRST_LEVEL_FITS) {
+                    // Otherwise, we may be able to check if the first inner level of the lastLevel fits.
+                    // This is safe because we assume (and check) that a newline comes after it, even though
+                    // it might be nested somewhere deep in the 2nd level.
+
+                    float firstLevelWidth = lastLevel.docs.get(0).getWidth();
+                    boolean enoughRoom = state2.column() + firstLevelWidth <= maxWidth;
+
+                    // Enforce our assumption.
+                    if (lastLevel.docs.size() > 1) {
+                        assertStartsWithBreakOrEmpty(state, lastLevel.docs.get(1));
+                    }
+
+                    if (!enoughRoom) {
+                        return Optional.empty();
+                    }
+
+                    // Else, fall back to computeBreaks which will try both with / without break.
+                }
+
+                // Note: computeBreaks, not computeBroken, so it can try to do this logic recursively for the
+                // lastLevel
+                return Optional.of(
+                        explorationNode
                                 .newChildNode(lastLevel, state2)
-                                .maybeExplore("recurse into inner tryBreakLastLevel", state3, exp ->
-                                        lastLevel.tryBreakLastLevel(commentsHelper, maxWidth, state3, exp, canInline))
-                                .map(expl -> expl.markAccepted()); // collapse??
-                    })
-                    .breakOnlyIfInnerLevelsThenFitOnOneLine((keepIndentWhenInlined, replaceIndent) -> {
-                        if (!canInline) {
-                            return Optional.empty();
-                        }
-                        State state2 = lastLevel.adjustState(state1, keepIndentWhenInlined, replaceIndent);
-                        return explorationNode
-                                .newChildNode(lastLevel, state2)
-                                .maybeExplore("end tryBreakLastLevel chain by inlining if prefix fits", state2, exp ->
-                                        lastLevel.tryBreakOnlyIfInnerLevelsThenFitOnOneLine(
-                                                commentsHelper,
-                                                maxWidth,
-                                                exp.newChildNode(lastLevel, state2), // temporary
-                                                state2))
-                                .map(Exploration::markAccepted);
-                    })
-                    // We don't know how to fit the inner level on the same line, so bail out.
-                    .otherwise_(Optional.empty());
-        }
-
-        if (lastLevel.getBreakabilityIfLastLevel() != LastLevelBreakability.BREAK_HERE) {
-            return Optional.empty();
-        }
-
-        // Experimental: clear accumulated indent if level we are breaking at would prefer replacing indent
-        State state2;
-        // TODO is it correct to always reset indent upon BREAK_HERE???
-        state2 = state1.withNoIndent().withIndentIncrementedBy(lastLevel.getPlusIndent());
-
-        // Ok then, we are allowed to break here, but first verify that we have enough room to inline this last
-        // level's prefix.
-        if (lastLevel.inlineability() == Inlineability.IF_FIRST_LEVEL_FITS) {
-            // Otherwise, we may be able to check if the first inner level of the lastLevel fits.
-            // This is safe because we assume (and check) that a newline comes after it, even though
-            // it might be nested somewhere deep in the 2nd level.
-
-            float firstLevelWidth = lastLevel.docs.get(0).getWidth();
-            boolean enoughRoom = state2.column() + firstLevelWidth <= maxWidth;
-
-            // Enforce our assumption.
-            if (lastLevel.docs.size() > 1) {
-                assertStartsWithBreakOrEmpty(state, lastLevel.docs.get(1));
-            }
-
-            if (!enoughRoom) {
+                                .explore("end tryBreakLastLevel chain", state2, exp ->
+                                        lastLevel.computeBreaks(commentsHelper, maxWidth, state2, exp))
+                                .markAccepted());
+            case ABORT:
                 return Optional.empty();
-            }
-
-            // Else, fall back to computeBreaks which will try both with / without break.
+            default:
+                throw new RuntimeException(
+                        "Unexpected lastLevelBreakability: " + lastLevel.getBreakabilityIfLastLevel());
         }
-
-        // Note: computeBreaks, not computeBroken, so it can try to do this logic recursively for the
-        // lastLevel
-        return Optional.of(
-                explorationNode
-                        .newChildNode(lastLevel, state2)
-                        .explore("end tryBreakLastLevel chain", state2, exp ->
-                                lastLevel.computeBreaks(commentsHelper, maxWidth, state2, exp))
-                        .markAccepted());
     }
 
     /**
