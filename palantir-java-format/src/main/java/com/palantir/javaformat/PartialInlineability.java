@@ -40,7 +40,7 @@ public enum PartialInlineability {
      * <p>This is usually only appropriate for levels that start with a direct {@link Break}, as opposed to a Break
      * that's nested inside some other levels.
      */
-    MAY_FOLLOW_PARTIALLY_INLINED_LEVEL,
+    ALWAYS_PARTIALLY_INLINEABLE,
 
     /**
      * Partially inlineable if the <em>first</em> inner level of this level fits on the current line.
