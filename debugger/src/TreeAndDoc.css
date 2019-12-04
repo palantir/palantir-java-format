@@ -1,0 +1,83 @@
+.TreeAndDoc {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 1000px;
+    max-height: 1000px;
+}
+
+.TreeAndDoc > * {
+    flex-grow: 1;
+    flex-basis: 50%;
+    /** necessary to prevent overflow */
+    max-width: 50%;
+}
+
+.TreeAndDoc > .column1 {
+    margin: 10px 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.TreeAndDoc .DecisionTree {
+    overflow: scroll;
+    flex-grow: 1;
+}
+
+/**
+ * Since the Treebeard tree has a different background, we want to make sure it always takes up the space or else
+ * it looks ugly.
+ */
+.TreeAndDoc .DecisionTree > ul {
+    min-height: 100%;
+    width: fit-content;
+    min-width: 100%;
+}
+
+.TreeAndDoc .InlineDocs {
+    display: flex;
+    flex-direction: column;
+    overflow: scroll;
+}
+
+.TreeAndDoc .InlineDocs .InlineDoc {
+    flex-grow: 1;
+    flex-basis: auto;
+}
+
+.HighlightInlineDoc {
+    flex-grow: 0;
+    flex-shrink: 1;
+}
+
+/* InlineDoc */
+
+.InlineDoc .doc-level.referenced {
+    border-radius: 2px;
+    background-color: hsla(56, 100%, 51%, 0.4);
+}
+
+/** Inside a referenced level, highlight direct children very specifically. */
+.InlineDoc .doc-level.referenced > .highlight {
+    background-color: hsl(120, 61%, 80%);
+}
+
+/** Inside a referenced level, highlight nested inner levels with progressively more red to indicate depth. */
+.InlineDoc .doc-level.referenced .doc-level {
+    background: hsla(0, 40%, 50%, 0.15);
+    /*outline: 2px solid hsla(0, 40%, 0%, 0.3);*/
+}
+
+.TreeAndDoc .node-info {
+    overflow-x: scroll;
+    min-height: 100px;
+    max-height: 100px;
+}
+
+.TreeAndDoc .node-info td {
+    padding: 0 5px;
+}
+
+.TreeAndDoc .explorationNode-description {
+    text-decoration: underline;
+}

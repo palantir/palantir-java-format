@@ -30,7 +30,7 @@ import com.palantir.javaformat.Indent;
 import com.palantir.javaformat.LastLevelBreakability;
 import com.palantir.javaformat.OpenOp;
 import com.palantir.javaformat.Output;
-import com.palantir.javaformat.doc.Obs.ExplorationNode;
+import com.palantir.javaformat.doc.Obs.Exploration;
 import com.palantir.javaformat.doc.StartsWithBreakVisitor.Result;
 import java.util.ArrayList;
 import java.util.List;
@@ -154,16 +154,15 @@ public final class Level extends Doc {
             this.levelNode = levelNode;
         }
 
-        private State breakNormally(State state, ExplorationNode explorationNode) {
-            return computeBroken(
-                    commentsHelper, maxWidth, state.withIndentIncrementedBy(getPlusIndent()), explorationNode);
+        private Exploration breakNormally(State state) {
+            State state1 = state.withIndentIncrementedBy(getPlusIndent());
+            return levelNode.explore("breaking normally", state1, explorationNode ->
+                    computeBroken(commentsHelper, maxWidth, state1, explorationNode));
         }
 
         @Override
         public State breakThisLevel() {
-            return levelNode
-                    .explore("breakThisLevel", explorationNode -> breakNormally(state, explorationNode))
-                    .markAccepted();
+            return breakNormally(state).markAccepted();
         }
 
         @Override
@@ -172,13 +171,13 @@ public final class Level extends Doc {
             // breaks if the outcome is the same.
             State state = this.state.withNewBranch();
 
-            Obs.Exploration broken = levelNode.explore(
-                    "breaking normally", (explorationNode) -> breakNormally(this.state, explorationNode));
+            Obs.Exploration broken = breakNormally(state);
 
             if (state.branchingCoefficient() < MAX_BRANCHING_COEFFICIENT) {
+                State state1 = state.withNoIndent();
                 Optional<Obs.Exploration> lastLevelBroken = levelNode.maybeExplore(
-                        "tryBreakLastLevel", (explorationNode) ->
-                                tryBreakLastLevel(commentsHelper, maxWidth, state.withNoIndent(), explorationNode));
+                        "tryBreakLastLevel", state1, (explorationNode) ->
+                                tryBreakLastLevel(commentsHelper, maxWidth, state1, explorationNode));
 
                 if (lastLevelBroken.isPresent()) {
                     if (lastLevelBroken.get().state().numLines() < broken.state().numLines()) {
@@ -191,11 +190,12 @@ public final class Level extends Doc {
 
         @Override
         public State breakOnlyIfInnerLevelsThenFitOnOneLine(boolean keepIndentWhenInlined) {
-            Obs.Exploration broken = levelNode.explore(
-                    "breaking normally", explorationNode -> breakNormally(this.state, explorationNode));
+            State stateForBroken = this.state.withIndentIncrementedBy(getPlusIndent());
+            Exploration broken = levelNode.explore("breaking normally", stateForBroken, explorationNode ->
+                    computeBroken(commentsHelper, maxWidth, stateForBroken, explorationNode));
 
             Optional<Obs.Exploration> maybeInlined = levelNode.maybeExplore(
-                    "handleBreakOnlyIfInnerLevelsThenFitOnOneLine", (explorationNode) ->
+                    "handleBreakOnlyIfInnerLevelsThenFitOnOneLine", state, (explorationNode) ->
                             handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
                                     commentsHelper,
                                     maxWidth,
@@ -317,7 +317,7 @@ public final class Level extends Doc {
                         State state3 = state2;
                         return explorationNode
                                 .newChildNode(lastLevel, state2)
-                                .maybeExplore("recurse into inner tryBreakLastLevel", exp ->
+                                .maybeExplore("recurse into inner tryBreakLastLevel", state3, exp ->
                                         lastLevel.tryBreakLastLevel(commentsHelper, maxWidth, state3, exp))
                                 .map(expl -> expl.markAccepted()); // collapse??
                     })
@@ -349,7 +349,7 @@ public final class Level extends Doc {
         return Optional.of(
                 explorationNode
                         .newChildNode(lastLevel, state1)
-                        .explore("end tryBreakLastLevel chain", exp ->
+                        .explore("end tryBreakLastLevel chain", state1, exp ->
                                 lastLevel.computeBreaks(commentsHelper, maxWidth, state1, exp))
                         .markAccepted());
     }
@@ -492,7 +492,7 @@ public final class Level extends Doc {
         }
     }
 
-    Indent getPlusIndent() {
+    public Indent getPlusIndent() {
         return openOp.plusIndent();
     }
 
@@ -512,7 +512,7 @@ public final class Level extends Doc {
         return openOp.debugName();
     }
 
-    OpenOp getOpenOp() {
+    public OpenOp getOpenOp() {
         return openOp;
     }
 

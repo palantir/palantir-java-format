@@ -46,7 +46,11 @@ public final class Obs {
 
     public interface Sink {
         FinishExplorationNode startExplorationNode(
-                int exporationId, OptionalInt parentLevelId, String humanDescription, int startColumn);
+                int exporationId,
+                OptionalInt parentLevelId,
+                String humanDescription,
+                int startColumn,
+                Optional<State> incomingState);
 
         /**
          * @param levelNodeId the unique ID of the {@link LevelNode}. There can be multiple LevelNodes per {@link
@@ -60,18 +64,18 @@ public final class Obs {
     }
 
     public static ExplorationNode createRoot(Sink sink) {
-        return new ExplorationNodeImpl(null, "(initial node)", sink, 0);
+        return new ExplorationNodeImpl(null, "(initial node)", sink, 0, Optional.empty());
     }
 
     /** At a single level, you can explore various options for how to break lines and then accept one. */
     interface LevelNode {
 
-        Exploration explore(String humanDescription, Function<ExplorationNode, State> supplier);
+        Exploration explore(String humanDescription, State incomingState, Function<ExplorationNode, State> supplier);
 
         int id();
 
         Optional<Exploration> maybeExplore(
-                String humanDescription, Function<ExplorationNode, Optional<State>> supplier);
+                String humanDescription, State incomingState, Function<ExplorationNode, Optional<State>> supplier);
 
         State finishLevel(State state);
     }
@@ -88,7 +92,6 @@ public final class Obs {
         private final Sink sink;
         private final FinishLevelNode finisher;
         private final int startColumn;
-        private int acceptedExplorationId;
 
         public LevelNodeImpl(Level level, State incomingState, int parentExplorationId, Sink sink) {
             this.level = level;
@@ -97,16 +100,22 @@ public final class Obs {
             this.startColumn = incomingState.column();
         }
 
+        /**
+         * @param incomingState the state when starting this exploration, whose indents might be different from those in
+         *     this level's {@code incomingState}.
+         */
         @Override
-        public Exploration explore(String humanDescription, Function<ExplorationNode, State> explorationFunc) {
-            ExplorationNodeImpl explorationNode = new ExplorationNodeImpl(this, humanDescription, sink, startColumn);
+        public Exploration explore(
+                String humanDescription, State incomingState, Function<ExplorationNode, State> explorationFunc) {
+            ExplorationNodeImpl explorationNode =
+                    new ExplorationNodeImpl(this, humanDescription, sink, startColumn, Optional.of(incomingState));
             State newState = explorationFunc.apply(explorationNode);
             explorationNode.recordNewState(Optional.of(newState));
 
             return new Exploration() {
                 @Override
                 public State markAccepted() {
-                    acceptedExplorationId = explorationNode.id();
+                    finisher.finishNode(explorationNode.id());
                     return newState;
                 }
 
@@ -119,8 +128,11 @@ public final class Obs {
 
         @Override
         public Optional<Exploration> maybeExplore(
-                String humanDescription, Function<ExplorationNode, Optional<State>> explorationFunc) {
-            ExplorationNodeImpl explorationNode = new ExplorationNodeImpl(this, humanDescription, sink, startColumn);
+                String humanDescription,
+                State incomingState,
+                Function<ExplorationNode, Optional<State>> explorationFunc) {
+            ExplorationNodeImpl explorationNode =
+                    new ExplorationNodeImpl(this, humanDescription, sink, startColumn, Optional.of(incomingState));
             Optional<State> maybeNewState = explorationFunc.apply(explorationNode);
             explorationNode.recordNewState(maybeNewState);
 
@@ -132,7 +144,7 @@ public final class Obs {
             return Optional.of(new Exploration() {
                 @Override
                 public State markAccepted() {
-                    acceptedExplorationId = explorationNode.id();
+                    finisher.finishNode(explorationNode.id());
                     return newState;
                 }
 
@@ -145,7 +157,7 @@ public final class Obs {
 
         @Override
         public State finishLevel(State state) {
-            finisher.finishNode(acceptedExplorationId);
+            // TODO save the state somehow
             // this final state will be different from the 'accepted' state
             return state;
         }
@@ -156,14 +168,20 @@ public final class Obs {
         private final FinishExplorationNode finishExplorationNode;
         private final Optional<Level> parentLevel;
 
-        public ExplorationNodeImpl(LevelNodeImpl parent, String humanDescription, Sink sink, int startColumn) {
+        public ExplorationNodeImpl(
+                LevelNodeImpl parent,
+                String humanDescription,
+                Sink sink,
+                int startColumn,
+                Optional<State> incomingState) {
             this.parentLevel = Optional.ofNullable(parent).map(p -> p.level);
             this.sink = sink;
             this.finishExplorationNode = sink.startExplorationNode(
                     id(),
                     parent != null ? OptionalInt.of(parent.id()) : OptionalInt.empty(),
                     humanDescription,
-                    startColumn);
+                    startColumn,
+                    incomingState);
         }
 
         @Override

@@ -13,6 +13,7 @@ import com.palantir.javaformat.doc.Obs.Sink;
 import com.palantir.javaformat.doc.State;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalInt;
 
 public final class JsonSink implements Sink {
@@ -23,7 +24,11 @@ public final class JsonSink implements Sink {
 
     @Override
     public FinishExplorationNode startExplorationNode(
-            int explorationId, OptionalInt parentLevelId, String humanDescription, int startColumn) {
+            int explorationId,
+            OptionalInt parentLevelId,
+            String humanDescription,
+            int startColumn,
+            Optional<State> incomingState) {
         ObjectNode json;
         if (parentLevelId.isPresent()) {
             json = childrenMap.get(parentLevelId.getAsInt()).addObject();
@@ -36,9 +41,13 @@ public final class JsonSink implements Sink {
         json.put("humanDescription", humanDescription);
         // The column where we started off this exploration. Necessary to correctly indent the level.
         json.put("startColumn", startColumn);
+        incomingState.ifPresent(state -> json.set("incomingState", OBJECT_MAPPER.valueToTree(state)));
         createChildrenNode(explorationId, json);
         return (parentLevel, newState) -> {
-            json.set("outputLevel", new JsonDocVisitor(newState).visit(parentLevel));
+            ObjectNode resultNode = OBJECT_MAPPER.createObjectNode();
+            json.set("result", resultNode);
+            resultNode.set("outputLevel", new JsonDocVisitor(newState).visit(parentLevel));
+            resultNode.set("finalState", OBJECT_MAPPER.valueToTree(newState));
         };
     }
 
@@ -49,9 +58,11 @@ public final class JsonSink implements Sink {
         json.put("id", levelNodeId);
         json.put("levelId", level.id());
         json.put("parentId", parentExplorationId);
-        json.put("debugName", level.getDebugName().orElse(null));
         json.put("flat", level.getFlat());
         json.put("toString", level.toString());
+        json.set("incomingState", OBJECT_MAPPER.valueToTree(incomingState));
+        json.set("openOp", OBJECT_MAPPER.valueToTree(level.getOpenOp()));
+        json.put("evaluatedIndent", level.getPlusIndent().eval(incomingState));
         createChildrenNode(levelNodeId, json);
         return acceptedExplorationId -> json.put("acceptedExplorationId", acceptedExplorationId);
     }
