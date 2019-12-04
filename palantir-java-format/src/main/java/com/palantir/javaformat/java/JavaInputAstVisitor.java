@@ -2793,9 +2793,9 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 // That's only ever the case if trailingDereferences is true.
                 .breakBehaviour(
                         trailingDereferences
-                                ? BreakBehaviours.preferBreakingLastInnerLevel(true)
+                                ? BreakBehaviours.preferBreakingLastInnerLevel(false)
                                 : BreakBehaviours.breakThisLevel())
-                .breakabilityIfLastLevel(LastLevelBreakability.ABORT)
+                .breakabilityIfLastLevel(LastLevelBreakability.CHECK_INNER)
                 .inlineability(Inlineability.IF_FIRST_LEVEL_FITS)
                 .columnLimitBeforeLastBreak(METHOD_CHAIN_COLUMN_LIMIT)
                 .build());
