@@ -27,10 +27,10 @@ import com.palantir.javaformat.BreakBehaviour;
 import com.palantir.javaformat.BreakBehaviours;
 import com.palantir.javaformat.CommentsHelper;
 import com.palantir.javaformat.Indent;
-import com.palantir.javaformat.Inlineability;
 import com.palantir.javaformat.LastLevelBreakability;
 import com.palantir.javaformat.OpenOp;
 import com.palantir.javaformat.Output;
+import com.palantir.javaformat.PartialInlineability;
 import com.palantir.javaformat.doc.Obs.Exploration;
 import com.palantir.javaformat.doc.StartsWithBreakVisitor.Result;
 import java.util.ArrayList;
@@ -329,7 +329,7 @@ public final class Level extends Doc {
                 // Ok then, we are allowed to break here, but first verify that we have enough room to inline this last
                 // level's prefix.
                 Preconditions.checkState(
-                        lastLevel.inlineability() == Inlineability.MAY_FOLLOW_PARTIALLY_INLINED_LEVEL,
+                        lastLevel.inlineability() == PartialInlineability.MAY_FOLLOW_PARTIALLY_INLINED_LEVEL,
                         "tryBreakLastLevel doesn't currently support ending the inlining chain at a level with a "
                                 + "custom inlineability: %s",
                         lastLevel.openOp);
@@ -503,7 +503,7 @@ public final class Level extends Doc {
         return openOp.breakabilityIfLastLevel();
     }
 
-    public Inlineability inlineability() {
+    public PartialInlineability inlineability() {
         return openOp.inlineability();
     }
 
