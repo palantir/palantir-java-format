@@ -92,11 +92,18 @@ export const TreeAndDoc: React.FC<{ formatterDecisions: FormatterDecisions, doc:
         }
     }
 
+    function nodeInfoBlock() {
+        const title = selected !== undefined
+            ? "levelId" in selected ? "Level node" : "Exploration node"
+            : "<no node selected>";
+        return <Callout intent={"none"} title={title} className={"node-info"}>
+            {selected !== undefined ? formatNodeData(selected) : null}
+        </Callout>;
+    }
+
     return <div className={"TreeAndDoc"}>
         <div className={"column1"}>
-            <Callout intent={"none"} title={"Node information"} className={"node-info"}>
-                {selected !== undefined ? formatNodeData(selected) : null}
-            </Callout>
+            {nodeInfoBlock()}
             <DecisionTree
                 formatterDecisions={props.formatterDecisions}
                 highlightDoc={setHighlighted}
