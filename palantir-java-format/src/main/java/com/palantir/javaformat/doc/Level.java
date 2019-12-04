@@ -27,10 +27,10 @@ import com.palantir.javaformat.BreakBehaviour;
 import com.palantir.javaformat.BreakBehaviours;
 import com.palantir.javaformat.CommentsHelper;
 import com.palantir.javaformat.Indent;
-import com.palantir.javaformat.Inlineability;
 import com.palantir.javaformat.LastLevelBreakability;
 import com.palantir.javaformat.OpenOp;
 import com.palantir.javaformat.Output;
+import com.palantir.javaformat.PartialInlineability;
 import com.palantir.javaformat.doc.Obs.Exploration;
 import com.palantir.javaformat.doc.Obs.LevelNode;
 import com.palantir.javaformat.doc.StartsWithBreakVisitor.Result;
@@ -422,7 +422,7 @@ public final class Level extends Doc {
 
                 // Ok then, we are allowed to break here, but first verify that we have enough room to inline this last
                 // level's prefix.
-                if (lastLevel.inlineability() == Inlineability.IF_FIRST_LEVEL_FITS) {
+                if (lastLevel.inlineability() == PartialInlineability.IF_FIRST_LEVEL_FITS) {
                     // Otherwise, we may be able to check if the first inner level of the lastLevel fits.
                     // This is safe because we assume (and check) that a newline comes after it, even though
                     // it might be nested somewhere deep in the 2nd level.
@@ -441,7 +441,6 @@ public final class Level extends Doc {
 
                     // Else, fall back to computeBreaks which will try both with / without break.
                 }
-
                 // Note: computeBreaks, not computeBroken, so it can try to do this logic recursively for the
                 // lastLevel
                 return Optional.of(
@@ -658,7 +657,7 @@ public final class Level extends Doc {
         return openOp.breakabilityIfLastLevel();
     }
 
-    public Inlineability inlineability() {
+    public PartialInlineability inlineability() {
         return openOp.inlineability();
     }
 

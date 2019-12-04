@@ -69,6 +69,7 @@ import com.palantir.javaformat.Op;
 import com.palantir.javaformat.OpenOp;
 import com.palantir.javaformat.OpsBuilder;
 import com.palantir.javaformat.OpsBuilder.BlankLineWanted;
+import com.palantir.javaformat.PartialInlineability;
 import com.palantir.javaformat.doc.Break;
 import com.palantir.javaformat.doc.BreakTag;
 import com.palantir.javaformat.doc.FillMode;
@@ -2799,7 +2800,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 .plusIndent(plusFour)
                 .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(true, true))
                 .breakabilityIfLastLevel(LastLevelBreakability.CHECK_INNER)
-                .inlineability(Inlineability.IF_FIRST_LEVEL_FITS)
+                .inlineability(PartialInlineability.IF_FIRST_LEVEL_FITS)
                 .columnLimitBeforeLastBreak(METHOD_CHAIN_COLUMN_LIMIT)
                 .build());
 
