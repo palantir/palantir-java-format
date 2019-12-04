@@ -31,7 +31,6 @@ import com.palantir.javaformat.LastLevelBreakability;
 import com.palantir.javaformat.OpenOp;
 import com.palantir.javaformat.Output;
 import com.palantir.javaformat.doc.Obs.Exploration;
-import com.palantir.javaformat.doc.Obs.ExplorationNode;
 import com.palantir.javaformat.doc.StartsWithBreakVisitor.Result;
 import java.util.ArrayList;
 import java.util.List;
@@ -493,7 +492,7 @@ public final class Level extends Doc {
         }
     }
 
-    Indent getPlusIndent() {
+    public Indent getPlusIndent() {
         return openOp.plusIndent();
     }
 
@@ -513,7 +512,7 @@ public final class Level extends Doc {
         return openOp.debugName();
     }
 
-    OpenOp getOpenOp() {
+    public OpenOp getOpenOp() {
         return openOp;
     }
 
