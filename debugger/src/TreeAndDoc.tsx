@@ -2,6 +2,7 @@ import { Id } from "./Data";
 import { Doc, Indent, Level } from "./Doc";
 import React, { Dispatch, FunctionComponent, useState } from "react";
 import { InlineDocComponent } from "./InlineDoc";
+import './TreeAndDoc.css';
 import { Callout, Classes, Tag, Tooltip } from "@blueprintjs/core";
 import {
     decorators as TreebeardDecorators,

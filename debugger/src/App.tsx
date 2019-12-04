@@ -1,6 +1,5 @@
 import React from 'react';
 import './App.css';
-import './TreeAndDoc.css';
 import { Callout, H1, Pre } from "@blueprintjs/core";
 import { Doc } from "./Doc";
 import { Op, Ops } from "./Ops";
