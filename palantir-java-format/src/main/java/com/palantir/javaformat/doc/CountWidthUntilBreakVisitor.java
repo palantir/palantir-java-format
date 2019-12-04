@@ -56,7 +56,7 @@ class CountWidthUntilBreakVisitor implements DocVisitor<Float> {
 
     @Override
     public Float visitLevel(Level level) {
-        if (level.inlineability() == PartialInlineability.IF_FIRST_LEVEL_FITS
+        if (level.partialInlineability() == PartialInlineability.IF_FIRST_LEVEL_FITS
                 // If this prefix wouldn't fit on a new line (within the availableWidth), then don't
                 // consider it at all, because there's no point, it would always be broken.
                 && level.getDocs().get(0).getWidth() <= availableWidth) {

@@ -422,7 +422,7 @@ public final class Level extends Doc {
 
                 // Ok then, we are allowed to break here, but first verify that we have enough room to inline this last
                 // level's prefix.
-                if (lastLevel.inlineability() == PartialInlineability.IF_FIRST_LEVEL_FITS) {
+                if (lastLevel.partialInlineability() == PartialInlineability.IF_FIRST_LEVEL_FITS) {
                     // Otherwise, we may be able to check if the first inner level of the lastLevel fits.
                     // This is safe because we assume (and check) that a newline comes after it, even though
                     // it might be nested somewhere deep in the 2nd level.
@@ -657,8 +657,8 @@ public final class Level extends Doc {
         return openOp.breakabilityIfLastLevel();
     }
 
-    public PartialInlineability inlineability() {
-        return openOp.inlineability();
+    public PartialInlineability partialInlineability() {
+        return openOp.partialInlineability();
     }
 
     public Optional<String> getDebugName() {
