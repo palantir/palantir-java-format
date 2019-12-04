@@ -1,5 +1,5 @@
 import { Id } from "./Data";
-import { Doc, Indent, Level } from "./Doc";
+import { Doc, Indent, Level, OpenOp } from "./Doc";
 import React, { Dispatch, FunctionComponent, useState } from "react";
 import { InlineDocComponent } from "./InlineDoc";
 import './TreeAndDoc.css';
@@ -19,8 +19,9 @@ type ExplorationNode = {
     startColumn: number, result?: ExplorationResult, incomingState?: State,
 };
 type LevelNode = {
-    type: "level", id: Id, parentId: Id, debugName?: string, flat: string, toString: string, acceptedExplorationId: Id,
-    levelId: Id, children: ReadonlyArray<ExplorationNode>, incomingState: State
+    type: "level", id: Id, parentId: Id, flat: string, toString: string, acceptedExplorationId: Id,
+    levelId: Id, children: ReadonlyArray<ExplorationNode>, incomingState: State, openOp: OpenOp,
+    evaluatedIndent: number
 };
 
 interface ExplorationResult {
@@ -44,7 +45,7 @@ interface TreeNode extends TreebeardTreeNode {
     data: NodeData,
 }
 
-type ExplorationNodeData = { startColumn: number, result?: ExplorationResult, parentLevelId?: Id, incomingState?: State };
+type ExplorationNodeData = ExplorationNode & { parentLevelId?: Id };
 type LevelNodeData = { levelId: Id, incomingState: State };
 type NodeData = LevelNodeData | ExplorationNodeData;
 
@@ -203,10 +204,6 @@ export class DecisionTree extends React.PureComponent<DecisionTreeProps, ITreeSt
 
     private static createExplorationNode(node: ExplorationNode, parent?: LevelNode): TreeNode {
         const onAcceptedPath = !parent || parent.acceptedExplorationId === node.id;
-        const outputLevel = this.getOutputLevelForExploration(node);
-        const indent = outputLevel !== undefined
-            ? this.renderIndentTag(outputLevel.openOp.plusIndent, outputLevel.evalPlusIndent)
-            : null;
 
         return {
             id: node.id.toString(),
@@ -217,15 +214,35 @@ export class DecisionTree extends React.PureComponent<DecisionTreeProps, ITreeSt
                 <Tooltip content={node.id.toString()}>
                     <span className={"explorationNode-description"}>{node.humanDescription}</span>
                 </Tooltip>
-                {" "}{indent}
             </div>,
             toggled: onAcceptedPath,
             active: onAcceptedPath,
             data: {
-                // Store the output level so we can display it
-                result: node.result,
-                startColumn: node.startColumn,
+                ...node,
                 parentLevelId: parent !== undefined ? parent.levelId : undefined,
+            },
+        };
+    }
+
+    private static createLevelNode(node: LevelNode, parentAccepted: boolean): TreeNode {
+        const indent = this.renderIndentTag(node.openOp.plusIndent, node.evaluatedIndent);
+        return {
+            id: node.id.toString(),
+            children: node.children.length > 0
+                ? node.children.map(child => DecisionTree.createExplorationNode(child, node))
+                : undefined,
+            name: (
+                <div>
+                    <Tooltip content={`Node ID: ${node.id.toString()}, Level ID: ${node.levelId.toString()}`}>
+                        {node.openOp.debugName || node.id}
+                    </Tooltip>
+                    {" "}{indent}
+                </div>
+            ),
+            toggled: true,
+            active: parentAccepted,
+            data: {
+                levelId: node.levelId,
                 incomingState: node.incomingState,
             },
         };
@@ -259,34 +276,6 @@ export class DecisionTree extends React.PureComponent<DecisionTreeProps, ITreeSt
                     </Tag>
                 </Tooltip>
         }
-    }
-
-    private static getOutputLevelForExploration(exploration: ExplorationNode): Level | undefined {
-        const result = exploration.result;
-        if (result === undefined) return;
-        return result.outputLevel;
-    }
-
-    private static createLevelNode(node: LevelNode, parentAccepted: boolean): TreeNode {
-        return {
-            id: node.id.toString(),
-            children: node.children.length > 0
-                ? node.children.map(child => DecisionTree.createExplorationNode(child, node))
-                : undefined,
-            name: (
-                <div>
-                    <Tooltip content={`Node ID: ${node.id.toString()}, Level ID: ${node.levelId.toString()}`}>
-                        {node.debugName || node.id}
-                    </Tooltip>
-                </div>
-            ),
-            toggled: true,
-            active: parentAccepted,
-            data: {
-                levelId: node.levelId,
-                incomingState: node.incomingState,
-            },
-        };
     }
 
     private onToggle = (nodeData: TreeNode, toggled: boolean) => {

@@ -641,7 +641,7 @@ public final class Level extends Doc {
         }
     }
 
-    Indent getPlusIndent() {
+    public Indent getPlusIndent() {
         return openOp.plusIndent();
     }
 
@@ -665,7 +665,7 @@ public final class Level extends Doc {
         return openOp.debugName();
     }
 
-    OpenOp getOpenOp() {
+    public OpenOp getOpenOp() {
         return openOp;
     }
 
