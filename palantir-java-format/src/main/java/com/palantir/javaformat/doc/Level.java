@@ -329,7 +329,7 @@ public final class Level extends Doc {
                 // Ok then, we are allowed to break here, but first verify that we have enough room to inline this last
                 // level's prefix.
                 Preconditions.checkState(
-                        lastLevel.inlineability() == PartialInlineability.MAY_FOLLOW_PARTIALLY_INLINED_LEVEL,
+                        lastLevel.partialInlineability() == PartialInlineability.MAY_FOLLOW_PARTIALLY_INLINED_LEVEL,
                         "tryBreakLastLevel doesn't currently support ending the inlining chain at a level with a "
                                 + "custom inlineability: %s",
                         lastLevel.openOp);
@@ -503,8 +503,8 @@ public final class Level extends Doc {
         return openOp.breakabilityIfLastLevel();
     }
 
-    public PartialInlineability inlineability() {
-        return openOp.inlineability();
+    public PartialInlineability partialInlineability() {
+        return openOp.partialInlineability();
     }
 
     public Optional<String> getDebugName() {

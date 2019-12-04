@@ -51,7 +51,7 @@ public abstract class OpenOp extends HasUniqueId implements Op {
     }
 
     @Default
-    public PartialInlineability inlineability() {
+    public PartialInlineability partialInlineability() {
         return PartialInlineability.MAY_FOLLOW_PARTIALLY_INLINED_LEVEL;
     }
 

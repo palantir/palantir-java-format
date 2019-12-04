@@ -2792,7 +2792,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 .plusIndent(plusFour)
                 .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(false))
                 .breakabilityIfLastLevel(LastLevelBreakability.CHECK_INNER)
-                .inlineability(PartialInlineability.IF_FIRST_LEVEL_FITS)
+                .partialInlineability(PartialInlineability.IF_FIRST_LEVEL_FITS)
                 .columnLimitBeforeLastBreak(METHOD_CHAIN_COLUMN_LIMIT)
                 .build());
 
