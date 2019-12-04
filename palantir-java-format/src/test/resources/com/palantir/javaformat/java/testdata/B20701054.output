@@ -1,7 +1,9 @@
 class B20701054 {
     void m() {
         ImmutableList<String> x = ImmutableList.builder().add(1).build();
-        OptionalBinder.<ASD>newOptionalBinder(binder(), InputWhitelist.class).setBinding().to(AllInputWhitelist.class);
+        OptionalBinder.<ASD>newOptionalBinder(binder(), InputWhitelist.class)
+                .setBinding()
+                .to(AllInputWhitelist.class);
 
         Foo z = Foo.INSTANCE.field;
         Foo z = Foo.INSTANCE.field.field;
@@ -72,19 +74,21 @@ class B20701054 {
         analysis().analyze(compilationUnit, context, configuration, new DescriptionListener() {
             @Override
             public void onDescribed(Description description) {
-                listener.onDescribed(description.filterFixes(new Predicate<Fix>() {
-                    @Override
-                    public boolean apply(Fix fix) {
-                        return compiles(fix, (JCCompilationUnit) compilationUnit, context);
-                    }
-                }));
+                listener.onDescribed(
+                        description.filterFixes(new Predicate<Fix>() {
+                            @Override
+                            public boolean apply(Fix fix) {
+                                return compiles(fix, (JCCompilationUnit) compilationUnit, context);
+                            }
+                        }));
             }
         });
 
         (test ? xxx : yyy).zzz(xxx);
 
-        (test ? xxx : yyy).zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz(
-                xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx);
+        (test ? xxx : yyy)
+                .zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz(
+                        xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx);
 
         (test
                         ? xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx

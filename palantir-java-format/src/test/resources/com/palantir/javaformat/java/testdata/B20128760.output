@@ -10,11 +10,15 @@ class B20128760 {
                         XxxxXxxxxxxxxx.xxxXxxxxxxxxXxxxxXxxxxXxXxxxxx(Xxxxxxxxxx.xxxXxxxXxxxx(x)))
                 .xxxxx();
 
-        xxxxxxXxxx(xxx.xxxXxXxxxxxxx(new XxxxxxxxxXxxxxxxx.Xxxxxxx()
-                                .xxxxXxxxXxx(Xxxxx.xxxXxxxxXxxx(new XxxxXx(
-                                        xxxxxxxxx1.xxxXxxxXx().xxxXxxxx() + xxxxxxxxx2.xxxXxxxXx().xxxXxxxx())))
-                                .xxxxx())
-                        .xxxXxxxxxx())
+        xxxxxxXxxx(
+                        xxx.xxxXxXxxxxxxx(new XxxxxxxxxXxxxxxxx.Xxxxxxx()
+                                        .xxxxXxxxXxx(
+                                                Xxxxx.xxxXxxxxXxxx(new XxxxXx(xxxxxxxxx1
+                                                                .xxxXxxxXx()
+                                                                .xxxXxxxx()
+                                                        + xxxxxxxxx2.xxxXxxxXx().xxxXxxxx())))
+                                        .xxxxx())
+                                .xxxXxxxxxx())
                 .xxxxxxxxXxxxxxx();
 
         XXxxxx<Xxxx, XxxxxxxXxxxxxxxxxxXxxxxxxxx> xxxxxxxxxXxxXxxXxXxxxxxxxXx = XX.xxxxXxxXxxx2(
@@ -34,9 +38,10 @@ class B20128760 {
                         .xxxXxxx()
                         .xxxxXxxxXxXx(X.xx.xxxxxxxxxxxxxxxxxxxxxxxxxxx);
 
-        xxxxxxXxxx(xxxxxxxxxx
-                        .xxxXxxxXxxxxXxxxxxxxxxxXxxxXxxxXxxxxXxxx(XXXxXXXXxXX, XXXXXXxXXXxXXXXxXX, XXXXXxXX)
-                        .xxxxxxxxxxxXxxxXxxxXxxxxx())
+        xxxxxxXxxx(
+                        xxxxxxxxxx
+                                .xxxXxxxXxxxxXxxxxxxxxxxXxxxXxxxXxxxxXxxx(XXXxXXXXxXX, XXXXXXxXXXxXXXXxXX, XXXXXxXX)
+                                .xxxxxxxxxxxXxxxXxxxXxxxxx())
                 .xxxxxxxxXxxxxxx(
                         xxxxXxxxxxxxxxxXxxxXxxxXxxxx(xxxx1Xxxx, Xxxxx.XXxXXX),
                         xxxxXxxxxxxxxxxXxxxXxxxXxxxx(xxxx2Xxxx, Xxxxx.XXxXXX));
@@ -70,9 +75,11 @@ class B20128760 {
                     Xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx {}
 
     {
-        Stream<ItemKey> itemIdsStream = stream(members).flatMap(m -> m.getFieldValues().entrySet().stream()
-                .filter(fv -> itemLinkFieldIds.contains(fv.getKey()))
-                .flatMap(fv -> FieldDTO.deserializeStringToListOfStrings(fv.getValue()).stream()
-                        .map(id -> new ItemKey(fieldsById.get(fv.getKey()).getItemTypeId(), id))));
+        Stream<ItemKey> itemIdsStream = stream(members).flatMap(m ->
+                m.getFieldValues().entrySet().stream()
+                        .filter(fv -> itemLinkFieldIds.contains(fv.getKey()))
+                        .flatMap(fv ->
+                                FieldDTO.deserializeStringToListOfStrings(fv.getValue()).stream()
+                                        .map(id -> new ItemKey(fieldsById.get(fv.getKey()).getItemTypeId(), id))));
     }
 }
