@@ -30,6 +30,7 @@ import com.palantir.javaformat.Indent;
 import com.palantir.javaformat.LastLevelBreakability;
 import com.palantir.javaformat.OpenOp;
 import com.palantir.javaformat.Output;
+import com.palantir.javaformat.PartialInlineability;
 import com.palantir.javaformat.doc.Obs.Exploration;
 import com.palantir.javaformat.doc.StartsWithBreakVisitor.Result;
 import java.util.ArrayList;
@@ -306,52 +307,46 @@ public final class Level extends Doc {
         //  * the lastLevel wants to be split, i.e. has Breakability.BREAK_HERE, then we continue
         //  * the lastLevel indicates we should check inside it for a potential split candidate.
         //    In this case, recurse rather than go into computeBreaks.
-        if (lastLevel.getBreakabilityIfLastLevel() == LastLevelBreakability.CHECK_INNER) {
-            // Try to fit the entire inner prefix if it's that kind of level.
-            return BreakBehaviours.caseOf(lastLevel.getBreakBehaviour())
-                    .preferBreakingLastInnerLevel(keepIndentWhenInlined -> {
-                        State state2 = state1;
-                        if (keepIndentWhenInlined) {
-                            state2 = state2.withIndentIncrementedBy(lastLevel.getPlusIndent());
-                        }
-                        State state3 = state2;
-                        return explorationNode
-                                .newChildNode(lastLevel, state2)
-                                .maybeExplore("recurse into inner tryBreakLastLevel", state3, exp ->
-                                        lastLevel.tryBreakLastLevel(commentsHelper, maxWidth, state3, exp))
-                                .map(expl -> expl.markAccepted()); // collapse??
-                    })
-                    // We don't know how to fit the inner level on the same line, so bail out.
-                    .otherwise_(Optional.empty());
-
-        } else if (lastLevel.getBreakabilityIfLastLevel() == LastLevelBreakability.ONLY_IF_FIRST_LEVEL_FITS) {
-            // Otherwise, we may be able to check if the first inner level of the lastLevel fits.
-            // This is safe because we assume (and check) that a newline comes after it, even though
-            // it might be nested somewhere deep in the 2nd level.
-
-            float firstLevelWidth = lastLevel.docs.get(0).getWidth();
-            boolean enoughRoom = state1.column() + firstLevelWidth <= maxWidth;
-
-            // Enforce our assumption.
-            if (lastLevel.docs.size() > 1) {
-                assertStartsWithBreakOrEmpty(state, lastLevel.docs.get(1));
-            }
-
-            if (!enoughRoom) {
+        switch (lastLevel.getBreakabilityIfLastLevel()) {
+            case CHECK_INNER:
+                // Try to fit the entire inner prefix if it's that kind of level.
+                return BreakBehaviours.caseOf(lastLevel.getBreakBehaviour())
+                        .preferBreakingLastInnerLevel(keepIndentWhenInlined -> {
+                            State state2 = state1;
+                            if (keepIndentWhenInlined) {
+                                state2 = state2.withIndentIncrementedBy(lastLevel.getPlusIndent());
+                            }
+                            State state3 = state2;
+                            return explorationNode
+                                    .newChildNode(lastLevel, state2)
+                                    .maybeExplore("recurse into inner tryBreakLastLevel", state3, exp ->
+                                            lastLevel.tryBreakLastLevel(commentsHelper, maxWidth, state3, exp))
+                                    .map(expl -> expl.markAccepted()); // collapse??
+                        })
+                        // We don't know how to fit the inner level on the same line, so bail out.
+                        .otherwise_(Optional.empty());
+            case ACCEPT_INLINE_CHAIN:
+                // Ok then, we are allowed to break here, but first verify that we have enough room to inline this last
+                // level's prefix.
+                Preconditions.checkState(
+                        lastLevel.partialInlineability() == PartialInlineability.ALWAYS_PARTIALLY_INLINEABLE,
+                        "tryBreakLastLevel doesn't currently support ending the inlining chain at a level with a "
+                                + "custom inlineability: %s",
+                        lastLevel.openOp);
+                // Note: computeBreaks, not computeBroken, so it can try to do this logic recursively for the
+                // lastLevel
+                return Optional.of(
+                        explorationNode
+                                .newChildNode(lastLevel, state1)
+                                .explore("end tryBreakLastLevel chain", state1, exp ->
+                                        lastLevel.computeBreaks(commentsHelper, maxWidth, state1, exp))
+                                .markAccepted());
+            case ABORT:
                 return Optional.empty();
-            }
-
-            // Else, fall back to computeBreaks which will try both with / without break.
+            default:
+                throw new RuntimeException(
+                        "Unexpected lastLevelBreakability: " + lastLevel.getBreakabilityIfLastLevel());
         }
-
-        // Note: computeBreaks, not computeBroken, so it can try to do this logic recursively for the
-        // lastLevel
-        return Optional.of(
-                explorationNode
-                        .newChildNode(lastLevel, state1)
-                        .explore("end tryBreakLastLevel chain", state1, exp ->
-                                lastLevel.computeBreaks(commentsHelper, maxWidth, state1, exp))
-                        .markAccepted());
     }
 
     private static void assertStartsWithBreakOrEmpty(State state, Doc doc) {
@@ -506,6 +501,10 @@ public final class Level extends Doc {
 
     LastLevelBreakability getBreakabilityIfLastLevel() {
         return openOp.breakabilityIfLastLevel();
+    }
+
+    public PartialInlineability partialInlineability() {
+        return openOp.partialInlineability();
     }
 
     public Optional<String> getDebugName() {
