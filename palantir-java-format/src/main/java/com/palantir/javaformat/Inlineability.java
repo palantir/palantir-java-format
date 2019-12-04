@@ -11,13 +11,17 @@ import com.palantir.javaformat.java.JavaInputAstVisitor;
  */
 public enum Inlineability {
     /**
-     * The level is always inlineable. This is usually only appropriate for levels that start with a direct {@link
-     * Break}, as opposed to a Break that's nested inside some other levels.
+     * The level may always be partially inlined, regardless of how much space is left on the current line. Partial
+     * inlining refers to the behaviour of {@link BreakBehaviours#breakOnlyIfInnerLevelsThenFitOnOneLine} where a level
+     * is too large to fit on the current line, but a prefix thereof is partially inlined onto the current line.
+     *
+     * <p>This is usually only appropriate for levels that start with a direct {@link Break}, as opposed to a Break
+     * that's nested inside some other levels.
      */
-    ALWAYS_INLINEABLE,
+    MAY_FOLLOW_PARTIALLY_INLINED_LEVEL,
 
     /**
-     * Inlineable if the <em>first</em> inner level of this level fits on the current line.
+     * Partially inlineable if the <em>first</em> inner level of this level fits on the current line.
      *
      * <p>This assumes that the next Doc after that starts with a {@link Break} (see {@link StartsWithBreakVisitor}) and
      * makes sense in contexts like {@link JavaInputAstVisitor#visitDotWithPrefix} where we want to treat first doc (the
