@@ -74,13 +74,12 @@ class B20701054 {
         analysis().analyze(compilationUnit, context, configuration, new DescriptionListener() {
             @Override
             public void onDescribed(Description description) {
-                listener.onDescribed(
-                        description.filterFixes(new Predicate<Fix>() {
-                            @Override
-                            public boolean apply(Fix fix) {
-                                return compiles(fix, (JCCompilationUnit) compilationUnit, context);
-                            }
-                        }));
+                listener.onDescribed(description.filterFixes(new Predicate<Fix>() {
+                    @Override
+                    public boolean apply(Fix fix) {
+                        return compiles(fix, (JCCompilationUnit) compilationUnit, context);
+                    }
+                }));
             }
         });
 
