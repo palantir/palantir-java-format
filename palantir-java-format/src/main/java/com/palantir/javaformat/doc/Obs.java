@@ -128,10 +128,11 @@ public final class Obs {
 
         @Override
         public Optional<Exploration> maybeExplore(
-                String humanDescription, State incomingState, Function<ExplorationNode, Optional<State>> explorationFunc) {
+                String humanDescription,
+                State incomingState,
+                Function<ExplorationNode, Optional<State>> explorationFunc) {
             ExplorationNodeImpl explorationNode =
-                    new ExplorationNodeImpl(this, humanDescription, sink, startColumn,
-                            Optional.of(incomingState));
+                    new ExplorationNodeImpl(this, humanDescription, sink, startColumn, Optional.of(incomingState));
             Optional<State> maybeNewState = explorationFunc.apply(explorationNode);
             explorationNode.recordNewState(maybeNewState);
 
