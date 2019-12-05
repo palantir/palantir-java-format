@@ -4,15 +4,17 @@ class B21954779 {
                         VM_METADATA, Optional.<InstanceProto>absent(), AssignReservedIp.YES, AttachDataDisk.YES))
                 .thenReturn(OPERATION);
 
-        fail(String.format(
-                "       Experiment name %s is used multiple times in %s",
-                expName, envName, zzzzzzzzzzzz, zzzzzzzzzzzz));
+        fail(
+                String.format(
+                        "       Experiment name %s is used multiple times in %s",
+                        expName, envName, zzzzzzzzzzzz, zzzzzzzzzzzz));
 
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                utils.showShortToast(application.getString(
-                        R.string.working_on_project_format, Utils.getProjectDisplayName(selectedProject)));
+                utils.showShortToast(
+                        application.getString(
+                                R.string.working_on_project_format, Utils.getProjectDisplayName(selectedProject)));
             }
         });
 

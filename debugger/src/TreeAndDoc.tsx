@@ -152,7 +152,7 @@ export class DecisionTree extends React.PureComponent<DecisionTreeProps, ITreeSt
                 duration: duration,
             };
         },
-        drawer: function() {
+        drawer: function () {
             return (
                 /* props */
                 {
@@ -166,7 +166,7 @@ export class DecisionTree extends React.PureComponent<DecisionTreeProps, ITreeSt
                     },
                 }
             );
-        }
+        },
     };
 
     private static CastTreebeard<N extends TreeNode>(): FunctionComponent<TreebeardProps<N>> {

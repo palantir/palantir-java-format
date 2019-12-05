@@ -226,7 +226,7 @@ public final class Level extends Doc {
             State state1 = adjustState(state, keepIndentWhenInlined, true).startInlining();
 
             Optional<Exploration> maybeInlined = levelNode.maybeExplore(
-                    "trying to inline prefix only", state1, (explorationNode) ->
+                    "trying to inline prefix only", state1, state, (explorationNode) ->
                             handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
                                     commentsHelper, maxWidth, state1, broken.state(), explorationNode));
 

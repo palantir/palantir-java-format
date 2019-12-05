@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Stop indiscriminately stopping an inlining at method calls like `SafeArg.of`.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/94
