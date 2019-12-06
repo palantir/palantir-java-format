@@ -3584,16 +3584,10 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     }
 
     /**
-     * Should a field with a set of modifiers be declared with horizontal annotations? This is currently true if all
-     * annotations are marker annotations.
+     * Should a field with a set of modifiers be declared with horizontal annotations? This is currently never true.
      */
     private Direction fieldAnnotationDirection(ModifiersTree modifiers) {
-        for (AnnotationTree annotation : modifiers.getAnnotations()) {
-            if (!annotation.getArguments().isEmpty()) {
-                return Direction.VERTICAL;
-            }
-        }
-        return Direction.HORIZONTAL;
+        return Direction.VERTICAL;
     }
 
     /**
