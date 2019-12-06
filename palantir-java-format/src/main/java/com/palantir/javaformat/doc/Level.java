@@ -422,9 +422,7 @@ public final class Level extends Doc {
      * </pre>
      */
     private boolean isSimpleLevel(SplitsBreaks prefixSplitsBreaks) {
-        boolean firstSplitIsEmpty = prefixSplitsBreaks.splits()
-                .get(0)
-                .stream()
+        boolean firstSplitIsEmpty = prefixSplitsBreaks.splits().get(0).stream()
                 .allMatch(doc -> StartsWithBreakVisitor.INSTANCE.visit(doc) == Result.EMPTY);
         return prefixSplitsBreaks.breaks().size() == 0 || prefixSplitsBreaks.breaks().size() == 1 && firstSplitIsEmpty;
     }
