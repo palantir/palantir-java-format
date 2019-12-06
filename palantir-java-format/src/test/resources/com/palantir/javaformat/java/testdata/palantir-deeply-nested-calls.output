@@ -1,0 +1,14 @@
+class PalantirDeeplyNestedCalls {
+    private static MagicConfigV1 testSheetV1 = MagicConfigV1.builder()
+            .foooos(ImmutableList.of(testFieldOneV1))
+            .baaars(ImmutableList.of(MagicConfigV1.builder()
+                    .foooos(ImmutableList.of(testFieldTwoV1, testFieldThreeV1))
+                    .baaars(ImmutableList.of(MagicConfigV1.builder()
+                            .baaars(ImmutableList.of(MagicConfigV1.builder()
+                                    .baaars(ImmutableList.of(
+                                            MagicConfigV1.builder().foooos(ImmutableList.of(testFieldFourV1)).build()))
+                                    .build()))
+                            .build()))
+                    .build()))
+            .build();
+}
