@@ -949,7 +949,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     @Override
     public Void visitVariable(VariableTree node, Void unused) {
         sync(node);
-        visitVariables(ImmutableList.of(node), DeclarationKind.NONE, fieldAnnotationDirection(node.getModifiers()));
+        visitVariables(ImmutableList.of(node), DeclarationKind.NONE, inlineAnnotationDirection(node.getModifiers()));
         return null;
     }
 
@@ -1863,7 +1863,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                     VariableTree variableTree = (VariableTree) resource;
                     declareOne(
                             DeclarationKind.PARAMETER,
-                            fieldAnnotationDirection(variableTree.getModifiers()),
+                            inlineAnnotationDirection(variableTree.getModifiers()),
                             Optional.of(variableTree.getModifiers()),
                             variableTree.getType(),
                             /* name= */ variableTree.getName(),
@@ -3585,10 +3585,10 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     }
 
     /**
-     * Should a field with a set of modifiers be declared with horizontal annotations? This is currently true if all
-     * annotations are marker annotations.
+     * Should a declaration with a set of modifiers be declared with horizontal annotations? This is currently true if
+     * all annotations are marker annotations.
      */
-    private Direction fieldAnnotationDirection(ModifiersTree modifiers) {
+    private Direction inlineAnnotationDirection(ModifiersTree modifiers) {
         for (AnnotationTree annotation : modifiers.getAnnotations()) {
             if (!annotation.getArguments().isEmpty()) {
                 return Direction.VERTICAL;
