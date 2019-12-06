@@ -1,0 +1,7 @@
+type: fix
+fix:
+  description: Bring back inlining the prefix of method calls *iff* the levels inlined
+    so far have all been simple. This fixes the regression introduced in 0.3.4 where
+    long nested method calls would end up with too many indents.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/99

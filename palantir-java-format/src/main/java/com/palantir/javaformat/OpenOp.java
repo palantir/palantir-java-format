@@ -55,6 +55,54 @@ public abstract class OpenOp extends HasUniqueId implements Op {
         return PartialInlineability.ALWAYS_PARTIALLY_INLINEABLE;
     }
 
+    /**
+     * A level is "simple" if it doesn't have multiple parameters (in the case of a method call), or multiple chained
+     * method calls.
+     *
+     * <p>This is used to poison the ability to partially inline method arguments down the line if a parent level was
+     * too complicated, so that you can't end up with this:
+     *
+     * <pre>
+     * method(arg1, arg2, arg3.foo().stream()
+     *         .filter(...)
+     *         .map(...));
+     * </pre>
+     *
+     * or
+     *
+     * <pre>
+     * log.info("Message", exception, SafeArg.of(
+     *         "foo", foo);
+     * </pre>
+     *
+     * But you can still get this (see test B20128760):
+     *
+     * <pre>
+     * Stream<ItemKey> itemIdsStream = stream(members).flatMap(m -> m.getFieldValues().entrySet().stream()
+     *         .filter(...)
+     *         .map(...));
+     * </pre>
+     *
+     * or this:
+     *
+     * <pre>
+     * method(anotherMethod(arg3.foo().stream()
+     *         .filter(...)
+     *         .map(...)));
+     * </pre>
+     *
+     * or this:
+     *
+     * <pre>
+     * method(anotherMethod(
+     *         ...)); // long arguments
+     * </pre>
+     */
+    @Default
+    public boolean isSimple() {
+        return true;
+    }
+
     public abstract Optional<String> debugName();
 
     /** Custom max column limit that contents of this level <em>before the last break</em> may not exceed. */
