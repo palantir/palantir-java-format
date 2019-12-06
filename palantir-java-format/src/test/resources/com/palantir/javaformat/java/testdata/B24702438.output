@@ -1,14 +1,22 @@
 class B24702438 {
 
-    @Inject int x;
+    @Inject
+    int x;
 
-    @Inject int y;
+    @Inject
+    int y;
 
-    @Inject int z;
+    @Inject
+    int z;
 
-    @Inject int x;
-    @Inject int y;
-    @Inject int z;
+    @Inject
+    int x;
+
+    @Inject
+    int y;
+
+    @Inject
+    int z;
 
     // this is a comment
 

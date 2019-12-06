@@ -16,9 +16,15 @@ class Test {
 
 class Test {
     final CreationMechanism creationMechanism;
-    @Nullable final String creationUserAgent;
+
+    @Nullable
+    final String creationUserAgent;
+
     final ClientId clientId;
-    @Nullable final String creationUserAgentXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX;
+
+    @Nullable
+    final String creationUserAgentXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX;
+
     final Token externalId;
 
     {
@@ -32,7 +38,8 @@ class Test {
 
 class Test {
 
-    @Nullable final String creationUserAgent;
+    @Nullable
+    final String creationUserAgent;
 
     {
         @Nullable final String creationUserAgent;
