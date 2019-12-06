@@ -26,5 +26,10 @@ public enum LastLevelBreakability {
      * #ABORT} if this level is not {@link BreakBehaviour.Cases#preferBreakingLastInnerLevel}.
      */
     CHECK_INNER,
+    /**
+     * Behaves like {@link #ACCEPT_INLINE_CHAIN} if the current inlined levels are all <em>simple</em> (according to
+     * {@link com.palantir.javaformat.doc.Level#isSimpleLevel}), otherwise behave like {@link #CHECK_INNER}.
+     */
+    ACCEPT_INLINE_CHAIN_IF_SIMPLE_OTHERWISE_CHECK_INNER,
     ;
 }

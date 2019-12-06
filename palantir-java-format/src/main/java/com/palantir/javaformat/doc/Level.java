@@ -19,7 +19,6 @@ package com.palantir.javaformat.doc;
 import static com.google.common.collect.Iterables.getLast;
 
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
@@ -32,6 +31,7 @@ import com.palantir.javaformat.OpenOp;
 import com.palantir.javaformat.Output;
 import com.palantir.javaformat.PartialInlineability;
 import com.palantir.javaformat.doc.Obs.Exploration;
+import com.palantir.javaformat.doc.Obs.ExplorationNode;
 import com.palantir.javaformat.doc.StartsWithBreakVisitor.Result;
 import java.util.ArrayList;
 import java.util.List;
@@ -178,7 +178,7 @@ public final class Level extends Doc {
                 State state1 = state.withNoIndent();
                 Optional<Obs.Exploration> lastLevelBroken = levelNode.maybeExplore(
                         "tryBreakLastLevel", state1, (explorationNode) ->
-                                tryBreakLastLevel(commentsHelper, maxWidth, state1, explorationNode));
+                                tryBreakLastLevel(commentsHelper, maxWidth, state1, explorationNode, true));
 
                 if (lastLevelBroken.isPresent()) {
                     if (lastLevelBroken.get().state().numLines() < broken.state().numLines()) {
@@ -271,7 +271,11 @@ public final class Level extends Doc {
     }
 
     private Optional<State> tryBreakLastLevel(
-            CommentsHelper commentsHelper, int maxWidth, State state, Obs.ExplorationNode explorationNode) {
+            CommentsHelper commentsHelper,
+            int maxWidth,
+            State state,
+            ExplorationNode explorationNode,
+            boolean isSimpleInliningSoFar) {
         if (docs.isEmpty() || !(getLast(docs) instanceof Level)) {
             return Optional.empty();
         }
@@ -295,6 +299,8 @@ public final class Level extends Doc {
 
         SplitsBreaks prefixSplitsBreaks = splitByBreaks(leadingDocs);
 
+        boolean isSimpleInlining = isSimpleInliningSoFar && isSimpleLevel(prefixSplitsBreaks);
+
         State state1 = tryToLayOutLevelOnOneLine(commentsHelper, maxWidth, state, prefixSplitsBreaks, explorationNode);
         // If a break was still forced somehow even though we could fit the leadingWidth, then abort.
         // This could happen if inner levels have set a `columnLimitBeforeLastBreak` or something like that.
@@ -302,45 +308,19 @@ public final class Level extends Doc {
             return Optional.empty();
         }
 
-        // Ok now how to handle the last level?
-        // There are two options:
-        //  * the lastLevel wants to be split, i.e. has Breakability.BREAK_HERE, then we continue
-        //  * the lastLevel indicates we should check inside it for a potential split candidate.
-        //    In this case, recurse rather than go into computeBreaks.
         switch (lastLevel.getBreakabilityIfLastLevel()) {
+            case ACCEPT_INLINE_CHAIN_IF_SIMPLE_OTHERWISE_CHECK_INNER:
+                if (isSimpleInlining) {
+                    return tryBreakLastLevel_acceptInlineChain(
+                            commentsHelper, maxWidth, explorationNode, lastLevel, state1);
+                }
+                // Otherwise, fall through to CHECK_INNER.
             case CHECK_INNER:
-                // Try to fit the entire inner prefix if it's that kind of level.
-                return BreakBehaviours.caseOf(lastLevel.getBreakBehaviour())
-                        .preferBreakingLastInnerLevel(keepIndentWhenInlined -> {
-                            State state2 = state1;
-                            if (keepIndentWhenInlined) {
-                                state2 = state2.withIndentIncrementedBy(lastLevel.getPlusIndent());
-                            }
-                            State state3 = state2;
-                            return explorationNode
-                                    .newChildNode(lastLevel, state2)
-                                    .maybeExplore("recurse into inner tryBreakLastLevel", state3, exp ->
-                                            lastLevel.tryBreakLastLevel(commentsHelper, maxWidth, state3, exp))
-                                    .map(expl -> expl.markAccepted()); // collapse??
-                        })
-                        // We don't know how to fit the inner level on the same line, so bail out.
-                        .otherwise_(Optional.empty());
+                return tryBreakLastLevel_checkInner(
+                        commentsHelper, maxWidth, explorationNode, lastLevel, isSimpleInlining, state1);
             case ACCEPT_INLINE_CHAIN:
-                // Ok then, we are allowed to break here, but first verify that we have enough room to inline this last
-                // level's prefix.
-                Preconditions.checkState(
-                        lastLevel.partialInlineability() == PartialInlineability.ALWAYS_PARTIALLY_INLINEABLE,
-                        "tryBreakLastLevel doesn't currently support ending the inlining chain at a level with a "
-                                + "custom inlineability: %s",
-                        lastLevel.openOp);
-                // Note: computeBreaks, not computeBroken, so it can try to do this logic recursively for the
-                // lastLevel
-                return Optional.of(
-                        explorationNode
-                                .newChildNode(lastLevel, state1)
-                                .explore("end tryBreakLastLevel chain", state1, exp ->
-                                        lastLevel.computeBreaks(commentsHelper, maxWidth, state1, exp))
-                                .markAccepted());
+                return tryBreakLastLevel_acceptInlineChain(
+                        commentsHelper, maxWidth, explorationNode, lastLevel, state1);
             case ABORT:
                 return Optional.empty();
             default:
@@ -349,11 +329,104 @@ public final class Level extends Doc {
         }
     }
 
-    private static void assertStartsWithBreakOrEmpty(State state, Doc doc) {
-        Preconditions.checkState(
-                StartsWithBreakVisitor.INSTANCE.visit(doc) != Result.NO,
-                "Doc should have started with a break but didn't:\n%s",
-                new LevelDelimitedFlatValueDocVisitor(state).visit(doc));
+    private static Optional<State> tryBreakLastLevel_acceptInlineChain(
+            CommentsHelper commentsHelper,
+            int maxWidth,
+            ExplorationNode explorationNode,
+            Level lastLevel,
+            State state) {
+        // Ok then, we are allowed to break here, but first verify that we have enough room to inline this last
+        // level's prefix.
+        float extraWidth = new CountWidthUntilBreakVisitor(maxWidth - state.indent()).visit(lastLevel);
+        boolean stillFits = !Float.isInfinite(extraWidth) && state.column() + extraWidth <= maxWidth;
+        if (!stillFits) {
+            return Optional.empty();
+        }
+
+        // Note: computeBreaks, not computeBroken, so it can try to do this logic recursively for the
+        // lastLevel
+        return Optional.of(
+                explorationNode
+                        .newChildNode(lastLevel, state)
+                        .explore("end tryBreakLastLevel chain", state, exp ->
+                                lastLevel.computeBreaks(commentsHelper, maxWidth, state, exp))
+                        .markAccepted());
+    }
+
+    private static Optional<State> tryBreakLastLevel_checkInner(
+            CommentsHelper commentsHelper,
+            int maxWidth,
+            ExplorationNode explorationNode,
+            Level lastLevel,
+            boolean isSimpleInlining,
+            State state) {
+        // Try to fit the entire inner prefix if it's that kind of level.
+        return BreakBehaviours.caseOf(lastLevel.getBreakBehaviour())
+                .preferBreakingLastInnerLevel(keepIndentWhenInlined -> {
+                    State state2 = state;
+                    if (keepIndentWhenInlined) {
+                        state2 = state2.withIndentIncrementedBy(lastLevel.getPlusIndent());
+                    }
+                    State state3 = state2;
+                    return explorationNode
+                            .newChildNode(lastLevel, state2)
+                            .maybeExplore(
+                                    "recurse into inner tryBreakLastLevel", state3, exp -> lastLevel.tryBreakLastLevel(
+                                            commentsHelper, maxWidth, state3, exp, isSimpleInlining))
+                            .map(expl -> expl.markAccepted()); // collapse??
+                })
+                // We don't know how to fit the inner level on the same line, so bail out.
+                .otherwise_(Optional.empty());
+    }
+
+    /**
+     * A level is simple if it has at most one direct break in it.
+     *
+     * <p>This is used to poison the ability to partially inline method arguments down the line if a parent level was
+     * too complicated, so that you can't end up with this:
+     *
+     * <pre>
+     * method(arg1, arg2, arg3.foo().stream()
+     *         .filter(...)
+     *         .map(...));
+     * </pre>
+     *
+     * or
+     *
+     * <pre>
+     * log.info("Message", exception, SafeArg.of(
+     *         "foo", foo);
+     * </pre>
+     *
+     * But you can still get this (see test B20128760):
+     *
+     * <pre>
+     * Stream<ItemKey> itemIdsStream = stream(members).flatMap(m -> m.getFieldValues().entrySet().stream()
+     *         .filter(...)
+     *         .map(...));
+     * </pre>
+     *
+     * or this:
+     *
+     * <pre>
+     * method(anotherMethod(arg3.foo().stream()
+     *         .filter(...)
+     *         .map(...)));
+     * </pre>
+     *
+     * or this:
+     *
+     * <pre>
+     * method(anotherMethod(
+     *         ...)); // long arguments
+     * </pre>
+     */
+    private boolean isSimpleLevel(SplitsBreaks prefixSplitsBreaks) {
+        boolean firstSplitIsEmpty = prefixSplitsBreaks.splits()
+                .get(0)
+                .stream()
+                .allMatch(doc -> StartsWithBreakVisitor.INSTANCE.visit(doc) == Result.EMPTY);
+        return prefixSplitsBreaks.breaks().size() == 0 || prefixSplitsBreaks.breaks().size() == 1 && firstSplitIsEmpty;
     }
 
     /**

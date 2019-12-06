@@ -2711,7 +2711,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                     .debugName("visitRegularDot")
                     .plusIndent(plusFour)
                     .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(false))
-                    .breakabilityIfLastLevel(LastLevelBreakability.CHECK_INNER)
+                    .breakabilityIfLastLevel(LastLevelBreakability.ACCEPT_INLINE_CHAIN_IF_SIMPLE_OTHERWISE_CHECK_INNER)
                     .columnLimitBeforeLastBreak(METHOD_CHAIN_COLUMN_LIMIT)
                     .build());
         }
@@ -2794,7 +2794,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 .debugName("visitDotWithPrefix")
                 .plusIndent(plusFour)
                 .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(false))
-                .breakabilityIfLastLevel(LastLevelBreakability.CHECK_INNER)
+                .breakabilityIfLastLevel(LastLevelBreakability.ACCEPT_INLINE_CHAIN_IF_SIMPLE_OTHERWISE_CHECK_INNER)
                 .partialInlineability(PartialInlineability.IF_FIRST_LEVEL_FITS)
                 .columnLimitBeforeLastBreak(METHOD_CHAIN_COLUMN_LIMIT)
                 .build());
