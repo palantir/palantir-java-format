@@ -1,0 +1,6 @@
+type: fix
+fix:
+  description: Partially inlined levels are now also limited such that the last dot
+    in method call chains can't exceed 80 characters.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/101
