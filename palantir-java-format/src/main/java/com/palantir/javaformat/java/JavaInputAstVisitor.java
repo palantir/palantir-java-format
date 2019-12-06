@@ -2713,6 +2713,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                     .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(false))
                     .breakabilityIfLastLevel(LastLevelBreakability.ACCEPT_INLINE_CHAIN_IF_SIMPLE_OTHERWISE_CHECK_INNER)
                     .columnLimitBeforeLastBreak(METHOD_CHAIN_COLUMN_LIMIT)
+                    .isSimple(!trailingDereferences)
                     .build());
         }
         // don't break after the first element if it is every small, unless the
@@ -2797,6 +2798,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 .breakabilityIfLastLevel(LastLevelBreakability.ACCEPT_INLINE_CHAIN_IF_SIMPLE_OTHERWISE_CHECK_INNER)
                 .partialInlineability(PartialInlineability.IF_FIRST_LEVEL_FITS)
                 .columnLimitBeforeLastBreak(METHOD_CHAIN_COLUMN_LIMIT)
+                .isSimple(!trailingDereferences)
                 .build());
 
         for (int times = 0; times < prefixes.size(); times++) {
@@ -3003,6 +3005,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 .plusIndent(plusIndent)
                 .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(false))
                 .breakabilityIfLastLevel(LastLevelBreakability.CHECK_INNER)
+                .isSimple(arguments.size() <= 1)
                 .build());
         token("(");
         if (!arguments.isEmpty()) {
@@ -3051,6 +3054,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 .plusIndent(ZERO)
                 .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(true))
                 .breakabilityIfLastLevel(LastLevelBreakability.CHECK_INNER)
+                .isSimple(arguments.size() <= 1)
                 .build());
         boolean first = true;
         FillMode fillMode = hasOnlyShortItems(arguments) ? FillMode.INDEPENDENT : FillMode.UNIFIED;

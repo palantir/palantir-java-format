@@ -299,7 +299,7 @@ public final class Level extends Doc {
 
         SplitsBreaks prefixSplitsBreaks = splitByBreaks(leadingDocs);
 
-        boolean isSimpleInlining = isSimpleInliningSoFar && isSimpleLevel(prefixSplitsBreaks);
+        boolean isSimpleInlining = isSimpleInliningSoFar && Level.this.openOp.isSimple();
 
         State state1 = tryToLayOutLevelOnOneLine(commentsHelper, maxWidth, state, prefixSplitsBreaks, explorationNode);
         // If a break was still forced somehow even though we could fit the leadingWidth, then abort.
@@ -377,54 +377,6 @@ public final class Level extends Doc {
                 })
                 // We don't know how to fit the inner level on the same line, so bail out.
                 .otherwise_(Optional.empty());
-    }
-
-    /**
-     * A level is "simple" if it has no direct breaks, or exactly one leading break.
-     *
-     * <p>This is used to poison the ability to partially inline method arguments down the line if a parent level was
-     * too complicated, so that you can't end up with this:
-     *
-     * <pre>
-     * method(arg1, arg2, arg3.foo().stream()
-     *         .filter(...)
-     *         .map(...));
-     * </pre>
-     *
-     * or
-     *
-     * <pre>
-     * log.info("Message", exception, SafeArg.of(
-     *         "foo", foo);
-     * </pre>
-     *
-     * But you can still get this (see test B20128760):
-     *
-     * <pre>
-     * Stream<ItemKey> itemIdsStream = stream(members).flatMap(m -> m.getFieldValues().entrySet().stream()
-     *         .filter(...)
-     *         .map(...));
-     * </pre>
-     *
-     * or this:
-     *
-     * <pre>
-     * method(anotherMethod(arg3.foo().stream()
-     *         .filter(...)
-     *         .map(...)));
-     * </pre>
-     *
-     * or this:
-     *
-     * <pre>
-     * method(anotherMethod(
-     *         ...)); // long arguments
-     * </pre>
-     */
-    private boolean isSimpleLevel(SplitsBreaks prefixSplitsBreaks) {
-        boolean firstSplitIsEmpty = prefixSplitsBreaks.splits().get(0).stream()
-                .allMatch(doc -> StartsWithBreakVisitor.INSTANCE.visit(doc) == Result.EMPTY);
-        return prefixSplitsBreaks.breaks().size() == 0 || prefixSplitsBreaks.breaks().size() == 1 && firstSplitIsEmpty;
     }
 
     /**
