@@ -3,8 +3,9 @@ class PalantirLongArrayInit {
         URL[] implementationUrls = implementationClassPath
                 .map(implementationUris -> {
                     log.debug("Using palantir-java-format implementation defined by URIs: {}", implementationUris);
-                    return implementationUris.stream().map(PalantirCodeStyleManager::toUrlUnchecked).toArray(URL[]
-                            ::new);
+                    return implementationUris.stream()
+                            .map(PalantirCodeStyleManager::toUrlUnchecked)
+                            .toArray(URL[]::new);
                 })
                 .orElse(null);
     }

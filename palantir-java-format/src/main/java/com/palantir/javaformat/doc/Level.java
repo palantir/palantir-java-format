@@ -104,19 +104,25 @@ public final class Level extends Doc {
 
     @Override
     public State computeBreaks(CommentsHelper commentsHelper, int maxWidth, State state, Obs.ExplorationNode observer) {
-        return tryToFitOnOneLine(maxWidth, state).orElseGet(() -> {
-            Obs.LevelNode childLevel = observer.newChildNode(this, state);
-            State newState = getBreakBehaviour().match(new BreakImpl(commentsHelper, maxWidth, state, childLevel));
+        return tryToFitOnOneLine(maxWidth, state, docs)
+                .map(newWidth -> state.withColumn(newWidth).withLevelState(this, ImmutableLevelState.of(true)))
+                .orElseGet(() -> {
+                    Obs.LevelNode childLevel = observer.newChildNode(this, state);
+                    State newState =
+                            getBreakBehaviour().match(new BreakImpl(commentsHelper, maxWidth, state, childLevel));
 
-            return childLevel.finishLevel(state.updateAfterLevel(newState));
-        });
+                    return childLevel.finishLevel(state.updateAfterLevel(newState));
+                });
     }
 
     /**
-     * Try to fit this level onto one line. If this returns empty, then the level will be broken in some way that is
-     * dictated by the {@link #getBreakBehaviour()}.
+     * Try to fit these docs belonging to the current level onto one line, returning empty if we couldn't. This takes
+     * into account the level's {@link #getColumnLimitBeforeLastBreak()}.
+     *
+     * @return the width after fitting it onto one line, if it was possible. This is guaranteed to be less than {@code
+     *     maxWidth}
      */
-    private Optional<State> tryToFitOnOneLine(int maxWidth, State state) {
+    private Optional<Integer> tryToFitOnOneLine(int maxWidth, State state, Iterable<Doc> docs) {
         if (getColumnLimitBeforeLastBreak().isPresent()) {
             float width = 0.0f;
             float widthBeforeLastBreak = 0.0f;
@@ -133,11 +139,9 @@ public final class Level extends Doc {
         }
 
         // Check that the entirety of this level fits on the current line.
-        float thisWidth = getWidth();
+        float thisWidth = getWidth(docs);
         if (state.column() + thisWidth <= maxWidth) {
-            return Optional.of(
-                    state.withColumn(state.column() + (int) thisWidth)
-                            .withLevelState(this, ImmutableLevelState.of(true)));
+            return Optional.of(state.column() + (int) thisWidth);
         }
         return Optional.empty();
     }
@@ -287,9 +291,7 @@ public final class Level extends Doc {
         // See if we can fill in everything but the lastDoc.
         // This is essentially like a small part of computeBreaks.
         List<Doc> leadingDocs = docs.subList(0, docs.size() - 1);
-        float leadingWidth = getWidth(leadingDocs);
-
-        if (state.column() + leadingWidth > maxWidth) {
+        if (!tryToFitOnOneLine(maxWidth, state, leadingDocs).isPresent()) {
             return Optional.empty();
         }
 
@@ -553,7 +555,7 @@ public final class Level extends Doc {
      * @param docs the {@link Doc}s
      * @return the width, or {@code Float.POSITIVE_INFINITY} if any {@link Doc} must be broken
      */
-    static float getWidth(List<Doc> docs) {
+    static float getWidth(Iterable<Doc> docs) {
         float width = 0.0F;
         for (Doc doc : docs) {
             width += doc.getWidth();
