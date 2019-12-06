@@ -380,7 +380,7 @@ public final class Level extends Doc {
     }
 
     /**
-     * A level is simple if it has at most one direct break in it.
+     * A level is "simple" if it has no direct breaks, or exactly one leading break.
      *
      * <p>This is used to poison the ability to partially inline method arguments down the line if a parent level was
      * too complicated, so that you can't end up with this:
