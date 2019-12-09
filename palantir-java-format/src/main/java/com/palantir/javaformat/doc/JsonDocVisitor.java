@@ -47,7 +47,10 @@ public final class JsonDocVisitor implements DocVisitor<JsonNode> {
 
     @Override
     public JsonNode visitToken(Token doc) {
-        return MAPPER.createObjectNode().put("type", "token").put("flat", doc.getFlat()).put("id", doc.id());
+        return MAPPER.createObjectNode()
+                .put("type", "token")
+                .put("flat", doc.getFlat())
+                .put("id", doc.id());
     }
 
     @Override

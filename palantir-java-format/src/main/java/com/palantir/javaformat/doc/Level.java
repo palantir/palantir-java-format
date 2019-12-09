@@ -267,9 +267,8 @@ public final class Level extends Doc {
             if (keepIndent) {
                 newState = newState.withIndentIncrementedBy(getPlusIndent());
             }
-            return Optional.of(
-                    tryToLayOutLevelOnOneLine(
-                            commentsHelper, maxWidth, newState, memoizedSplitsBreaks.get(), explorationNode));
+            return Optional.of(tryToLayOutLevelOnOneLine(
+                    commentsHelper, maxWidth, newState, memoizedSplitsBreaks.get(), explorationNode));
         }
         return Optional.empty();
     }
@@ -347,12 +346,11 @@ public final class Level extends Doc {
 
         // Note: computeBreaks, not computeBroken, so it can try to do this logic recursively for the
         // lastLevel
-        return Optional.of(
-                explorationNode
-                        .newChildNode(lastLevel, state)
-                        .explore("end tryBreakLastLevel chain", state, exp ->
-                                lastLevel.computeBreaks(commentsHelper, maxWidth, state, exp))
-                        .markAccepted());
+        return Optional.of(explorationNode
+                .newChildNode(lastLevel, state)
+                .explore("end tryBreakLastLevel chain", state, exp ->
+                        lastLevel.computeBreaks(commentsHelper, maxWidth, state, exp))
+                .markAccepted());
     }
 
     private static Optional<State> tryBreakLastLevel_checkInner(

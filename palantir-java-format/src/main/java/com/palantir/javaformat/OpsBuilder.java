@@ -337,8 +337,8 @@ public final class OpsBuilder {
              * (for example) we're guessing at an optional token.
              */
             if (realOrImaginary == Token.RealOrImaginary.REAL) {
-                throw new FormattingError(diagnostic(String.format(
-                        "expected token: '%s'; generated %s instead", peekToken().orElse(null), token)));
+                throw new FormattingError(diagnostic(
+                        String.format("expected token: '%s'; generated %s instead", peekToken().orElse(null), token)));
             }
         }
     }
@@ -523,10 +523,12 @@ public final class OpsBuilder {
                         if (tokBefore.isNewline()) {
                             newlines++;
                         } else if (tokBefore.isComment()) {
-                            tokOps.put(j, Break.make(
-                                    tokBefore.isSlashSlashComment() ? FillMode.FORCED : FillMode.UNIFIED,
-                                    "",
-                                    tokenOp.getPlusIndentCommentsBefore()));
+                            tokOps.put(
+                                    j,
+                                    Break.make(
+                                            tokBefore.isSlashSlashComment() ? FillMode.FORCED : FillMode.UNIFIED,
+                                            "",
+                                            tokenOp.getPlusIndentCommentsBefore()));
                             tokOps.putAll(j, makeComment(tokBefore));
                             space = tokBefore.isSlashStarComment();
                             newlines = 0;
@@ -566,10 +568,13 @@ public final class OpsBuilder {
                                             && tokenOp.breakAndIndentTrailingComment()
                                                     .isPresent());
                             if (breakAfter) {
-                                tokOps.put(tokAfterPos, Break.make(
-                                        FillMode.FORCED,
-                                        "",
-                                        tokenOp.breakAndIndentTrailingComment().orElse(Const.ZERO)));
+                                tokOps.put(
+                                        tokAfterPos,
+                                        Break.make(
+                                                FillMode.FORCED,
+                                                "",
+                                                tokenOp.breakAndIndentTrailingComment()
+                                                        .orElse(Const.ZERO)));
                             } else {
                                 tokOps.put(tokAfterPos, SPACE);
                             }

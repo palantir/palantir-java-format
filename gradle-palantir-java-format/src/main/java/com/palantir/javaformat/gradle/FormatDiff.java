@@ -72,25 +72,27 @@ final class FormatDiff {
     /** Parses the filenames and edited ranges out of `git diff -U0`. */
     @VisibleForTesting
     static Stream<SingleFileDiff> parseGitDiffOutput(String gitOutput) {
-        return Streams.stream(Splitter.on(SEPARATOR).omitEmptyStrings().split(gitOutput)).flatMap(singleFileDiff -> {
-            Matcher filenameMatcher = FILENAME.matcher(singleFileDiff);
-            if (!filenameMatcher.find()) {
-                System.err.println("Failed to find filename");
-                return Stream.empty();
-            }
-            Path path = Paths.get(filenameMatcher.group("filename"));
+        return Streams.stream(Splitter.on(SEPARATOR).omitEmptyStrings().split(gitOutput))
+                .flatMap(singleFileDiff -> {
+                    Matcher filenameMatcher = FILENAME.matcher(singleFileDiff);
+                    if (!filenameMatcher.find()) {
+                        System.err.println("Failed to find filename");
+                        return Stream.empty();
+                    }
+                    Path path = Paths.get(filenameMatcher.group("filename"));
 
-            RangeSet<Integer> lineRanges = TreeRangeSet.create();
-            Matcher hunk = HUNK.matcher(singleFileDiff);
-            while (hunk.find()) {
-                int firstLineOfHunk = Integer.parseInt(hunk.group("startLineOneIndexed")) - 1;
-                int hunkLength = Optional.ofNullable(hunk.group("numLines")).map(Integer::parseInt).orElse(1);
-                Range<Integer> rangeZeroIndexed = Range.closedOpen(firstLineOfHunk, firstLineOfHunk + hunkLength);
-                lineRanges.add(rangeZeroIndexed);
-            }
+                    RangeSet<Integer> lineRanges = TreeRangeSet.create();
+                    Matcher hunk = HUNK.matcher(singleFileDiff);
+                    while (hunk.find()) {
+                        int firstLineOfHunk = Integer.parseInt(hunk.group("startLineOneIndexed")) - 1;
+                        int hunkLength = Optional.ofNullable(hunk.group("numLines")).map(Integer::parseInt).orElse(1);
+                        Range<Integer> rangeZeroIndexed =
+                                Range.closedOpen(firstLineOfHunk, firstLineOfHunk + hunkLength);
+                        lineRanges.add(rangeZeroIndexed);
+                    }
 
-            return Stream.of(new SingleFileDiff(path, lineRanges));
-        });
+                    return Stream.of(new SingleFileDiff(path, lineRanges));
+                });
     }
 
     private static void format(FormatterService formatter, SingleFileDiff diff) {

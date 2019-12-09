@@ -36,7 +36,8 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class DiagnosticTest {
-    @TempDir public Path testFolder;
+    @TempDir
+    public Path testFolder;
 
     private Locale backupLocale;
 

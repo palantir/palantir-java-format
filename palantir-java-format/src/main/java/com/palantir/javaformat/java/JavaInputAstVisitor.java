@@ -1572,7 +1572,8 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     }
 
     private static <T> Stream<Long> indexes(Stream<T> stream, Predicate<T> predicate) {
-        return Streams.mapWithIndex(stream, (x, i) -> predicate.apply(x) ? i : -1).filter(x -> x != -1);
+        return Streams.mapWithIndex(stream, (x, i) -> predicate.apply(x) ? i : -1)
+                .filter(x -> x != -1);
     }
 
     @Override

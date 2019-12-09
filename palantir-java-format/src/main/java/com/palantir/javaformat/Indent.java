@@ -65,9 +65,14 @@ public abstract class Indent {
     /** A conditional function, whose value depends on whether a break was taken. */
     @JsonTypeName("if")
     public static final class If extends Indent {
-        @JsonProperty private final BreakTag condition;
-        @JsonProperty private final Indent thenIndent;
-        @JsonProperty private final Indent elseIndent;
+        @JsonProperty
+        private final BreakTag condition;
+
+        @JsonProperty
+        private final Indent thenIndent;
+
+        @JsonProperty
+        private final Indent elseIndent;
 
         private If(BreakTag condition, Indent thenIndent, Indent elseIndent) {
             this.condition = condition;
