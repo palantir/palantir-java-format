@@ -37,7 +37,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 class FormatDiffTest {
-    @TempDir Path repo;
+    @TempDir
+    Path repo;
 
     @Test
     void parsing_git_diff_output_works() throws IOException {

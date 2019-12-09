@@ -34,7 +34,8 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 @Execution(ExecutionMode.CONCURRENT)
 public class CommandLineOptionsParserTest {
 
-    @TempDir public Path testFolder;
+    @TempDir
+    public Path testFolder;
 
     @Test
     public void defaults() {
@@ -94,8 +95,10 @@ public class CommandLineOptionsParserTest {
                         .lines()
                         .asRanges())
                 .containsExactly(
-                        Range.closedOpen(0, 2), Range.closedOpen(3, 5), Range.closedOpen(6, 8), Range.closedOpen(
-                                9, 11));
+                        Range.closedOpen(0, 2),
+                        Range.closedOpen(3, 5),
+                        Range.closedOpen(6, 8),
+                        Range.closedOpen(9, 11));
     }
 
     @Test

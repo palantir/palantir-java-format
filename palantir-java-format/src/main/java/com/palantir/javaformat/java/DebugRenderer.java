@@ -96,11 +96,15 @@ public class DebugRenderer {
                 json.put("type", "token");
                 json.put(
                         "beforeText",
-                        inputToken.getToksBefore().stream().map(Input.Tok::getText).collect(Collectors.joining()));
+                        inputToken.getToksBefore().stream()
+                                .map(Input.Tok::getText)
+                                .collect(Collectors.joining()));
                 json.put("text", inputToken.getTok().getText());
                 json.put(
                         "afterText",
-                        inputToken.getToksAfter().stream().map(Input.Tok::getText).collect(Collectors.joining()));
+                        inputToken.getToksAfter().stream()
+                                .map(Input.Tok::getText)
+                                .collect(Collectors.joining()));
                 json.put("hue", computeHue(token));
             }
             if (op instanceof Break) {

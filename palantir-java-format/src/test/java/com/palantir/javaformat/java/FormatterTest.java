@@ -38,7 +38,8 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 @Execution(ExecutionMode.CONCURRENT)
 public final class FormatterTest {
 
-    @TempDir public Path testFolder;
+    @TempDir
+    public Path testFolder;
 
     @Test
     public void testFormatAosp() throws Exception {

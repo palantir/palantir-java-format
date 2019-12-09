@@ -47,7 +47,8 @@ public final class PartialFormattingTest {
         return ImmutableList.copyOf(new Object[][] {{"\n"}, {"\r"}, {"\r\n"}});
     }
 
-    @TempDir public Path testFolder;
+    @TempDir
+    public Path testFolder;
 
     private final String newline;
 
@@ -595,10 +596,9 @@ public final class PartialFormattingTest {
         assertThat(ranges).hasSize(1);
         Replacement replacement = ranges.get(0);
         assertThat(replacement.getReplacementString())
-                .isEqualTo(
-                        lines(
-                                "", //
-                                "  void f() {}"));
+                .isEqualTo(lines(
+                        "", //
+                        "  void f() {}"));
         int replaceFrom = input.indexOf("void f") - newline.length();
         assertThat(replacement.getReplaceRange().lowerEndpoint()).isEqualTo(replaceFrom);
     }

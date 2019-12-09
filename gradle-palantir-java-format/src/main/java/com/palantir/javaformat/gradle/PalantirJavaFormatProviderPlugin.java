@@ -38,10 +38,12 @@ public final class PalantirJavaFormatProviderPlugin implements Plugin<Project> {
             conf.setCanBeConsumed(false);
 
             conf.defaultDependencies(deps -> {
-                deps.add(rootProject.getDependencies().create(ImmutableMap.of(
-                        "group", "com.palantir.javaformat",
-                        "name", "palantir-java-format",
-                        "version", JavaFormatExtension.class.getPackage().getImplementationVersion())));
+                deps.add(rootProject
+                        .getDependencies()
+                        .create(ImmutableMap.of(
+                                "group", "com.palantir.javaformat",
+                                "name", "palantir-java-format",
+                                "version", JavaFormatExtension.class.getPackage().getImplementationVersion())));
             });
         });
 

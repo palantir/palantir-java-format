@@ -43,7 +43,8 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 @Execution(ExecutionMode.CONCURRENT)
 public class MainTest {
 
-    @TempDir public Path testFolder;
+    @TempDir
+    public Path testFolder;
 
     // PrintWriter instances used below are hard-coded to use system-default line separator.
     private final Joiner joiner = Joiner.on(System.lineSeparator());
