@@ -1,0 +1,6 @@
+type: fix
+fix:
+  description: No longer break string concats unless they are a method's only argument
+    on the line so far.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/104
