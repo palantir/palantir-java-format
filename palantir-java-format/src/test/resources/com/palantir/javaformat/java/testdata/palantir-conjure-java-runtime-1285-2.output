@@ -1,0 +1,17 @@
+/**
+ * https://github.com/palantir/conjure-java-runtime/blob/56e666aaf20f038dc11751c6a1f74998f8584a7d/conjure-java-jaxrs-client/src/test/java/com/palantir/conjure/java/client/jaxrs/JaxRsClientFailoverTest.java#L146-L154
+ */
+class PalantirConjureJavaRuntime1285_Test2 {
+    public void foo() {
+        TestService bogusHostProxy = JaxRsClient.create(
+                TestService.class,
+                AGENT,
+                new HostMetricsRegistry(),
+                ClientConfiguration.builder()
+                        .from(createTestConfig(
+                                "http://foo-bar-bogus-host.unresolvable:80",
+                                "http://localhost:" + failoverTestCase.server1.getPort()))
+                        .maxNumRetries(2)
+                        .build());
+    }
+}
