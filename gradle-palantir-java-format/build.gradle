@@ -4,10 +4,10 @@ apply from: rootProject.file('gradle/publish-jar.gradle')
 apply plugin: 'com.palantir.revapi'
 
 dependencies {
+    compileOnly 'com.diffplug.spotless:spotless-plugin-gradle'
     implementation gradleApi()
     implementation 'com.google.guava:guava'
     implementation 'gradle.plugin.org.jetbrains.gradle.plugin.idea-ext:gradle-idea-ext'
-    implementation 'com.diffplug.spotless:spotless-plugin-gradle'
     implementation project(':palantir-java-format-spi')
 
     testImplementation 'com.netflix.nebula:nebula-test'
@@ -33,7 +33,7 @@ gradlePlugin {
         palantirJavaFormatSpotless {
             id = 'com.palantir.java-format-spotless'
             implementationClass = 'com.palantir.javaformat.gradle.PalantirJavaFormatSpotlessPlugin'
-            description = 'Configures a spotless java step that formats using palantir-java-format.'
+            description = 'If spotless is applied, configures a java step that formats using palantir-java-format.'
         }
         palantirJavaFormatProvider {
             id = 'com.palantir.java-format-provider'

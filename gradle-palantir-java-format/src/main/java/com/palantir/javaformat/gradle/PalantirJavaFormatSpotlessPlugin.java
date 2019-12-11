@@ -11,14 +11,14 @@ public final class PalantirJavaFormatSpotlessPlugin implements Plugin<Project> {
         project.getRootProject().getPluginManager().apply(PalantirJavaFormatProviderPlugin.class);
 
         project.getPluginManager().withPlugin("java", plugin -> {
-            project.getPluginManager().apply("com.diffplug.gradle.spotless");
-
-            SpotlessExtension spotlessExtension = project.getExtensions().getByType(SpotlessExtension.class);
-            spotlessExtension.java(java -> java.addStep(PalantirJavaFormatStep.create(
-                    project.getRootProject()
-                            .getConfigurations()
-                            .getByName(PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME),
-                    project.getRootProject().getExtensions().getByType(JavaFormatExtension.class))));
+            project.getPluginManager().withPlugin("com.diffplug.gradle.spotless", spotlessPlugin -> {
+                SpotlessExtension spotlessExtension = project.getExtensions().getByType(SpotlessExtension.class);
+                spotlessExtension.java(java -> java.addStep(PalantirJavaFormatStep.create(
+                        project.getRootProject()
+                                .getConfigurations()
+                                .getByName(PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME),
+                        project.getRootProject().getExtensions().getByType(JavaFormatExtension.class))));
+            });
         });
     }
 }
