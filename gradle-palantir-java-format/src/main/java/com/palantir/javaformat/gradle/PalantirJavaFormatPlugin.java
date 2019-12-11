@@ -28,6 +28,10 @@ public final class PalantirJavaFormatPlugin implements Plugin<Project> {
     @Override
     public void apply(Project project) {
         project.getRootProject().getPlugins().apply(PalantirJavaFormatProviderPlugin.class);
+
+        project.getPlugins().apply(PalantirJavaFormatIdeaPlugin.class);
+        project.getPlugins().apply(PalantirJavaFormatSpotlessPlugin.class);
+
         project.getPlugins().withId("java", p -> {
             project.getTasks().register("formatDiff", FormatDiffTask.class);
 
