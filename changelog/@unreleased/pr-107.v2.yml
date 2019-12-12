@@ -1,0 +1,7 @@
+type: improvement
+improvement:
+  description: |-
+    A new plugin `com.palantir.java-format-spotless` configures [gradle-spotless](https://plugins.gradle.org/plugin/com.diffplug.gradle.spotless) (if applied) to format java files using palantir-java-format.
+    The main `com.palantir.java-format` plugin now applies both the spotless and idea plugins too.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/107
