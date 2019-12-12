@@ -14,5 +14,4 @@ public class PalantirJavaFormatSpotlessPlugin implements Plugin<Project> {
             });
         });
     }
-
 }
