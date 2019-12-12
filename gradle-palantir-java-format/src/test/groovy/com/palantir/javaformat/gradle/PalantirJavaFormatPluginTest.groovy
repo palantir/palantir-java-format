@@ -35,7 +35,6 @@ class PalantirJavaFormatPluginTest extends IntegrationTestKitSpec {
             }
             apply plugin: 'idea'
         """.stripIndent()
-        System.properties.'ignoreDeprecations' = 'true'
     }
 
     def 'formatDiff updates only lines changed in git diff'() {
@@ -64,7 +63,7 @@ class PalantirJavaFormatPluginTest extends IntegrationTestKitSpec {
         '''.stripIndent()
 
         then:
-        runTasks('formatDiff', '--warning-mode=all')
+        runTasks('formatDiff')
         file('src/main/java/Main.java').text == '''
         class Main {
             public static void crazyExistingFormatting  (  String... args) {
