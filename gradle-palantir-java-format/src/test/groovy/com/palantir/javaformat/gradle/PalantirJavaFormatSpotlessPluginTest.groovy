@@ -8,6 +8,11 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
 
     void setup() {
         buildFile << """
+            buildscript {
+                dependencies {
+                    classpath "com.diffplug.spotless:spotless-plugin-gradle:3.26.1"
+                }
+            }
             plugins {
                 id 'java'
                 id 'com.palantir.java-format'

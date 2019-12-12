@@ -3,8 +3,12 @@ apply plugin: 'groovy'
 apply from: rootProject.file('gradle/publish-jar.gradle')
 apply plugin: 'com.palantir.revapi'
 
+configurations {
+    implicitDependencies
+    pluginClasspath
+}
+
 dependencies {
-    implementation 'com.diffplug.spotless:spotless-plugin-gradle'
     implementation gradleApi()
     implementation 'com.google.guava:guava'
     implementation 'gradle.plugin.org.jetbrains.gradle.plugin.idea-ext:gradle-idea-ext'
@@ -15,6 +19,15 @@ dependencies {
     testImplementation 'org.junit.vintage:junit-vintage-engine'
     testImplementation 'org.assertj:assertj-core'
     testImplementation project(':palantir-java-format')
+
+    // Have to configure this manually in order to resolve the implicitDependencies together with runtimeClasspath
+    // This is to allow both our code and spotless to end up on the same class loader in tests.
+    // Ordinarily when running, these would end up on the same classloader
+    pluginClasspath configurations.implicitDependencies
+    pluginClasspath configurations.runtimeClasspath
+    pluginClasspath sourceSets.main.output
+    compileOnly configurations.implicitDependencies
+    implicitDependencies 'com.diffplug.spotless:spotless-plugin-gradle'
 }
 
 gradlePlugin {
@@ -41,6 +54,10 @@ gradlePlugin {
             description = 'Exposes a configuration containing the palantir-java-format jars'
         }
     }
+}
+
+tasks.withType(PluginUnderTestMetadata) {
+    pluginClasspath.from = configurations.pluginClasspath
 }
 
 idea {
