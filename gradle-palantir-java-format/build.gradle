@@ -4,7 +4,7 @@ apply from: rootProject.file('gradle/publish-jar.gradle')
 apply plugin: 'com.palantir.revapi'
 
 dependencies {
-    compileOnly 'com.diffplug.spotless:spotless-plugin-gradle'
+    implementation 'com.diffplug.spotless:spotless-plugin-gradle'
     implementation gradleApi()
     implementation 'com.google.guava:guava'
     implementation 'gradle.plugin.org.jetbrains.gradle.plugin.idea-ext:gradle-idea-ext'
