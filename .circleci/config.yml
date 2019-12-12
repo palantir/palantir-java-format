@@ -2,7 +2,7 @@
 # To request a modification to the general template, file an issue on Excavator.
 # To manually manage the CircleCI configuration for this project, remove the .circleci/template.sh file.
 
-version: 2
+version: 2.1
 jobs:
   compile:
     docker: [{ image: 'circleci/openjdk:8u222-stretch-node' }]
