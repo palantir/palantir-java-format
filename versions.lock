@@ -20,7 +20,7 @@ org.checkerframework:checker-qual:2.5.2 (2 constraints: 5917a461)
 org.codehaus.mojo:animal-sniffer-annotations:1.17 (1 constraints: ed09d8aa)
 org.derive4j:derive4j-annotation:1.1.1 (1 constraints: 0505f435)
 org.functionaljava:functionaljava:4.8 (1 constraints: b0042b2c)
-org.immutables:value:2.8.2 (1 constraints: 0e050f36)
+org.immutables:value:2.8.3 (1 constraints: 0f051036)
 
 [Test dependencies]
 cglib:cglib-nodep:3.2.2 (1 constraints: 490ded24)
