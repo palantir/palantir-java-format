@@ -3,6 +3,11 @@ apply plugin: 'groovy'
 apply from: rootProject.file('gradle/publish-jar.gradle')
 apply plugin: 'com.palantir.revapi'
 
+configurations {
+    implicitDependencies
+    pluginClasspath
+}
+
 dependencies {
     implementation gradleApi()
     implementation 'com.google.guava:guava'
@@ -14,6 +19,15 @@ dependencies {
     testImplementation 'org.junit.vintage:junit-vintage-engine'
     testImplementation 'org.assertj:assertj-core'
     testImplementation project(':palantir-java-format')
+
+    // Have to configure this manually in order to resolve the implicitDependencies together with runtimeClasspath
+    // This is to allow both our code and spotless to end up on the same class loader in tests.
+    // Ordinarily when running, these would end up on the same classloader
+    pluginClasspath configurations.implicitDependencies
+    pluginClasspath configurations.runtimeClasspath
+    pluginClasspath sourceSets.main.output
+    compileOnly configurations.implicitDependencies
+    implicitDependencies 'com.diffplug.spotless:spotless-plugin-gradle'
 }
 
 gradlePlugin {
@@ -22,19 +36,28 @@ gradlePlugin {
         palantirJavaFormat {
             id = 'com.palantir.java-format'
             implementationClass = 'com.palantir.javaformat.gradle.PalantirJavaFormatPlugin'
-            description = 'A modern, lambda-friendly, 120 character Java formatter.'
+            description = 'A modern, lambda-friendly, 120 character Java formatter. Applies all other palantir-java-format plugins.'
         }
         palantirJavaFormatIdea {
             id = 'com.palantir.java-format-idea'
             implementationClass = 'com.palantir.javaformat.gradle.PalantirJavaFormatIdeaPlugin'
             description = 'Plugin to configure the PalantirJavaFormat IDEA plugin based on an optional implementation version of the formatter.'
         }
+        palantirJavaFormatSpotless {
+            id = 'com.palantir.java-format-spotless'
+            implementationClass = 'com.palantir.javaformat.gradle.PalantirJavaFormatSpotlessPlugin'
+            description = 'If spotless is applied, configures a java step that formats using palantir-java-format.'
+        }
         palantirJavaFormatProvider {
             id = 'com.palantir.java-format-provider'
             implementationClass = 'com.palantir.javaformat.gradle.PalantirJavaFormatProviderPlugin'
-            description = 'Exposes a configuration containing the palantir-java-format jarss'
+            description = 'Exposes a configuration containing the palantir-java-format jars'
         }
     }
+}
+
+tasks.withType(PluginUnderTestMetadata) {
+    pluginClasspath.from = configurations.pluginClasspath
 }
 
 idea {

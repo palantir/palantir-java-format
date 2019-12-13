@@ -21,11 +21,6 @@ import nebula.test.IntegrationTestKitSpec
 class PalantirJavaFormatIdeaPluginTest extends IntegrationTestKitSpec {
 
     void setup() {
-        // Note: this deprecation is due to gradle-idea-ext-plugin 0.5, however they fixed the issue in master, which
-        // is yet unreleased.
-        // https://github.com/JetBrains/gradle-idea-ext-plugin/commit/348fabfa5f5471c3c555b2a76b3c38b84d075aad
-        System.properties.'ignoreDeprecations' = 'true'
-
         buildFile << """
             plugins {
                 id 'com.palantir.java-format-idea'
