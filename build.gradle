@@ -51,12 +51,9 @@ subprojects {
     }
 
     tasks.withType(JavaCompile) {
-        options.errorprone.errorproneArgs += [
-            '-Xep:PreconditionsConstantMessage:OFF',
-            '-Xep:PreferSafeLoggableExceptions:OFF',
-            '-Xep:PreferAssertj:OFF',
-            '-Xep:PreferSafeLoggingPreconditions:OFF',
-            '-Xep:SwitchStatementDefaultCase:OFF'
-        ]
+        options.errorprone.errorproneArgs += ['-Xep:PreconditionsConstantMessage:OFF',
+                                              '-Xep:PreferSafeLoggableExceptions:OFF',
+                                              '-Xep:PreferSafeLoggingPreconditions:OFF',
+                                              '-Xep:SwitchStatementDefaultCase:OFF']
     }
 }
