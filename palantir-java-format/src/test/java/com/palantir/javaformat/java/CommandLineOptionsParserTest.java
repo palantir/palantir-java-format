@@ -17,7 +17,7 @@ package com.palantir.javaformat.java;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth8.assertThat;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.fail;
 
 import com.google.common.collect.Range;
 import java.io.IOException;
@@ -150,7 +150,7 @@ public class CommandLineOptionsParserTest {
     public void illegalLines() {
         try {
             CommandLineOptionsParser.parse(Arrays.asList("-lines=1:1", "-lines=1:1"));
-            fail();
+            fail("fail");
         } catch (IllegalArgumentException e) {
             assertThat(e.getMessage()).contains("overlap");
         }

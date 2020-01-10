@@ -15,7 +15,7 @@
 package com.palantir.javaformat.java;
 
 import static com.palantir.javaformat.java.FileBasedTests.isRecreate;
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.palantir.javaformat.Newlines;
 import com.palantir.javaformat.jupiter.ParameterizedClass;
@@ -74,7 +74,7 @@ public class FormatterIntegrationTest {
                 tests.writeFormatterOutput(name, output);
                 return;
             }
-            assertEquals("bad output for " + name, expected, output);
+            assertThat(output).describedAs("bad output for " + name).isEqualTo(expected);
         } catch (FormatterException e) {
             throw new RuntimeException(String.format("Formatter crashed on %s", name), e);
         }
@@ -91,7 +91,7 @@ public class FormatterIntegrationTest {
         try {
             String mangled = expected.replace(separator, "\n");
             String output = createFormatter().formatSource(mangled);
-            assertEquals("bad output for " + name, mangled, output);
+            assertThat(output).describedAs("bad output for " + name).isEqualTo(mangled);
         } catch (FormatterException e) {
             throw new RuntimeException(String.format("Formatter crashed on %s", name), e);
         }
@@ -103,7 +103,7 @@ public class FormatterIntegrationTest {
         try {
             String mangled = expected.replace(separator, "\r");
             String output = createFormatter().formatSource(mangled);
-            assertEquals("bad output for " + name, mangled, output);
+            assertThat(output).describedAs("bad output for " + name).isEqualTo(mangled);
         } catch (FormatterException e) {
             throw new RuntimeException(String.format("Formatter crashed on %s", name), e);
         }
@@ -115,7 +115,7 @@ public class FormatterIntegrationTest {
         try {
             String mangled = expected.replace(separator, "\r\n");
             String output = createFormatter().formatSource(mangled);
-            assertEquals("bad output for " + name, mangled, output);
+            assertThat(output).describedAs("bad output for " + name).isEqualTo(mangled);
         } catch (FormatterException e) {
             throw new RuntimeException(String.format("Formatter crashed on %s", name), e);
         }

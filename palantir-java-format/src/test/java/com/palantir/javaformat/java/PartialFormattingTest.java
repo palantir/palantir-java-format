@@ -16,7 +16,6 @@ package com.palantir.javaformat.java;
 
 import static com.google.common.truth.Truth.assertThat;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.junit.Assert.assertEquals;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
@@ -31,6 +30,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
@@ -923,7 +923,7 @@ public final class PartialFormattingTest {
         int start = input.indexOf(newline + "}}");
         ImmutableList<Range<Integer>> ranges = ImmutableList.of(Range.closedOpen(start, start + newline.length() + 2));
         String output = Formatter.create().formatSource(input, ranges);
-        assertEquals("bad output", expected, output);
+        Assertions.assertThat(output).describedAs("bad output").isEqualTo(expected);
     }
 
     // regression test for b/b22196513
@@ -951,7 +951,7 @@ public final class PartialFormattingTest {
         int end = start + match.length();
         ImmutableList<Range<Integer>> ranges = ImmutableList.of(Range.closedOpen(start, end));
         String output = Formatter.create().formatSource(input, ranges);
-        assertEquals("bad output", expected, output);
+        Assertions.assertThat(output).describedAs("bad output").isEqualTo(expected);
     }
 
     @TestTemplate
@@ -1178,7 +1178,7 @@ public final class PartialFormattingTest {
         for (; length <= line1.length() + newline.length(); length++) {
             Range<Integer> range = Range.closedOpen(startOffset, startOffset + length);
             String output = Formatter.create().formatSource(input, ImmutableList.of(range));
-            assertEquals("bad output", expectedFormatLine1, output);
+            Assertions.assertThat(output).describedAs("bad output").isEqualTo(expectedFormatLine1);
         }
 
         String expectedFormatLine1And2 = lines(
@@ -1191,7 +1191,7 @@ public final class PartialFormattingTest {
         for (; length <= line1.length() + line2.length() + 2 * newline.length(); length++) {
             Range<Integer> range = Range.closedOpen(startOffset, startOffset + length);
             String output = Formatter.create().formatSource(input, ImmutableList.of(range));
-            assertEquals("bad output", expectedFormatLine1And2, output);
+            Assertions.assertThat(output).describedAs("bad output").isEqualTo(expectedFormatLine1And2);
         }
     }
 

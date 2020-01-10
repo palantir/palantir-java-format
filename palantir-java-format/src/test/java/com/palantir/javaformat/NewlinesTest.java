@@ -16,11 +16,12 @@
 
 package com.palantir.javaformat;
 
+import static org.assertj.core.api.Assertions.fail;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.truth.Truth;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 public class NewlinesTest {
@@ -68,7 +69,7 @@ public class NewlinesTest {
         it.next();
         try {
             it.next();
-            Assert.fail();
+            fail("fail");
         } catch (NoSuchElementException e) {
             // expected
         }
@@ -78,7 +79,7 @@ public class NewlinesTest {
         it.next();
         try {
             it.next();
-            Assert.fail();
+            fail("fail");
         } catch (NoSuchElementException e) {
             // expected
         }
@@ -91,7 +92,7 @@ public class NewlinesTest {
         it.next();
         try {
             it.next();
-            Assert.fail();
+            fail("fail");
         } catch (NoSuchElementException e) {
             // expected
         }
@@ -101,7 +102,7 @@ public class NewlinesTest {
         it.next();
         try {
             it.next();
-            Assert.fail();
+            fail("fail");
         } catch (NoSuchElementException e) {
             // expected
         }
