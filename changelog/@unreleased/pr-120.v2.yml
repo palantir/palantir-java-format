@@ -1,0 +1,7 @@
+type: improvement
+improvement:
+  description: When importing a gradle project with `com.palantir.java-format-idea`
+    from IntelliJ, eagerly configure the necessary XML files in `.idea` rather than
+    relying on unwieldy IntelliJ task triggers.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/120
