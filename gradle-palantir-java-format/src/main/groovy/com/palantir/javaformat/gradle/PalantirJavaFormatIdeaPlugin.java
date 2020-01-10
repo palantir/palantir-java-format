@@ -75,7 +75,7 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
         if (!Boolean.getBoolean("idea.active")) {
             return;
         }
-        project.afterEvaluate(p -> {
+        project.getGradle().projectsEvaluated(gradle -> {
             List<URI> uris = implConfiguration.getFiles().stream().map(File::toURI).collect(Collectors.toList());
 
             createOrUpdateIdeaXmlFile(project.file(".idea/palantir-java-format.xml"), node ->
