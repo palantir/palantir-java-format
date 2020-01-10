@@ -363,10 +363,11 @@ public class MainTest {
 
         assertThat(exitCode).isEqualTo(0);
 
-        assertThat(out.toString()).isEqualTo(b.toAbsolutePath().toString()
-                + System.lineSeparator()
-                + c.toAbsolutePath().toString()
-                + System.lineSeparator());
+        assertThat(out.toString())
+                .isEqualTo(b.toAbsolutePath().toString()
+                        + System.lineSeparator()
+                        + c.toAbsolutePath().toString()
+                        + System.lineSeparator());
         assertThat(err.toString()).isEmpty();
     }
 

@@ -10,10 +10,10 @@ buildscript {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
         classpath 'com.netflix.nebula:nebula-publishing-plugin:14.1.1'
         classpath 'com.netflix.nebula:gradle-info-plugin:5.2.0'
-        classpath 'com.palantir.baseline:gradle-baseline-java:2.42.0'
+        classpath 'com.palantir.baseline:gradle-baseline-java:2.48.1'
         classpath 'gradle.plugin.org.inferred:gradle-processors:3.2.0'
         classpath 'com.palantir.gradle.gitversion:gradle-git-version:0.12.2'
-        classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:1.14.0'
+        classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:1.15.0'
     }
 }
 
@@ -51,12 +51,9 @@ subprojects {
     }
 
     tasks.withType(JavaCompile) {
-        options.errorprone.errorproneArgs += [
-            '-Xep:PreconditionsConstantMessage:OFF',
-            '-Xep:PreferSafeLoggableExceptions:OFF',
-            '-Xep:PreferAssertj:OFF',
-            '-Xep:PreferSafeLoggingPreconditions:OFF',
-            '-Xep:SwitchStatementDefaultCase:OFF'
-        ]
+        options.errorprone.errorproneArgs += ['-Xep:PreconditionsConstantMessage:OFF',
+                                              '-Xep:PreferSafeLoggableExceptions:OFF',
+                                              '-Xep:PreferSafeLoggingPreconditions:OFF',
+                                              '-Xep:SwitchStatementDefaultCase:OFF']
     }
 }
