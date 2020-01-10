@@ -17,18 +17,26 @@
 package com.palantir.javaformat.gradle;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.io.Files;
+import groovy.util.Node;
+import groovy.util.XmlNodePrinter;
+import groovy.util.XmlParser;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import javax.xml.parsers.ParserConfigurationException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.Task;
 import org.gradle.api.artifacts.Configuration;
-import org.gradle.api.plugins.ExtensionAware;
-import org.gradle.api.provider.Provider;
 import org.gradle.plugins.ide.idea.model.IdeaModel;
-import org.jetbrains.gradle.ext.TaskTriggersConfig;
+import org.xml.sax.SAXException;
 
 public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
 
@@ -60,25 +68,44 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
     }
 
     private static void configureIntelliJImport(Project project, Configuration implConfiguration) {
-        project.getPluginManager().apply("org.jetbrains.gradle.plugin.idea-ext");
+        // Note: we tried using 'org.jetbrains.gradle.plugin.idea-ext' and afterSync triggers, but these are currently
+        // very hard to manage as the tasks feel disconnected from the Sync operation, and you can't remove them once
+        // you've added them. For that reason, we accept that we have to resolve this configuration at
+        // configuration-time, but only do it when part of an IDEA import.
+        if (!Boolean.getBoolean("idea.active")) {
+            return;
+        }
+        project.afterEvaluate(p -> {
+            List<URI> uris = implConfiguration.getFiles().stream().map(File::toURI).collect(Collectors.toList());
 
-        Provider<? extends Task> configurePalantirJavaFormatXmlTask = project.getTasks()
-                .register("configurePalantirJavaFormatXml", ConfigurePalantirJavaFormatXml.class, task -> {
-                    task.getImplConfiguration().set(implConfiguration);
-                });
-
-        Provider<? extends Task> configurePalantirJavaFormatPluginDependencyXml = project.getTasks()
-                .register("configurePalantirJavaFormatPluginDependencyXml", ConfigureExternalDependenciesXml.class);
-
-        Task palantirJavaFormatIntellij = project.getTasks().create("palantirJavaFormatIntellij", task -> {
-            task.setDescription("Configure IntelliJ directory-based repository after importing");
-            task.setGroup(UpdateIntellijXmlTask.INTELLIJ_TASK_GROUP);
-            task.dependsOn(configurePalantirJavaFormatXmlTask, configurePalantirJavaFormatPluginDependencyXml);
+            createOrUpdateIdeaXmlFile(project.file(".idea/palantir-java-format.xml"), node ->
+                    ConfigureJavaFormatterXml.configureJavaFormat(node, uris));
+            createOrUpdateIdeaXmlFile(project.file(".idea/externalDependencies.xml"), node ->
+                    ConfigureJavaFormatterXml.configureExternalDependencies(node));
         });
+    }
 
-        ExtensionAware ideaProject = (ExtensionAware) project.getExtensions().getByType(IdeaModel.class).getProject();
-        ExtensionAware settings = (ExtensionAware) ideaProject.getExtensions().getByName("settings");
-        TaskTriggersConfig taskTriggers = settings.getExtensions().getByType(TaskTriggersConfig.class);
-        taskTriggers.beforeSync(palantirJavaFormatIntellij);
+    private static void createOrUpdateIdeaXmlFile(File configurationFile, Consumer<Node> configure) {
+        Node rootNode;
+        if (configurationFile.isFile()) {
+            try {
+                rootNode = new XmlParser().parse(configurationFile);
+            } catch (IOException | SAXException | ParserConfigurationException e) {
+                throw new RuntimeException("Couldn't parse existing configuration file: " + configurationFile, e);
+            }
+        } else {
+            rootNode = new Node(null, "project", ImmutableMap.of("version", "4"));
+        }
+
+        configure.accept(rootNode);
+
+        try (BufferedWriter writer = Files.newWriter(configurationFile, Charset.defaultCharset());
+                PrintWriter printWriter = new PrintWriter(writer)) {
+            XmlNodePrinter nodePrinter = new XmlNodePrinter(printWriter);
+            nodePrinter.setPreserveWhitespace(true);
+            nodePrinter.print(rootNode);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to write back to configuration file: " + configurationFile, e);
+        }
     }
 }
