@@ -124,9 +124,9 @@ public final class Level extends Doc {
      */
     private Optional<Integer> tryToFitOnOneLine(int maxWidth, State state, Iterable<Doc> docs) {
         float column = state.column();
-        float columnBeforeLastBreak = column;
+        float columnBeforeLastBreak = 0f; // Not activated by default
         for (Doc doc : docs) {
-            if (doc instanceof Break) {
+            if (doc instanceof Break && ((Break) doc).hasColumnLimit()) {
                 columnBeforeLastBreak = column;
             } else if (doc instanceof Level) {
                 // Levels might have nested levels that have a 'columnLimitBeforeLastBreak' set, so recurse.
@@ -547,6 +547,10 @@ public final class Level extends Doc {
         return openOp;
     }
 
+    /**
+     * An optional, more restrictive column limit for inner breaks that are marked as {@link Break#hasColumnLimit()}. If
+     * the level is to be considered one-lineable, the last such break must not start at a column higher than this.
+     */
     public OptionalInt getColumnLimitBeforeLastBreak() {
         return openOp.columnLimitBeforeLastBreak();
     }
