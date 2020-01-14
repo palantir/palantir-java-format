@@ -1208,6 +1208,33 @@ public final class JavadocFormattingTest {
     }
 
     @Test
+    void mergesClosingBraceWithFollowingTag() {
+        String[] input = {
+            "/**", //
+            " * Example:",
+            " *",
+            " * <pre>    {@code",
+            " *   class T {",
+            " *   }",
+            " * }</pre>",
+            " */",
+            "class Test {}",
+        };
+        String[] expected = {
+            "/**", //
+            " * Example:",
+            " *",
+            " * <pre>{@code",
+            " * class T {",
+            " * }",
+            " * }</pre>",
+            " */",
+            "class Test {}",
+        };
+        doFormatTest(input, expected);
+    }
+
+    @Test
     public void codeInCode() {
         // Eclipse's parser seems to get confused at the second {@code}. Test that we handle it.
         String[] input = {
