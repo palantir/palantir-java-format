@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Nested method chains now also adhere to column limit.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/123

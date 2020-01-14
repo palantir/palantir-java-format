@@ -2727,7 +2727,12 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         for (ExpressionTree e : items) {
             if (needDot) {
                 if (length > minLength) {
-                    builder.breakOp(FillMode.UNIFIED, "", ZERO);
+                    builder.breakOp(Break.builder()
+                            .fillMode(FillMode.UNIFIED)
+                            .flat("")
+                            .plusIndent(ZERO)
+                            .hasColumnLimit(shouldHaveColumnLimit(e))
+                            .build());
                 }
                 token(".");
                 length++;
@@ -2821,7 +2826,13 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                     fillMode = FillMode.UNIFIED;
                 }
 
-                builder.breakOp(fillMode, "", ZERO, Optional.of(nameTag));
+                builder.breakOp(Break.builder()
+                        .fillMode(fillMode)
+                        .flat("")
+                        .plusIndent(ZERO)
+                        .optTag(Optional.of(nameTag))
+                        .hasColumnLimit(shouldHaveColumnLimit(e))
+                        .build());
                 token(".");
             }
             BreakTag tyargTag = new BreakTag();
@@ -2839,6 +2850,22 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         }
 
         builder.close();
+    }
+
+    /**
+     * We only want to limit the max column of expressions that are method invocations. All of these expressions below
+     * would have a column limit.
+     *
+     * <ul>
+     *   <li>{@code foo().bar()}
+     *   <li>{@code foo().bar()[0]}
+     *   <li>{@code foo().bar()[0][0]}
+     * </ul>
+     *
+     * Whereas an expression like a name {@code com.palantir.foo.bar.Baz} would not.
+     */
+    private boolean shouldHaveColumnLimit(ExpressionTree expr) {
+        return getArrayBase(expr).getKind() == METHOD_INVOCATION;
     }
 
     /** Returns the simple names of expressions in a "." chain. */

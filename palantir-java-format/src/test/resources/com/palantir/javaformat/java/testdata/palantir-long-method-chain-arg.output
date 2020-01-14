@@ -1,0 +1,9 @@
+class PalantirLongMethodChainArg {
+    void foo() {
+        return cache.get(ImmutableRequest.builder()
+                .group(group)
+                .name(artifact)
+                .addRepositories("release-jar")
+                .build());
+    }
+}

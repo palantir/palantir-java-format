@@ -123,25 +123,33 @@ public final class Level extends Doc {
      *     maxWidth}
      */
     private Optional<Integer> tryToFitOnOneLine(int maxWidth, State state, Iterable<Doc> docs) {
-        if (getColumnLimitBeforeLastBreak().isPresent()) {
-            float width = 0.0f;
-            float widthBeforeLastBreak = 0.0f;
-            for (Doc doc : docs) {
-                if (doc instanceof Break) {
-                    widthBeforeLastBreak = width;
+        int column = state.column();
+        int columnBeforeLastBreak = 0; // Not activated by default
+        for (Doc doc : docs) {
+            if (doc instanceof Break && ((Break) doc).hasColumnLimit()) {
+                columnBeforeLastBreak = column;
+            } else if (doc instanceof Level) {
+                // Levels might have nested levels that have a 'columnLimitBeforeLastBreak' set, so recurse.
+                State newState = state.withColumn(column);
+                Level innerLevel = (Level) doc;
+                Optional<Integer> newWidth = innerLevel.tryToFitOnOneLine(maxWidth, newState, innerLevel.getDocs());
+                if (!newWidth.isPresent()) {
+                    return Optional.empty();
                 }
-                width += doc.getWidth();
+                column = newWidth.get();
+                continue;
             }
-            // Make an additional check that widthBeforeLastBreak fits in the column limit
-            if (state.column() + widthBeforeLastBreak > getColumnLimitBeforeLastBreak().getAsInt()) {
-                return Optional.empty();
-            }
+            column += doc.getWidth();
+        }
+        // Make an additional check that widthBeforeLastBreak fits in the column limit
+        if (getColumnLimitBeforeLastBreak().isPresent()
+                && columnBeforeLastBreak > getColumnLimitBeforeLastBreak().getAsInt()) {
+            return Optional.empty();
         }
 
         // Check that the entirety of this level fits on the current line.
-        float thisWidth = getWidth(docs);
-        if (state.column() + thisWidth <= maxWidth) {
-            return Optional.of(state.column() + (int) thisWidth);
+        if (column <= maxWidth) {
+            return Optional.of(column);
         }
         return Optional.empty();
     }
@@ -538,6 +546,10 @@ public final class Level extends Doc {
         return openOp;
     }
 
+    /**
+     * An optional, more restrictive column limit for inner breaks that are marked as {@link Break#hasColumnLimit()}. If
+     * the level is to be considered one-lineable, the last such break must not start at a column higher than this.
+     */
     public OptionalInt getColumnLimitBeforeLastBreak() {
         return openOp.columnLimitBeforeLastBreak();
     }
