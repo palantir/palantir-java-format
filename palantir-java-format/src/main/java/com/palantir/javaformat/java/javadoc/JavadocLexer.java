@@ -168,8 +168,7 @@ final class JavadocLexer {
             return LITERAL;
         } else if (input.tryConsume("}")) {
             braceDepth.decrementIfPositive();
-            // TODO(dansanduleac): is this always an inline tag close?
-            return INLINE_TAG_CLOSE;
+            return braceDepth.isPositive() ? LITERAL : INLINE_TAG_CLOSE;
         }
 
         // Inside an inline tag, don't do any HTML interpretation.
@@ -283,8 +282,8 @@ final class JavadocLexer {
                 inlineTagDepth.decrementIfPositive();
             }
 
-            if (nextType == LITERAL || nextType == INLINE_TAG_OPEN) {
-                accumulated.append(tokens.peek().getValue());
+            accumulated.append(tokens.peek().getValue());
+            if (nextType == LITERAL || nextType == INLINE_TAG_OPEN || nextType == INLINE_TAG_CLOSE) {
                 tokens.next();
                 continue;
             }
@@ -311,12 +310,6 @@ final class JavadocLexer {
                     && (tokens.peek().getValue().startsWith("@") || inlineTagDepth.isPositive())) {
                 // OK, we're in the case described above.
                 accumulated.append(" ");
-                accumulated.append(tokens.peek().getValue());
-                tokens.next();
-                continue;
-            }
-
-            if (tokens.peek().getType() == INLINE_TAG_CLOSE && !inlineTagDepth.isPositive()) {
                 accumulated.append(tokens.peek().getValue());
                 tokens.next();
                 continue;
