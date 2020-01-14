@@ -25,7 +25,7 @@ apply plugin: 'com.palantir.git-version'
 apply plugin: 'com.palantir.baseline'
 apply plugin: 'com.palantir.consistent-versions'
 
-version System.env.CIRCLE_TAG ?: gitVersion()
+version 'dev'
 
 allprojects {
     group = 'com.palantir.javaformat'
@@ -55,5 +55,12 @@ subprojects {
                                               '-Xep:PreferSafeLoggableExceptions:OFF',
                                               '-Xep:PreferSafeLoggingPreconditions:OFF',
                                               '-Xep:SwitchStatementDefaultCase:OFF']
+    }
+}
+
+// Hack to ensure we don't run out of memory, see https://circleci.com/gh/palantir/palantir-java-format/3189
+project(':gradle-palantir-java-format') { Project p ->
+    tasks.named('test') {
+        mustRunAfter ((rootProject.subprojects - p)*.tasks*.named('test'))
     }
 }
