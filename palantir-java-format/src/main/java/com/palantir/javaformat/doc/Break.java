@@ -38,6 +38,9 @@ public abstract class Break extends Doc implements Op {
 
     public abstract Optional<BreakTag> optTag();
 
+    /** If this break is restricted by its parent {@link Level}'s {@link Level#getColumnLimitBeforeLastBreak()}. */
+    public abstract boolean hasColumnLimit();
+
     /**
      * Make a {@code Break}.
      *
@@ -47,7 +50,12 @@ public abstract class Break extends Doc implements Op {
      * @return the new {@code Break}
      */
     public static Break make(FillMode fillMode, String flat, Indent plusIndent) {
-        return builder().fillMode(fillMode).flat(flat).plusIndent(plusIndent).build();
+        return builder()
+                .fillMode(fillMode)
+                .flat(flat)
+                .plusIndent(plusIndent)
+                .hasColumnLimit(false)
+                .build();
     }
 
     /**
@@ -65,6 +73,7 @@ public abstract class Break extends Doc implements Op {
                 .flat(flat)
                 .plusIndent(plusIndent)
                 .optTag(optTag)
+                .hasColumnLimit(false)
                 .build();
     }
 
@@ -78,6 +87,7 @@ public abstract class Break extends Doc implements Op {
                 .fillMode(FillMode.FORCED)
                 .flat("")
                 .plusIndent(Indent.Const.ZERO)
+                .hasColumnLimit(false)
                 .build();
     }
 

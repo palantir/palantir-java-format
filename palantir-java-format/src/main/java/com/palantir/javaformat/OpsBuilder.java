@@ -438,6 +438,11 @@ public final class OpsBuilder {
         add(Break.make(fillMode, flat, plusIndent, optionalTag));
     }
 
+    /** Emit a self-built {@link Break}. */
+    public void breakOp(Break breakOp) {
+        add(breakOp);
+    }
+
     private int lastPartialFormatBoundary = -1;
 
     /**

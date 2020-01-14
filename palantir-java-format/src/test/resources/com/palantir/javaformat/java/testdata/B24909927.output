@@ -122,8 +122,9 @@ class Xxx {
                                                         .xxxXxxx(XxxxXxxx.XXX)
                                                         .xxxxx())
                                                 .xxxxx())
-                                        .xxxXxxxxxxxxxXxxXxxxXxxxxxxxx(
-                                                XxxxxxxxxxXxxXxxxXxxxxxxxx.xxxXxxxxxx().xxxXxxxxxxxxxXxxxXx(42).xxxxx())
+                                        .xxxXxxxxxxxxxXxxXxxxXxxxxxxxx(XxxxxxxxxxXxxXxxxXxxxxxxxx.xxxXxxxxxx()
+                                                .xxxXxxxxxxxxxXxxxXx(42)
+                                                .xxxxx())
                                         .xxxxx())
                                 .xxxxx())
                         .xxxXxxxxxx(XxxxxxxXxxx.xxxXxxxxxx()

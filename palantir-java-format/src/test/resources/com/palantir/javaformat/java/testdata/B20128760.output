@@ -11,8 +11,9 @@ class B20128760 {
                 .xxxxx();
 
         xxxxxxXxxx(xxx.xxxXxXxxxxxxx(new XxxxxxxxxXxxxxxxx.Xxxxxxx()
-                                .xxxxXxxxXxx(Xxxxx.xxxXxxxxXxxx(new XxxxXx(
-                                        xxxxxxxxx1.xxxXxxxXx().xxxXxxxx() + xxxxxxxxx2.xxxXxxxXx().xxxXxxxx())))
+                                .xxxxXxxxXxx(Xxxxx.xxxXxxxxXxxx(
+                                        new XxxxXx(xxxxxxxxx1.xxxXxxxXx().xxxXxxxx()
+                                                + xxxxxxxxx2.xxxXxxxXx().xxxXxxxx())))
                                 .xxxxx())
                         .xxxXxxxxxx())
                 .xxxxxxxxXxxxxxx();
