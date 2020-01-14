@@ -128,6 +128,8 @@ public final class JavadocFormatter {
                     output.writeLineBreakNoAutoIndent();
                     break;
                 case LITERAL:
+                case INLINE_TAG_OPEN:
+                case INLINE_TAG_CLOSE:
                     output.writeLiteral(token);
                     break;
                 case PARAGRAPH_CLOSE_TAG:

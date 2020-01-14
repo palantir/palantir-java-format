@@ -30,6 +30,8 @@ import static com.palantir.javaformat.java.javadoc.Token.Type.FORCED_NEWLINE;
 import static com.palantir.javaformat.java.javadoc.Token.Type.HEADER_CLOSE_TAG;
 import static com.palantir.javaformat.java.javadoc.Token.Type.HEADER_OPEN_TAG;
 import static com.palantir.javaformat.java.javadoc.Token.Type.HTML_COMMENT;
+import static com.palantir.javaformat.java.javadoc.Token.Type.INLINE_TAG_CLOSE;
+import static com.palantir.javaformat.java.javadoc.Token.Type.INLINE_TAG_OPEN;
 import static com.palantir.javaformat.java.javadoc.Token.Type.LIST_CLOSE_TAG;
 import static com.palantir.javaformat.java.javadoc.Token.Type.LIST_ITEM_CLOSE_TAG;
 import static com.palantir.javaformat.java.javadoc.Token.Type.LIST_ITEM_OPEN_TAG;
@@ -160,13 +162,13 @@ final class JavadocLexer {
 
         if (input.tryConsumeRegex(INLINE_TAG_OPEN_PATTERN)) {
             braceDepth.increment();
-            return LITERAL;
+            return INLINE_TAG_OPEN;
         } else if (input.tryConsume("{")) {
             braceDepth.incrementIfPositive();
             return LITERAL;
         } else if (input.tryConsume("}")) {
             braceDepth.decrementIfPositive();
-            return LITERAL;
+            return braceDepth.isPositive() ? LITERAL : INLINE_TAG_CLOSE;
         }
 
         // Inside an inline tag, don't do any HTML interpretation.
@@ -270,9 +272,17 @@ final class JavadocLexer {
          */
         ImmutableList.Builder<Token> output = ImmutableList.builder();
         StringBuilder accumulated = new StringBuilder();
+        NestingCounter inlineTagDepth = new NestingCounter();
 
         for (PeekingIterator<Token> tokens = peekingIterator(input.iterator()); tokens.hasNext(); ) {
-            if (tokens.peek().getType() == LITERAL) {
+            Type nextType = tokens.peek().getType();
+            if (nextType == INLINE_TAG_OPEN) {
+                inlineTagDepth.increment();
+            } else if (nextType == INLINE_TAG_CLOSE) {
+                inlineTagDepth.decrementIfPositive();
+            }
+
+            if (nextType == LITERAL || nextType == INLINE_TAG_OPEN || nextType == INLINE_TAG_CLOSE) {
                 accumulated.append(tokens.peek().getValue());
                 tokens.next();
                 continue;
@@ -296,7 +306,8 @@ final class JavadocLexer {
                 seenWhitespace.append(tokens.next().getValue());
             }
 
-            if (tokens.peek().getType() == LITERAL && tokens.peek().getValue().startsWith("@")) {
+            if (tokens.peek().getType() == LITERAL
+                    && (tokens.peek().getValue().startsWith("@") || inlineTagDepth.isPositive())) {
                 // OK, we're in the case described above.
                 accumulated.append(" ");
                 accumulated.append(tokens.peek().getValue());
