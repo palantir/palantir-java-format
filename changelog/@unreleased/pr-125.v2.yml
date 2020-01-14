@@ -1,6 +1,6 @@
 type: improvement
 improvement:
-  description: In javadocs, keep inline tags like `{@link ...}` on one line if not
-    already split.
+  description: In javadocs, keep inline tags like `{@link ...}` on the same line if
+    not already split.
   links:
   - https://github.com/palantir/palantir-java-format/pull/125
