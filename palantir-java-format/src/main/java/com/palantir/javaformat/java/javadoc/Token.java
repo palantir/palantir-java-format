@@ -83,10 +83,13 @@ final class Token {
          * start a new line, and write the second. Hence, the token acts as an optional line break.
          */
         OPTIONAL_LINE_BREAK,
+        /** The start of a {@code {@...}} construct such as {@code {@code foo}}, that is: {@code {@code}}. */
+        INLINE_TAG_OPEN,
+        /** The end of a {@code {@...}} construct such as {@code {@code foo}}, i.e. a closing brace {@code }}. */
+        INLINE_TAG_CLOSE,
         /**
-         * Anything else: {@code foo}, {@code <b>}, {@code {@code foo}} etc. {@link JavadocLexer} sometimes creates
-         * adjacent literal tokens, which it then merges into a single, larger literal token before returning its
-         * output.
+         * Anything else: {@code foo}, {@code <b>} etc. {@link JavadocLexer} sometimes creates adjacent literal tokens,
+         * which it then merges into a single, larger literal token before returning its output.
          *
          * <p>This also includes whitespace in a {@code <pre>} or {@code <table>} section. We preserve user formatting
          * in these sections, including arbitrary numbers of spaces. By treating such whitespace as a literal, we can
