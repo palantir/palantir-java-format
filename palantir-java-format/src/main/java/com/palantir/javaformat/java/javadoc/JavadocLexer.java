@@ -282,8 +282,8 @@ final class JavadocLexer {
                 inlineTagDepth.decrementIfPositive();
             }
 
-            accumulated.append(tokens.peek().getValue());
             if (nextType == LITERAL || nextType == INLINE_TAG_OPEN || nextType == INLINE_TAG_CLOSE) {
+                accumulated.append(tokens.peek().getValue());
                 tokens.next();
                 continue;
             }
