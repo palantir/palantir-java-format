@@ -83,7 +83,7 @@ final class Token {
          * start a new line, and write the second. Hence, the token acts as an optional line break.
          */
         OPTIONAL_LINE_BREAK,
-        /** The start of a {@code {@...}} construct such as {@code {@code foo}}, that is: {@code {@code}}. */
+        /** The start of a {@code {@...}} construct such as {@code {@code foo}}, that is: <code>&#123;@code</code>. */
         INLINE_TAG_OPEN,
         /** The end of a {@code {@...}} construct such as {@code {@code foo}}, i.e. a closing brace {@code }}. */
         INLINE_TAG_CLOSE,
