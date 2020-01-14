@@ -1190,6 +1190,24 @@ public final class JavadocFormattingTest {
     }
 
     @Test
+    public void doesNotBreakLink() {
+        String[] input = {
+            "/**", //
+            " * This line is too long for the link to fit on a single line isn't it yes indeed too long {@link Foo}",
+            " */",
+            "class Test {}",
+        };
+        String[] expected = {
+            "/**", //
+            " * This line is too long for the link to fit on a single line isn't it yes indeed too long",
+            " * {@link Foo}",
+            " */",
+            "class Test {}",
+        };
+        doFormatTest(input, expected);
+    }
+
+    @Test
     public void codeInCode() {
         // Eclipse's parser seems to get confused at the second {@code}. Test that we handle it.
         String[] input = {
