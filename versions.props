@@ -1,5 +1,5 @@
 com.diffplug.spotless:spotless-plugin-gradle = 3.27.1
-com.github.ben-manes.caffeine:caffeine = 2.8.0
+com.github.ben-manes.caffeine:caffeine = 2.8.1
 com.google.auto.service:auto-service = 1.0-rc6
 com.google.code.findbugs:jsr305 = 3.0.2
 com.google.errorprone:error_prone_annotations = 2.3.4
@@ -7,7 +7,7 @@ com.google.errorprone:javac-shaded = 9+181-r4173-1
 com.google.guava:guava = 27.0.1-jre
 com.google.guava:guava-testlib = 27.0.1-jre
 com.google.testing.compile:compile-testing = 0.15
-com.google.truth:truth = 1.0
+com.google.truth:truth = 1.0.1
 com.netflix.nebula:nebula-test = 7.6.0
 junit:junit = 4.13
 org.assertj:assertj-core = 3.14.0
