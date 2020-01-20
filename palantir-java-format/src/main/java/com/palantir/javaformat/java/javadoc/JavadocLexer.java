@@ -273,6 +273,7 @@ final class JavadocLexer {
         ImmutableList.Builder<Token> output = ImmutableList.builder();
         StringBuilder accumulated = new StringBuilder();
         NestingCounter inlineTagDepth = new NestingCounter();
+        boolean lastTagWasInlineTagStart = false;
 
         for (PeekingIterator<Token> tokens = peekingIterator(input.iterator()); tokens.hasNext(); ) {
             Type nextType = tokens.peek().getType();
@@ -280,6 +281,11 @@ final class JavadocLexer {
                 inlineTagDepth.increment();
             } else if (nextType == INLINE_TAG_CLOSE) {
                 inlineTagDepth.decrementIfPositive();
+            }
+
+            if (nextType == INLINE_TAG_OPEN) {
+                // This remains true until we hit some whitespace.
+                lastTagWasInlineTagStart = true;
             }
 
             if (nextType == LITERAL || nextType == INLINE_TAG_OPEN || nextType == INLINE_TAG_CLOSE) {
@@ -307,7 +313,8 @@ final class JavadocLexer {
             }
 
             if (tokens.peek().getType() == LITERAL
-                    && (tokens.peek().getValue().startsWith("@") || inlineTagDepth.isPositive())) {
+                    && (tokens.peek().getValue().startsWith("@") || lastTagWasInlineTagStart)) {
+                lastTagWasInlineTagStart = false;
                 // OK, we're in the case described above.
                 accumulated.append(" ");
                 accumulated.append(tokens.peek().getValue());
@@ -322,6 +329,7 @@ final class JavadocLexer {
                 output.add(new Token(WHITESPACE, seenWhitespace.toString()));
             }
 
+            lastTagWasInlineTagStart = false;
             // We have another token coming, possibly of type OTHER. Leave it for the next iteration.
         }
 
