@@ -1207,6 +1207,30 @@ public final class JavadocFormattingTest {
         doFormatTest(input, expected);
     }
 
+    /**
+     * Test that a long {@code {@link #foo(many, arguments)}} while keeping {@code @link} and {@code foo(many} on the
+     * same line.
+     */
+    @Test
+    public void wrapsLongInlineTag_withoutBreakingFirstWhitespace() {
+        String[] input = {
+            "/**", //
+            " * This line is too long for the link to fit on a single line isn't it yes indeed too long {@link "
+                    + "#foo(bar, baz, there, are, just, so, many, arguments, arent, there, yep, indeed, yessir, yaya)}",
+            " */",
+            "class Test {}",
+        };
+        String[] expected = {
+            "/**", //
+            " * This line is too long for the link to fit on a single line isn't it yes indeed too long",
+            " * {@link #foo(bar, baz, there, are, just, so, many, arguments, arent, there, yep, indeed, yessir,",
+            " * yaya)}",
+            " */",
+            "class Test {}",
+        };
+        doFormatTest(input, expected);
+    }
+
     @Test
     void mergesClosingBraceWithFollowingTag() {
         String[] input = {
