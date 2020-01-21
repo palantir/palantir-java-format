@@ -4,9 +4,8 @@ class B21465217 {
                 BufferedOutputStream bout = new BufferedOutputStream(out2);
                 OutputStreamWriter writer = new OutputStreamWriter(bout, UTF_8___________________________)) {}
 
-        try (Writer sourceWriter = env.getFiler()
-                .createSourceFile(qualifiedNamezzzzzzzz)
-                .openWriter()) {
+        try (Writer sourceWriter =
+                env.getFiler().createSourceFile(qualifiedNamezzzzzzzz).openWriter()) {
             sourceWriter.append(fileContents);
         }
     }

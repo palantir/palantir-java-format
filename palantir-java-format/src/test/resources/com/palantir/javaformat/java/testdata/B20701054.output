@@ -14,29 +14,16 @@ class B20701054 {
         ImmutableList<String> x = ImmutableList.INSTANCE.add(1).build();
         ImmutableList<String> x = ImmutableList.INSTANCE.add(1).add(2).build();
         ImmutableList<String> x = ImmutableList.INSTANCE.add(1).add(2).add(3).build();
-        ImmutableList<String> x = ImmutableList.INSTANCE
-                .add(1)
-                .add(2)
-                .add(3)
-                .add(4)
-                .build();
+        ImmutableList<String> x =
+                ImmutableList.INSTANCE.add(1).add(2).add(3).add(4).build();
 
         ImmutableList<String> x = ImmutableList.builder().add(1).build();
         ImmutableList<String> x = ImmutableList.builder().add(1).add(2).build();
         ImmutableList<String> x = ImmutableList.builder().add(1).add(2).add(3).build();
-        ImmutableList<String> x = ImmutableList.builder()
-                .add(1)
-                .add(2)
-                .add(3)
-                .add(4)
-                .build();
-        ImmutableList<String> x = ImmutableList.builder()
-                .add(1)
-                .add(2)
-                .add(3)
-                .add(4)
-                .add(5)
-                .build();
+        ImmutableList<String> x =
+                ImmutableList.builder().add(1).add(2).add(3).add(4).build();
+        ImmutableList<String> x =
+                ImmutableList.builder().add(1).add(2).add(3).add(4).add(5).build();
         ImmutableList<String> x = ImmutableList.builder()
                 .add(1)
                 .add(2)
