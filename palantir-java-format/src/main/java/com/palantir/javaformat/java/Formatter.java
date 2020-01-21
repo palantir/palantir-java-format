@@ -71,10 +71,10 @@ import org.openjdk.tools.javac.util.Options;
  * then generates a structured {@link Doc}. Each AST node type has a visitor to emit a sequence of {@link Op}s for the
  * node.
  *
- * <p>Some data-structure operations are easier in the list of {@link Op}s, while others become easier in the {@link
- * Doc}. The {@link Op}s are walked to attach the comments. As the {@link Op}s are generated, missing input tokens are
- * inserted and incorrect output tokens are dropped, ensuring that the output matches the input even in the face of
- * formatter errors. Finally, the formatter walks the {@link Doc} to format it in the given width.
+ * <p>Some data-structure operations are easier in the list of {@link Op}s, while others become easier in the
+ * {@link Doc}. The {@link Op}s are walked to attach the comments. As the {@link Op}s are generated, missing input
+ * tokens are inserted and incorrect output tokens are dropped, ensuring that the output matches the input even in the
+ * face of formatter errors. Finally, the formatter walks the {@link Doc} to format it in the given width.
  *
  * <p>This formatter also produces data structures of which tokens and comments appear where on the input, and on the
  * output, to help output a partial reformatting of a slightly edited input.

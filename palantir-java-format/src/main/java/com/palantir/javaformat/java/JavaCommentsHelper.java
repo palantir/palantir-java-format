@@ -99,7 +99,9 @@ public final class JavaCommentsHelper implements CommentsHelper {
         builder.append(lines.get(0).trim());
         String indentString = Strings.repeat(" ", column0);
         for (int i = 1; i < lines.size(); ++i) {
-            builder.append(lineSeparator).append(indentString).append(lines.get(i).trim());
+            builder.append(lineSeparator)
+                    .append(indentString)
+                    .append(lines.get(i).trim());
         }
         return builder.toString();
     }

@@ -119,8 +119,8 @@ public final class Level extends Doc {
      * Try to fit these docs belonging to the current level onto one line, returning empty if we couldn't. This takes
      * into account the level's {@link #getColumnLimitBeforeLastBreak()}.
      *
-     * @return the width after fitting it onto one line, if it was possible. This is guaranteed to be less than {@code
-     *     maxWidth}
+     * @return the width after fitting it onto one line, if it was possible. This is guaranteed to be less than
+     *     {@code maxWidth}
      */
     private Optional<Integer> tryToFitOnOneLine(int maxWidth, State state, Iterable<Doc> docs) {
         int column = state.column();
@@ -193,7 +193,8 @@ public final class Level extends Doc {
                                 tryBreakLastLevel(commentsHelper, maxWidth, state1, explorationNode, true));
 
                 if (lastLevelBroken.isPresent()) {
-                    if (lastLevelBroken.get().state().numLines() < broken.state().numLines()) {
+                    if (lastLevelBroken.get().state().numLines()
+                            < broken.state().numLines()) {
                         return lastLevelBroken.get().markAccepted();
                     }
                 }
@@ -388,9 +389,9 @@ public final class Level extends Doc {
     }
 
     /**
-     * Mark breaks in this level as not broken, but lay out the inner levels normally, according to their own {@link
-     * BreakBehaviour}. The resulting {@link State#mustBreak} will be true if this level did not fit on exactly one
-     * line.
+     * Mark breaks in this level as not broken, but lay out the inner levels normally, according to their own
+     * {@link BreakBehaviour}. The resulting {@link State#mustBreak} will be true if this level did not fit on exactly
+     * one line.
      */
     private State tryToLayOutLevelOnOneLine(
             CommentsHelper commentsHelper,

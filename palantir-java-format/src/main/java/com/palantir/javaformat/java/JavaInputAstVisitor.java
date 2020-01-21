@@ -1000,7 +1000,8 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                         : ZERO);
         if (!node.getInitializer().isEmpty()) {
             if (node.getInitializer().get(0).getKind() == VARIABLE) {
-                PeekingIterator<StatementTree> it = Iterators.peekingIterator(node.getInitializer().iterator());
+                PeekingIterator<StatementTree> it =
+                        Iterators.peekingIterator(node.getInitializer().iterator());
                 visitVariables(variableFragments(it, it.next()), DeclarationKind.NONE, Direction.HORIZONTAL);
             } else {
                 boolean first = true;
@@ -2877,13 +2878,15 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             expression = getArrayBase(expression);
             switch (expression.getKind()) {
                 case MEMBER_SELECT:
-                    simpleNames.add(((MemberSelectTree) expression).getIdentifier().toString());
+                    simpleNames.add(
+                            ((MemberSelectTree) expression).getIdentifier().toString());
                     break;
                 case IDENTIFIER:
                     simpleNames.add(((IdentifierTree) expression).getName().toString());
                     break;
                 case METHOD_INVOCATION:
-                    simpleNames.add(getMethodName((MethodInvocationTree) expression).toString());
+                    simpleNames.add(
+                            getMethodName((MethodInvocationTree) expression).toString());
                     break OUTER;
                 default:
                     break OUTER;
@@ -3149,7 +3152,8 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 }
                 if (tree.getKind() == STRING_LITERAL) {
                     Object value = ((LiteralTree) tree).getValue();
-                    if (value instanceof String && FORMAT_SPECIFIER.matcher(value.toString()).find()) {
+                    if (value instanceof String
+                            && FORMAT_SPECIFIER.matcher(value.toString()).find()) {
                         formatString[0] = true;
                     }
                 }
@@ -3299,7 +3303,8 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
 
         builder.open(
                 kind == DeclarationKind.PARAMETER
-                                && (modifiers.isPresent() && !modifiers.get().getAnnotations().isEmpty())
+                                && (modifiers.isPresent()
+                                        && !modifiers.get().getAnnotations().isEmpty())
                         ? plusFour
                         : ZERO);
         {
@@ -3426,7 +3431,8 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                     lastWasAnnotation = false;
                     break;
                 case ".":
-                    if (!builder.peekToken().get().equals(".") || !builder.peekToken(1).get().equals(".")) {
+                    if (!builder.peekToken().get().equals(".")
+                            || !builder.peekToken(1).get().equals(".")) {
                         return;
                     }
                     if (lastWasAnnotation) {
@@ -3610,7 +3616,8 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 markerAnnotations++;
             }
         }
-        return markerAnnotations <= 1 && markerAnnotations == modifiers.getAnnotations().size()
+        return markerAnnotations <= 1
+                        && markerAnnotations == modifiers.getAnnotations().size()
                 ? Direction.HORIZONTAL
                 : Direction.VERTICAL;
     }

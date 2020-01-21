@@ -61,7 +61,8 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
         IdeaModel ideaModel = project.getExtensions().getByType(IdeaModel.class);
         ideaModel.getProject().getIpr().withXml(xmlProvider -> {
             // this block is lazy
-            List<URI> uris = implConfiguration.getFiles().stream().map(File::toURI).collect(Collectors.toList());
+            List<URI> uris =
+                    implConfiguration.getFiles().stream().map(File::toURI).collect(Collectors.toList());
             ConfigureJavaFormatterXml.configureJavaFormat(xmlProvider.asNode(), uris);
             ConfigureJavaFormatterXml.configureExternalDependencies(xmlProvider.asNode());
         });
@@ -76,7 +77,8 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
             return;
         }
         project.getGradle().projectsEvaluated(gradle -> {
-            List<URI> uris = implConfiguration.getFiles().stream().map(File::toURI).collect(Collectors.toList());
+            List<URI> uris =
+                    implConfiguration.getFiles().stream().map(File::toURI).collect(Collectors.toList());
 
             createOrUpdateIdeaXmlFile(project.file(".idea/palantir-java-format.xml"), node ->
                     ConfigureJavaFormatterXml.configureJavaFormat(node, uris));

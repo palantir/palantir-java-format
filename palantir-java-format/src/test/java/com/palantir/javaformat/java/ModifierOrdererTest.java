@@ -31,13 +31,15 @@ public class ModifierOrdererTest {
 
     @Test
     public void simple() throws FormatterException {
-        assertThat(ModifierOrderer.reorderModifiers("static abstract class InnerClass {}").getText())
+        assertThat(ModifierOrderer.reorderModifiers("static abstract class InnerClass {}")
+                        .getText())
                 .isEqualTo("abstract static class InnerClass {}");
     }
 
     @Test
     public void comment() throws FormatterException {
-        assertThat(ModifierOrderer.reorderModifiers("static/*1*/abstract/*2*/public").getText())
+        assertThat(ModifierOrderer.reorderModifiers("static/*1*/abstract/*2*/public")
+                        .getText())
                 .isEqualTo("public/*1*/abstract/*2*/static");
     }
 

@@ -42,9 +42,9 @@ final class JavadocWriter {
     private final int maxLineLength;
     private final StringBuilder output = new StringBuilder();
     /**
-     * Whether we are inside an {@code <li>} element, excluding the case in which the {@code <li>} contains a {@code
-     * <ul>} or {@code <ol>} that we are also inside -- unless of course we're inside an {@code <li>} element in that
-     * inner list :)
+     * Whether we are inside an {@code <li>} element, excluding the case in which the {@code <li>} contains a
+     * {@code <ul>} or {@code <ol>} that we are also inside -- unless of course we're inside an {@code <li>} element in
+     * that inner list :)
      */
     private boolean continuingListItemOfInnermostList;
 
@@ -275,8 +275,9 @@ final class JavadocWriter {
 
     /**
      * The kind of whitespace that has been requested between the previous and next tokens. The order of the values is
-     * significant: It goes from lowest priority to highest. For example, if the previous token requests {@link
-     * #BLANK_LINE} after it but the next token requests only {@link #NEWLINE} before it, we insert {@link #BLANK_LINE}.
+     * significant: It goes from lowest priority to highest. For example, if the previous token requests
+     * {@link #BLANK_LINE} after it but the next token requests only {@link #NEWLINE} before it, we insert
+     * {@link #BLANK_LINE}.
      */
     enum RequestedWhitespace {
         NONE,

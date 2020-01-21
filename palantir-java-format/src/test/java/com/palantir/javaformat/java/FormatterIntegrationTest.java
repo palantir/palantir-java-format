@@ -82,7 +82,10 @@ public class FormatterIntegrationTest {
 
     private static Formatter createFormatter() {
         return new Formatter(
-                JavaFormatterOptions.builder().style(JavaFormatterOptions.Style.PALANTIR).build(), isDebugMode());
+                JavaFormatterOptions.builder()
+                        .style(JavaFormatterOptions.Style.PALANTIR)
+                        .build(),
+                isDebugMode());
     }
 
     @TestTemplate

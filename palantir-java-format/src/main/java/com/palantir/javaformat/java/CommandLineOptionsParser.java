@@ -149,8 +149,8 @@ final class CommandLineOptionsParser {
 
     /**
      * Parse multiple --lines flags, like {"1:12,14,20:36", "40:45,50"}. Multiple ranges can be given with multiple
-     * --lines flags or separated by commas. A single line can be set by a single number. Line numbers are {@code
-     * 1}-based, but are converted to the {@code 0}-based numbering used internally by google-java-format.
+     * --lines flags or separated by commas. A single line can be set by a single number. Line numbers are
+     * {@code 1}-based, but are converted to the {@code 0}-based numbering used internally by google-java-format.
      */
     private static void parseRangeSet(ImmutableRangeSet.Builder<Integer> result, String ranges) {
         for (String range : COMMA_SPLITTER.split(ranges)) {
@@ -159,8 +159,8 @@ final class CommandLineOptionsParser {
     }
 
     /**
-     * Parse a range, as in "1:12" or "42". Line numbers provided are {@code 1}-based, but are converted here to {@code
-     * 0}-based.
+     * Parse a range, as in "1:12" or "42". Line numbers provided are {@code 1}-based, but are converted here to
+     * {@code 0}-based.
      */
     private static Range<Integer> parseRange(String arg) {
         List<String> args = COLON_SPLITTER.splitToList(arg);

@@ -387,7 +387,10 @@ public class MainTest {
         Main main = new Main(new PrintWriter(out, true), new PrintWriter(err, true), System.in);
 
         int exitCode = main.format(
-                "", a.toAbsolutePath().toString(), c.toAbsolutePath().toString(), b.toAbsolutePath().toString());
+                "",
+                a.toAbsolutePath().toString(),
+                c.toAbsolutePath().toString(),
+                b.toAbsolutePath().toString());
 
         // Formatter returns failure if a file was not present.
         assertThat(exitCode).isEqualTo(1);

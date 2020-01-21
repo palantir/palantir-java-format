@@ -6,6 +6,7 @@ buildscript {
     }
 
     dependencies {
+        classpath 'com.palantir.javaformat:gradle-palantir-java-format:0.3.14'
         classpath 'com.palantir.gradle.revapi:gradle-revapi:1.1.3'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
         classpath 'com.netflix.nebula:nebula-publishing-plugin:14.1.1'
@@ -28,6 +29,7 @@ apply plugin: 'com.palantir.consistent-versions'
 version System.env.CIRCLE_TAG ?: gitVersion()
 
 allprojects {
+    apply plugin: 'com.palantir.java-format'
     group = 'com.palantir.javaformat'
     version = rootProject.version
 

@@ -85,7 +85,9 @@ final class FormatDiff {
                     Matcher hunk = HUNK.matcher(singleFileDiff);
                     while (hunk.find()) {
                         int firstLineOfHunk = Integer.parseInt(hunk.group("startLineOneIndexed")) - 1;
-                        int hunkLength = Optional.ofNullable(hunk.group("numLines")).map(Integer::parseInt).orElse(1);
+                        int hunkLength = Optional.ofNullable(hunk.group("numLines"))
+                                .map(Integer::parseInt)
+                                .orElse(1);
                         Range<Integer> rangeZeroIndexed =
                                 Range.closedOpen(firstLineOfHunk, firstLineOfHunk + hunkLength);
                         lineRanges.add(rangeZeroIndexed);
@@ -120,7 +122,8 @@ final class FormatDiff {
 
     private static String gitDiff(Path dir) throws IOException, InterruptedException {
         // TODO(dfox): this does nothing if working dir is clean - maybe use HEAD^ to format prev commit?
-        return gitCommand(dir, "git", "diff", "-U0", "HEAD", dir.toAbsolutePath().toString());
+        return gitCommand(
+                dir, "git", "diff", "-U0", "HEAD", dir.toAbsolutePath().toString());
     }
 
     private static Path gitTopLevelDir(Path dir) throws IOException, InterruptedException {
@@ -128,7 +131,8 @@ final class FormatDiff {
     }
 
     private static String gitCommand(Path dir, String... args) throws IOException, InterruptedException {
-        Process process = new ProcessBuilder().command(args).directory(dir.toFile()).start();
+        Process process =
+                new ProcessBuilder().command(args).directory(dir.toFile()).start();
 
         Preconditions.checkState(process.waitFor(10, TimeUnit.SECONDS), "git diff took too long to terminate");
         Preconditions.checkState(process.exitValue() == 0, "Expected return code of 0");
@@ -140,7 +144,8 @@ final class FormatDiff {
 
     private static String applyReplacements(String input, Collection<Replacement> replacementsCollection) {
         List<Replacement> replacements = new ArrayList<>(replacementsCollection);
-        replacements.sort(comparing((Replacement r) -> r.getReplaceRange().lowerEndpoint()).reversed());
+        replacements.sort(comparing((Replacement r) -> r.getReplaceRange().lowerEndpoint())
+                .reversed());
         StringBuilder writer = new StringBuilder(input);
         for (Replacement replacement : replacements) {
             writer.replace(
@@ -158,7 +163,8 @@ final class FormatDiff {
         lines.add(input.length() + 1);
 
         final RangeSet<Integer> characterRanges = TreeRangeSet.create();
-        for (Range<Integer> lineRange : lineRanges.subRangeSet(Range.closedOpen(0, lines.size() - 1)).asRanges()) {
+        for (Range<Integer> lineRange :
+                lineRanges.subRangeSet(Range.closedOpen(0, lines.size() - 1)).asRanges()) {
             int lineStart = lines.get(lineRange.lowerEndpoint());
             // Exclude the trailing newline. This isn't strictly necessary, but handling blank lines
             // as empty ranges is convenient.

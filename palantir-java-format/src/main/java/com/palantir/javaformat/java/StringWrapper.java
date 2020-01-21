@@ -72,7 +72,8 @@ public final class StringWrapper {
         }
 
         TreeRangeMap<Integer, String> replacements = getReflowReplacements(columnLimit, input);
-        String firstPass = formatter.formatSource(input, replacements.asMapOfRanges().keySet());
+        String firstPass =
+                formatter.formatSource(input, replacements.asMapOfRanges().keySet());
 
         if (!firstPass.equals(input)) {
             // If formatting the replacement ranges resulted in a change, recalculate the replacements on
@@ -301,7 +302,8 @@ public final class StringWrapper {
             if (input.stream().mapToInt(x -> x.length()).sum() <= width) {
                 width -= trailing;
             }
-            while (!input.isEmpty() && (length <= 4 || (length + input.peekFirst().length()) < width)) {
+            while (!input.isEmpty()
+                    && (length <= 4 || (length + input.peekFirst().length()) < width)) {
                 String text = input.removeFirst();
                 line.add(text);
                 length += text.length();
@@ -385,7 +387,8 @@ public final class StringWrapper {
                 input.subSequence(getEndPosition(unit, one), getStartPosition(two)));
     }
 
-    public static final CharMatcher STRING_CONCAT_DELIMITER = CharMatcher.whitespace().or(CharMatcher.anyOf("\"+"));
+    public static final CharMatcher STRING_CONCAT_DELIMITER =
+            CharMatcher.whitespace().or(CharMatcher.anyOf("\"+"));
 
     private static int getEndPosition(JCTree.JCCompilationUnit unit, Tree tree) {
         return ((JCTree) tree).getEndPosition(unit.endPositions);

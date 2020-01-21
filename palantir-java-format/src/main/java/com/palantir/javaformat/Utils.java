@@ -33,7 +33,8 @@ public final class Utils {
 
     public static String applyReplacements(String input, Collection<Replacement> replacementsCollection) {
         List<Replacement> replacements = new ArrayList<>(replacementsCollection);
-        replacements.sort(comparing((Replacement r) -> r.getReplaceRange().lowerEndpoint()).reversed());
+        replacements.sort(comparing((Replacement r) -> r.getReplaceRange().lowerEndpoint())
+                .reversed());
         StringBuilder writer = new StringBuilder(input);
         for (Replacement replacement : replacements) {
             writer.replace(
@@ -51,7 +52,8 @@ public final class Utils {
         lines.add(input.length() + 1);
 
         final RangeSet<Integer> characterRanges = TreeRangeSet.create();
-        for (Range<Integer> lineRange : lineRanges.subRangeSet(Range.closedOpen(0, lines.size() - 1)).asRanges()) {
+        for (Range<Integer> lineRange :
+                lineRanges.subRangeSet(Range.closedOpen(0, lines.size() - 1)).asRanges()) {
             int lineStart = lines.get(lineRange.lowerEndpoint());
             // Exclude the trailing newline. This isn't strictly necessary, but handling blank lines
             // as empty ranges is convenient.

@@ -90,7 +90,11 @@ class JavacTokens {
                     if (last < c.getSourcePos(0)) {
                         tokens.add(new RawTok(null, null, last, c.getSourcePos(0)));
                     }
-                    tokens.add(new RawTok(null, null, c.getSourcePos(0), c.getSourcePos(0) + c.getText().length()));
+                    tokens.add(new RawTok(
+                            null,
+                            null,
+                            c.getSourcePos(0),
+                            c.getSourcePos(0) + c.getText().length()));
                     last = c.getSourcePos(0) + c.getText().length();
                 }
             }

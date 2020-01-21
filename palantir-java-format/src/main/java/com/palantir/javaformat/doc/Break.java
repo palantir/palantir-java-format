@@ -130,7 +130,8 @@ public abstract class Break extends Doc implements Op {
     }
 
     public State computeBreaks(State stateIn, boolean broken) {
-        State state = optTag().map(breakTag -> stateIn.breakTaken(breakTag, broken)).orElse(stateIn);
+        State state =
+                optTag().map(breakTag -> stateIn.breakTaken(breakTag, broken)).orElse(stateIn);
         return state.withBreak(this, broken);
     }
 

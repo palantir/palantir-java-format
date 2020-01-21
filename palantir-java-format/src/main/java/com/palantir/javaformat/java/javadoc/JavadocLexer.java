@@ -253,8 +253,8 @@ final class JavadocLexer {
     /**
      * Join together adjacent literal tokens, and join together adjacent whitespace tokens.
      *
-     * <p>For literal tokens, this means something like {@code ["<b>", "foo", "</b>"] => ["<b>foo</b>"]}. See {@link
-     * #LITERAL_PATTERN} for discussion of why those tokens are separate to begin with.
+     * <p>For literal tokens, this means something like {@code ["<b>", "foo", "</b>"] => ["<b>foo</b>"]}. See
+     * {@link #LITERAL_PATTERN} for discussion of why those tokens are separate to begin with.
      *
      * <p>Whitespace tokens are treated analogously. We don't really "want" to join whitespace tokens, but in the course
      * of joining literals, we incidentally join whitespace, too. We do take advantage of the joining later on: It
@@ -353,7 +353,8 @@ final class JavadocLexer {
             if (tokens.peek().getType() == LITERAL) {
                 output.add(tokens.next());
 
-                if (tokens.peek().getType() == WHITESPACE && hasMultipleNewlines(tokens.peek().getValue())) {
+                if (tokens.peek().getType() == WHITESPACE
+                        && hasMultipleNewlines(tokens.peek().getValue())) {
                     output.add(tokens.next());
 
                     if (tokens.peek().getType() == LITERAL) {
@@ -459,7 +460,8 @@ final class JavadocLexer {
         if (last.getType() == LITERAL && last.getValue().endsWith("}")) {
             saved.removeLast();
             if (last.length() > 1) {
-                saved.addLast(new Token(LITERAL, last.getValue().substring(0, last.getValue().length() - 1)));
+                saved.addLast(new Token(
+                        LITERAL, last.getValue().substring(0, last.getValue().length() - 1)));
                 saved.addLast(new Token(FORCED_NEWLINE, null));
             }
             trailingBrace = true;

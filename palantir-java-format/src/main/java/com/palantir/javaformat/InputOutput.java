@@ -83,8 +83,8 @@ public abstract class InputOutput {
      * Given an {@code InputOutput}, compute the map from tok indices to line ranges.
      *
      * @param put the {@code InputOutput}
-     * @return the map from {@code com.google.googlejavaformat.java.JavaInput.Tok} indices to line ranges in this {@code
-     *     put}
+     * @return the map from {@code com.google.googlejavaformat.java.JavaInput.Tok} indices to line ranges in this
+     *     {@code put}
      */
     public static Map<Integer, Range<Integer>> makeKToIJ(InputOutput put) {
         Map<Integer, Range<Integer>> map = new HashMap<>();

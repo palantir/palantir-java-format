@@ -96,8 +96,10 @@ public final class ParameterizedClass implements TestTemplateInvocationContextPr
         // we cache the result of our @Parameters in the 'parent' so it can be reused by other @TestTemplate methods
         ExtensionContext parent = extensionContext.getParent().get();
 
-        List<Object[]> objectArrayArray = invokeUserParametersMethod(parent, parent.getTestClass().get());
-        String stringFormatTemplate = findStringFormatTemplate(parent, parent.getTestClass().get());
+        List<Object[]> objectArrayArray =
+                invokeUserParametersMethod(parent, parent.getTestClass().get());
+        String stringFormatTemplate =
+                findStringFormatTemplate(parent, parent.getTestClass().get());
 
         return objectArrayArray.stream().map(objectArray -> new TestTemplateInvocationContext() {
             @Override
@@ -151,7 +153,8 @@ public final class ParameterizedClass implements TestTemplateInvocationContextPr
 
             Object testClassInstance = context.getTestInstance().get();
             for (Field annotatedField : annotatedFields) {
-                Parameter parameter = AnnotationUtils.findAnnotation(annotatedField, Parameter.class).get();
+                Parameter parameter = AnnotationUtils.findAnnotation(annotatedField, Parameter.class)
+                        .get();
                 int indexIntoArray = parameter.value();
                 annotatedField.set(testClassInstance, objectArray[indexIntoArray]);
             }
