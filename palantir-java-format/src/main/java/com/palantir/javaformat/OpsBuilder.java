@@ -229,8 +229,8 @@ public final class OpsBuilder {
             if (tokenI < tokensN && inputPosition > tokens.get(tokenI).getTok().getPosition()) {
                 // Found a missing input token. Insert it and mark it missing (usually not good).
                 Input.Token token = tokens.get(tokenI++);
-                throw new FormattingError(
-                        diagnostic(String.format("did not generate token \"%s\"", token.getTok().getText())));
+                throw new FormattingError(diagnostic(String.format(
+                        "did not generate token \"%s\"", token.getTok().getText())));
             }
         }
     }
@@ -241,7 +241,8 @@ public final class OpsBuilder {
         if (inputPosition > this.inputPosition) {
             ImmutableList<? extends Input.Token> tokens = input.getTokens();
             int tokensN = tokens.size();
-            while (tokenI < tokensN && inputPosition > tokens.get(tokenI).getTok().getPosition()) {
+            while (tokenI < tokensN
+                    && inputPosition > tokens.get(tokenI).getTok().getPosition()) {
                 Input.Token token = tokens.get(tokenI++);
                 add(Token.make(
                         token,
@@ -337,8 +338,9 @@ public final class OpsBuilder {
              * (for example) we're guessing at an optional token.
              */
             if (realOrImaginary == Token.RealOrImaginary.REAL) {
-                throw new FormattingError(diagnostic(
-                        String.format("expected token: '%s'; generated %s instead", peekToken().orElse(null), token)));
+                throw new FormattingError(diagnostic(String.format(
+                        "expected token: '%s'; generated %s instead",
+                        peekToken().orElse(null), token)));
             }
         }
     }

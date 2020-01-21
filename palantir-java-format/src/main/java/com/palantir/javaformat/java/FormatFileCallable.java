@@ -73,7 +73,8 @@ class FormatFileCallable implements Callable<String> {
                 // 0 stands for "format the line under the cursor"
                 length = 1;
             }
-            characterRanges.add(Range.closedOpen(parameters.offsets().get(i), parameters.offsets().get(i) + length));
+            characterRanges.add(Range.closedOpen(
+                    parameters.offsets().get(i), parameters.offsets().get(i) + length));
         }
 
         return characterRanges;

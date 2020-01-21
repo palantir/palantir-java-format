@@ -230,7 +230,8 @@ public final class JavaOutput extends Output {
                 }
             }
 
-            int replaceTo = Math.min(endTok.getPosition() + endTok.length(), javaInput.getText().length());
+            int replaceTo = Math.min(
+                    endTok.getPosition() + endTok.length(), javaInput.getText().length());
             // If the formatted ranged ended in the trailing trivia of the last token before EOF,
             // format all the way up to EOF to deal with trailing whitespace correctly.
             if (endTok.getIndex() == javaInput.getkN() - 1) {

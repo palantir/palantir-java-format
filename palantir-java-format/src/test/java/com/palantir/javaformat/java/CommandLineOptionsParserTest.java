@@ -84,7 +84,8 @@ public class CommandLineOptionsParserTest {
 
     @Test
     public void lengths() {
-        assertThat(CommandLineOptionsParser.parse(Arrays.asList("-length", "1", "--length", "2")).lengths())
+        assertThat(CommandLineOptionsParser.parse(Arrays.asList("-length", "1", "--length", "2"))
+                        .lengths())
                 .containsExactly(1, 2);
     }
 
@@ -103,7 +104,8 @@ public class CommandLineOptionsParserTest {
 
     @Test
     public void offset() {
-        assertThat(CommandLineOptionsParser.parse(Arrays.asList("-offset", "1", "--offset", "2")).offsets())
+        assertThat(CommandLineOptionsParser.parse(Arrays.asList("-offset", "1", "--offset", "2"))
+                        .offsets())
                 .containsExactly(1, 2);
     }
 
@@ -121,7 +123,8 @@ public class CommandLineOptionsParserTest {
 
     @Test
     public void skipSortingImports() {
-        assertThat(CommandLineOptionsParser.parse(Arrays.asList("--skip-sorting-imports")).sortImports())
+        assertThat(CommandLineOptionsParser.parse(Arrays.asList("--skip-sorting-imports"))
+                        .sortImports())
                 .isFalse();
     }
 
@@ -141,7 +144,8 @@ public class CommandLineOptionsParserTest {
 
     @Test
     public void setExitIfChanged() {
-        assertThat(CommandLineOptionsParser.parse(Arrays.asList("--set-exit-if-changed")).setExitIfChanged())
+        assertThat(CommandLineOptionsParser.parse(Arrays.asList("--set-exit-if-changed"))
+                        .setExitIfChanged())
                 .isTrue();
     }
 
@@ -174,7 +178,8 @@ public class CommandLineOptionsParserTest {
 
     @Test
     public void assumeFilename() {
-        assertThat(CommandLineOptionsParser.parse(Arrays.asList("--assume-filename", "Foo.java")).assumeFilename())
+        assertThat(CommandLineOptionsParser.parse(Arrays.asList("--assume-filename", "Foo.java"))
+                        .assumeFilename())
                 .hasValue("Foo.java");
         assertThat(CommandLineOptionsParser.parse(Arrays.asList("Foo.java")).assumeFilename())
                 .isEmpty();
@@ -182,7 +187,8 @@ public class CommandLineOptionsParserTest {
 
     @Test
     public void skipReflowLongStrings() {
-        assertThat(CommandLineOptionsParser.parse(Arrays.asList("--skip-reflowing-long-strings")).reflowLongStrings())
+        assertThat(CommandLineOptionsParser.parse(Arrays.asList("--skip-reflowing-long-strings"))
+                        .reflowLongStrings())
                 .isFalse();
     }
 }

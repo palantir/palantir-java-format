@@ -111,7 +111,8 @@ final class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
     }
 
     private static TextRange toTextRange(Range<Integer> range) {
-        checkState(range.lowerBoundType().equals(BoundType.CLOSED) && range.upperBoundType().equals(BoundType.OPEN));
+        checkState(range.lowerBoundType().equals(BoundType.CLOSED)
+                && range.upperBoundType().equals(BoundType.OPEN));
         return new TextRange(range.lowerEndpoint(), range.upperEndpoint());
     }
 

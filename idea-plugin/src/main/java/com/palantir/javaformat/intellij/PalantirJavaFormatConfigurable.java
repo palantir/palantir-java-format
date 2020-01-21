@@ -104,8 +104,9 @@ class PalantirJavaFormatConfigurable extends BaseConfigurable implements Searcha
         enable.setSelected(settings.isEnabled());
         styleComboBox.setSelectedItem(UiFormatterStyle.convert(settings.getStyle()));
         pluginVersion.setText(PalantirJavaFormatConfigurable.class.getPackage().getImplementationVersion());
-        formatterVersion.setText(
-                settings.getImplementationClassPath().map(this::computeFormatterVersion).orElse("(bundled)"));
+        formatterVersion.setText(settings.getImplementationClassPath()
+                .map(this::computeFormatterVersion)
+                .orElse("(bundled)"));
     }
 
     private String computeFormatterVersion(List<URI> implementationClassPath) {

@@ -26,7 +26,8 @@ import java.util.List;
 
 /** A {@code DocBuilder} converts a sequence of {@link Op}s into a {@link Doc}. */
 public final class DocBuilder {
-    private final Level base = Level.make(OpenOp.builder().plusIndent(Indent.Const.ZERO).debugName("root").build());
+    private final Level base = Level.make(
+            OpenOp.builder().plusIndent(Indent.Const.ZERO).debugName("root").build());
     private final ArrayDeque<Level> stack = new ArrayDeque<>();
 
     /**
@@ -34,8 +35,8 @@ public final class DocBuilder {
      *
      * <p>Processing {@link Doc}s presents a subtle problem. Suppose we have a {@link Doc} for to an assignment node,
      * {@code a = b}, with an optional {@link Break} following the {@code =}. Suppose we have 5 characters to write it,
-     * so that we think we don't need the break. Unfortunately, this {@link Doc} lies in an expression statement {@link
-     * Doc} for the statement {@code a = b;} and this statement does not fit in 3 characters. This is why many
+     * so that we think we don't need the break. Unfortunately, this {@link Doc} lies in an expression statement
+     * {@link Doc} for the statement {@code a = b;} and this statement does not fit in 3 characters. This is why many
      * formatters sometimes emit lines that are too long, or cheat by using a narrower line length to avoid such
      * problems.
      *

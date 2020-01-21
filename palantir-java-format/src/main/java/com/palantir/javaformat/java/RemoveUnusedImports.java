@@ -145,7 +145,8 @@ public class RemoveUnusedImports {
             @Override
             public Void visitReference(ReferenceTree referenceTree, Void unused) {
                 DCReference reference = (DCReference) referenceTree;
-                long basePos = reference.getSourcePosition((DCTree.DCDocComment) getCurrentPath().getDocComment());
+                long basePos = reference.getSourcePosition(
+                        (DCTree.DCDocComment) getCurrentPath().getDocComment());
                 // the position of trees inside the reference node aren't stored, but the qualifier's
                 // start position is the beginning of the reference node
                 if (reference.qualifierExpression != null) {
@@ -175,7 +176,9 @@ public class RemoveUnusedImports {
                     usedInJavadoc.put(
                             node.getName().toString(),
                             basePos != -1
-                                    ? Range.closedOpen((int) basePos, (int) basePos + node.getName().length())
+                                    ? Range.closedOpen(
+                                            (int) basePos,
+                                            (int) basePos + node.getName().length())
                                     : null);
                     return super.visitIdentifier(node, aVoid);
                 }
@@ -271,7 +274,9 @@ public class RemoveUnusedImports {
             Multimap<String, Range<Integer>> usedInJavadoc,
             JCImport importTree,
             String simpleName) {
-        String qualifier = ((JCFieldAccess) importTree.getQualifiedIdentifier()).getExpression().toString();
+        String qualifier = ((JCFieldAccess) importTree.getQualifiedIdentifier())
+                .getExpression()
+                .toString();
         if (qualifier.equals("java.lang")) {
             return true;
         }
@@ -305,7 +310,8 @@ public class RemoveUnusedImports {
         // be applied in descending order without adjusting offsets.
         StringBuilder sb = new StringBuilder(source);
         int offset = 0;
-        for (Map.Entry<Range<Integer>, String> replacement : replacements.asMapOfRanges().entrySet()) {
+        for (Map.Entry<Range<Integer>, String> replacement :
+                replacements.asMapOfRanges().entrySet()) {
             Range<Integer> range = replacement.getKey();
             String replaceWith = replacement.getValue();
             int start = offset + range.lowerEndpoint();

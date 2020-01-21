@@ -59,11 +59,11 @@ import org.openjdk.tools.javac.util.Log.DeferredDiagnosticHandler;
 public final class JavaInput extends Input {
     /**
      * A {@code JavaInput} is a sequence of {@link Tok}s that cover the Java input. A {@link Tok} is either a token (if
-     * {@code isToken()}), or a non-token, which is a comment (if {@code isComment()}) or a newline (if {@code
-     * isNewline()}) or a maximal sequence of other whitespace characters (if {@code isSpaces()}). Each {@link Tok}
-     * contains a sequence of characters, an index (sequential starting at {@code 0} for tokens and comments, else
-     * {@code -1}), and a ({@code 0}-origin) position in the input. The concatenation of the texts of all the {@link
-     * Tok}s equals the input. Each Input ends with a token EOF {@link Tok}, with empty text.
+     * {@code isToken()}), or a non-token, which is a comment (if {@code isComment()}) or a newline (if
+     * {@code isNewline()}) or a maximal sequence of other whitespace characters (if {@code isSpaces()}). Each
+     * {@link Tok} contains a sequence of characters, an index (sequential starting at {@code 0} for tokens and
+     * comments, else {@code -1}), and a ({@code 0}-origin) position in the input. The concatenation of the texts of all
+     * the {@link Tok}s equals the input. Each Input ends with a token EOF {@link Tok}, with empty text.
      *
      * <p>A {@code /*} comment possibly contains newlines; a {@code //} comment does not contain the terminating newline
      * character, but is followed by a newline {@link Tok}.
@@ -177,9 +177,9 @@ public final class JavaInput extends Input {
     /**
      * A {@link Token} contains a token {@link Tok} and its associated non-tokens; each non-token {@link Tok} belongs to
      * one {@link Token}. Each {@link Token} has an immutable list of its non-tokens that appear before it, and another
-     * list of its non-tokens that appear after it. The concatenation of the texts of all the {@link Token}s' {@link
-     * Tok}s, each preceded by the texts of its {@code toksBefore} and followed by the texts of its {@code toksAfter},
-     * equals the input.
+     * list of its non-tokens that appear after it. The concatenation of the texts of all the {@link Token}s'
+     * {@link Tok}s, each preceded by the texts of its {@code toksBefore} and followed by the texts of its
+     * {@code toksAfter}, equals the input.
      */
     @Immutable
     static final class Token implements Input.Token {
@@ -344,7 +344,10 @@ public final class JavaInput extends Input {
      *     will include tokens up to but not including that token.
      */
     static ImmutableList<Tok> buildToks(String text, ImmutableSet<TokenKind> stopTokens) throws FormatterException {
-        stopTokens = ImmutableSet.<TokenKind>builder().addAll(stopTokens).add(TokenKind.EOF).build();
+        stopTokens = ImmutableSet.<TokenKind>builder()
+                .addAll(stopTokens)
+                .add(TokenKind.EOF)
+                .build();
         Context context = new Context();
         new JavacFileManager(context, true, UTF_8);
         DiagnosticCollector<JavaFileObject> diagnosticCollector = new DiagnosticCollector<>();
@@ -569,7 +572,8 @@ public final class JavaInput extends Input {
             return EMPTY_RANGE;
         }
         return Range.closedOpen(
-                enclosed.iterator().next().getTok().getIndex(), getLast(enclosed).getTok().getIndex() + 1);
+                enclosed.iterator().next().getTok().getIndex(),
+                getLast(enclosed).getTok().getIndex() + 1);
     }
 
     /**

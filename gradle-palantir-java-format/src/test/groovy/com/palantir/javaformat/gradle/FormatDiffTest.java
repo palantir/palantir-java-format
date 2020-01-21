@@ -83,7 +83,8 @@ class FormatDiffTest {
     }
 
     private void runCommandInRepo(String... args) throws IOException, InterruptedException {
-        Process process = new ProcessBuilder().command(args).directory(repo.toFile()).start();
+        Process process =
+                new ProcessBuilder().command(args).directory(repo.toFile()).start();
 
         Preconditions.checkState(process.waitFor(10, TimeUnit.SECONDS), "git diff took too long to terminate");
 

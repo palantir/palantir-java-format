@@ -43,7 +43,8 @@ public final class PalantirJavaFormatProviderPlugin implements Plugin<Project> {
                         .create(ImmutableMap.of(
                                 "group", "com.palantir.javaformat",
                                 "name", "palantir-java-format",
-                                "version", JavaFormatExtension.class.getPackage().getImplementationVersion())));
+                                "version",
+                                        JavaFormatExtension.class.getPackage().getImplementationVersion())));
             });
         });
 

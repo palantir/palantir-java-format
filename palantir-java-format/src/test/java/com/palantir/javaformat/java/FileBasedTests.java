@@ -36,7 +36,8 @@ public final class FileBasedTests {
     }
 
     public FileBasedTests(Class<?> testClass, String testDirName) {
-        this.resourcePrefix = Paths.get(testClass.getPackage().getName().replace('.', '/')).resolve(testDirName);
+        this.resourcePrefix =
+                Paths.get(testClass.getPackage().getName().replace('.', '/')).resolve(testDirName);
         this.testClass = testClass;
         this.fullTestPath = Paths.get("src/test/resources").resolve(resourcePrefix);
     }
