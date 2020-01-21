@@ -134,7 +134,7 @@ final class FormatDiff {
         Process process =
                 new ProcessBuilder().command(args).directory(dir.toFile()).start();
 
-        Preconditions.checkState(process.waitFor(10, TimeUnit.SECONDS), "git diff took too long to terminate");
+        Preconditions.checkState(process.waitFor(30, TimeUnit.SECONDS), "git diff took too long to terminate");
         Preconditions.checkState(process.exitValue() == 0, "Expected return code of 0");
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
