@@ -98,6 +98,29 @@ private static GradleException notFound(String group, String name, Configuration
 }
 ```
 
+## com.palantir.java-format gradle plugin
+
+You should apply this plugin to all projects where you want your java code formatted, e.g.
+
+```groovy
+buildscript {
+    dependencies {
+        classpath 'com.palantir.javaformat:gradle-palantir-java-format:<version>'
+    }
+}
+allprojects {
+    apply plugin: 'com.palantir.java-format'
+}
+```
+
+Applying this automatically configures IntelliJ, whether you run `./gradlew idea`
+or import the project directly from IntelliJ, to use the correct version of the formatter
+when formatting java code.
+
+If using [com.palantir.baseline-idea](https://plugins.gradle.org/plugin/com.palantir.baseline-idea)
+in conjunction with this plugin, the Save Actions IntelliJ plugin will be recommended
+and automatically configured to auto-format all your java source files on save.
+
 ## IntelliJ plugin
 
 A
@@ -106,13 +129,16 @@ is available from the plugin repository. To install it, go to your IDE's
 settings and select the `Plugins` category. Click the `Marketplace` tab, search
 for the `palantir-java-format` plugin, and click the `Install` button.
 
-The plugin will be enabled by default. To disable it in the current project, go
+The plugin will be disabled by default on new projects, but as mentioned [above](#com.palantir.java-format-gradle-plugin), 
+if using the `com.palantir.java-format` gradle plugin, it will be recommended 
+in IntelliJ, and automatically configured.
+
+To manually enable it in the current project, go
 to `File→Settings...→palantir-java-format Settings` (or `IntelliJ
 IDEA→Preferences...→Other Settings→palantir-java-format Settings` on macOS) and
-check the `Enable palantir-java-format` checkbox. (A notification will be
-presented when you first open a project offering to do this for you.)
+check the `Enable palantir-java-format` checkbox.
 
-To disable it by default in new projects, use `File→Other Settings→Default
+To enable it by default in new projects, use `File→Other Settings→Default
 Settings...`.
 
 When enabled, it will replace the normal `Reformat Code` action, which can be
