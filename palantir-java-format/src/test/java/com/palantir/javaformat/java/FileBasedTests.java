@@ -72,7 +72,7 @@ public final class FileBasedTests {
         }
         List<Object[]> testInputs = new ArrayList<>();
         if (!isRecreate()) {
-            assertThat(outputs).describedAs("unmatched inputs and outputs").hasSize(inputs.size());
+            assertThat(outputs).describedAs("unmatched inputs and outputs").hasSameSizeAs(inputs);
         }
         for (Map.Entry<String, String> entry : inputs.entrySet()) {
             String fileName = entry.getKey();
