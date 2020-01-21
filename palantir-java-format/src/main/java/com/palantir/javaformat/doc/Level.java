@@ -458,7 +458,7 @@ public final class Level extends Doc {
     }
 
     /** Lay out a Break-separated group of Docs in the current Level. */
-    private static State computeBreakAndSplit(
+    private State computeBreakAndSplit(
             CommentsHelper commentsHelper,
             int maxWidth,
             State state,
@@ -467,9 +467,12 @@ public final class Level extends Doc {
             Obs.ExplorationNode explorationNode) {
         float breakWidth = optBreakDoc.isPresent() ? optBreakDoc.get().getWidth() : 0.0F;
         float splitWidth = getWidth(split);
+
         boolean shouldBreak = (optBreakDoc.isPresent() && optBreakDoc.get().fillMode() == FillMode.UNIFIED)
                 || state.mustBreak()
-                || state.column() + breakWidth + splitWidth > maxWidth;
+                || Double.isInfinite(breakWidth)
+                || !tryToFitOnOneLine(maxWidth, state.withColumn(state.column() + (int) breakWidth), split)
+                        .isPresent();
 
         if (optBreakDoc.isPresent()) {
             state = optBreakDoc.get().computeBreaks(state, shouldBreak);

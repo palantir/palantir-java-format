@@ -1,0 +1,6 @@
+class PalantirChainNextLine {
+    void foo() {
+        Iterator<Map.Entry<ThingId, DelegateOtherThing>> delegateIterator =
+                delegates.entrySet().iterator();
+    }
+}

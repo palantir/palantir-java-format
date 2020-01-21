@@ -1,0 +1,8 @@
+type: fix
+fix:
+  description: 'Method chains in initializers may once again be laid onto a single
+    next line, if they are short enough. This fixes a regression from #123 (0.3.11)
+    where the column limit for method chains would prevent us from attempting to put
+    the initializer on the 2nd line first and see if that works.'
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/138
