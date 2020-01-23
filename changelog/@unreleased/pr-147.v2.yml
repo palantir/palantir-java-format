@@ -1,0 +1,7 @@
+type: improvement
+improvement:
+  description: More strictly control when we can inline a chunk of code followed by
+    an expression lambda, to avoid pathological cases with a very simple expression
+    being split onto the next line.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/147
