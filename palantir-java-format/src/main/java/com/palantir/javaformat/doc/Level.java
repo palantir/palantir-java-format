@@ -28,6 +28,7 @@ import com.palantir.javaformat.CommentsHelper;
 import com.palantir.javaformat.Indent;
 import com.palantir.javaformat.LastLevelBreakability;
 import com.palantir.javaformat.OpenOp;
+import com.palantir.javaformat.OpenOp.Complexity;
 import com.palantir.javaformat.Output;
 import com.palantir.javaformat.PartialInlineability;
 import com.palantir.javaformat.doc.Obs.Exploration;
@@ -309,7 +310,9 @@ public final class Level extends Doc {
 
         SplitsBreaks prefixSplitsBreaks = splitByBreaks(leadingDocs);
 
-        boolean isSimpleInlining = isSimpleInliningSoFar && Level.this.openOp.isSimple();
+        boolean isSimpleInlining = isSimpleInliningSoFar
+                        && Level.this.openOp.complexity() == Complexity.SIMPLE_IF_CURRENT_INLINE_CHAIN_IS_SIMPLE
+                || Level.this.openOp.complexity() == Complexity.FORCE_SIMPLE;
 
         State state1 = tryToLayOutLevelOnOneLine(commentsHelper, maxWidth, state, prefixSplitsBreaks, explorationNode);
         // If a break was still forced somehow even though we could fit the leadingWidth, then abort.
