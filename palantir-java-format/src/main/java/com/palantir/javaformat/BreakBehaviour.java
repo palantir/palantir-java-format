@@ -61,7 +61,7 @@ public abstract class BreakBehaviour {
                         }
                         return null;
                     })
-                    .preferBreakingLastInnerLevel((keepIndentWhenInlined) -> {
+                    .preferBreakingLastInnerLevel(keepIndentWhenInlined -> {
                         try {
                             gen.writeObjectField("type", "preferBreakingLastInnerLevel");
                             gen.writeObjectField("keepIndentWhenInlined", keepIndentWhenInlined);
@@ -70,7 +70,7 @@ public abstract class BreakBehaviour {
                         }
                         return null;
                     })
-                    .breakOnlyIfInnerLevelsThenFitOnOneLine((keepIndentWhenInlined) -> {
+                    .breakOnlyIfInnerLevelsThenFitOnOneLine(keepIndentWhenInlined -> {
                         try {
                             gen.writeObjectField("type", "breakOnlyIfInnerLevelsThenFitOnOneLine");
                             gen.writeObjectField("keepIndentWhenInlined", keepIndentWhenInlined);
