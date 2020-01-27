@@ -41,13 +41,10 @@ public final class JavaCommentsHelper implements CommentsHelper {
 
     @Override
     public String rewrite(Tok tok, int maxWidth, int column0) {
-        if (!tok.isComment()) {
+        if (!tok.isComment() || tok.isJavadocComment()) {
             return tok.getOriginalText();
         }
         String text = tok.getOriginalText();
-        if (tok.isJavadocComment()) {
-            text = javadocFormatter.formatJavadoc(text, column0);
-        }
         List<String> lines = new ArrayList<>();
         Iterator<String> it = Newlines.lineIterator(text);
         while (it.hasNext()) {
