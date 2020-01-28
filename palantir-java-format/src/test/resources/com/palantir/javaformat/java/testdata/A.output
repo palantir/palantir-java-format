@@ -1,9 +1,9 @@
 package com.google.googlejavaformat.java.test;
 
 /**
- * Tests for AbstractTypeDeclarations, AnnotationTypeDeclarations, AnnotationTypeMemberDeclarations, Annotations,
- * AnonymousClassDeclarations, ArrayAccesses, ArrayCreations, ArrayInitializers, ArrayTypes, AssertStatements, and
- * Assignments.
+ * Tests for AbstractTypeDeclarations, AnnotationTypeDeclarations, AnnotationTypeMemberDeclarations,
+ * Annotations, AnonymousClassDeclarations, ArrayAccesses, ArrayCreations, ArrayInitializers,
+ * ArrayTypes, AssertStatements, and Assignments.
  */
 class A {
     public @interface X {

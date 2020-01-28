@@ -28,9 +28,12 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 @Execution(ExecutionMode.CONCURRENT)
 public final class JavadocFormattingTest {
 
-    private final Formatter formatter = Formatter.createFormatter(JavaFormatterOptions.builder()
-            .style(JavaFormatterOptions.Style.GOOGLE)
-            .build());
+    private final Formatter formatter = new Formatter(
+            JavaFormatterOptions.builder()
+                    .style(JavaFormatterOptions.Style.GOOGLE)
+                    .build(),
+            false,
+            JavaFormatterInternalOptions.builder().reformatJavadoc(true).build());
 
     @Test
     public void notJavadoc() {

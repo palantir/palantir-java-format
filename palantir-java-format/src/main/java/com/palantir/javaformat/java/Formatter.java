@@ -93,20 +93,26 @@ public final class Formatter {
 
     private final JavaFormatterOptions options;
     private final boolean debugMode;
+    private final JavaFormatterInternalOptions internalOptions;
 
     @VisibleForTesting
-    Formatter(JavaFormatterOptions options, boolean debugMode) {
+    Formatter(JavaFormatterOptions options, boolean debugMode, JavaFormatterInternalOptions internalOptions) {
         this.options = options;
         this.debugMode = debugMode;
+        this.internalOptions = internalOptions;
     }
 
     /** A new Formatter instance with default options. */
     public static Formatter create() {
-        return new Formatter(JavaFormatterOptions.defaultOptions(), false);
+        return new Formatter(
+                JavaFormatterOptions.defaultOptions(),
+                false,
+                JavaFormatterInternalOptions.builder().build());
     }
 
     public static Formatter createFormatter(JavaFormatterOptions options) {
-        return new Formatter(options, false);
+        return new Formatter(
+                options, false, JavaFormatterInternalOptions.builder().build());
     }
 
     /**
@@ -273,7 +279,8 @@ public final class Formatter {
         // 'de-linting' changes (e.g. import ordering).
         javaInput = ModifierOrderer.reorderModifiers(javaInput, characterRanges);
 
-        JavaCommentsHelper commentsHelper = new JavaCommentsHelper(javaInput.getLineSeparator(), options);
+        JavaCommentsHelper commentsHelper =
+                new JavaCommentsHelper(javaInput.getLineSeparator(), options, internalOptions);
         JavaOutput javaOutput;
         try {
             javaOutput = format(javaInput, options, commentsHelper, debugMode);
