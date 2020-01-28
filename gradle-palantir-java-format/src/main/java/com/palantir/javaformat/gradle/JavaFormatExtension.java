@@ -16,22 +16,30 @@
 
 package com.palantir.javaformat.gradle;
 
+import com.google.common.base.Suppliers;
 import com.google.common.collect.Iterables;
 import com.palantir.javaformat.java.FormatterService;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ServiceLoader;
+import java.util.function.Supplier;
 import org.gradle.api.artifacts.Configuration;
 
 public class JavaFormatExtension {
     private final Configuration configuration;
+    private final Supplier<FormatterService> memoizedService;
 
     public JavaFormatExtension(Configuration configuration) {
         this.configuration = configuration;
+        this.memoizedService = Suppliers.memoize(this::serviceLoadInternal);
     }
 
     public FormatterService serviceLoad() {
+        return memoizedService.get();
+    }
+
+    private FormatterService serviceLoadInternal() {
         URL[] jarUris = configuration.getFiles().stream()
                 .map(file -> {
                     try {
