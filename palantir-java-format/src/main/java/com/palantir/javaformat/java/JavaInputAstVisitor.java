@@ -688,7 +688,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 BreakBehaviours.preferBreakingLastInnerLevel(true),
                 node.getClassBody() != null
                         ? LastLevelBreakability.ACCEPT_INLINE_CHAIN
-                        : LastLevelBreakability.CHECK_INNER);￿
+                        : LastLevelBreakability.CHECK_INNER);
         if (node.getEnclosingExpression() != null) {
             scan(node.getEnclosingExpression(), null);
             builder.breakOp();
