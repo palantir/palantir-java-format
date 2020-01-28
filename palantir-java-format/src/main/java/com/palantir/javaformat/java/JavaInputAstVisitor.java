@@ -1234,7 +1234,9 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 .plusIndent(statementBody ? ZERO : plusFour)
                 .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(statementBody))
                 .breakabilityIfLastLevel(
-                        statementBody ? LastLevelBreakability.ACCEPT_INLINE_CHAIN : LastLevelBreakability.CHECK_INNER)
+                        statementBody
+                                ? LastLevelBreakability.ACCEPT_INLINE_CHAIN
+                                : LastLevelBreakability.ACCEPT_INLINE_CHAIN_IF_SIMPLE_OTHERWISE_CHECK_INNER)
                 // When doing CHECK_INNER, make the next level think that the current inlining is simple
                 .complexity(Complexity.FORCE_SIMPLE)
                 .build());

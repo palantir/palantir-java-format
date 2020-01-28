@@ -10,7 +10,7 @@ public class Foo {
     }
 
     static String baz(Optional<String> optional) {
-        return optional.orElseGet((String) () -> bar(Optional.of("some thing that is very very very looooooong"))
-                .get());
+        return optional.orElseGet((String) () ->
+                bar(Optional.of("some thing that is very very very looooooong")).get());
     }
 }
