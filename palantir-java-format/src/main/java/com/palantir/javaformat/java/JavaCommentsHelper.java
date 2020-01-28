@@ -33,18 +33,23 @@ public final class JavaCommentsHelper implements CommentsHelper {
     private final JavaFormatterOptions options;
     private final JavadocFormatter javadocFormatter;
 
-    public JavaCommentsHelper(String lineSeparator, JavaFormatterOptions options) {
+    public JavaCommentsHelper(
+            String lineSeparator, JavaFormatterOptions options, JavaFormatterInternalOptions internalOptions) {
         this.lineSeparator = lineSeparator;
         this.options = options;
-        this.javadocFormatter = new JavadocFormatter(options.maxLineLength());
+        this.javadocFormatter =
+                internalOptions.reformatJavadoc() ? new JavadocFormatter(options.maxLineLength()) : null;
     }
 
     @Override
     public String rewrite(Tok tok, int maxWidth, int column0) {
-        if (!tok.isComment() || tok.isJavadocComment()) {
+        if (!tok.isComment()) {
             return tok.getOriginalText();
         }
         String text = tok.getOriginalText();
+        if (javadocFormatter != null && tok.isJavadocComment()) {
+            text = javadocFormatter.formatJavadoc(text, column0);
+        }
         List<String> lines = new ArrayList<>();
         Iterator<String> it = Newlines.lineIterator(text);
         while (it.hasNext()) {
