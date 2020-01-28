@@ -283,8 +283,10 @@ public class MainTest {
             };
             StringWriter out = new StringWriter();
             StringWriter err = new StringWriter();
-            Main main = new Main(new PrintWriter(out, true), new PrintWriter(err, true), new ByteArrayInputStream(
-                    joiner.join(input).getBytes(UTF_8)));
+            Main main = new Main(
+                    new PrintWriter(out, true),
+                    new PrintWriter(err, true),
+                    new ByteArrayInputStream(joiner.join(input).getBytes(UTF_8)));
             assertThat(main.format("-")).isEqualTo(1);
             assertThat(err.toString()).contains("<stdin>:4:3: error: class, interface, or enum expected");
 
@@ -306,8 +308,10 @@ public class MainTest {
         };
         StringWriter out = new StringWriter();
         StringWriter err = new StringWriter();
-        Main main = new Main(new PrintWriter(out, true), new PrintWriter(err, true), new ByteArrayInputStream(
-                joiner.join(input).getBytes(UTF_8)));
+        Main main = new Main(
+                new PrintWriter(out, true),
+                new PrintWriter(err, true),
+                new ByteArrayInputStream(joiner.join(input).getBytes(UTF_8)));
         assertThat(main.format("-")).isEqualTo(0);
         assertThat(out.toString()).isEqualTo(joiner.join(input));
     }
@@ -316,8 +320,9 @@ public class MainTest {
     public void newline() throws Exception {
         StringWriter out = new StringWriter();
         StringWriter err = new StringWriter();
-        Main main = new Main(new PrintWriter(out, true), new PrintWriter(err, true), new ByteArrayInputStream(
-                "class T {}\n\t".getBytes(UTF_8)));
+        Main main = new Main(
+                new PrintWriter(out, true), new PrintWriter(err, true), new ByteArrayInputStream("class T {}\n\t"
+                        .getBytes(UTF_8)));
         assertThat(main.format("-")).isEqualTo(0);
         assertThat(out.toString()).isEqualTo("class T {}\n");
     }
@@ -326,8 +331,9 @@ public class MainTest {
     public void dryRunStdinUnchanged() throws Exception {
         StringWriter out = new StringWriter();
         StringWriter err = new StringWriter();
-        Main main = new Main(new PrintWriter(out, true), new PrintWriter(err, true), new ByteArrayInputStream(
-                "class Test {}\n".getBytes(UTF_8)));
+        Main main = new Main(
+                new PrintWriter(out, true), new PrintWriter(err, true), new ByteArrayInputStream("class Test {}\n"
+                        .getBytes(UTF_8)));
         assertThat(main.format("-n", "-")).isEqualTo(0);
         assertThat(out.toString()).isEmpty();
         assertThat(err.toString()).isEmpty();
@@ -338,8 +344,10 @@ public class MainTest {
         StringWriter out = new StringWriter();
         StringWriter err = new StringWriter();
         String input = "class Test {\n}\n";
-        Main main = new Main(new PrintWriter(out, true), new PrintWriter(err, true), new ByteArrayInputStream(
-                input.getBytes(UTF_8)));
+        Main main = new Main(
+                new PrintWriter(out, true),
+                new PrintWriter(err, true),
+                new ByteArrayInputStream(input.getBytes(UTF_8)));
         assertThat(main.format("-n", "-")).isEqualTo(0);
         assertThat(out.toString()).isEqualTo("<stdin>" + System.lineSeparator());
         assertThat(err.toString()).isEmpty();
@@ -460,8 +468,10 @@ public class MainTest {
         };
         StringWriter out = new StringWriter();
         StringWriter err = new StringWriter();
-        Main main = new Main(new PrintWriter(out, true), new PrintWriter(err, true), new ByteArrayInputStream(
-                joiner.join(input).getBytes(UTF_8)));
+        Main main = new Main(
+                new PrintWriter(out, true),
+                new PrintWriter(err, true),
+                new ByteArrayInputStream(joiner.join(input).getBytes(UTF_8)));
         assertThat(main.format("--assume-filename=Foo.java", "-")).isEqualTo(1);
         assertThat(err.toString()).contains("Foo.java:1:15: error: class, interface, or enum expected");
     }
@@ -474,8 +484,10 @@ public class MainTest {
         };
         StringWriter out = new StringWriter();
         StringWriter err = new StringWriter();
-        Main main = new Main(new PrintWriter(out, true), new PrintWriter(err, true), new ByteArrayInputStream(
-                joiner.join(input).getBytes(UTF_8)));
+        Main main = new Main(
+                new PrintWriter(out, true),
+                new PrintWriter(err, true),
+                new ByteArrayInputStream(joiner.join(input).getBytes(UTF_8)));
         assertThat(main.format("--dry-run", "--assume-filename=Foo.java", "-")).isEqualTo(0);
         assertThat(out.toString()).isEqualTo("Foo.java" + System.lineSeparator());
     }

@@ -162,129 +162,145 @@ class PalantirJavaFormatConfigurable extends BaseConfigurable implements Searcha
         panel.setLayout(new GridLayoutManager(5, 2, new Insets(0, 0, 0, 0), -1, -1));
         enable = new JCheckBox();
         enable.setText("Enable palantir-java-format");
-        panel.add(enable, new GridConstraints(
-                0,
-                0,
-                1,
-                2,
-                GridConstraints.ANCHOR_WEST,
-                GridConstraints.FILL_NONE,
-                GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
-                GridConstraints.SIZEPOLICY_FIXED,
-                null,
-                null,
-                null,
-                0,
-                false));
+        panel.add(
+                enable,
+                new GridConstraints(
+                        0,
+                        0,
+                        1,
+                        2,
+                        GridConstraints.ANCHOR_WEST,
+                        GridConstraints.FILL_NONE,
+                        GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                        GridConstraints.SIZEPOLICY_FIXED,
+                        null,
+                        null,
+                        null,
+                        0,
+                        false));
         final Spacer spacer1 = new Spacer();
-        panel.add(spacer1, new GridConstraints(
-                4,
-                0,
-                1,
-                2,
-                GridConstraints.ANCHOR_CENTER,
-                GridConstraints.FILL_VERTICAL,
-                1,
-                GridConstraints.SIZEPOLICY_WANT_GROW,
-                null,
-                null,
-                null,
-                0,
-                false));
+        panel.add(
+                spacer1,
+                new GridConstraints(
+                        4,
+                        0,
+                        1,
+                        2,
+                        GridConstraints.ANCHOR_CENTER,
+                        GridConstraints.FILL_VERTICAL,
+                        1,
+                        GridConstraints.SIZEPOLICY_WANT_GROW,
+                        null,
+                        null,
+                        null,
+                        0,
+                        false));
         final JLabel label1 = new JLabel();
         label1.setText("Code style");
-        panel.add(label1, new GridConstraints(
-                1,
-                0,
-                1,
-                1,
-                GridConstraints.ANCHOR_WEST,
-                GridConstraints.FILL_NONE,
-                GridConstraints.SIZEPOLICY_FIXED,
-                GridConstraints.SIZEPOLICY_FIXED,
-                null,
-                null,
-                null,
-                0,
-                false));
-        panel.add(styleComboBox, new GridConstraints(
-                1,
-                1,
-                1,
-                1,
-                GridConstraints.ANCHOR_WEST,
-                GridConstraints.FILL_HORIZONTAL,
-                GridConstraints.SIZEPOLICY_CAN_GROW,
-                GridConstraints.SIZEPOLICY_FIXED,
-                null,
-                null,
-                null,
-                1,
-                false));
+        panel.add(
+                label1,
+                new GridConstraints(
+                        1,
+                        0,
+                        1,
+                        1,
+                        GridConstraints.ANCHOR_WEST,
+                        GridConstraints.FILL_NONE,
+                        GridConstraints.SIZEPOLICY_FIXED,
+                        GridConstraints.SIZEPOLICY_FIXED,
+                        null,
+                        null,
+                        null,
+                        0,
+                        false));
+        panel.add(
+                styleComboBox,
+                new GridConstraints(
+                        1,
+                        1,
+                        1,
+                        1,
+                        GridConstraints.ANCHOR_WEST,
+                        GridConstraints.FILL_HORIZONTAL,
+                        GridConstraints.SIZEPOLICY_CAN_GROW,
+                        GridConstraints.SIZEPOLICY_FIXED,
+                        null,
+                        null,
+                        null,
+                        1,
+                        false));
         final JLabel label2 = new JLabel();
         label2.setText("Implementation version");
-        panel.add(label2, new GridConstraints(
-                3,
-                0,
-                1,
-                1,
-                GridConstraints.ANCHOR_WEST,
-                GridConstraints.FILL_NONE,
-                GridConstraints.SIZEPOLICY_FIXED,
-                GridConstraints.SIZEPOLICY_FIXED,
-                null,
-                null,
-                null,
-                0,
-                false));
+        panel.add(
+                label2,
+                new GridConstraints(
+                        3,
+                        0,
+                        1,
+                        1,
+                        GridConstraints.ANCHOR_WEST,
+                        GridConstraints.FILL_NONE,
+                        GridConstraints.SIZEPOLICY_FIXED,
+                        GridConstraints.SIZEPOLICY_FIXED,
+                        null,
+                        null,
+                        null,
+                        0,
+                        false));
         formatterVersion = new JLabel();
         formatterVersion.setText("what version are we running with?");
-        panel.add(formatterVersion, new GridConstraints(
-                3,
-                1,
-                1,
-                1,
-                GridConstraints.ANCHOR_CENTER,
-                GridConstraints.FILL_HORIZONTAL,
-                GridConstraints.SIZEPOLICY_CAN_GROW,
-                GridConstraints.SIZEPOLICY_FIXED,
-                null,
-                null,
-                null,
-                1,
-                false));
+        panel.add(
+                formatterVersion,
+                new GridConstraints(
+                        3,
+                        1,
+                        1,
+                        1,
+                        GridConstraints.ANCHOR_CENTER,
+                        GridConstraints.FILL_HORIZONTAL,
+                        GridConstraints.SIZEPOLICY_CAN_GROW,
+                        GridConstraints.SIZEPOLICY_FIXED,
+                        null,
+                        null,
+                        null,
+                        1,
+                        false));
         final JLabel label3 = new JLabel();
         label3.setText("Plugin version");
-        panel.add(label3, new GridConstraints(
-                2,
-                0,
-                1,
-                1,
-                GridConstraints.ANCHOR_WEST,
-                GridConstraints.FILL_NONE,
-                GridConstraints.SIZEPOLICY_FIXED,
-                GridConstraints.SIZEPOLICY_FIXED,
-                null,
-                null,
-                null,
-                0,
-                false));
+        panel.add(
+                label3,
+                new GridConstraints(
+                        2,
+                        0,
+                        1,
+                        1,
+                        GridConstraints.ANCHOR_WEST,
+                        GridConstraints.FILL_NONE,
+                        GridConstraints.SIZEPOLICY_FIXED,
+                        GridConstraints.SIZEPOLICY_FIXED,
+                        null,
+                        null,
+                        null,
+                        0,
+                        false));
         pluginVersion = new JLabel();
         pluginVersion.setText("plugin version");
-        panel.add(pluginVersion, new GridConstraints(
-                2,
-                1,
-                1,
-                1,
-                GridConstraints.ANCHOR_WEST,
-                GridConstraints.FILL_NONE,
-                GridConstraints.SIZEPOLICY_FIXED,
-                GridConstraints.SIZEPOLICY_FIXED,
-                null,
-                null,
-                null,
-                1,
-                false));
+        panel.add(
+                pluginVersion,
+                new GridConstraints(
+                        2,
+                        1,
+                        1,
+                        1,
+                        GridConstraints.ANCHOR_WEST,
+                        GridConstraints.FILL_NONE,
+                        GridConstraints.SIZEPOLICY_FIXED,
+                        GridConstraints.SIZEPOLICY_FIXED,
+                        null,
+                        null,
+                        null,
+                        1,
+                        false));
     }
 
     /** @noinspection ALL */

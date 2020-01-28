@@ -251,8 +251,9 @@ public final class Level extends Doc {
             Level lastLevel = innerLevels.stream()
                     .filter(doc -> StartsWithBreakVisitor.INSTANCE.visit(doc) != Result.EMPTY)
                     .collect(GET_LAST_COLLECTOR)
-                    .orElseThrow(() -> new IllegalStateException(
-                            "Levels were broken so expected to find at least a non-empty level"));
+                    .orElseThrow(() ->
+                            new IllegalStateException(
+                                    "Levels were broken so expected to find at least a non-empty level"));
 
             // Add the width of tokens, breaks before the lastLevel. We must always have space for
             // these.

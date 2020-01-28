@@ -460,8 +460,10 @@ final class JavadocLexer {
         if (last.getType() == LITERAL && last.getValue().endsWith("}")) {
             saved.removeLast();
             if (last.length() > 1) {
-                saved.addLast(new Token(
-                        LITERAL, last.getValue().substring(0, last.getValue().length() - 1)));
+                saved.addLast(
+                        new Token(
+                                LITERAL,
+                                last.getValue().substring(0, last.getValue().length() - 1)));
                 saved.addLast(new Token(FORCED_NEWLINE, null));
             }
             trailingBrace = true;
@@ -480,9 +482,12 @@ final class JavadocLexer {
         output.add(new Token(FORCED_NEWLINE, "\n"));
         for (Token token : saved) {
             if (token.getType() == LITERAL) {
-                output.add(new Token(
-                        LITERAL,
-                        trim > 0 && token.length() > trim ? token.getValue().substring(trim) : token.getValue()));
+                output.add(
+                        new Token(
+                                LITERAL,
+                                trim > 0 && token.length() > trim
+                                        ? token.getValue().substring(trim)
+                                        : token.getValue()));
             } else {
                 output.add(token);
             }
