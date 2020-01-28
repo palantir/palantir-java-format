@@ -3,8 +3,18 @@ public class B29368546 {
      * Example:
      *
      * <pre>{@code
-     * class T {
-     * }
+     *     class T {
+     *     }
+     * }</pre>
+     */
+    int x;
+
+    /**
+     * Example:
+     *
+     * <pre>    {@code
+     *   class T {
+     *   }
      * }</pre>
      */
     int x;
@@ -13,19 +23,8 @@ public class B29368546 {
      * Example:
      *
      * <pre>{@code
-     * class T {
-     * }
-     * }</pre>
-     */
-    int x;
-
-    /**
-     * Example:
-     *
-     * <pre>{@code
-     * class T {
-     * }
-     * }</pre>
+     *   class T {
+     *   }}</pre>
      */
     int x;
 
@@ -43,8 +42,8 @@ public class B29368546 {
      * foo bar
      * }
      *
-     * more stuff that ends with {
-     * }</pre>
+     * more stuff that ends with {}
+     * </pre>
      */
     int x;
 

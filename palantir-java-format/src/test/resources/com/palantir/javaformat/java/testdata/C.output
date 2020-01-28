@@ -1,8 +1,9 @@
 package com.google.googlejavaformat.java.test;
 
 /**
- * Tests for CastExpressions, CatchClauses, CharacterLiterals, ClassInstanceCreations, CommentHelper,
- * ConditionalExpressions, ConstructorInvocations, ContinueStatements, and CreationReferences.
+ * Tests for CastExpressions, CatchClauses, CharacterLiterals, ClassInstanceCreations,
+ * CommentHelper, ConditionalExpressions, ConstructorInvocations, ContinueStatements, and
+ * CreationReferences.
  */
 class C<T> {
     // TODO(jdd): Test higher-language-level constructs.

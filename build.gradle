@@ -6,15 +6,15 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.palantir.javaformat:gradle-palantir-java-format:0.3.15'
+        classpath 'com.palantir.javaformat:gradle-palantir-java-format:0.3.16'
         classpath 'com.palantir.gradle.revapi:gradle-revapi:1.1.3'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
         classpath 'com.netflix.nebula:nebula-publishing-plugin:14.1.1'
         classpath 'com.netflix.nebula:gradle-info-plugin:5.2.0'
-        classpath 'com.palantir.baseline:gradle-baseline-java:2.49.1'
+        classpath 'com.palantir.baseline:gradle-baseline-java:3.1.1'
         classpath 'gradle.plugin.org.inferred:gradle-processors:3.3.0'
         classpath 'com.palantir.gradle.gitversion:gradle-git-version:0.12.2'
-        classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:1.15.0'
+        classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:1.16.0'
     }
 }
 

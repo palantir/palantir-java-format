@@ -190,7 +190,7 @@ public final class Level extends Doc {
             if (state.branchingCoefficient() < MAX_BRANCHING_COEFFICIENT) {
                 State state1 = state.withNoIndent();
                 Optional<Obs.Exploration> lastLevelBroken = levelNode.maybeExplore(
-                        "tryBreakLastLevel", state1, (explorationNode) ->
+                        "tryBreakLastLevel", state1, explorationNode ->
                                 tryBreakLastLevel(commentsHelper, maxWidth, state1, explorationNode, true));
 
                 if (lastLevelBroken.isPresent()) {
@@ -210,7 +210,7 @@ public final class Level extends Doc {
                     computeBroken(commentsHelper, maxWidth, stateForBroken, explorationNode));
 
             Optional<Obs.Exploration> maybeInlined = levelNode.maybeExplore(
-                    "handleBreakOnlyIfInnerLevelsThenFitOnOneLine", state, (explorationNode) ->
+                    "handleBreakOnlyIfInnerLevelsThenFitOnOneLine", state, explorationNode ->
                             handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
                                     commentsHelper,
                                     maxWidth,
