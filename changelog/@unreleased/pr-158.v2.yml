@@ -1,0 +1,7 @@
+type: fix
+fix:
+  description: 'Only service load the formatter implementation once, rather than once
+    per gradle project. This avoids gradle potentially exceedding the `MaxMetaspaceSize`
+    and throwing `java.lang.OutOfMemoryError: Metaspace`.'
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/158
