@@ -1,9 +1,11 @@
 package com.palantir.javaformat.java;
 
+import com.google.errorprone.annotations.Immutable;
 import org.immutables.value.Value;
 
 @Value.Immutable
-public interface JavaFormatterInternalOptions {
+@Immutable
+interface JavaFormatterInternalOptions {
 
     @Value.Default
     default boolean reformatJavadoc() {
