@@ -1,0 +1,6 @@
+type: fix
+fix:
+  description: Don't inline constructor calls without a custom body (i.e. if they
+    are not anonymous classes).
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/157
