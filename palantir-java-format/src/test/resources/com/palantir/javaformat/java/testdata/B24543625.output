@@ -1,9 +1,9 @@
 /**
-* This<br>
-* is<br>
-* a<br>
-* train.
-*/
+ * This<br>
+ * is<br>
+ * a<br>
+ * train.
+ */
 class TheTrain {
     /*
                                    ______
@@ -55,11 +55,11 @@ class TheTrain {
     int z;
 
     /**
-  * This is (was) malformed javadoc.
-  * <pre>
-  System.err.println
-  * </pre>
-  */
+     * This is (was) malformed javadoc.
+     * <pre>
+     * System.err.println
+     * </pre>
+     */
     int z;
 
     private Object f; /*-{

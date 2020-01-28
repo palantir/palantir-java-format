@@ -35,15 +35,15 @@ class M {
     void methodName2(int x) throws Exception {}
 
     /**
-   * JavaDoc.
-   */
+     * JavaDoc.
+     */
     void methodName3(int x)
             throws Exception0, Exception1, Exception2, Exception3, Exception4, Exception5, Exception6, Exception7,
                     Exception8, Exception9 {}
 
     /**
-   * JavaDoc.
-   */
+     * JavaDoc.
+     */
     void methodName4(
             int a,
             int b,
@@ -69,8 +69,8 @@ class M {
             int v) {}
 
     /**
-   * JavaDoc.
-   */
+     * JavaDoc.
+     */
     void methodName5(
             int a,
             int b,
@@ -97,8 +97,8 @@ class M {
             throws Exception {}
 
     /**
-   * JavaDoc.
-   */
+     * JavaDoc.
+     */
     void methodName6(
             int a,
             int b,
