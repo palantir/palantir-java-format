@@ -227,8 +227,17 @@ public final class Level extends Doc {
     }
 
     /**
-     * Attempts to perform the {@link BreakBehaviours#breakOnlyIfInnerLevelsThenFitOnOneLine} logic, returning empty
-     * if it couldn't.
+     * Attempts to perform the {@link BreakBehaviour.Cases#breakOnlyIfInnerLevelsThenFitOnOneLine} logic, returning
+     * empty if it couldn't. Namely, this will only return a state if:
+     * <ul>
+     *     <li>everything fit on the current or on the next line (we verify this by checking that none of the inner
+     *         levels were broken; or failing that
+     *     <li>a sensible prefix of this level fits onto the current line. See {@link CountWidthUntilBreakVisitor} for
+     *         how we determine the full prefix that <em>must</em> fit on the current line.
+     * </ul>
+     *
+     * @param brokenState is expected to be the state resulting from {@link Level#breakNormally}, but is passed in
+     *                    for efficiency reasons
      */
     private Optional<State> handle_breakOnlyIfInnerLevelsThenFitOnOneLine(
             CommentsHelper commentsHelper,

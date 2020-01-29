@@ -22,7 +22,7 @@ import com.palantir.javaformat.doc.StartsWithBreakVisitor.Result;
 import java.util.List;
 import java.util.OptionalInt;
 
-/** Count the width of code we definitely to try fitting on a single line. */
+/** Count the width of code we definitely want to try fitting on a single line. */
 class CountWidthUntilBreakVisitor implements DocVisitor<Float> {
     private final int availableWidth;
 
