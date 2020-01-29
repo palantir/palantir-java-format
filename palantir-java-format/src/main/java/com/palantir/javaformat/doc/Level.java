@@ -392,8 +392,14 @@ public final class Level extends Doc {
                     return explorationNode
                             .newChildNode(lastLevel, state1)
                             .maybeExplore(humanDescription, state1, exp -> {
-                                // Not all
-                                // Need to actually check the inner last level of `lastLevel`.
+                                // Not all levels would look good if inlined in this position, so we accept
+                                // levels that are meant to look good even if partially inlined, e.g. method
+                                // chains, which will catch things like builders, but not other kinds of levels like
+                                // constant expressions.
+                                // See the palantir-expression-lambdas.input test for an example of what this is
+                                // trying to avoid.
+
+                                // For this, need to actually check the last inner level of `lastLevel` (2 levels down).
                                 if (lastLevel.docs.isEmpty() || !(getLast(lastLevel.docs) instanceof Level)) {
                                     return Optional.empty();
                                 }
@@ -404,7 +410,7 @@ public final class Level extends Doc {
                                         return Optional.empty();
                                     case ACCEPT_INLINE_CHAIN:
                                     case ACCEPT_INLINE_CHAIN_IF_SIMPLE_OTHERWISE_CHECK_INNER:
-                                        // we want to allow inlining in these cases
+                                        // we only want to allow inlining in these cases
                                 }
 
                                 return Optional.of(lastLevel.computeBreaks(commentsHelper, maxWidth, state1, exp));
