@@ -373,41 +373,43 @@ public final class Level extends Doc {
         // Try to fit the entire inner prefix if it's that kind of level.
         return BreakBehaviours.caseOf(lastLevel.getBreakBehaviour())
                 .preferBreakingLastInnerLevel(keepIndentWhenInlined -> {
-                    State state2 = state;
-                    if (keepIndentWhenInlined) {
-                        state2 = state2.withIndentIncrementedBy(lastLevel.getPlusIndent());
-                    }
-                    State state3 = state2;
+                    State state1 =
+                            keepIndentWhenInlined ? state.withIndentIncrementedBy(lastLevel.getPlusIndent()) : state;
+
                     return explorationNode
-                            .newChildNode(lastLevel, state2)
+                            .newChildNode(lastLevel, state1)
                             .maybeExplore(
-                                    "recurse into inner tryBreakLastLevel", state3, exp -> lastLevel.tryBreakLastLevel(
-                                            commentsHelper, maxWidth, state3, exp, isSimpleInlining))
-                            .map(expl -> expl.markAccepted()); // collapse??
+                                    "recurse into inner tryBreakLastLevel", state1, exp -> lastLevel.tryBreakLastLevel(
+                                            commentsHelper, maxWidth, state1, exp, isSimpleInlining))
+                            .map(Exploration::markAccepted);
                 })
                 .breakOnlyIfInnerLevelsThenFitOnOneLine(keepIndentWhenInlined -> {
-                    // Need to actually check the inner last level of `lastLevel`.
-                    if (lastLevel.docs.isEmpty() || !(getLast(lastLevel.docs) instanceof Level)) {
-                        return Optional.empty();
-                    }
-                    Level lastLevel2 = ((Level) getLast(lastLevel.docs));
-                    if (lastLevel2.getBreakabilityIfLastLevel() == LastLevelBreakability.ABORT
-                            || lastLevel2.getBreakabilityIfLastLevel() == LastLevelBreakability.CHECK_INNER) {
-                        return Optional.empty();
-                    }
-
-                    State state2 = state;
-                    if (keepIndentWhenInlined) {
-                        state2 = state2.withIndentIncrementedBy(lastLevel.getPlusIndent());
-                    }
-                    State state3 = state2;
+                    State state1 =
+                            keepIndentWhenInlined ? state.withIndentIncrementedBy(lastLevel.getPlusIndent()) : state;
 
                     // TODO somewhere we should check that there is enough space to inline
-                    return Optional.of(explorationNode
-                            .newChildNode(lastLevel, state2)
-                            .explore("recurse into inner breakOnlyIfInnerLevelsThenFitOnOneLine", state3, exp ->
-                                    lastLevel.computeBreaks(commentsHelper, maxWidth, state3, exp))
-                            .markAccepted());
+                    String humanDescription = "end tryBreakLastLevel chain -> breakOnlyIfInnerLevelsThenFitOnOneLine";
+                    return explorationNode
+                            .newChildNode(lastLevel, state1)
+                            .maybeExplore(humanDescription, state1, exp -> {
+                                // Not all
+                                // Need to actually check the inner last level of `lastLevel`.
+                                if (lastLevel.docs.isEmpty() || !(getLast(lastLevel.docs) instanceof Level)) {
+                                    return Optional.empty();
+                                }
+                                Level lastLevel2 = ((Level) getLast(lastLevel.docs));
+                                switch (lastLevel2.getBreakabilityIfLastLevel()) {
+                                    case ABORT:
+                                    case CHECK_INNER:
+                                        return Optional.empty();
+                                    case ACCEPT_INLINE_CHAIN:
+                                    case ACCEPT_INLINE_CHAIN_IF_SIMPLE_OTHERWISE_CHECK_INNER:
+                                        // we want to allow inlining in these cases
+                                }
+
+                                return Optional.of(lastLevel.computeBreaks(commentsHelper, maxWidth, state1, exp));
+                            })
+                            .map(Exploration::markAccepted);
                 })
                 // We don't know how to fit the inner level on the same line, so bail out.
                 .otherwise_(Optional.empty());
