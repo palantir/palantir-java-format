@@ -245,7 +245,9 @@ public final class Level extends Doc {
         boolean anyLevelWasBroken = innerLevels.stream().anyMatch(level -> !brokenState.isOneLine(level));
 
         boolean prefixFits = false;
-        if (anyLevelWasBroken) {
+        if (!anyLevelWasBroken) {
+            return Optional.of(brokenState);
+        } else {
             // Find the last level, skipping empty levels (that contain nothing, or are made up
             // entirely of other empty levels).
 
