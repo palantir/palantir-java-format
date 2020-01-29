@@ -99,8 +99,20 @@ public abstract class OpenOp extends HasUniqueId implements Op {
      * </pre>
      */
     @Default
-    public boolean isSimple() {
-        return true;
+    public Complexity complexity() {
+        return Complexity.SIMPLE;
+    }
+
+    public enum Complexity {
+        /**
+         * This level is simple.
+         */
+        SIMPLE,
+        /**
+         * This level is complex, which will cause certain levels downstream from here (that might otherwise fit on
+         * the same line) to not be considered.
+         */
+        COMPLEX,
     }
 
     public abstract Optional<String> debugName();
@@ -127,5 +139,9 @@ public abstract class OpenOp extends HasUniqueId implements Op {
         return new Builder();
     }
 
-    public static class Builder extends ImmutableOpenOp.Builder {}
+    public static class Builder extends ImmutableOpenOp.Builder {
+        public Builder isSimple(boolean isSimple) {
+            return complexity(isSimple ? Complexity.SIMPLE : Complexity.COMPLEX);
+        }
+    }
 }

@@ -1,0 +1,7 @@
+class PalantirExpressionLambdas {
+    void foo() {
+        publisher = new ThisThatEventPublisher(
+                txnManager, () -> Events.encoder(keyPair, new TestClock()), EventSeries.THING, () ->
+                        DEFAULT_EVENT_BATCH_SIZE);
+    }
+}

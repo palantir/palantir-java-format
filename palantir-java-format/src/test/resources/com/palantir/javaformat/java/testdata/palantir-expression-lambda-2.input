@@ -1,0 +1,6 @@
+class PalantirExpressionLambda2 {
+    void foo() {
+        this(txnManager, foundryResources, commitLogHandler, timestamp ->
+                new UUID(timestamp, UUID.randomUUID().getLeastSignificantBits()));
+    }
+}

@@ -28,10 +28,12 @@ import com.palantir.javaformat.CommentsHelper;
 import com.palantir.javaformat.Indent;
 import com.palantir.javaformat.LastLevelBreakability;
 import com.palantir.javaformat.OpenOp;
+import com.palantir.javaformat.OpenOp.Complexity;
 import com.palantir.javaformat.Output;
 import com.palantir.javaformat.PartialInlineability;
 import com.palantir.javaformat.doc.Obs.Exploration;
 import com.palantir.javaformat.doc.Obs.ExplorationNode;
+import com.palantir.javaformat.doc.Obs.LevelNode;
 import com.palantir.javaformat.doc.StartsWithBreakVisitor.Result;
 import java.util.ArrayList;
 import java.util.List;
@@ -168,9 +170,7 @@ public final class Level extends Doc {
         }
 
         private Exploration breakNormally(State state) {
-            State state1 = state.withIndentIncrementedBy(getPlusIndent());
-            return levelNode.explore("breaking normally", state1, explorationNode ->
-                    computeBroken(commentsHelper, maxWidth, state1, explorationNode));
+            return Level.this.breakNormally(state, levelNode, commentsHelper, maxWidth);
         }
 
         @Override
@@ -204,19 +204,13 @@ public final class Level extends Doc {
 
         @Override
         public State breakOnlyIfInnerLevelsThenFitOnOneLine(boolean keepIndentWhenInlined) {
-            State stateForBroken = this.state.withIndentIncrementedBy(getPlusIndent());
-            Exploration broken = levelNode.explore("breaking normally", stateForBroken, explorationNode ->
-                    computeBroken(commentsHelper, maxWidth, stateForBroken, explorationNode));
+            Exploration broken = Level.this.breakNormally(state, levelNode, commentsHelper, maxWidth);
 
-            Optional<Obs.Exploration> maybeInlined = levelNode.maybeExplore(
-                    "handleBreakOnlyIfInnerLevelsThenFitOnOneLine", state, explorationNode ->
-                            handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
-                                    commentsHelper,
-                                    maxWidth,
-                                    this.state,
-                                    broken.state(),
-                                    keepIndentWhenInlined,
-                                    explorationNode));
+            Optional<Exploration> maybeInlined = levelNode.maybeExplore(
+                    "handle_breakOnlyIfInnerLevelsThenFitOnOneLine",
+                    state,
+                    explorationNode -> handle_breakOnlyIfInnerLevelsThenFitOnOneLine(
+                            commentsHelper, maxWidth, state, broken.state(), keepIndentWhenInlined, explorationNode));
 
             if (maybeInlined.isPresent()) {
                 return maybeInlined.get().markAccepted();
@@ -226,7 +220,26 @@ public final class Level extends Doc {
         }
     }
 
-    private Optional<State> handleBreakOnlyIfInnerLevelsThenFitOnOneLine(
+    private Exploration breakNormally(State state, LevelNode levelNode, CommentsHelper commentsHelper, int maxWidth) {
+        State stateForBroken = state.withIndentIncrementedBy(getPlusIndent());
+        return levelNode.explore("breaking normally", stateForBroken, explorationNode ->
+                computeBroken(commentsHelper, maxWidth, stateForBroken, explorationNode));
+    }
+
+    /**
+     * Attempts to perform the {@link BreakBehaviour.Cases#breakOnlyIfInnerLevelsThenFitOnOneLine} logic, returning
+     * empty if it couldn't. Namely, this will only return a state if:
+     * <ul>
+     *     <li>everything fit on the current or on the next line (we verify this by checking that none of the inner
+     *         levels were broken; or failing that
+     *     <li>a sensible prefix of this level fits onto the current line. See {@link CountWidthUntilBreakVisitor} for
+     *         how we determine the full prefix that <em>must</em> fit on the current line.
+     * </ul>
+     *
+     * @param brokenState is expected to be the state resulting from {@link Level#breakNormally}, but is passed in
+     *                    for efficiency reasons
+     */
+    private Optional<State> handle_breakOnlyIfInnerLevelsThenFitOnOneLine(
             CommentsHelper commentsHelper,
             int maxWidth,
             State state,
@@ -240,47 +253,43 @@ public final class Level extends Doc {
 
         boolean anyLevelWasBroken = innerLevels.stream().anyMatch(level -> !brokenState.isOneLine(level));
 
-        boolean prefixFits = false;
-        if (anyLevelWasBroken) {
-            // Find the last level, skipping empty levels (that contain nothing, or are made up
-            // entirely of other empty levels).
+        if (!anyLevelWasBroken) {
+            return Optional.of(brokenState);
+        }
+        // Find the last level, skipping empty levels (that contain nothing, or are made up
+        // entirely of other empty levels).
 
-            // Last level because there might be other in-between levels after the initial break like `new
-            // int[]
-            // {`, and we want to skip those.
-            Level lastLevel = innerLevels.stream()
-                    .filter(doc -> StartsWithBreakVisitor.INSTANCE.visit(doc) != Result.EMPTY)
-                    .collect(GET_LAST_COLLECTOR)
-                    .orElseThrow(() ->
-                            new IllegalStateException(
-                                    "Levels were broken so expected to find at least a non-empty level"));
+        // Last level because there might be other in-between levels after the initial break like `new
+        // int[]
+        // {`, and we want to skip those.
+        Level lastLevel = innerLevels.stream()
+                .filter(doc -> StartsWithBreakVisitor.INSTANCE.visit(doc) != Result.EMPTY)
+                .collect(GET_LAST_COLLECTOR)
+                .orElseThrow(() ->
+                        new IllegalStateException("Levels were broken so expected to find at least a non-empty level"));
 
-            // Add the width of tokens, breaks before the lastLevel. We must always have space for
-            // these.
-            List<Doc> leadingDocs = docs.subList(0, docs.indexOf(lastLevel));
-            float leadingWidth = getWidth(leadingDocs);
+        // Add the width of tokens, breaks before the lastLevel. We must always have space for
+        // these.
+        List<Doc> leadingDocs = docs.subList(0, docs.indexOf(lastLevel));
+        float leadingWidth = getWidth(leadingDocs);
 
-            // Potentially add the width of prefixes we want to consider as part of the width that
-            // must fit on the same line, so that we don't accidentally break prefixes when we could
-            // have avoided doing so.
-            leadingWidth += new CountWidthUntilBreakVisitor(maxWidth - state.indent()).visit(lastLevel);
+        // Potentially add the width of prefixes we want to consider as part of the width that
+        // must fit on the same line, so that we don't accidentally break prefixes when we could
+        // have avoided doing so.
+        leadingWidth += new CountWidthUntilBreakVisitor(maxWidth - state.indent()).visit(lastLevel);
 
-            boolean fits = !Float.isInfinite(leadingWidth) && state.column() + leadingWidth <= maxWidth;
+        boolean fits = !Float.isInfinite(leadingWidth) && state.column() + leadingWidth <= maxWidth;
 
-            if (fits) {
-                prefixFits = true;
-            }
+        if (!fits) {
+            return Optional.empty();
         }
 
-        if (prefixFits) {
-            State newState = state.withNoIndent();
-            if (keepIndent) {
-                newState = newState.withIndentIncrementedBy(getPlusIndent());
-            }
-            return Optional.of(tryToLayOutLevelOnOneLine(
-                    commentsHelper, maxWidth, newState, memoizedSplitsBreaks.get(), explorationNode));
+        State newState = state.withNoIndent();
+        if (keepIndent) {
+            newState = newState.withIndentIncrementedBy(getPlusIndent());
         }
-        return Optional.empty();
+        return Optional.of(tryToLayOutLevelOnOneLine(
+                commentsHelper, maxWidth, newState, memoizedSplitsBreaks.get(), explorationNode));
     }
 
     private Optional<State> tryBreakLastLevel(
@@ -310,7 +319,7 @@ public final class Level extends Doc {
 
         SplitsBreaks prefixSplitsBreaks = splitByBreaks(leadingDocs);
 
-        boolean isSimpleInlining = isSimpleInliningSoFar && Level.this.openOp.isSimple();
+        boolean isSimpleInlining = isSimpleInliningSoFar && Level.this.openOp.complexity() == Complexity.SIMPLE;
 
         State state1 = tryToLayOutLevelOnOneLine(commentsHelper, maxWidth, state, prefixSplitsBreaks, explorationNode);
         // If a break was still forced somehow even though we could fit the leadingWidth, then abort.
@@ -373,17 +382,59 @@ public final class Level extends Doc {
         // Try to fit the entire inner prefix if it's that kind of level.
         return BreakBehaviours.caseOf(lastLevel.getBreakBehaviour())
                 .preferBreakingLastInnerLevel(keepIndentWhenInlined -> {
-                    State state2 = state;
-                    if (keepIndentWhenInlined) {
-                        state2 = state2.withIndentIncrementedBy(lastLevel.getPlusIndent());
-                    }
-                    State state3 = state2;
+                    State state1 =
+                            keepIndentWhenInlined ? state.withIndentIncrementedBy(lastLevel.getPlusIndent()) : state;
+
                     return explorationNode
-                            .newChildNode(lastLevel, state2)
+                            .newChildNode(lastLevel, state1)
                             .maybeExplore(
-                                    "recurse into inner tryBreakLastLevel", state3, exp -> lastLevel.tryBreakLastLevel(
-                                            commentsHelper, maxWidth, state3, exp, isSimpleInlining))
-                            .map(expl -> expl.markAccepted()); // collapse??
+                                    "recurse into inner tryBreakLastLevel", state1, exp -> lastLevel.tryBreakLastLevel(
+                                            commentsHelper, maxWidth, state1, exp, isSimpleInlining))
+                            .map(Exploration::markAccepted);
+                })
+                .breakOnlyIfInnerLevelsThenFitOnOneLine(keepIndentWhenInlined -> {
+                    // This case currently only matches lambda _expressions_ (without curlies)
+                    State state1 =
+                            keepIndentWhenInlined ? state.withIndentIncrementedBy(lastLevel.getPlusIndent()) : state;
+
+                    String humanDescription = "end tryBreakLastLevel chain -> breakOnlyIfInnerLevelsThenFitOnOneLine";
+                    LevelNode levelNode = explorationNode.newChildNode(lastLevel, state1);
+                    return levelNode
+                            .maybeExplore(humanDescription, state1, exp -> {
+                                // Not all levels would look good if inlined in this position, so we accept
+                                // levels that are meant to look good even if partially inlined, e.g. method
+                                // chains, which will catch things like builders, but not other kinds of levels like
+                                // constant expressions.
+                                // See the palantir-expression-lambdas.input test for an example of what this is
+                                // trying to avoid.
+
+                                // For this, need to actually check the last inner level of `lastLevel` (2 levels down).
+                                if (lastLevel.docs.isEmpty() || !(getLast(lastLevel.docs) instanceof Level)) {
+                                    return Optional.empty();
+                                }
+                                Level lastLevel2 = ((Level) getLast(lastLevel.docs));
+                                switch (lastLevel2.getBreakabilityIfLastLevel()) {
+                                    case ABORT:
+                                    case CHECK_INNER:
+                                        return Optional.empty();
+                                    case ACCEPT_INLINE_CHAIN:
+                                    case ACCEPT_INLINE_CHAIN_IF_SIMPLE_OTHERWISE_CHECK_INNER:
+                                        // we only want to allow inlining in these cases
+                                }
+
+                                // Note: intentionally using 'state' and not 'state1' as Level.breakNormally will always
+                                // add the level's plusIndent.
+                                Exploration broken =
+                                        lastLevel.breakNormally(state, levelNode, commentsHelper, maxWidth);
+                                return lastLevel.handle_breakOnlyIfInnerLevelsThenFitOnOneLine(
+                                        commentsHelper,
+                                        maxWidth,
+                                        state1,
+                                        broken.state(),
+                                        keepIndentWhenInlined,
+                                        explorationNode);
+                            })
+                            .map(Exploration::markAccepted);
                 })
                 // We don't know how to fit the inner level on the same line, so bail out.
                 .otherwise_(Optional.empty());

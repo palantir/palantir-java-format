@@ -1231,8 +1231,14 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         builder.open(OpenOp.builder()
                 .debugName("lambda body")
                 .plusIndent(statementBody ? ZERO : plusFour)
-                .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(true))
-                .breakabilityIfLastLevel(LastLevelBreakability.ACCEPT_INLINE_CHAIN)
+                .breakBehaviour(
+                        statementBody
+                                ? BreakBehaviours.preferBreakingLastInnerLevel(true)
+                                : BreakBehaviours.breakOnlyIfInnerLevelsThenFitOnOneLine(false))
+                .breakabilityIfLastLevel(
+                        statementBody
+                                ? LastLevelBreakability.ACCEPT_INLINE_CHAIN
+                                : LastLevelBreakability.ACCEPT_INLINE_CHAIN_IF_SIMPLE_OTHERWISE_CHECK_INNER)
                 .build());
         if (statementBody) {
             builder.space();

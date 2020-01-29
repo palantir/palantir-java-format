@@ -1,0 +1,13 @@
+class PalantirExpressionLambda1 {
+    void foo() {
+        return createInternal(
+                client,
+                config,
+                userAgent,
+                hostEventsSink,
+                serviceClass,
+                RANDOMIZE,
+                reshuffle,
+                () -> new ExponentialBackoff(config.maxNumRetries(), config.backoffSlotSize()));
+    }
+}
