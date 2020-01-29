@@ -65,7 +65,6 @@ import com.palantir.javaformat.Input;
 import com.palantir.javaformat.LastLevelBreakability;
 import com.palantir.javaformat.Op;
 import com.palantir.javaformat.OpenOp;
-import com.palantir.javaformat.OpenOp.Complexity;
 import com.palantir.javaformat.OpsBuilder;
 import com.palantir.javaformat.OpsBuilder.BlankLineWanted;
 import com.palantir.javaformat.PartialInlineability;
@@ -1240,8 +1239,6 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                         statementBody
                                 ? LastLevelBreakability.ACCEPT_INLINE_CHAIN
                                 : LastLevelBreakability.ACCEPT_INLINE_CHAIN_IF_SIMPLE_OTHERWISE_CHECK_INNER)
-                // When doing CHECK_INNER, make the next level think that the current inlining is simple
-                .complexity(Complexity.FORCE_SIMPLE)
                 .build());
         if (statementBody) {
             builder.space();

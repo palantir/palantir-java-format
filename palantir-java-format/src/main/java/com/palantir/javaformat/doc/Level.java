@@ -310,9 +310,7 @@ public final class Level extends Doc {
 
         SplitsBreaks prefixSplitsBreaks = splitByBreaks(leadingDocs);
 
-        boolean isSimpleInlining = isSimpleInliningSoFar
-                        && Level.this.openOp.complexity() == Complexity.SIMPLE_IF_CURRENT_INLINE_CHAIN_IS_SIMPLE
-                || Level.this.openOp.complexity() == Complexity.FORCE_SIMPLE;
+        boolean isSimpleInlining = isSimpleInliningSoFar && Level.this.openOp.complexity() == Complexity.SIMPLE;
 
         State state1 = tryToLayOutLevelOnOneLine(commentsHelper, maxWidth, state, prefixSplitsBreaks, explorationNode);
         // If a break was still forced somehow even though we could fit the leadingWidth, then abort.

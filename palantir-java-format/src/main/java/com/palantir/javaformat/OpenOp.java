@@ -100,18 +100,18 @@ public abstract class OpenOp extends HasUniqueId implements Op {
      */
     @Default
     public Complexity complexity() {
-        return Complexity.SIMPLE_IF_CURRENT_INLINE_CHAIN_IS_SIMPLE;
+        return Complexity.SIMPLE;
     }
 
     public enum Complexity {
         /**
-         * If the current chain of levels being inlined so far have all been simple, then the chain so far is simple
-         * too.
+         * This level is simple.
          */
-        SIMPLE_IF_CURRENT_INLINE_CHAIN_IS_SIMPLE,
-        /** The inline chain so far is always considered to be simple. */
-        FORCE_SIMPLE,
-        /** The inline chain is complex, which will cause certain inlinings to not be considered. */
+        SIMPLE,
+        /**
+         * This level is complex, which will cause certain levels downstream from here (that might otherwise fit on
+         * the same line) to not be considered.
+         */
         COMPLEX,
     }
 
@@ -141,7 +141,7 @@ public abstract class OpenOp extends HasUniqueId implements Op {
 
     public static class Builder extends ImmutableOpenOp.Builder {
         public Builder isSimple(boolean isSimple) {
-            return complexity(isSimple ? Complexity.SIMPLE_IF_CURRENT_INLINE_CHAIN_IS_SIMPLE : Complexity.COMPLEX);
+            return complexity(isSimple ? Complexity.SIMPLE : Complexity.COMPLEX);
         }
     }
 }
