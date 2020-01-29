@@ -387,7 +387,6 @@ public final class Level extends Doc {
                     State state1 =
                             keepIndentWhenInlined ? state.withIndentIncrementedBy(lastLevel.getPlusIndent()) : state;
 
-                    // TODO somewhere we should check that there is enough space to inline
                     String humanDescription = "end tryBreakLastLevel chain -> breakOnlyIfInnerLevelsThenFitOnOneLine";
                     return explorationNode
                             .newChildNode(lastLevel, state1)
@@ -413,6 +412,10 @@ public final class Level extends Doc {
                                         // we only want to allow inlining in these cases
                                 }
 
+                                // This will try to put 'lastLevel' entirely on the 2nd line if possible, or failing
+                                // that, partially inline its prefix onto the current line.
+                                // The checks above should ensure that the output would look good even if we partially
+                                // inline it.
                                 return Optional.of(lastLevel.computeBreaks(commentsHelper, maxWidth, state1, exp));
                             })
                             .map(Exploration::markAccepted);
