@@ -244,48 +244,43 @@ public final class Level extends Doc {
 
         boolean anyLevelWasBroken = innerLevels.stream().anyMatch(level -> !brokenState.isOneLine(level));
 
-        boolean prefixFits = false;
         if (!anyLevelWasBroken) {
             return Optional.of(brokenState);
-        } else {
-            // Find the last level, skipping empty levels (that contain nothing, or are made up
-            // entirely of other empty levels).
+        }
+        // Find the last level, skipping empty levels (that contain nothing, or are made up
+        // entirely of other empty levels).
 
-            // Last level because there might be other in-between levels after the initial break like `new
-            // int[]
-            // {`, and we want to skip those.
-            Level lastLevel = innerLevels.stream()
-                    .filter(doc -> StartsWithBreakVisitor.INSTANCE.visit(doc) != Result.EMPTY)
-                    .collect(GET_LAST_COLLECTOR)
-                    .orElseThrow(() -> new IllegalStateException(
-                            "Levels were broken so expected to find at least a non-empty level"));
+        // Last level because there might be other in-between levels after the initial break like `new
+        // int[]
+        // {`, and we want to skip those.
+        Level lastLevel = innerLevels.stream()
+                .filter(doc -> StartsWithBreakVisitor.INSTANCE.visit(doc) != Result.EMPTY)
+                .collect(GET_LAST_COLLECTOR)
+                .orElseThrow(() ->
+                        new IllegalStateException("Levels were broken so expected to find at least a non-empty level"));
 
-            // Add the width of tokens, breaks before the lastLevel. We must always have space for
-            // these.
-            List<Doc> leadingDocs = docs.subList(0, docs.indexOf(lastLevel));
-            float leadingWidth = getWidth(leadingDocs);
+        // Add the width of tokens, breaks before the lastLevel. We must always have space for
+        // these.
+        List<Doc> leadingDocs = docs.subList(0, docs.indexOf(lastLevel));
+        float leadingWidth = getWidth(leadingDocs);
 
-            // Potentially add the width of prefixes we want to consider as part of the width that
-            // must fit on the same line, so that we don't accidentally break prefixes when we could
-            // have avoided doing so.
-            leadingWidth += new CountWidthUntilBreakVisitor(maxWidth - state.indent()).visit(lastLevel);
+        // Potentially add the width of prefixes we want to consider as part of the width that
+        // must fit on the same line, so that we don't accidentally break prefixes when we could
+        // have avoided doing so.
+        leadingWidth += new CountWidthUntilBreakVisitor(maxWidth - state.indent()).visit(lastLevel);
 
-            boolean fits = !Float.isInfinite(leadingWidth) && state.column() + leadingWidth <= maxWidth;
+        boolean fits = !Float.isInfinite(leadingWidth) && state.column() + leadingWidth <= maxWidth;
 
-            if (fits) {
-                prefixFits = true;
-            }
+        if (!fits) {
+            return Optional.empty();
         }
 
-        if (prefixFits) {
-            State newState = state.withNoIndent();
-            if (keepIndent) {
-                newState = newState.withIndentIncrementedBy(getPlusIndent());
-            }
-            return Optional.of(tryToLayOutLevelOnOneLine(
-                    commentsHelper, maxWidth, newState, memoizedSplitsBreaks.get(), explorationNode));
+        State newState = state.withNoIndent();
+        if (keepIndent) {
+            newState = newState.withIndentIncrementedBy(getPlusIndent());
         }
-        return Optional.empty();
+        return Optional.of(tryToLayOutLevelOnOneLine(
+                commentsHelper, maxWidth, newState, memoizedSplitsBreaks.get(), explorationNode));
     }
 
     private Optional<State> tryBreakLastLevel(
