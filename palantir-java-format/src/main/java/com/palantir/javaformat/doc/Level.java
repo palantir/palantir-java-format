@@ -387,6 +387,30 @@ public final class Level extends Doc {
                                             commentsHelper, maxWidth, state3, exp, isSimpleInlining))
                             .map(expl -> expl.markAccepted()); // collapse??
                 })
+                .breakOnlyIfInnerLevelsThenFitOnOneLine(keepIndentWhenInlined -> {
+                    // Need to actually check the inner last level of `lastLevel`.
+                    if (lastLevel.docs.isEmpty() || !(getLast(lastLevel.docs) instanceof Level)) {
+                        return Optional.empty();
+                    }
+                    Level lastLevel2 = ((Level) getLast(lastLevel.docs));
+                    if (lastLevel2.getBreakabilityIfLastLevel() == LastLevelBreakability.ABORT
+                            || lastLevel2.getBreakabilityIfLastLevel() == LastLevelBreakability.CHECK_INNER) {
+                        return Optional.empty();
+                    }
+
+                    State state2 = state;
+                    if (keepIndentWhenInlined) {
+                        state2 = state2.withIndentIncrementedBy(lastLevel.getPlusIndent());
+                    }
+                    State state3 = state2;
+
+                    // TODO somewhere we should check that there is enough space to inline
+                    return Optional.of(explorationNode
+                            .newChildNode(lastLevel, state2)
+                            .explore("recurse into inner breakOnlyIfInnerLevelsThenFitOnOneLine", state3, exp ->
+                                    lastLevel.computeBreaks(commentsHelper, maxWidth, state3, exp))
+                            .markAccepted());
+                })
                 // We don't know how to fit the inner level on the same line, so bail out.
                 .otherwise_(Optional.empty());
     }
