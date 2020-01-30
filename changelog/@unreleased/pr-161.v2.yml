@@ -1,0 +1,6 @@
+type: fix
+fix:
+  description: Only allow expressions with prefix to be inlined after a lambda/simple
+    expression if they contain method calls.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/161

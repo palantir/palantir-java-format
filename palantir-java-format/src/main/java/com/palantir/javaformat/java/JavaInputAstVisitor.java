@@ -2811,11 +2811,16 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         // Are there method invocations or field accesses after the prefix?
         boolean trailingDereferences = !prefixes.isEmpty() && getLast(prefixes) < items.size() - 1;
 
+        boolean hasMethodInvocations = items.stream().anyMatch(expr -> expr.getKind() == METHOD_INVOCATION);
+
         builder.open(OpenOp.builder()
                 .debugName("visitDotWithPrefix")
                 .plusIndent(plusFour)
                 .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(false))
-                .breakabilityIfLastLevel(LastLevelBreakability.ACCEPT_INLINE_CHAIN_IF_SIMPLE_OTHERWISE_CHECK_INNER)
+                .breakabilityIfLastLevel(
+                        hasMethodInvocations
+                                ? LastLevelBreakability.ACCEPT_INLINE_CHAIN_IF_SIMPLE_OTHERWISE_CHECK_INNER
+                                : LastLevelBreakability.CHECK_INNER)
                 .partialInlineability(PartialInlineability.IF_FIRST_LEVEL_FITS)
                 .columnLimitBeforeLastBreak(METHOD_CHAIN_COLUMN_LIMIT)
                 .isSimple(!trailingDereferences)
