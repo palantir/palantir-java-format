@@ -1,0 +1,7 @@
+class PalantirExpressionLambdas {
+    void foo() {
+        this.sequentialTableFactory = SequentialTableFactory.create(
+                ObjectMappers.newServerObjectMapper(), Event.class, txnManager::getTimestampService, () ->
+                        SequentialTableFactory.Strategy.V1);
+    }
+}
