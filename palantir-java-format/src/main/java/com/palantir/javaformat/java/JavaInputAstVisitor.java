@@ -712,7 +712,12 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     @Override
     public Void visitConditionalExpression(ConditionalExpressionTree node, Void unused) {
         sync(node);
-        builder.open(plusFour);
+        builder.open(OpenOp.builder()
+                .plusIndent(plusFour)
+                .breakabilityIfLastLevel(LastLevelBreakability.ACCEPT_INLINE_CHAIN_IF_SIMPLE_OTHERWISE_CHECK_INNER)
+                .columnLimitBeforeLastBreak(METHOD_CHAIN_COLUMN_LIMIT)
+                .debugName("visitConditionalExpression")
+                .build());
         scan(node.getCondition(), null);
         builder.breakOp(" ");
         token("?");
