@@ -29,6 +29,16 @@ public abstract class BreakBehaviour {
         R preferBreakingLastInnerLevel(boolean keepIndentWhenInlined);
 
         /**
+         * Attempt to inline the suffix of this level (which must be a {@link Level} and the last doc), recursing into
+         * the {@link Level} just before the last {@link Level} (if there is such a level) to see if that can be broken
+         * instead.
+         *
+         * <p>This behaves like {@link #breakThisLevel()} if we couldn't recurse into such an inner level, or if the
+         * suffix level doesn't fit on the last line.
+         */
+        R inlineSuffix();
+
+        /**
          * Break if by doing so all inner levels then fit on a single line. However, don't break if we can fit in the
          * {@link Doc docs} up to the first break (which might be nested inside the next doc if it's a {@link Level}),
          * in order to prevent exceeding the maxLength accidentally.
@@ -65,6 +75,14 @@ public abstract class BreakBehaviour {
                         try {
                             gen.writeObjectField("type", "preferBreakingLastInnerLevel");
                             gen.writeObjectField("keepIndentWhenInlined", keepIndentWhenInlined);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        return null;
+                    })
+                    .inlineSuffix(() -> {
+                        try {
+                            gen.writeObjectField("type", "inlineSuffix");
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }

@@ -1,0 +1,6 @@
+type: fix
+fix:
+  description: Method references are no longer split onto their own line unless the
+    expression they're referencing is also completely split.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/164

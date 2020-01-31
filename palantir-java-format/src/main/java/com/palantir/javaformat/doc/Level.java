@@ -19,6 +19,7 @@ package com.palantir.javaformat.doc;
 import static com.google.common.collect.Iterables.getLast;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
@@ -218,6 +219,13 @@ public final class Level extends Doc {
                 return broken.markAccepted();
             }
         }
+
+        @Override
+        public State inlineSuffix() {
+            Optional<Obs.Exploration> lastLevelBroken = levelNode.maybeExplore("inlineSuffix", state, explorationNode ->
+                    tryInlineSuffix(commentsHelper, maxWidth, state, explorationNode, true));
+            return lastLevelBroken.orElseGet(() -> this.breakNormally(state)).markAccepted();
+        }
     }
 
     private Exploration breakNormally(State state, LevelNode levelNode, CommentsHelper commentsHelper, int maxWidth) {
@@ -301,15 +309,57 @@ public final class Level extends Doc {
         if (docs.isEmpty() || !(getLast(docs) instanceof Level)) {
             return Optional.empty();
         }
-        Level lastLevel = ((Level) getLast(docs));
-        // Only split levels that have declared they want to be split in this way.
-        if (lastLevel.getBreakabilityIfLastLevel() == LastLevelBreakability.ABORT) {
+        Level innerLevel = ((Level) getLast(docs));
+
+        return tryBreakInnerLevel(commentsHelper, maxWidth, state, explorationNode, innerLevel, isSimpleInliningSoFar);
+    }
+
+    private Optional<State> tryInlineSuffix(
+            CommentsHelper commentsHelper,
+            int maxWidth,
+            State state,
+            ExplorationNode explorationNode,
+            boolean isSimpleInliningSoFar) {
+        Preconditions.checkState(
+                docs.size() > 0 && getLast(docs) instanceof Level,
+                "Level with break behaviour inlineSuffix must end with a level as its last doc");
+        Level lastLevel = (Level) getLast(docs);
+        Preconditions.checkState(
+                StartsWithBreakVisitor.INSTANCE.visit(lastLevel) == Result.YES,
+                "Level with break behaviour inlineSuffix must have a last level that starts with a break");
+
+        if (docs.size() < 2 || !(docs.get(docs.size() - 2) instanceof Level)) {
             return Optional.empty();
         }
-        // See if we can fill in everything but the lastDoc.
+        Level lastLevelBeforeSuffix = (Level) docs.get(docs.size() - 2);
+
+        return tryBreakInnerLevel(
+                commentsHelper, maxWidth, state, explorationNode, lastLevelBeforeSuffix, isSimpleInliningSoFar);
+    }
+
+    private Optional<State> tryBreakInnerLevel(
+            CommentsHelper commentsHelper,
+            int maxWidth,
+            State state,
+            ExplorationNode explorationNode,
+            Level innerLevel,
+            boolean isSimpleInliningSoFar) {
+
+        // Only split levels that have declared they want to be split in this way.
+        if (innerLevel.getBreakabilityIfLastLevel() == LastLevelBreakability.ABORT) {
+            return Optional.empty();
+        }
+        // See if we can fill in everything but the innerLevel.
         // This is essentially like a small part of computeBreaks.
-        List<Doc> leadingDocs = docs.subList(0, docs.size() - 1);
+        int innerLevelIndex = docs.indexOf(innerLevel);
+        List<Doc> leadingDocs = docs.subList(0, innerLevelIndex);
         if (!tryToFitOnOneLine(maxWidth, state, leadingDocs).isPresent()) {
+            return Optional.empty();
+        }
+
+        List<Doc> trailingDocs = docs.subList(innerLevelIndex + 1, docs.size());
+        float trailingWidth = getWidth(trailingDocs);
+        if (Double.isInfinite(trailingWidth)) {
             return Optional.empty();
         }
 
@@ -328,28 +378,37 @@ public final class Level extends Doc {
             return Optional.empty();
         }
 
-        switch (lastLevel.getBreakabilityIfLastLevel()) {
+        Optional<State> state2;
+        switch (innerLevel.getBreakabilityIfLastLevel()) {
             case ACCEPT_INLINE_CHAIN_IF_SIMPLE_OTHERWISE_CHECK_INNER:
                 if (isSimpleInlining) {
-                    return tryBreakLastLevel_acceptInlineChain(
-                            commentsHelper, maxWidth, explorationNode, lastLevel, state1);
+                    state2 = tryBreakInnerLevel_acceptInlineChain(
+                            commentsHelper, maxWidth, explorationNode, innerLevel, state1);
+                    break;
                 }
                 // Otherwise, fall through to CHECK_INNER.
             case CHECK_INNER:
-                return tryBreakLastLevel_checkInner(
-                        commentsHelper, maxWidth, explorationNode, lastLevel, isSimpleInlining, state1);
+                state2 = tryBreakInnerLevel_checkInner(
+                        commentsHelper, maxWidth, explorationNode, innerLevel, isSimpleInlining, state1);
+                break;
             case ACCEPT_INLINE_CHAIN:
-                return tryBreakLastLevel_acceptInlineChain(
-                        commentsHelper, maxWidth, explorationNode, lastLevel, state1);
+                state2 = tryBreakInnerLevel_acceptInlineChain(
+                        commentsHelper, maxWidth, explorationNode, innerLevel, state1);
+                break;
             case ABORT:
-                return Optional.empty();
+                state2 = Optional.empty();
+                break;
             default:
                 throw new RuntimeException(
-                        "Unexpected lastLevelBreakability: " + lastLevel.getBreakabilityIfLastLevel());
+                        "Unexpected lastLevelBreakability: " + innerLevel.getBreakabilityIfLastLevel());
         }
+        return state2.flatMap(stateAfterInner -> {
+            // Do we have a suffix to inline too?
+            return tryToFitOnOneLine(maxWidth, stateAfterInner, trailingDocs).map(stateAfterInner::withColumn);
+        });
     }
 
-    private static Optional<State> tryBreakLastLevel_acceptInlineChain(
+    private static Optional<State> tryBreakInnerLevel_acceptInlineChain(
             CommentsHelper commentsHelper,
             int maxWidth,
             ExplorationNode explorationNode,
@@ -372,33 +431,41 @@ public final class Level extends Doc {
                 .markAccepted());
     }
 
-    private static Optional<State> tryBreakLastLevel_checkInner(
+    private static Optional<State> tryBreakInnerLevel_checkInner(
             CommentsHelper commentsHelper,
             int maxWidth,
             ExplorationNode explorationNode,
-            Level lastLevel,
+            Level innerLevel,
             boolean isSimpleInlining,
             State state) {
         // Try to fit the entire inner prefix if it's that kind of level.
-        return BreakBehaviours.caseOf(lastLevel.getBreakBehaviour())
+        return BreakBehaviours.caseOf(innerLevel.getBreakBehaviour())
                 .preferBreakingLastInnerLevel(keepIndentWhenInlined -> {
                     State state1 =
-                            keepIndentWhenInlined ? state.withIndentIncrementedBy(lastLevel.getPlusIndent()) : state;
+                            keepIndentWhenInlined ? state.withIndentIncrementedBy(innerLevel.getPlusIndent()) : state;
 
                     return explorationNode
-                            .newChildNode(lastLevel, state1)
+                            .newChildNode(innerLevel, state1)
                             .maybeExplore(
-                                    "recurse into inner tryBreakLastLevel", state1, exp -> lastLevel.tryBreakLastLevel(
+                                    "recurse into inner tryBreakLastLevel", state1, exp -> innerLevel.tryBreakLastLevel(
                                             commentsHelper, maxWidth, state1, exp, isSimpleInlining))
+                            .map(Exploration::markAccepted);
+                })
+                .inlineSuffix(() -> {
+                    State state1 = state.withIndentIncrementedBy(innerLevel.getPlusIndent());
+                    return explorationNode
+                            .newChildNode(innerLevel, state1)
+                            .maybeExplore("recurse into inner tryInlineSuffix", state1, exp ->
+                                    innerLevel.tryInlineSuffix(commentsHelper, maxWidth, state1, exp, isSimpleInlining))
                             .map(Exploration::markAccepted);
                 })
                 .breakOnlyIfInnerLevelsThenFitOnOneLine(keepIndentWhenInlined -> {
                     // This case currently only matches lambda _expressions_ (without curlies)
                     State state1 =
-                            keepIndentWhenInlined ? state.withIndentIncrementedBy(lastLevel.getPlusIndent()) : state;
+                            keepIndentWhenInlined ? state.withIndentIncrementedBy(innerLevel.getPlusIndent()) : state;
 
                     String humanDescription = "end tryBreakLastLevel chain -> breakOnlyIfInnerLevelsThenFitOnOneLine";
-                    LevelNode levelNode = explorationNode.newChildNode(lastLevel, state1);
+                    LevelNode levelNode = explorationNode.newChildNode(innerLevel, state1);
                     return levelNode
                             .maybeExplore(humanDescription, state1, exp -> {
                                 // Not all levels would look good if inlined in this position, so we accept
@@ -409,10 +476,10 @@ public final class Level extends Doc {
                                 // trying to avoid.
 
                                 // For this, need to actually check the last inner level of `lastLevel` (2 levels down).
-                                if (lastLevel.docs.isEmpty() || !(getLast(lastLevel.docs) instanceof Level)) {
+                                if (innerLevel.docs.isEmpty() || !(getLast(innerLevel.docs) instanceof Level)) {
                                     return Optional.empty();
                                 }
-                                Level lastLevel2 = ((Level) getLast(lastLevel.docs));
+                                Level lastLevel2 = ((Level) getLast(innerLevel.docs));
                                 switch (lastLevel2.getBreakabilityIfLastLevel()) {
                                     case ABORT:
                                     case CHECK_INNER:
@@ -425,8 +492,8 @@ public final class Level extends Doc {
                                 // Note: intentionally using 'state' and not 'state1' as Level.breakNormally will always
                                 // add the level's plusIndent.
                                 Exploration broken =
-                                        lastLevel.breakNormally(state, levelNode, commentsHelper, maxWidth);
-                                return lastLevel.handle_breakOnlyIfInnerLevelsThenFitOnOneLine(
+                                        innerLevel.breakNormally(state, levelNode, commentsHelper, maxWidth);
+                                return innerLevel.handle_breakOnlyIfInnerLevelsThenFitOnOneLine(
                                         commentsHelper,
                                         maxWidth,
                                         state1,

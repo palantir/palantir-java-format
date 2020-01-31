@@ -918,9 +918,8 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         builder.open(OpenOp.builder()
                 .plusIndent(plusFour)
                 .debugName("methodReference")
-                // Would like to use CHECK_INNER but we'd have to check in the _first_ level rather than the last
-                // level, which the current logic can't do yet.
-                .breakabilityIfLastLevel(LastLevelBreakability.ACCEPT_INLINE_CHAIN)
+                .breakabilityIfLastLevel(LastLevelBreakability.CHECK_INNER)
+                .breakBehaviour(BreakBehaviours.inlineSuffix())
                 .build());
         scan(node.getQualifierExpression(), null);
         builder.open(ZERO);
