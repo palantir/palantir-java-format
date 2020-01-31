@@ -17,6 +17,7 @@ package com.palantir.javaformat.java;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static com.palantir.javaformat.java.JavaFormatterOptions.Style;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.fail;
 
 import com.google.common.base.Joiner;
@@ -434,5 +435,15 @@ public final class FormatterTest {
                         + " unbroken sentence moving from topic to topic so that no-one had a"
                         + " chance to interrupt;\n"
                         + "}\n");
+    }
+
+    @Test
+    void canParse_java9_private_interface_methods() {
+        assertThatCode(() -> Formatter.create()
+                        .formatSourceAndFixImports(""
+                                + "interface T {\n"
+                                + "    private static void foo() {}\n" //
+                                + "}"))
+                .doesNotThrowAnyException();
     }
 }

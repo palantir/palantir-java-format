@@ -16,12 +16,8 @@
 
 package com.palantir.javaformat.java;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import com.google.common.base.CharMatcher;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
@@ -29,18 +25,9 @@ import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeMap;
 import com.google.common.collect.TreeRangeSet;
 import com.palantir.javaformat.Newlines;
-import java.io.IOError;
-import java.io.IOException;
-import java.net.URI;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-import org.openjdk.javax.tools.Diagnostic;
-import org.openjdk.javax.tools.DiagnosticCollector;
-import org.openjdk.javax.tools.DiagnosticListener;
-import org.openjdk.javax.tools.JavaFileObject;
-import org.openjdk.javax.tools.SimpleJavaFileObject;
-import org.openjdk.javax.tools.StandardLocation;
 import org.openjdk.source.doctree.DocCommentTree;
 import org.openjdk.source.doctree.ReferenceTree;
 import org.openjdk.source.tree.IdentifierTree;
@@ -51,10 +38,7 @@ import org.openjdk.source.util.DocTreePathScanner;
 import org.openjdk.source.util.TreePathScanner;
 import org.openjdk.source.util.TreeScanner;
 import org.openjdk.tools.javac.api.JavacTrees;
-import org.openjdk.tools.javac.file.JavacFileManager;
 import org.openjdk.tools.javac.main.Option;
-import org.openjdk.tools.javac.parser.JavacParser;
-import org.openjdk.tools.javac.parser.ParserFactory;
 import org.openjdk.tools.javac.tree.DCTree;
 import org.openjdk.tools.javac.tree.DCTree.DCReference;
 import org.openjdk.tools.javac.tree.JCTree;
@@ -63,7 +47,6 @@ import org.openjdk.tools.javac.tree.JCTree.JCFieldAccess;
 import org.openjdk.tools.javac.tree.JCTree.JCIdent;
 import org.openjdk.tools.javac.tree.JCTree.JCImport;
 import org.openjdk.tools.javac.util.Context;
-import org.openjdk.tools.javac.util.Log;
 import org.openjdk.tools.javac.util.Options;
 
 /**
@@ -201,36 +184,8 @@ public class RemoveUnusedImports {
     }
 
     private static JCCompilationUnit parse(Context context, String javaInput) throws FormatterException {
-        DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
-        context.put(DiagnosticListener.class, diagnostics);
         Options.instance(context).put("allowStringFolding", "false");
-        JCCompilationUnit unit;
-        JavacFileManager fileManager = new JavacFileManager(context, true, UTF_8);
-        try {
-            fileManager.setLocation(StandardLocation.PLATFORM_CLASS_PATH, ImmutableList.of());
-        } catch (IOException e) {
-            // impossible
-            throw new IOError(e);
-        }
-        SimpleJavaFileObject source = new SimpleJavaFileObject(URI.create("source"), JavaFileObject.Kind.SOURCE) {
-            @Override
-            public CharSequence getCharContent(boolean ignoreEncodingErrors) throws IOException {
-                return javaInput;
-            }
-        };
-        Log.instance(context).useSource(source);
-        ParserFactory parserFactory = ParserFactory.instance(context);
-        JavacParser parser = parserFactory.newParser(
-                javaInput, /*keepDocComments=*/ true, /*keepEndPos=*/ true, /*keepLineMap=*/ true);
-        unit = parser.parseCompilationUnit();
-        unit.sourcefile = source;
-        Iterable<Diagnostic<? extends JavaFileObject>> errorDiagnostics =
-                Iterables.filter(diagnostics.getDiagnostics(), Formatter::errorDiagnostic);
-        if (!Iterables.isEmpty(errorDiagnostics)) {
-            // error handling is done during formatting
-            throw FormatterExceptions.fromJavacDiagnostics(errorDiagnostics);
-        }
-        return unit;
+        return Formatter.parseJcCompilationUnit(context, javaInput);
     }
 
     /** Construct replacements to fix unused imports. */

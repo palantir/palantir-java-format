@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Support source=9 across all formatter steps.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/163

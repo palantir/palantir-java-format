@@ -130,43 +130,13 @@ public final class Formatter {
             throws FormatterException {
 
         Context context = new Context();
-        DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
-        context.put(DiagnosticListener.class, diagnostics);
         Options.instance(context).put("allowStringFolding", "false");
-        // TODO(cushon): this should default to the latest supported source level, remove this after
-        // backing out
-        // https://github.com/google/error-prone-javac/commit/c97f34ddd2308302587ce2de6d0c984836ea5b9f
-        Options.instance(context).put(Option.SOURCE, "9");
-        JCCompilationUnit unit;
-        JavacFileManager fileManager = new JavacFileManager(context, true, UTF_8);
-        try {
-            fileManager.setLocation(StandardLocation.PLATFORM_CLASS_PATH, ImmutableList.of());
-        } catch (IOException e) {
-            // impossible
-            throw new IOError(e);
-        }
-        SimpleJavaFileObject source = new SimpleJavaFileObject(URI.create("source"), JavaFileObject.Kind.SOURCE) {
-            @Override
-            public CharSequence getCharContent(boolean ignoreEncodingErrors) throws IOException {
-                return javaInput.getText();
-            }
-        };
-        Log.instance(context).useSource(source);
-        ParserFactory parserFactory = ParserFactory.instance(context);
-        JavacParser parser = parserFactory.newParser(
-                javaInput.getText(), /*keepDocComments=*/ true, /*keepEndPos=*/ true, /*keepLineMap=*/ true);
-        unit = parser.parseCompilationUnit();
-        unit.sourcefile = source;
 
-        javaInput.setCompilationUnit(unit);
-        Iterable<Diagnostic<? extends JavaFileObject>> errorDiagnostics =
-                Iterables.filter(diagnostics.getDiagnostics(), Formatter::errorDiagnostic);
-        if (!Iterables.isEmpty(errorDiagnostics)) {
-            throw FormatterExceptions.fromJavacDiagnostics(errorDiagnostics);
-        }
+        JCCompilationUnit unit = parseJcCompilationUnit(context, javaInput.getText());
 
-        OpsBuilder opsBuilder = new OpsBuilder(javaInput);
         // Output the compilation unit.
+        javaInput.setCompilationUnit(unit);
+        OpsBuilder opsBuilder = new OpsBuilder(javaInput);
         new JavaInputAstVisitor(opsBuilder, options.indentationMultiplier()).scan(unit, null);
         opsBuilder.sync(javaInput.getText().length());
         opsBuilder.drain();
@@ -189,6 +159,42 @@ public final class Formatter {
             DebugRenderer.render(javaInput, opsOutput, doc, finalState, javaOutput, sink.getOutput());
         }
         return javaOutput;
+    }
+
+    static JCCompilationUnit parseJcCompilationUnit(Context context, String sourceText) throws FormatterException {
+        DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
+        context.put(DiagnosticListener.class, diagnostics);
+        // TODO(cushon): this should default to the latest supported source level, remove this after
+        // backing out
+        // https://github.com/google/error-prone-javac/commit/c97f34ddd2308302587ce2de6d0c984836ea5b9f
+        Options.instance(context).put(Option.SOURCE, "9");
+        JCCompilationUnit unit;
+        JavacFileManager fileManager = new JavacFileManager(context, true, UTF_8);
+        try {
+            fileManager.setLocation(StandardLocation.PLATFORM_CLASS_PATH, ImmutableList.of());
+        } catch (IOException e) {
+            // impossible
+            throw new IOError(e);
+        }
+        SimpleJavaFileObject source = new SimpleJavaFileObject(URI.create("source"), JavaFileObject.Kind.SOURCE) {
+            @Override
+            public CharSequence getCharContent(boolean ignoreEncodingErrors) throws IOException {
+                return sourceText;
+            }
+        };
+        Log.instance(context).useSource(source);
+        ParserFactory parserFactory = ParserFactory.instance(context);
+        JavacParser parser = parserFactory.newParser(
+                sourceText, /*keepDocComments=*/ true, /*keepEndPos=*/ true, /*keepLineMap=*/ true);
+        unit = parser.parseCompilationUnit();
+        unit.sourcefile = source;
+
+        Iterable<Diagnostic<? extends JavaFileObject>> errorDiagnostics =
+                Iterables.filter(diagnostics.getDiagnostics(), Formatter::errorDiagnostic);
+        if (!Iterables.isEmpty(errorDiagnostics)) {
+            throw FormatterExceptions.fromJavacDiagnostics(errorDiagnostics);
+        }
+        return unit;
     }
 
     static boolean errorDiagnostic(Diagnostic<?> input) {
