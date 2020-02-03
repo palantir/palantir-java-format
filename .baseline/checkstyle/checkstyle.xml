@@ -247,7 +247,6 @@
             <message key="name.invalidPattern" value="Package name ''{0}'' must match pattern ''{1}''."/>
         </module>
         <module name="ParameterAssignment"/> <!-- Java Coding Guidelines: Final variables and parameters -->
-        <module name="ParenPad"/> <!-- Java Style Guide: Horizontal whitespace -->
         <module name="RedundantImport"/> <!-- Java Style Guide: No unused imports -->
         <module name="RedundantModifier"/> <!-- Java Coding Guidelines: Avoid redundant modifiers -->
         <module name="RegexpSinglelineJava"> <!-- Java Coding Guidelines: Use appropriate assertion methods -->
