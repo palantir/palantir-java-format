@@ -1,0 +1,7 @@
+class PalantirLongConditionalExpression {
+    void foo() {
+        return bytesRead < 0
+                ? (totalBytesRead == 0 ? -1 : totalBytesRead)
+                : totalBytesRead;
+    }
+}
