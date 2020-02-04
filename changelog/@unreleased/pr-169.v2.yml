@@ -1,6 +1,6 @@
 type: fix
 fix:
-  description: Don't partially inline an lambda body / initializer expression, unless
-    this results in fewer lines used.
+  description: Only partially inline an lambda body / initializer expression if this
+    results in fewer lines used, *or* it's a long method chain, like a builder.
   links:
   - https://github.com/palantir/palantir-java-format/pull/169
