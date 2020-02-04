@@ -296,8 +296,12 @@ public final class Level extends Doc {
         if (keepIndent) {
             newState = newState.withIndentIncrementedBy(getPlusIndent());
         }
-        return Optional.of(tryToLayOutLevelOnOneLine(
-                commentsHelper, maxWidth, newState, memoizedSplitsBreaks.get(), explorationNode));
+        State partiallyInlinedState = tryToLayOutLevelOnOneLine(
+                commentsHelper, maxWidth, newState, memoizedSplitsBreaks.get(), explorationNode);
+        if (partiallyInlinedState.numLines() < brokenState.numLines()) {
+            return Optional.of(partiallyInlinedState);
+        }
+        return Optional.of(brokenState);
     }
 
     private Optional<State> tryBreakLastLevel(
