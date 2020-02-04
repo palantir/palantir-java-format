@@ -98,6 +98,26 @@ private static GradleException notFound(String group, String name, Configuration
 }
 ```
 
+## Optimised for code review
+
+Even though PJF sometimes inlines code more than other formatters, reducing what we see as unnecessary breaks that don't help code comprehension, there are also cases where it will split code into more lines too, in order to improve clarity and code reviewability.
+
+One such case is long method chains. Whereas other formatters are content to completely one-line a long method call chain if it fits, it doesn't usually produce a very readable result:
+
+```java
+var foo = SomeType.builder().thing1(thing1).thing2(thing2).thing3(thing3).build();
+```
+
+To avoid this edge case, we employ a limit of 80 chars for chained method calls, such that _the last method call dot_ must come before that column, or else the chain is not inlined.
+
+```java
+var foo = SomeType.builder()
+        .thing1(thing1)
+        .thing2(thing2)
+        .thing3(thing3)
+        .build();
+```
+
 ## com.palantir.java-format gradle plugin
 
 You should apply this plugin to all projects where you want your java code formatted, e.g.
