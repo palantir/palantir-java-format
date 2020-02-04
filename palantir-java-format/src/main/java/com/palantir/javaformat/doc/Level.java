@@ -298,10 +298,12 @@ public final class Level extends Doc {
         }
         State partiallyInlinedState = tryToLayOutLevelOnOneLine(
                 commentsHelper, maxWidth, newState, memoizedSplitsBreaks.get(), explorationNode);
-        if (partiallyInlinedState.numLines() < brokenState.numLines()) {
+
+        boolean bodyIsComplex = innerLevels.stream().anyMatch(il -> il.openOp.complexity() == Complexity.COMPLEX);
+        if (bodyIsComplex || partiallyInlinedState.numLines() < brokenState.numLines()) {
             return Optional.of(partiallyInlinedState);
         }
-        return Optional.of(brokenState);
+        return Optional.empty();
     }
 
     private Optional<State> tryBreakLastLevel(

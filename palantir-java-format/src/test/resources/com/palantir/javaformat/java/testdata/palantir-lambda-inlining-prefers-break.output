@@ -1,7 +1,8 @@
 class PalantirLambdaInliningPrefersBreak {
     void foo() {
-        endpointDefinition.getDeprecated().ifPresent(documentation ->
-                endpointBuilder.addMethod(MethodSpec.methodBuilder("deprecated")
+        endpointDefinition
+                .getDeprecated()
+                .ifPresent(documentation -> endpointBuilder.addMethod(MethodSpec.methodBuilder("deprecated")
                         .addModifiers(Modifier.PUBLIC)
                         .addAnnotation(Override.class)
                         .returns(ParameterizedTypeName.get(ClassName.get(Optional.class), ClassName.get(String.class)))
