@@ -262,7 +262,7 @@ public final class Level extends Doc {
         boolean anyLevelWasBroken = innerLevels.stream().anyMatch(level -> !brokenState.isOneLine(level));
 
         if (!anyLevelWasBroken) {
-            return Optional.of(brokenState);
+            return Optional.of(brokenState.withExtraPartialInlining());
         }
         // Find the last level, skipping empty levels (that contain nothing, or are made up
         // entirely of other empty levels).
@@ -300,7 +300,9 @@ public final class Level extends Doc {
                 commentsHelper, maxWidth, newState, memoizedSplitsBreaks.get(), explorationNode);
 
         boolean bodyIsComplex = innerLevels.stream().anyMatch(il -> il.openOp.complexity() == Complexity.COMPLEX);
-        if (bodyIsComplex || partiallyInlinedState.numLines() < brokenState.numLines()) {
+        if (bodyIsComplex
+                || brokenState.partialInlinings() > partiallyInlinedState.partialInlinings()
+                || partiallyInlinedState.numLines() < brokenState.numLines()) {
             return Optional.of(partiallyInlinedState);
         }
         return Optional.empty();

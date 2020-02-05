@@ -42,6 +42,9 @@ public abstract class State {
     public abstract boolean mustBreak();
     /** Counts how many lines a particular formatting took. */
     public abstract int numLines();
+
+    public abstract int partialInlinings();
+
     /**
      * Counts how many times reached a branch, where multiple formattings would be considered. Expected runtime is
      * exponential in this number.
@@ -77,6 +80,7 @@ public abstract class State {
                 .column(0)
                 .mustBreak(false)
                 .numLines(0)
+                .partialInlinings(0)
                 .branchingCoefficient(0)
                 .breakTagsTaken(Set.empty(HasUniqueId.ord()))
                 .breakStates(TreeMap.empty(HasUniqueId.ord()))
@@ -176,6 +180,7 @@ public abstract class State {
                 .breakStates(afterInnerLevel.breakStates())
                 .levelStates(afterInnerLevel.levelStates())
                 .tokStates(afterInnerLevel.tokStates())
+                .partialInlinings(afterInnerLevel.partialInlinings())
                 .build();
     }
 
@@ -209,6 +214,13 @@ public abstract class State {
         return builder()
                 .from(this)
                 .tokStates(tokStates().set(comment, tokState))
+                .build();
+    }
+
+    public State withExtraPartialInlining() {
+        return State.builder()
+                .from(this)
+                .partialInlinings(partialInlinings() + 1)
                 .build();
     }
 

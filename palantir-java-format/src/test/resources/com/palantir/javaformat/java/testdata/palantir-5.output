@@ -6,8 +6,8 @@ class Palantir5 {
     }
 
     void bar() {
-        TopologicallySortedList<NodeId> sortedNodes =
-                TopologicallySortedList.create(parentIdByNodeId.keySet(), nodeId ->
-                        StreamEx.of(parentIdByNodeId.get(nodeId)).toSet());
+        TopologicallySortedList<NodeId> sortedNodes = TopologicallySortedList.create(
+                parentIdByNodeId.keySet(),
+                nodeId -> StreamEx.of(parentIdByNodeId.get(nodeId)).toSet());
     }
 }
