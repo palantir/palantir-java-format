@@ -1,0 +1,10 @@
+class Palantir2 {
+    void foo() {
+        if (useAddedColumnsSetDesription) {
+            resultSet = spark.sparkSetCreator()
+                    .resolve(
+                            initialSetResolver,
+                            new LatitudeWithAddedColumnsSetDescription(initialSet, list, Optional.empty()));
+        }
+    }
+}
