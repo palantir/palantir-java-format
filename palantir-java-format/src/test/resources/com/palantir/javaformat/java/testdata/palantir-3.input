@@ -1,0 +1,17 @@
+class Palantir3 {
+    void foo() {
+        operations.put(FunctionDefinition.ARRAY_REGEX_REPLACE, (func, helper) -> {
+            return new Column(new ArrayTransform(
+                    helper.expressionAsColumn(func.arguments().get(0)).expr(), new LambdaFunction(
+                            new RegExpReplace(
+                                    var,
+                                    helper.expressionAsColumn(func.arguments().get(1))
+                                            .expr(),
+                                    helper.expressionAsColumn(func.arguments().get(2))
+                                            .expr()),
+                            JavaConversions.asScalaBuffer(Arrays.asList(var)),
+                            false)));
+        });
+    }
+}
+

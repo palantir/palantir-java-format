@@ -1,0 +1,14 @@
+class Palantir2 {
+    void foo() {
+        operations.put(FunctionDefinition.LOREM_IPSUM_DOLOR_, (func, helper) -> new Column(new GetArrayItem(
+                helper.accessColumnFuncti(func.arguments().get(0)).expr(),
+                helper.accessColumnFuncti(
+                                // Subtract 1 from the provided index to move from 1-indexed to 0-indexed.
+                                FooBarClassName1.of(
+                                        func.arguments().get(1),
+                                        FooBarClassName1.BinaryOperation.SUBTRACT,
+                                        IntegerLiteral.of(1)))
+                        .expr())));
+    }
+}
+
