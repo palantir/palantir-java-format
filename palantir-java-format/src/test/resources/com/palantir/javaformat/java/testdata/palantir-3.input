@@ -1,4 +1,4 @@
-class Palantir2 {
+class Palantir3 {
     void foo() {
         operations.put(FunctionDefinition.ARRAY_REGEX_REPLACE, (func, helper) -> {
             return new Column(new ArrayTransform(

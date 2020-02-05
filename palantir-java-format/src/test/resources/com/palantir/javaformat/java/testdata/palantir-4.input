@@ -1,7 +1,7 @@
-class Palantir2 {
+class Palantir4 {
     void foo() {
         if (useAddedColumnsSetDesription) {
-            resultSet = spark.sparkSetCreator().resolve(initialSetResolver, new LatitudeWithAddedColumnsSetDescription(
+            resultSet = spark.sparkSetCreator().resolve(initialSetResolver, new LoremIpsumLongClassNameWithDescription(
                     initialSet, list, Optional.empty()));
         }
     }

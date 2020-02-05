@@ -1,10 +1,10 @@
-class Palantir2 {
+class Palantir4 {
     void foo() {
         if (useAddedColumnsSetDesription) {
             resultSet = spark.sparkSetCreator()
                     .resolve(
                             initialSetResolver,
-                            new LatitudeWithAddedColumnsSetDescription(initialSet, list, Optional.empty()));
+                            new LoremIpsumLongClassNameWithDescription(initialSet, list, Optional.empty()));
         }
     }
 }

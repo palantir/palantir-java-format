@@ -1,0 +1,8 @@
+class Palantir6 {
+    void foo() {
+        Optional<Dataset<Row>> maybeCached = OptionalUtils.orElseGetOptional(
+                Optional.ofNullable(localRowsCache.getIfPresent(setDescription)),
+                () -> Optional.ofNullable(datasetCache.getIfPresent(setDescription)));
+    }
+}
+
