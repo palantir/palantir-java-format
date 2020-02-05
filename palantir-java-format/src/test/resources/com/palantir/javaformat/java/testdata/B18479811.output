@@ -1,7 +1,9 @@
 class Test {
     public void testPrimitiveFields() {
         ConverterVerifier.verifyFieldsAreAnnotatedWithToPojo(
-                Contact.class, DomainContact.class, new ImmutableList.Builder<String>()
+                Contact.class,
+                DomainContact.class,
+                new ImmutableList.Builder<String>()
                         .add(
                                 "address1",
                                 "address2",
