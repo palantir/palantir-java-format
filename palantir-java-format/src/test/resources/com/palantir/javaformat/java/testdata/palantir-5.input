@@ -1,0 +1,14 @@
+class Palantir5 {
+    void foo() {
+        ConfigurationBuilder configuration = new ConfigurationBuilder()
+                .addUrls(apiUrls)
+                .filterInputsBy(name -> name != null && !name.contains("Immutable"));
+    }
+
+    void bar() {
+        TopologicallySortedList<NodeId> sortedNodes = TopologicallySortedList.create(
+                parentIdByNodeId.keySet(),
+                nodeId -> StreamEx.of(parentIdByNodeId.get(nodeId)).toSet());
+    }
+}
+
