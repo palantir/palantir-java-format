@@ -58,4 +58,10 @@ subprojects {
                                               '-Xep:PreferSafeLoggingPreconditions:OFF',
                                               '-Xep:SwitchStatementDefaultCase:OFF']
     }
+
+    // Run `./gradlew test -Drecreate=true` to recreate all the expected
+    // generated code that we have checked into the repo.
+    tasks.withType(Test) {
+        systemProperty 'recreate', System.getProperty('recreate', 'false')
+    }
 }
