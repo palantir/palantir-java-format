@@ -1,0 +1,8 @@
+class Palantir8 {
+    void foo() {
+        assertThatServiceExceptionThrownBy(new Aggregation.Builder()
+                        .max(max)
+                        .aggregations(ImmutableMap.of("bountiful", bountifulAggregation))::build)
+                .hasType(MY_ERROR_TYPE);
+    }
+}

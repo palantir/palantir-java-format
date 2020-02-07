@@ -476,14 +476,11 @@ public final class Level extends Doc {
                                             commentsHelper, maxWidth, state1, exp, isSimpleInlining))
                             .map(Exploration::markAccepted);
                 })
-                .inlineSuffix(() -> {
-                    State state1 = state.withIndentIncrementedBy(innerLevel.getPlusIndent());
-                    return explorationNode
-                            .newChildNode(innerLevel, state1)
-                            .maybeExplore("recurse into inner tryInlineSuffix", state1, exp ->
-                                    innerLevel.tryInlineSuffix(commentsHelper, maxWidth, state1, exp, isSimpleInlining))
-                            .map(Exploration::markAccepted);
-                })
+                .inlineSuffix(() -> explorationNode
+                        .newChildNode(innerLevel, state)
+                        .maybeExplore("recurse into inner tryInlineSuffix", state, exp ->
+                                innerLevel.tryInlineSuffix(commentsHelper, maxWidth, state, exp, isSimpleInlining))
+                        .map(Exploration::markAccepted))
                 .breakOnlyIfInnerLevelsThenFitOnOneLine(keepIndentWhenInlined -> {
                     // This case currently only matches lambda _expressions_ (without curlies)
                     State state1 =
