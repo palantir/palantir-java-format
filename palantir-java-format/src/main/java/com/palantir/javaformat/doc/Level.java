@@ -522,7 +522,11 @@ public final class Level extends Doc {
                                                 keepIndentWhenInlined,
                                                 explorationNode);
                                     case ACCEPT_INLINE_CHAIN_IF_SIMPLE_OTHERWISE_CHECK_INNER:
-                                        // TODO but what if this lastLevel2 is not simple???
+                                        // We will allow inlining this kind of level but only if the level itself is
+                                        // not simple.
+                                        if (lastLevel2.openOp.complexity() == Complexity.SIMPLE) {
+                                            return Optional.empty();
+                                        }
                                         return innerLevel.tryInlinePrefixOntoCurrentLine(
                                                 commentsHelper,
                                                 maxWidth,
