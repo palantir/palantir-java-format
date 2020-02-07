@@ -44,34 +44,6 @@ public abstract class State {
     public abstract int numLines();
 
     /**
-     * How many hanging expressions were produced, i.e. when an expression was pushed onto the next line. In
-     * practice, the only place where these can occur is expression lambdas where the expression was split onto the
-     * next line.
-     *
-     * <p>We keep track of this because these affect readability when they occur inside a larger expression.
-     *
-     * <p>A hanging expression looks like this:
-     *
-     * <pre>
-     * someMethod(arg1, arg2, param ->
-     *         doSomethingWith(param));
-     * </pre>
-     *
-     * However, it only counts as hanging if the expression lambda's body couldn't be partially inlined. Thus, the
-     * following kind of formatting does <em>not</em> count:
-     *
-     * <pre>
-     * someMethod(arg1, arg2, param -> param
-     *         .method1(...)
-     *         .method2(...)
-     *         .method3(...));
-     * </pre>
-     *
-     * @see State#withExtraHangingExpression()
-     */
-    public abstract int numHangingExpressions();
-
-    /**
      * Counts how many times reached a branch, where multiple formattings would be considered. Expected runtime is
      * exponential in this number.
      *
@@ -106,7 +78,6 @@ public abstract class State {
                 .column(0)
                 .mustBreak(false)
                 .numLines(0)
-                .numHangingExpressions(0)
                 .branchingCoefficient(0)
                 .breakTagsTaken(Set.empty(HasUniqueId.ord()))
                 .breakStates(TreeMap.empty(HasUniqueId.ord()))
@@ -201,7 +172,6 @@ public abstract class State {
                 // Overridden state
                 .column(afterInnerLevel.column())
                 .numLines(afterInnerLevel.numLines())
-                .numHangingExpressions(afterInnerLevel.numHangingExpressions())
                 // TODO(dsanduleac): put these behind a "GlobalState"
                 .breakTagsTaken(afterInnerLevel.breakTagsTaken())
                 .breakStates(afterInnerLevel.breakStates())
@@ -240,13 +210,6 @@ public abstract class State {
         return builder()
                 .from(this)
                 .tokStates(tokStates().set(comment, tokState))
-                .build();
-    }
-
-    public State withExtraHangingExpression() {
-        return State.builder()
-                .from(this)
-                .numHangingExpressions(numHangingExpressions() + 1)
                 .build();
     }
 

@@ -258,7 +258,7 @@ public final class Level extends Doc {
         boolean anyLevelWasBroken = brokenState.numLines() != state.numLines() + 1;
 
         if (!anyLevelWasBroken) {
-            return Optional.of(brokenState.withExtraHangingExpression());
+            return Optional.of(brokenState);
         }
 
         Optional<State> partiallyInlinedStateOpt =
@@ -273,9 +273,7 @@ public final class Level extends Doc {
                 .map(doc -> ((Level) doc))
                 .anyMatch(il -> il.openOp.complexity() == Complexity.COMPLEX);
 
-        if (bodyIsComplex
-                || partiallyInlinedState.numHangingExpressions() < brokenState.numHangingExpressions()
-                || partiallyInlinedState.numLines() < brokenState.numLines()) {
+        if (bodyIsComplex || partiallyInlinedState.numLines() < brokenState.numLines()) {
             return Optional.of(partiallyInlinedState);
         }
         return Optional.empty();
