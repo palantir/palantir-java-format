@@ -683,12 +683,15 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     @Override
     public Void visitNewClass(NewClassTree node, Void unused) {
         sync(node);
-        builder.open(
-                ZERO,
-                BreakBehaviours.preferBreakingLastInnerLevel(true),
-                node.getClassBody() != null
-                        ? LastLevelBreakability.ACCEPT_INLINE_CHAIN
-                        : LastLevelBreakability.CHECK_INNER);
+        LastLevelBreakability breakabilityIfLastLevel = node.getClassBody() != null
+                ? LastLevelBreakability.ACCEPT_INLINE_CHAIN
+                : LastLevelBreakability.ACCEPT_INLINE_CHAIN_IF_SIMPLE_OTHERWISE_CHECK_INNER;
+        builder.open(OpenOp.builder()
+                .debugName("visitNewClass")
+                .plusIndent(ZERO)
+                .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(true))
+                .breakabilityIfLastLevel(breakabilityIfLastLevel)
+                .build());
         if (node.getEnclosingExpression() != null) {
             scan(node.getEnclosingExpression(), null);
             builder.breakOp();

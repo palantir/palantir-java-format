@@ -254,18 +254,45 @@ public final class Level extends Doc {
             State brokenState,
             boolean keepIndent,
             Obs.ExplorationNode explorationNode) {
-        List<Level> innerLevels = this.docs.stream()
-                .filter(doc -> doc instanceof Level)
-                .map(doc -> ((Level) doc))
-                .collect(Collectors.toList());
 
-        boolean anyLevelWasBroken = innerLevels.stream().anyMatch(level -> !brokenState.isOneLine(level));
+        boolean anyLevelWasBroken = brokenState.numLines() != state.numLines() + 1;
 
         if (!anyLevelWasBroken) {
             return Optional.of(brokenState.withExtraHangingExpression());
         }
+
+        Optional<State> partiallyInlinedStateOpt =
+                tryInlinePrefixOntoCurrentLine(commentsHelper, maxWidth, state, keepIndent, explorationNode);
+        if (!partiallyInlinedStateOpt.isPresent()) {
+            return Optional.empty();
+        }
+        State partiallyInlinedState = partiallyInlinedStateOpt.get();
+
+        boolean bodyIsComplex = this.docs.stream()
+                .filter(doc -> doc instanceof Level)
+                .map(doc -> ((Level) doc))
+                .anyMatch(il -> il.openOp.complexity() == Complexity.COMPLEX);
+
+        if (bodyIsComplex
+                || partiallyInlinedState.numHangingExpressions() < brokenState.numHangingExpressions()
+                || partiallyInlinedState.numLines() < brokenState.numLines()) {
+            return Optional.of(partiallyInlinedState);
+        }
+        return Optional.empty();
+    }
+
+    private Optional<State> tryInlinePrefixOntoCurrentLine(
+            CommentsHelper commentsHelper,
+            int maxWidth,
+            State state,
+            boolean keepIndent,
+            Obs.ExplorationNode explorationNode) {
         // Find the last level, skipping empty levels (that contain nothing, or are made up
         // entirely of other empty levels).
+        List<Level> innerLevels = this.docs.stream()
+                .filter(doc -> doc instanceof Level)
+                .map(doc -> ((Level) doc))
+                .collect(Collectors.toList());
 
         // Last level because there might be other in-between levels after the initial break like `new
         // int[]
@@ -296,16 +323,8 @@ public final class Level extends Doc {
         if (keepIndent) {
             newState = newState.withIndentIncrementedBy(getPlusIndent());
         }
-        State partiallyInlinedState = tryToLayOutLevelOnOneLine(
-                commentsHelper, maxWidth, newState, memoizedSplitsBreaks.get(), explorationNode);
-
-        boolean bodyIsComplex = innerLevels.stream().anyMatch(il -> il.openOp.complexity() == Complexity.COMPLEX);
-        if (bodyIsComplex
-                || brokenState.numHangingExpressions() > partiallyInlinedState.numHangingExpressions()
-                || partiallyInlinedState.numLines() < brokenState.numLines()) {
-            return Optional.of(partiallyInlinedState);
-        }
-        return Optional.empty();
+        return Optional.of(tryToLayOutLevelOnOneLine(
+                commentsHelper, maxWidth, newState, memoizedSplitsBreaks.get(), explorationNode));
     }
 
     private Optional<State> tryBreakLastLevel(
@@ -493,21 +512,26 @@ public final class Level extends Doc {
                                     case CHECK_INNER:
                                         return Optional.empty();
                                     case ACCEPT_INLINE_CHAIN:
+                                        Exploration broken =
+                                                innerLevel.breakNormally(state, levelNode, commentsHelper, maxWidth);
+                                        return innerLevel.handle_breakOnlyIfInnerLevelsThenFitOnOneLine(
+                                                commentsHelper,
+                                                maxWidth,
+                                                state1,
+                                                broken.state(),
+                                                keepIndentWhenInlined,
+                                                explorationNode);
                                     case ACCEPT_INLINE_CHAIN_IF_SIMPLE_OTHERWISE_CHECK_INNER:
-                                        // we only want to allow inlining in these cases
+                                        // TODO but what if this lastLevel2 is not simple???
+                                        return innerLevel.tryInlinePrefixOntoCurrentLine(
+                                                commentsHelper,
+                                                maxWidth,
+                                                state1,
+                                                keepIndentWhenInlined,
+                                                explorationNode);
+                                    default:
+                                        throw new RuntimeException("Unknown breakabilityIfLastLevel: " + lastLevel2);
                                 }
-
-                                // Note: intentionally using 'state' and not 'state1' as Level.breakNormally will always
-                                // add the level's plusIndent.
-                                Exploration broken =
-                                        innerLevel.breakNormally(state, levelNode, commentsHelper, maxWidth);
-                                return innerLevel.handle_breakOnlyIfInnerLevelsThenFitOnOneLine(
-                                        commentsHelper,
-                                        maxWidth,
-                                        state1,
-                                        broken.state(),
-                                        keepIndentWhenInlined,
-                                        explorationNode);
                             })
                             .map(Exploration::markAccepted);
                 })

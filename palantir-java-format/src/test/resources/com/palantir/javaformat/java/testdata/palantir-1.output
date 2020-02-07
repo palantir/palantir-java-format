@@ -1,9 +1,8 @@
 class Palantir1 {
     void foo() {
         for (Double d : Lists.newArrayList(5.0, 10.0, 1.0, 0.0)) {
-            list.add(
-                    new BinaryNumericConstantColumnInfoV1(
-                            operation, SparkIntegrationTestRuleSets.column("x"), d, Optional.empty()));
+            list.add(new BinaryNumericConstantColumnInfoV1(
+                    operation, SparkIntegrationTestRuleSets.column("x"), d, Optional.empty()));
         }
     }
 }
