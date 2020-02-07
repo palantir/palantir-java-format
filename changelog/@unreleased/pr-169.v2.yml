@@ -1,6 +1,6 @@
-type: fix
-fix:
-  description: Only partially inline an lambda body / initializer expression if this
-    results in fewer lines used, *or* it's a long method chain, like a builder.
+type: improvement
+improvement:
+  description: Reduce situations where an inlined lambda can get a newline after the
+    arrow, and allow inlining new Class() calls in more contexts.
   links:
   - https://github.com/palantir/palantir-java-format/pull/169
