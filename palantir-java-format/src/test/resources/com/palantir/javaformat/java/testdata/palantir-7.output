@@ -1,9 +1,9 @@
 class Palantir7 {
     void foo() {
         when(graphService.getPathFromRootToNode(any(GraphId.class), any(NodeId.class)))
-                .thenAnswer(invocation -> invocation.getArguments().length == 2
-                                && invocation.getArguments()[1] != null
-                        ? ImmutableList.of(invocation.getArgument(1))
-                        : ImmutableList.of(NodeId.create()));
+                .thenAnswer(invocation ->
+                        invocation.getArguments().length == 2 && invocation.getArguments()[1] != null
+                                ? ImmutableList.of(invocation.getArgument(1))
+                                : ImmutableList.of(NodeId.create()));
     }
 }

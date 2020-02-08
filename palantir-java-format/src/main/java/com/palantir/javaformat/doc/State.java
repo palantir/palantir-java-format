@@ -42,6 +42,7 @@ public abstract class State {
     public abstract boolean mustBreak();
     /** Counts how many lines a particular formatting took. */
     public abstract int numLines();
+
     /**
      * Counts how many times reached a branch, where multiple formattings would be considered. Expected runtime is
      * exponential in this number.
