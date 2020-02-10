@@ -190,8 +190,9 @@ public final class Level extends Doc {
             if (state.branchingCoefficient() < MAX_BRANCHING_COEFFICIENT) {
                 State state1 = state.withNoIndent();
                 Optional<Obs.Exploration> lastLevelBroken = levelNode.maybeExplore(
-                        "tryBreakLastLevel", state1, explorationNode ->
-                                tryBreakLastLevel(commentsHelper, maxWidth, state1, explorationNode, true));
+                        "tryBreakLastLevel",
+                        state1,
+                        explorationNode -> tryBreakLastLevel(commentsHelper, maxWidth, state1, explorationNode, true));
 
                 if (lastLevelBroken.isPresent()) {
                     if (lastLevelBroken.get().state().numLines()
@@ -222,16 +223,20 @@ public final class Level extends Doc {
 
         @Override
         public State inlineSuffix() {
-            Optional<Obs.Exploration> lastLevelBroken = levelNode.maybeExplore("inlineSuffix", state, explorationNode ->
-                    tryInlineSuffix(commentsHelper, maxWidth, state, explorationNode, true));
+            Optional<Obs.Exploration> lastLevelBroken = levelNode.maybeExplore(
+                    "inlineSuffix",
+                    state,
+                    explorationNode -> tryInlineSuffix(commentsHelper, maxWidth, state, explorationNode, true));
             return lastLevelBroken.orElseGet(() -> this.breakNormally(state)).markAccepted();
         }
     }
 
     private Exploration breakNormally(State state, LevelNode levelNode, CommentsHelper commentsHelper, int maxWidth) {
         State stateForBroken = state.withIndentIncrementedBy(getPlusIndent());
-        return levelNode.explore("breaking normally", stateForBroken, explorationNode ->
-                computeBroken(commentsHelper, maxWidth, stateForBroken, explorationNode));
+        return levelNode.explore(
+                "breaking normally",
+                stateForBroken,
+                explorationNode -> computeBroken(commentsHelper, maxWidth, stateForBroken, explorationNode));
     }
 
     /**
@@ -451,8 +456,10 @@ public final class Level extends Doc {
         // lastLevel
         return Optional.of(explorationNode
                 .newChildNode(lastLevel, state)
-                .explore("end tryBreakLastLevel chain", state, exp ->
-                        lastLevel.computeBreaks(commentsHelper, maxWidth, state, exp))
+                .explore(
+                        "end tryBreakLastLevel chain",
+                        state,
+                        exp -> lastLevel.computeBreaks(commentsHelper, maxWidth, state, exp))
                 .markAccepted());
     }
 
@@ -472,14 +479,19 @@ public final class Level extends Doc {
                     return explorationNode
                             .newChildNode(innerLevel, state1)
                             .maybeExplore(
-                                    "recurse into inner tryBreakLastLevel", state1, exp -> innerLevel.tryBreakLastLevel(
+                                    "recurse into inner tryBreakLastLevel",
+                                    state1,
+                                    exp -> innerLevel.tryBreakLastLevel(
                                             commentsHelper, maxWidth, state1, exp, isSimpleInlining))
                             .map(Exploration::markAccepted);
                 })
                 .inlineSuffix(() -> explorationNode
                         .newChildNode(innerLevel, state)
-                        .maybeExplore("recurse into inner tryInlineSuffix", state, exp ->
-                                innerLevel.tryInlineSuffix(commentsHelper, maxWidth, state, exp, isSimpleInlining))
+                        .maybeExplore(
+                                "recurse into inner tryInlineSuffix",
+                                state,
+                                exp -> innerLevel.tryInlineSuffix(
+                                        commentsHelper, maxWidth, state, exp, isSimpleInlining))
                         .map(Exploration::markAccepted))
                 .breakOnlyIfInnerLevelsThenFitOnOneLine(keepIndentWhenInlined -> {
                     // This case currently only matches lambda _expressions_ (without curlies)

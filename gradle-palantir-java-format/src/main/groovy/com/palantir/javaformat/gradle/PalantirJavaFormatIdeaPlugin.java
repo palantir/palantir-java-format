@@ -80,10 +80,12 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
             List<URI> uris =
                     implConfiguration.getFiles().stream().map(File::toURI).collect(Collectors.toList());
 
-            createOrUpdateIdeaXmlFile(project.file(".idea/palantir-java-format.xml"), node ->
-                    ConfigureJavaFormatterXml.configureJavaFormat(node, uris));
-            createOrUpdateIdeaXmlFile(project.file(".idea/externalDependencies.xml"), node ->
-                    ConfigureJavaFormatterXml.configureExternalDependencies(node));
+            createOrUpdateIdeaXmlFile(
+                    project.file(".idea/palantir-java-format.xml"),
+                    node -> ConfigureJavaFormatterXml.configureJavaFormat(node, uris));
+            createOrUpdateIdeaXmlFile(
+                    project.file(".idea/externalDependencies.xml"),
+                    node -> ConfigureJavaFormatterXml.configureExternalDependencies(node));
         });
     }
 

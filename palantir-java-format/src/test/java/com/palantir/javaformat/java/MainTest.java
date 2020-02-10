@@ -321,8 +321,9 @@ public class MainTest {
         StringWriter out = new StringWriter();
         StringWriter err = new StringWriter();
         Main main = new Main(
-                new PrintWriter(out, true), new PrintWriter(err, true), new ByteArrayInputStream("class T {}\n\t"
-                        .getBytes(UTF_8)));
+                new PrintWriter(out, true),
+                new PrintWriter(err, true),
+                new ByteArrayInputStream("class T {}\n\t".getBytes(UTF_8)));
         assertThat(main.format("-")).isEqualTo(0);
         assertThat(out.toString()).isEqualTo("class T {}\n");
     }
@@ -332,8 +333,9 @@ public class MainTest {
         StringWriter out = new StringWriter();
         StringWriter err = new StringWriter();
         Main main = new Main(
-                new PrintWriter(out, true), new PrintWriter(err, true), new ByteArrayInputStream("class Test {}\n"
-                        .getBytes(UTF_8)));
+                new PrintWriter(out, true),
+                new PrintWriter(err, true),
+                new ByteArrayInputStream("class Test {}\n".getBytes(UTF_8)));
         assertThat(main.format("-n", "-")).isEqualTo(0);
         assertThat(out.toString()).isEmpty();
         assertThat(err.toString()).isEmpty();
