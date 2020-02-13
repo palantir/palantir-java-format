@@ -13,5 +13,11 @@ class Palantir10 {
         // Test that we still reflow short string concatenations (spanning exactly 2 lines)
         foo("foo" + "bar" + THING + "baz");
         foo("foo" + "bar" + THING + "baz");
+
+        // This causes an NPE if we're not careful when getting the last token of the binary expression
+        if (!partialDataSourceType.equals(dataSourceType)) {
+            throw new ClientException("You may not use a " + partialDataSourceType + " partial in a " + dataSourceType
+                    + " query. Caused by partial \"" + partialName + "\"");
+        }
     }
 }

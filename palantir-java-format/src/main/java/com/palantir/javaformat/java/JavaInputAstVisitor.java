@@ -49,6 +49,7 @@ import com.google.common.base.Throwables;
 import com.google.common.base.Verify;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableRangeMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
@@ -84,7 +85,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.IntFunction;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
@@ -3304,13 +3305,22 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
 
     /** How many lines does this node take up in the input. Returns at least 1. */
     int lineSpan(Tree node) {
-        IntFunction<Integer> lineNumberAt = tokenPosition -> {
-            Input.Token token = builder.getInput().getPositionTokenMap().get(tokenPosition);
-            return builder.getInput().getLineNumber(token.getTok().getPosition());
-        };
-        return lineNumberAt.apply(getEndPosition(node, getCurrentPath()))
-                - lineNumberAt.apply(getStartPosition(node))
-                + 1;
+        ImmutableRangeMap<Integer, ? extends Input.Token> positionTokenMap =
+                builder.getInput().getPositionTokenMap();
+        Function<Input.Token, Integer> lineNumberAt =
+                token -> builder.getInput().getLineNumber(token.getTok().getPosition());
+
+        int startPosition = getStartPosition(node);
+        int endPosition = getEndPosition(node, getCurrentPath());
+        // The last token will not be in the range map if it's whitespace, because of JavaOutput.endTok's filtering.
+        // Thus, we go back until we find a "real" last token.
+        // If all tokens down from endPosition are null, then we are guaranteed stop at startPosition.
+        while (endPosition > startPosition && positionTokenMap.get(endPosition) == null) {
+            endPosition--;
+        }
+        Input.Token startToken = positionTokenMap.get(startPosition);
+        Input.Token endToken = positionTokenMap.get(endPosition);
+        return lineNumberAt.apply(endToken) - lineNumberAt.apply(startToken) + 1;
     }
 
     /** Returns true if {@code atLeastM} of the expressions in the given column are the same kind. */
