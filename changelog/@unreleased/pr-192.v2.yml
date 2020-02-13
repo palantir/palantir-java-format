@@ -1,0 +1,6 @@
+type: improvement
+improvement:
+  description: Preserve the user's newlines in a long string concatenation (defined
+    as a concatenation with `+` where at least one expression is a literal string).
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/192
