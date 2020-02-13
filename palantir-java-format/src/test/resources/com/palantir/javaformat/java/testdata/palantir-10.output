@@ -1,4 +1,5 @@
 class Palantir10 {
+    // We preserve input newlines for this long string concatenation (more than 2 lines)
     @SqlUpdate("CREATE TABLE things "
             + "(id VARCHAR(" + MAX_LENGTH + ") NOT NULL, "
             + "title VARCHAR(" + MAX_LENGTH + ")  NOT NULL, "
@@ -7,4 +8,10 @@ class Palantir10 {
             + "documentJson VARCHAR(" + MAX_DOCUMENT_LENGTH + ") NOT NULL, "
             + "PRIMARY KEY (id))")
     void createTable();
+
+    void foo() {
+        // Test that we still reflow short string concatenations (spanning exactly 2 lines)
+        foo("foo" + "bar" + THING + "baz");
+        foo("foo" + "bar" + THING + "baz");
+    }
 }
