@@ -85,7 +85,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
@@ -3307,8 +3306,6 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     int lineSpan(Tree node) {
         ImmutableRangeMap<Integer, ? extends Input.Token> positionTokenMap =
                 builder.getInput().getPositionTokenMap();
-        Function<Input.Token, Integer> lineNumberAt =
-                token -> builder.getInput().getLineNumber(token.getTok().getPosition());
 
         int startPosition = getStartPosition(node);
         int endPosition = getEndPosition(node, getCurrentPath());
@@ -3320,7 +3317,11 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         }
         Input.Token startToken = positionTokenMap.get(startPosition);
         Input.Token endToken = positionTokenMap.get(endPosition);
-        return lineNumberAt.apply(endToken) - lineNumberAt.apply(startToken) + 1;
+        return lineNumberAt(endToken) - lineNumberAt(startToken) + 1;
+    }
+
+    private int lineNumberAt(Input.Token token) {
+        return builder.getInput().getLineNumber(token.getTok().getPosition());
     }
 
     /** Returns true if {@code atLeastM} of the expressions in the given column are the same kind. */
