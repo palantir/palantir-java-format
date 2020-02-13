@@ -84,6 +84,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.IntFunction;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
@@ -1145,23 +1146,24 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         List<String> operators = new ArrayList<>();
         walkInfix(precedence(node), node, operands, operators);
         boolean isStringConcat = isStringConcat(node);
+        boolean shouldPreserveNewlines = isStringConcat && lineSpan(node) > 2;
         FillMode fillMode = hasOnlyShortItems(operands) || isStringConcat ? INDEPENDENT : UNIFIED;
+
         builder.open(
                 plusFour,
                 BreakBehaviours.breakThisLevel(),
                 LastLevelBreakability.ACCEPT_INLINE_CHAIN_IF_SIMPLE_OTHERWISE_CHECK_INNER);
         scan(operands.get(0), null);
-        FillMode nextFillMode = builder.mostRecentTokenFollowedByNewline() ? UNIFIED : fillMode;
         int operatorsN = operators.size();
+        boolean shouldEnforceNewline = builder.mostRecentTokenFollowedByNewline();
         for (int i = 0; i < operatorsN; i++) {
+            FillMode nextFillMode = shouldPreserveNewlines && shouldEnforceNewline ? UNIFIED : fillMode;
             builder.breakOp(nextFillMode, " ", ZERO);
             builder.op(operators.get(i));
-            boolean shouldEnforceNewline = builder.mostRecentTokenFollowedByNewline();
+            shouldEnforceNewline = builder.mostRecentTokenFollowedByNewline();
             builder.space();
             scan(operands.get(i + 1), null);
             shouldEnforceNewline = shouldEnforceNewline || builder.mostRecentTokenFollowedByNewline();
-
-            nextFillMode = isStringConcat && shouldEnforceNewline ? UNIFIED : fillMode;
         }
         builder.close();
         return null;
@@ -3298,6 +3300,17 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     private Integer actualColumn(ExpressionTree expression) {
         Map<Integer, Integer> positionToColumnMap = builder.getInput().getPositionToColumnMap();
         return positionToColumnMap.get(builder.actualStartColumn(getStartPosition(expression)));
+    }
+
+    /** How many lines does this node take up in the input. Returns at least 1. */
+    int lineSpan(Tree node) {
+        IntFunction<Integer> lineNumberAt = tokenPosition -> {
+            Input.Token token = builder.getInput().getPositionTokenMap().get(tokenPosition);
+            return builder.getInput().getLineNumber(token.getTok().getPosition());
+        };
+        return lineNumberAt.apply(getEndPosition(node, getCurrentPath()))
+                - lineNumberAt.apply(getStartPosition(node))
+                + 1;
     }
 
     /** Returns true if {@code atLeastM} of the expressions in the given column are the same kind. */
