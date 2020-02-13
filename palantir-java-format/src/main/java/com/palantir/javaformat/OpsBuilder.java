@@ -307,7 +307,7 @@ public final class OpsBuilder {
     }
 
     /** Return whether the last token emitted is followed by a newline. */
-    public boolean lastTokenFollowedByNewline() {
+    public boolean mostRecentTokenFollowedByNewline() {
         Preconditions.checkState(tokenI > 0, "No token was emitted yet");
         return input.getTokens().get(tokenI - 1).getToksAfter().stream().anyMatch(Tok::isNewline);
     }

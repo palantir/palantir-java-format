@@ -1151,15 +1151,15 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 BreakBehaviours.breakThisLevel(),
                 LastLevelBreakability.ACCEPT_INLINE_CHAIN_IF_SIMPLE_OTHERWISE_CHECK_INNER);
         scan(operands.get(0), null);
-        FillMode nextFillMode = builder.lastTokenFollowedByNewline() ? UNIFIED : fillMode;
+        FillMode nextFillMode = builder.mostRecentTokenFollowedByNewline() ? UNIFIED : fillMode;
         int operatorsN = operators.size();
         for (int i = 0; i < operatorsN; i++) {
             builder.breakOp(nextFillMode, " ", ZERO);
             builder.op(operators.get(i));
-            boolean shouldEnforceNewline = builder.lastTokenFollowedByNewline();
+            boolean shouldEnforceNewline = builder.mostRecentTokenFollowedByNewline();
             builder.space();
             scan(operands.get(i + 1), null);
-            shouldEnforceNewline = shouldEnforceNewline || builder.lastTokenFollowedByNewline();
+            shouldEnforceNewline = shouldEnforceNewline || builder.mostRecentTokenFollowedByNewline();
 
             nextFillMode = isStringConcat && shouldEnforceNewline ? UNIFIED : fillMode;
         }
