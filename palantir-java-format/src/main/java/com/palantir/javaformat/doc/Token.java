@@ -73,7 +73,7 @@ public final class Token extends Doc implements Op {
      * @param plusIndentCommentsBefore extra {@code plusIndent} for comments just before this token
      * @return the new {@code Token}
      */
-    public static Op make(
+    public static Token make(
             Input.Token token,
             RealOrImaginary realOrImaginary,
             Indent plusIndentCommentsBefore,

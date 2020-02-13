@@ -1144,18 +1144,24 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         List<ExpressionTree> operands = new ArrayList<>();
         List<String> operators = new ArrayList<>();
         walkInfix(precedence(node), node, operands, operators);
-        FillMode fillMode = hasOnlyShortItems(operands) ? INDEPENDENT : UNIFIED;
+        boolean isStringConcat = isStringConcat(node);
+        FillMode fillMode = hasOnlyShortItems(operands) || isStringConcat ? INDEPENDENT : UNIFIED;
         builder.open(
                 plusFour,
                 BreakBehaviours.breakThisLevel(),
                 LastLevelBreakability.ACCEPT_INLINE_CHAIN_IF_SIMPLE_OTHERWISE_CHECK_INNER);
         scan(operands.get(0), null);
+        FillMode nextFillMode = builder.lastTokenFollowedByNewline() ? UNIFIED : fillMode;
         int operatorsN = operators.size();
         for (int i = 0; i < operatorsN; i++) {
-            builder.breakOp(fillMode, " ", ZERO);
+            builder.breakOp(nextFillMode, " ", ZERO);
             builder.op(operators.get(i));
+            boolean shouldEnforceNewline = builder.lastTokenFollowedByNewline();
             builder.space();
             scan(operands.get(i + 1), null);
+            shouldEnforceNewline |= builder.lastTokenFollowedByNewline();
+
+            nextFillMode = isStringConcat && shouldEnforceNewline ? UNIFIED : fillMode;
         }
         builder.close();
         return null;
@@ -3148,12 +3154,35 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         if (arguments.size() < 2) {
             return false;
         }
-        return isStringConcat(arguments.get(0));
+        return isFormatString(arguments.get(0));
     }
 
     private static final Pattern FORMAT_SPECIFIER = Pattern.compile("%|\\{[0-9]\\}");
 
     private boolean isStringConcat(ExpressionTree first) {
+        final boolean[] stringConcat = {false};
+        new TreeScanner() {
+            @Override
+            public void scan(JCTree tree) {
+                if (tree == null) {
+                    return;
+                }
+                switch (tree.getKind()) {
+                    case STRING_LITERAL:
+                        stringConcat[0] = true;
+                        break;
+                    case PLUS:
+                        super.scan(tree);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }.scan((JCTree) first);
+        return stringConcat[0];
+    }
+
+    private boolean isFormatString(ExpressionTree first) {
         final boolean[] stringLiteral = {true};
         final boolean[] formatString = {false};
         new TreeScanner() {

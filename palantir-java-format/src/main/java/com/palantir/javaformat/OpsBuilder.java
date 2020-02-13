@@ -15,11 +15,13 @@
 package com.palantir.javaformat;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import com.palantir.javaformat.Indent.Const;
+import com.palantir.javaformat.Input.Tok;
 import com.palantir.javaformat.doc.Break;
 import com.palantir.javaformat.doc.BreakTag;
 import com.palantir.javaformat.doc.Comment;
@@ -29,6 +31,7 @@ import com.palantir.javaformat.doc.FillMode;
 import com.palantir.javaformat.doc.NonBreakingSpace;
 import com.palantir.javaformat.doc.State;
 import com.palantir.javaformat.doc.Token;
+import com.palantir.javaformat.doc.Token.RealOrImaginary;
 import com.palantir.javaformat.java.FormatterDiagnostic;
 import com.palantir.javaformat.java.InputMetadata;
 import com.palantir.javaformat.java.InputMetadataBuilder;
@@ -303,6 +306,14 @@ public final class OpsBuilder {
         return peekToken(0);
     }
 
+    /** Return whether the last token emitted is followed by a newline, but not a {@code //} comment. */
+    public boolean lastTokenFollowedByNewline() {
+        Preconditions.checkState(tokenI > 0, "No token was emitted yet");
+        ImmutableList<? extends Tok> afterLast =
+                input.getTokens().get(tokenI - 1).getToksAfter();
+        return afterLast.stream().anyMatch(Tok::isNewline) && afterLast.stream().noneMatch(Tok::isSlashSlashComment);
+    }
+
     /** Return the text of an upcoming {@link Input.Token}, or absent if there is none. */
     public Optional<String> peekToken(int skip) {
         ImmutableList<? extends Input.Token> tokens = input.getTokens();
@@ -329,7 +340,7 @@ public final class OpsBuilder {
         if (token.equals(peekToken().orElse(null))) { // Found the input token. Output it.
             add(Token.make(
                     tokens.get(tokenI++),
-                    Token.RealOrImaginary.REAL,
+                    RealOrImaginary.REAL,
                     plusIndentCommentsBefore,
                     breakAndIndentTrailingComment));
         } else {
