@@ -16,5 +16,12 @@ class Palantir10 {
                     + "bar" + THING + "baz");
         foo("foo"
                 + "bar" + THING + "baz");
+
+        // This causes an NPE if we're not careful when getting the last token of the binary expression
+        if (!partialDataSourceType.equals(dataSourceType)) {
+            throw new ClientException("You may not use a " + partialDataSourceType
+                    + " partial in a " + dataSourceType + " query. Caused by partial \"" + partialName + "\""
+            );
+        }
     }
 }
