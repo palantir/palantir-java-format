@@ -18,10 +18,6 @@
     <module name="NewlineAtEndOfFile"> <!-- Java Style Guide: Line ending: LF -->
         <property name="lineSeparator" value="lf"/>
     </module>
-    <module name="RegexpHeader">
-        <property name="header" value="^/\*$\n^ \* \(c\) Copyright \d{4} Palantir Technologies Inc\. All rights reserved\.$"/>
-        <property name="fileExtensions" value=".java,.ts"/>
-    </module>
     <module name="RegexpMultiline"> <!-- Development Practices: Writing good unit tests -->
         <property name="fileExtensions" value="java"/>
         <property name="format" value="@VisibleForTesting\s+(protected|public)"/>
