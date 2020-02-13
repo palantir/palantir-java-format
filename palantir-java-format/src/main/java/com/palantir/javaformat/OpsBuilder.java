@@ -306,12 +306,10 @@ public final class OpsBuilder {
         return peekToken(0);
     }
 
-    /** Return whether the last token emitted is followed by a newline, but not a {@code //} comment. */
+    /** Return whether the last token emitted is followed by a newline. */
     public boolean lastTokenFollowedByNewline() {
         Preconditions.checkState(tokenI > 0, "No token was emitted yet");
-        ImmutableList<? extends Tok> afterLast =
-                input.getTokens().get(tokenI - 1).getToksAfter();
-        return afterLast.stream().anyMatch(Tok::isNewline) && afterLast.stream().noneMatch(Tok::isSlashSlashComment);
+        return input.getTokens().get(tokenI - 1).getToksAfter().stream().anyMatch(Tok::isNewline);
     }
 
     /** Return the text of an upcoming {@link Input.Token}, or absent if there is none. */
