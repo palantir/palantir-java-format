@@ -1159,7 +1159,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             boolean shouldEnforceNewline = builder.lastTokenFollowedByNewline();
             builder.space();
             scan(operands.get(i + 1), null);
-            shouldEnforceNewline |= builder.lastTokenFollowedByNewline();
+            shouldEnforceNewline = shouldEnforceNewline || builder.lastTokenFollowedByNewline();
 
             nextFillMode = isStringConcat && shouldEnforceNewline ? UNIFIED : fillMode;
         }
