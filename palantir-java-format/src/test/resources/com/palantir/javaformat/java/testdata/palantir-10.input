@@ -1,0 +1,10 @@
+class Palantir10 {
+    @SqlUpdate("CREATE TABLE things "
+            + "(id VARCHAR(" + MAX_LENGTH + ") NOT NULL, "
+            + "title VARCHAR(" + MAX_LENGTH + ")  NOT NULL, "
+            + "description VARCHAR(" + MAX_DESCRIPTION_LENGTH + ") NOT NULL, "
+            + "standard BOOLEAN NOT NULL, "
+            + "documentJson VARCHAR(" + MAX_DOCUMENT_LENGTH + ") NOT NULL, "
+            + "PRIMARY KEY (id))")
+    void createTable();
+}
