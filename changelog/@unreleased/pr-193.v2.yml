@@ -1,0 +1,6 @@
+type: fix
+fix:
+  description: Fix bug in 0.3.24 that could sometimes cause a NPE when encountering
+    a newline right after a string concatenation expression.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/193
