@@ -1785,7 +1785,10 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             return false;
         }
         boolean isArrayInitializer = value.getKind() == NEW_ARRAY;
-        builder.open(isArrayInitializer ? ZERO : plusFour);
+        builder.open(
+                isArrayInitializer ? ZERO : plusFour,
+                BreakBehaviours.preferBreakingLastInnerLevel(true),
+                LastLevelBreakability.CHECK_INNER);
         token("@");
         scan(node.getAnnotationType(), null);
         token("(");
