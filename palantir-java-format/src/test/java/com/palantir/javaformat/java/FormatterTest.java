@@ -18,7 +18,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static com.palantir.javaformat.java.JavaFormatterOptions.Style;
 import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.google.common.base.Joiner;
 import com.google.common.io.CharStreams;
@@ -388,11 +388,8 @@ public final class FormatterTest {
 
     @Test
     public void throwsFormatterException() throws Exception {
-        try {
-            Formatter.create().formatSourceAndFixImports("package foo; public class {");
-            fail("fail");
-        } catch (FormatterException expected) {
-        }
+        assertThatThrownBy(() -> Formatter.create().formatSourceAndFixImports("package foo; public class {"))
+                .isInstanceOf(FormatterException.class);
     }
 
     @Test

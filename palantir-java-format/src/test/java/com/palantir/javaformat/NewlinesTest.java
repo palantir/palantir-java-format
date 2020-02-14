@@ -16,7 +16,7 @@
 
 package com.palantir.javaformat;
 
-import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.truth.Truth;
@@ -67,22 +67,12 @@ public class NewlinesTest {
         it.next();
         it.next();
         it.next();
-        try {
-            it.next();
-            fail("fail");
-        } catch (NoSuchElementException e) {
-            // expected
-        }
+        assertThatThrownBy(() -> it.next()).isInstanceOf(NoSuchElementException.class);
 
         it = Newlines.lineOffsetIterator("foo\nbar");
         it.next();
         it.next();
-        try {
-            it.next();
-            fail("fail");
-        } catch (NoSuchElementException e) {
-            // expected
-        }
+        assertThatThrownBy(() -> it.next()).isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
@@ -90,21 +80,11 @@ public class NewlinesTest {
         Iterator<String> it = Newlines.lineIterator("foo\nbar\n");
         it.next();
         it.next();
-        try {
-            it.next();
-            fail("fail");
-        } catch (NoSuchElementException e) {
-            // expected
-        }
+        assertThatThrownBy(() -> it.next()).isInstanceOf(NoSuchElementException.class);
 
         it = Newlines.lineIterator("foo\nbar");
         it.next();
         it.next();
-        try {
-            it.next();
-            fail("fail");
-        } catch (NoSuchElementException e) {
-            // expected
-        }
+        assertThatThrownBy(() -> it.next()).isInstanceOf(NoSuchElementException.class);
     }
 }

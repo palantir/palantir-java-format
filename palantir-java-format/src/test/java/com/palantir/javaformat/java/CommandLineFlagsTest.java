@@ -15,6 +15,7 @@
 package com.palantir.javaformat.java;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
 
 import org.junit.jupiter.api.Test;
@@ -29,19 +30,9 @@ public class CommandLineFlagsTest {
 
     @Test
     public void formatInPlaceRequiresAtLeastOneFile() throws UsageException {
-        try {
-            Main.processArgs("-i");
-            fail("fail");
-        } catch (UsageException e) {
-            // expected
-        }
+        assertThatThrownBy(() -> Main.processArgs("-i")).isInstanceOf(UsageException.class);
 
-        try {
-            Main.processArgs("-i", "-");
-            fail("fail");
-        } catch (UsageException e) {
-            // expected
-        }
+        assertThatThrownBy(() -> Main.processArgs("-i", "-")).isInstanceOf(UsageException.class);
 
         Main.processArgs("-i", "Foo.java");
         Main.processArgs("-i", "Foo.java", "Bar.java");
@@ -51,35 +42,18 @@ public class CommandLineFlagsTest {
     public void formatASubsetRequiresExactlyOneFile() throws UsageException {
         Main.processArgs("-lines", "10", "Foo.java");
 
-        try {
-            Main.processArgs("-lines", "10");
-            fail("fail");
-        } catch (UsageException e) {
-            // expected
-        }
+        assertThatThrownBy(() -> Main.processArgs("-lines", "10")).isInstanceOf(UsageException.class);
 
-        try {
-            Main.processArgs("-lines", "10", "Foo.java", "Bar.java");
-            fail("fail");
-        } catch (UsageException e) {
-            // expected
-        }
+        assertThatThrownBy(() -> Main.processArgs("-lines", "10", "Foo.java", "Bar.java"))
+                .isInstanceOf(UsageException.class);
 
         Main.processArgs("-offset", "10", "-length", "10", "Foo.java");
 
-        try {
-            Main.processArgs("-offset", "10", "-length", "10");
-            fail("fail");
-        } catch (UsageException e) {
-            // expected
-        }
+        assertThatThrownBy(() -> Main.processArgs("-offset", "10", "-length", "10"))
+                .isInstanceOf(UsageException.class);
 
-        try {
-            Main.processArgs("-offset", "10", "-length", "10", "Foo.java", "Bar.java");
-            fail("fail");
-        } catch (UsageException e) {
-            // expected
-        }
+        assertThatThrownBy(() -> Main.processArgs("-offset", "10", "-length", "10", "Foo.java", "Bar.java"))
+                .isInstanceOf(UsageException.class);
     }
 
     // TODO(eaftan): clang-format allows a single offset with no length, which means to format
@@ -88,19 +62,11 @@ public class CommandLineFlagsTest {
     public void numberOfOffsetsMustMatchNumberOfLengths() throws UsageException {
         Main.processArgs("-offset", "10", "-length", "20", "Foo.java");
 
-        try {
-            Main.processArgs("-offset", "10", "-length", "20", "-offset", "50", "Foo.java");
-            fail("fail");
-        } catch (UsageException e) {
-            // expected
-        }
+        assertThatThrownBy(() -> Main.processArgs("-offset", "10", "-length", "20", "-offset", "50", "Foo.java"))
+                .isInstanceOf(UsageException.class);
 
-        try {
-            Main.processArgs("-offset", "10", "-length", "20", "-length", "50", "Foo.java");
-            fail("fail");
-        } catch (UsageException e) {
-            // expected
-        }
+        assertThatThrownBy(() -> Main.processArgs("-offset", "10", "-length", "20", "-length", "50", "Foo.java"))
+                .isInstanceOf(UsageException.class);
     }
 
     @Test
@@ -109,19 +75,9 @@ public class CommandLineFlagsTest {
 
         Main.processArgs("-help");
 
-        try {
-            Main.processArgs();
-            fail("fail");
-        } catch (UsageException e) {
-            // expected
-        }
+        assertThatThrownBy(() -> Main.processArgs()).isInstanceOf(UsageException.class);
 
-        try {
-            Main.processArgs("-aosp");
-            fail("fail");
-        } catch (UsageException e) {
-            // expected
-        }
+        assertThatThrownBy(() -> Main.processArgs("-aosp")).isInstanceOf(UsageException.class);
     }
 
     @Test
