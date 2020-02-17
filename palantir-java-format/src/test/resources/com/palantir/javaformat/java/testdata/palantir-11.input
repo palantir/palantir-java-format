@@ -1,0 +1,17 @@
+/*
+ * (c) Copyright 2017 Palantir Technologies Inc. All rights reserved.
+ */
+
+public class Palantir11 {
+    private void foo() {
+        boolean answer = strategy.accept(Strategies.visitor(
+                greaterThan -> true, // we don't need to validate greaterThan because it'll roll up to a good version
+                exact -> !coordinates.contains(MavenCoordinate.of(productId, exact.getVersion())),
+                remove -> true,
+                stay -> true,
+                stayWithExceptions ->
+                        !coordinates.contains(MavenCoordinate.of(
+                                productId,
+                                stayWithExceptions.getDeploymentsExceptionVersion().getVersion()))));
+    }
+}

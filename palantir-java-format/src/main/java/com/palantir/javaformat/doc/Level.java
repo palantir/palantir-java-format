@@ -260,7 +260,12 @@ public final class Level extends Doc {
             boolean keepIndent,
             Obs.ExplorationNode explorationNode) {
 
-        boolean anyLevelWasBroken = brokenState.numLines() != state.numLines() + 1;
+        // Note: we are not checking if the brokenState produced one extra line compared to state, as this can be
+        // misleading if there is no level but a single comment that got reflowed onto multiple lines (see palantir-11).
+        boolean anyLevelWasBroken = docs.stream()
+                .filter(doc -> doc instanceof Level)
+                .map(doc -> ((Level) doc))
+                .anyMatch(level -> !brokenState.isOneLine(level));
 
         if (!anyLevelWasBroken) {
             return Optional.of(brokenState);
