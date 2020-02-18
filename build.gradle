@@ -10,7 +10,7 @@ buildscript {
         classpath 'com.palantir.gradle.revapi:gradle-revapi:1.2.0'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
         classpath 'com.netflix.nebula:nebula-publishing-plugin:17.0.5'
-        classpath 'com.netflix.nebula:gradle-info-plugin:7.0.1'
+        classpath 'com.netflix.nebula:gradle-info-plugin:7.1.1'
         classpath 'com.palantir.baseline:gradle-baseline-java:3.4.2'
         classpath 'gradle.plugin.org.inferred:gradle-processors:3.3.0'
         classpath 'com.palantir.gradle.gitversion:gradle-git-version:0.12.2'
