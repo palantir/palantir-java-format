@@ -18,7 +18,6 @@ package com.palantir.javaformat.doc;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.Indent;
 import fj.data.Set;
@@ -100,9 +99,10 @@ public abstract class State {
     }
 
     String getTokText(Comment comment) {
-        return Preconditions.checkNotNull(
-                        tokStates().get(comment).toNull(), "Expected Tok state to exist for: %s", comment)
-                .text();
+        // A TokState will only be present if computeBreaks was called.
+        // That won't always happen, for example when the level containing this comment was one-lined.
+        // Note: if the parent level was inlined, this method itself also won't get called, unless we're in debug mode.
+        return tokStates().get(comment).map(TokState::text).orSome(comment::getFlat);
     }
 
     /** Record whether break was taken. */
