@@ -1,0 +1,26 @@
+public class Palantir12 {
+    private void foo() {
+        switch (true) {
+            case false:
+            {
+                String foo = "bar";
+                return 5;
+            }
+            {
+                // second block should cause first one not to inline
+            }
+            case true:
+            {
+                String foo = "bar";
+                return 5;
+            }
+            default:
+            {
+                {
+                    String foo = "bar";
+                }
+                return 5;
+            }
+        }
+    }
+}
