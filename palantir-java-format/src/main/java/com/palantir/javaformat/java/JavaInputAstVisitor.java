@@ -1511,7 +1511,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             builder.open(plusTwo);
             builder.forcedBreak();
             builder.blankLineWanted(BlankLineWanted.PRESERVE);
-            visitStatements(node.getBody().getStatements());
+            visitStatements(node.getBody().getStatements(), false);
             builder.close();
             builder.forcedBreak();
             builder.blankLineWanted(BlankLineWanted.NO);
@@ -1817,8 +1817,13 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             scan(node.getExpression(), null);
             token(":");
         }
-        builder.open(plusTwo);
-        visitStatements(node.getStatements());
+        boolean isBlock =
+                node.getStatements().size() == 1 && node.getStatements().get(0).getKind() == BLOCK;
+        builder.open(isBlock ? ZERO : plusTwo);
+        if (isBlock) {
+            builder.space();
+        }
+        visitStatements(node.getStatements(), isBlock);
         builder.close();
         return null;
     }
@@ -2115,7 +2120,7 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             } else {
                 builder.blankLineWanted(BlankLineWanted.PRESERVE);
             }
-            visitStatements(node.getStatements());
+            visitStatements(node.getStatements(), false);
             builder.close();
             builder.forcedBreak();
             builder.close();
@@ -2149,13 +2154,15 @@ public final class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         }
     }
 
-    private void visitStatements(List<? extends StatementTree> statements) {
+    private void visitStatements(List<? extends StatementTree> statements, boolean inlineFirst) {
         boolean first = true;
         PeekingIterator<StatementTree> it = Iterators.peekingIterator(statements.iterator());
         dropEmptyDeclarations();
         while (it.hasNext()) {
             StatementTree tree = it.next();
-            builder.forcedBreak();
+            if (!(inlineFirst && first)) {
+                builder.forcedBreak();
+            }
             if (!first) {
                 builder.blankLineWanted(BlankLineWanted.PRESERVE);
             }
