@@ -1,4 +1,4 @@
-public class Palantir12 {
+public class PalantirCaseStatementsBlock {
     private void foo() {
         switch (true) {
             case false:
