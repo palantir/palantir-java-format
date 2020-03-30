@@ -42,7 +42,6 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.immutables.value.Value;
 
 /** A {@code Level} inside a {@link Doc}. */
@@ -263,7 +262,10 @@ public final class Level extends Doc {
 
         // Note: we are not checking if the brokenState produced one extra line compared to state, as this can be
         // misleading if there is no level but a single comment that got reflowed onto multiple lines (see palantir-11).
-        boolean anyLevelWasBroken = getNonEmptyInnerLevels().anyMatch(level -> !brokenState.isOneLine(level));
+        boolean anyLevelWasBroken = docs.stream()
+                .filter(doc -> doc instanceof Level)
+                .map(doc -> ((Level) doc))
+                .anyMatch(level -> !brokenState.isOneLine(level));
 
         if (!anyLevelWasBroken) {
             return Optional.of(brokenState);
@@ -276,19 +278,15 @@ public final class Level extends Doc {
         }
         State partiallyInlinedState = partiallyInlinedStateOpt.get();
 
-        boolean bodyIsComplex = getNonEmptyInnerLevels().anyMatch(il -> il.openOp.complexity() == Complexity.COMPLEX);
+        boolean bodyIsComplex = this.docs.stream()
+                .filter(doc -> doc instanceof Level)
+                .map(doc -> ((Level) doc))
+                .anyMatch(il -> il.openOp.complexity() == Complexity.COMPLEX);
 
         if (bodyIsComplex || partiallyInlinedState.numLines() < brokenState.numLines()) {
             return Optional.of(partiallyInlinedState);
         }
         return Optional.empty();
-    }
-
-    private Stream<Level> getNonEmptyInnerLevels() {
-        return docs.stream()
-                .filter(doc -> doc instanceof Level)
-                .map(doc -> ((Level) doc))
-                .filter(doc -> StartsWithBreakVisitor.INSTANCE.visit(doc) != Result.EMPTY);
     }
 
     private Optional<State> tryInlinePrefixOntoCurrentLine(
@@ -299,9 +297,15 @@ public final class Level extends Doc {
             Obs.ExplorationNode explorationNode) {
         // Find the last level, skipping empty levels (that contain nothing, or are made up
         // entirely of other empty levels).
+        List<Level> innerLevels = this.docs.stream()
+                .filter(doc -> doc instanceof Level)
+                .map(doc -> ((Level) doc))
+                .collect(Collectors.toList());
+
         // Last level because there might be other in-between levels after the initial break like `new
-        // int[] {`, and we want to skip those.
-        Level lastLevel = getNonEmptyInnerLevels()
+        // int[]
+        // {`, and we want to skip those.
+        Level lastLevel = innerLevels.stream()
                 .filter(doc -> StartsWithBreakVisitor.INSTANCE.visit(doc) != Result.EMPTY)
                 .collect(GET_LAST_COLLECTOR)
                 .orElseThrow(() ->
