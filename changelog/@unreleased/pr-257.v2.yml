@@ -1,0 +1,6 @@
+type: fix
+fix:
+  description: Fix edge case with empty levels causing formattings very close to the
+    column limit to throw.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/257
