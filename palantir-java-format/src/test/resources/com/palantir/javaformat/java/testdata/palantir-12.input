@@ -1,0 +1,25 @@
+public class Palantir12 {
+
+    @Override
+    public
+    void
+    foo() {
+        new DogWalker()
+                .walk(
+                        DogBreed.FOX_TERRIER,
+                        new RoadWalker<Void>() {
+                            @Override
+                            public Void call(Dog dog) {
+                                routes.forEach((route) -> route.getCoordinates()
+                                        .forEach((coordinate) -> {
+                                            coordinate.getOtherDogs().forEach(otherDog -> {
+                                                if (!dog.likes(otherDog)) {
+                                                    badEncounters.computeIfAbsent(coordinate, _x -> new HashSet<>())
+                                                            .add(dog).add(otherDog);
+                                                }
+                                            });
+                                        }));
+                            }
+                        });
+    }
+}
