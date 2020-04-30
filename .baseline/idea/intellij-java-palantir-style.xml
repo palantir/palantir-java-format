@@ -16,7 +16,7 @@
         <option name="BINARY_OPERATION_WRAP" value="1" />
         <option name="BLANK_LINES_AFTER_CLASS_HEADER" value="1" />
         <option name="CALL_PARAMETERS_WRAP" value="1" />
-        <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="99" />
+        <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="999" />
         <option name="DOWHILE_BRACE_FORCE" value="3" />
         <option name="EXTENDS_KEYWORD_WRAP" value="1" />
         <option name="EXTENDS_LIST_WRAP" value="1" />
@@ -31,8 +31,8 @@
           </value>
         </option>
         <GroovyCodeStyleSettings>
-          <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="99" />
-          <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="99" />
+          <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="999" />
+          <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="999" />
           <option name="PACKAGES_TO_USE_IMPORT_ON_DEMAND">
             <value />
           </option>
@@ -55,7 +55,7 @@
         <option name="KEEP_CONTROL_STATEMENT_IN_ONE_LINE" value="false" />
         <option name="METHOD_CALL_CHAIN_WRAP" value="1" />
         <option name="METHOD_PARAMETERS_WRAP" value="1" />
-        <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="99" />
+        <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="999" />
         <option name="OPTIMIZE_IMPORTS_ON_THE_FLY" value="true" />
         <option name="OTHER_INDENT_OPTIONS">
           <value>
