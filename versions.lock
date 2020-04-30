@@ -34,7 +34,7 @@ org.codehaus.mojo:animal-sniffer-annotations:1.17 (1 constraints: ed09d8aa)
 org.derive4j:derive4j-annotation:1.1.1 (1 constraints: 0505f435)
 org.eclipse.jgit:org.eclipse.jgit:5.5.0.201909110433-r (1 constraints: a5142bf8)
 org.functionaljava:functionaljava:4.8 (1 constraints: b0042b2c)
-org.immutables:value:2.8.3 (1 constraints: 0f051036)
+org.immutables:value:2.8.7 (1 constraints: 13051436)
 org.slf4j:slf4j-api:1.7.2 (1 constraints: 4a0e8c50)
 
 [Test dependencies]
