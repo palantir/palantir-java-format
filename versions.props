@@ -1,4 +1,4 @@
-com.diffplug.spotless:spotless-plugin-gradle = 3.28.1
+com.diffplug.spotless:spotless-plugin-gradle = 3.29.0
 com.github.ben-manes.caffeine:caffeine = 2.8.2
 com.google.auto.service:auto-service = 1.0-rc6
 com.google.code.findbugs:jsr305 = 3.0.2
@@ -10,7 +10,7 @@ com.google.testing.compile:compile-testing = 0.15
 com.google.truth:truth = 1.0
 com.netflix.nebula:nebula-test = 7.8.6
 junit:junit = 4.13
-org.assertj:assertj-core = 3.15.0
+org.assertj:assertj-core = 3.16.0
 org.derive4j:* = 1.1.1
 org.functionaljava:functionaljava = 4.8
 org.immutables:value = 2.8.7
