@@ -30,6 +30,7 @@ import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.codeStyle.DocCommentSettings;
 import com.intellij.psi.codeStyle.FormattingModeAwareIndentAdjuster;
 import com.intellij.psi.codeStyle.Indent;
+import com.intellij.psi.impl.source.codeStyle.CodeStyleManagerImpl;
 import com.intellij.util.IncorrectOperationException;
 import com.intellij.util.ThrowableRunnable;
 import java.util.Collection;
@@ -38,13 +39,22 @@ import javax.annotation.Nullable;
 /**
  * Decorates the {@link CodeStyleManager} abstract class by delegating to a concrete implementation instance (likely
  * IJ's default instance).
+ *
+ * Explicitly extend the IntelliJ {@link #CodeStyleManagerImpl} so that any methods added in newer releases are
+ * inherited automatically with a reasonable default implementation.
+ *
+ * The https://github.com/JetBrains/intellij-community/commit/2d5740176cc9206db2d5ab5d8f67cec74b85a017
+ * added a CodeManager#scheduleReformatWhenSettingsComputed(PsiFile) method in idea/202.5103.13 where the
+ * default implementation throws an UnsuportedOperationException.
+ * See https://youtrack.jetbrains.com/issue/IDEA-244645 for more details.
  */
 @SuppressWarnings("deprecation")
-class CodeStyleManagerDecorator extends CodeStyleManager implements FormattingModeAwareIndentAdjuster {
+class CodeStyleManagerDecorator extends CodeStyleManagerImpl implements FormattingModeAwareIndentAdjuster {
 
     private final CodeStyleManager delegate;
 
-    CodeStyleManagerDecorator(CodeStyleManager delegate) {
+    CodeStyleManagerDecorator(Project project, CodeStyleManager delegate) {
+        super(project);
         this.delegate = delegate;
     }
 

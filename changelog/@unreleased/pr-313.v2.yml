@@ -1,0 +1,7 @@
+type: fix
+fix:
+  description: Explicitly extend the IntelliJ CodeStyleManagerImpl so that any methods
+    added in newer releases are inherited automatically with a reasonable default
+    implementation.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/313

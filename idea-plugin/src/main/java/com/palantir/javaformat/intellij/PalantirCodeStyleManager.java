@@ -82,12 +82,12 @@ final class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
             Caffeine.newBuilder().maximumSize(1).build(PalantirCodeStyleManager::createFormatter);
 
     public PalantirCodeStyleManager(@NotNull Project project) {
-        super(new CodeStyleManagerImpl(project));
+        super(project, new CodeStyleManagerImpl(project));
     }
 
     @NonInjectable
     PalantirCodeStyleManager(@NotNull CodeStyleManager original) {
-        super(original);
+        super(original.getProject(), original);
     }
 
     static Map<TextRange, String> getReplacements(
