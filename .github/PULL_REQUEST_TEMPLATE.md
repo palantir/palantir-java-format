@@ -2,8 +2,8 @@
 <!-- What's wrong with the current state of the world and why change it now? -->
 
 ## After this PR
+<!-- User-facing outcomes this PR delivers go below -->
 ==COMMIT_MSG==
-<!-- User-facing outcomes this PR delivers -->
 ==COMMIT_MSG==
 
 ## Possible downsides?
