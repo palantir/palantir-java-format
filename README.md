@@ -149,8 +149,8 @@ is available from the plugin repository. To install it, go to your IDE's
 settings and select the `Plugins` category. Click the `Marketplace` tab, search
 for the `palantir-java-format` plugin, and click the `Install` button.
 
-The plugin will be disabled by default on new projects, but as mentioned [above](#compalantirjava-format-gradle-plugin), 
-if using the `com.palantir.java-format` gradle plugin, it will be recommended 
+The plugin will be disabled by default on new projects, but as mentioned [above](#compalantirjava-format-gradle-plugin),
+if using the `com.palantir.java-format` gradle plugin, it will be recommended
 in IntelliJ, and automatically configured.
 
 To manually enable it in the current project, go
@@ -164,6 +164,15 @@ Settings...`.
 When enabled, it will replace the normal `Reformat Code` action, which can be
 triggered from the `Code` menu or with the Ctrl-Alt-L (by default) keyboard
 shortcut.
+
+## Package for Arch Linux
+
+It's possible to install palantir-java-format on Arch Linux via Arch User Repositories:
+https://aur.archlinux.org/packages/palantir-java-format/
+
+The package also provides a command line interface that can be easily integrated.
+Source code of the package is available on GitHub:
+[PKGBUILD](https://github.com/kovetskiy/pkgbuilds/tree/master/palantir-java-format)
 
 ## Future works
 
