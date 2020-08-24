@@ -9,12 +9,12 @@ buildscript {
         classpath 'com.palantir.javaformat:gradle-palantir-java-format:1.0.1'
         classpath 'com.palantir.gradle.revapi:gradle-revapi:1.4.3'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5'
-        classpath 'com.netflix.nebula:nebula-publishing-plugin:17.3.0'
-        classpath 'com.netflix.nebula:gradle-info-plugin:8.3.2'
+        classpath 'com.netflix.nebula:nebula-publishing-plugin:17.3.1'
+        classpath 'com.netflix.nebula:gradle-info-plugin:8.5.0'
         classpath 'com.palantir.baseline:gradle-baseline-java:3.11.0'
         classpath 'gradle.plugin.org.inferred:gradle-processors:3.3.0'
         classpath 'com.palantir.gradle.gitversion:gradle-git-version:0.12.3'
-        classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:1.24.0'
+        classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:1.25.0'
     }
 }
 
