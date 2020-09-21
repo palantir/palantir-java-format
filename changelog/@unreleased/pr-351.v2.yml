@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: Specify gradle-palantir-java-format's dependency on palantir-java-format
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/351
