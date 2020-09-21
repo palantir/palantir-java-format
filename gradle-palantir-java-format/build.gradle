@@ -12,6 +12,8 @@ dependencies {
     implementation gradleApi()
     implementation 'com.google.guava:guava'
     implementation project(':palantir-java-format-spi')
+    
+    runtimeOnly project(':palantir-java-format')
 
     testImplementation 'com.netflix.nebula:nebula-test'
     testImplementation 'org.junit.jupiter:junit-jupiter'
