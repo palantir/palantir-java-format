@@ -23,11 +23,7 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
 
     void setup() {
         buildFile << """
-            buildscript {
-                dependencies {
-                    classpath "com.diffplug.spotless:spotless-plugin-gradle:3.26.1"
-                }
-            }
+            // The 'com.diffplug.spotless:spotless-plugin-gradle' dependency is already added by palantir-java-format
             plugins {
                 id 'java'
                 id 'com.palantir.java-format'
@@ -41,7 +37,7 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
 
     def "formats with spotless when spotless is applied"() {
         buildFile << """
-            apply plugin: 'com.diffplug.gradle.spotless'
+            apply plugin: 'com.diffplug.spotless'
         """.stripIndent()
 
         file('src/main/java/Main.java').text = invalidJavaFile
