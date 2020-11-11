@@ -38,7 +38,6 @@ import com.palantir.javaformat.doc.Obs;
 import com.palantir.javaformat.doc.Obs.Sink;
 import com.palantir.javaformat.doc.State;
 import com.sun.tools.javac.file.JavacFileManager;
-import com.sun.tools.javac.main.Option;
 import com.sun.tools.javac.parser.JavacParser;
 import com.sun.tools.javac.parser.ParserFactory;
 import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
@@ -164,10 +163,6 @@ public final class Formatter {
     static JCCompilationUnit parseJcCompilationUnit(Context context, String sourceText) throws FormatterException {
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
         context.put(DiagnosticListener.class, diagnostics);
-        // TODO(cushon): this should default to the latest supported source level, remove this after
-        // backing out
-        // https://github.com/google/error-prone-javac/commit/c97f34ddd2308302587ce2de6d0c984836ea5b9f
-        Options.instance(context).put(Option.SOURCE, "9");
         JCCompilationUnit unit;
         JavacFileManager fileManager = new JavacFileManager(context, true, UTF_8);
         try {
