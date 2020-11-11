@@ -44,6 +44,10 @@ tasks.withType(JavaCompile).configureEach {
     ]
 }
 
+tasks.withType(Javadoc).configureEach {
+    options.optionFiles << file('javadoc.options')
+}
+
 // false positives due to org.junit.runners.* in the test cases
 tasks.checkJUnitDependencies.enabled = false
 
