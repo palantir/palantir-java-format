@@ -19,7 +19,7 @@ import com.google.common.collect.ImmutableList;
 import com.palantir.javaformat.java.FormatterDiagnostic;
 
 /** An unchecked formatting error. */
-public class FormattingError extends Error {
+public class FormattingError extends RuntimeException {
 
     private final ImmutableList<FormatterDiagnostic> diagnostics;
 
