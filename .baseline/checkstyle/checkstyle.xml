@@ -47,6 +47,10 @@
     <module name="BeforeExecutionExclusionFileFilter">
         <property name="fileNamePattern" value="module\-info\.java$"/>
     </module>
+    <module name="LineLength"> <!-- Java Style Guide: No line-wrapping -->
+        <property name="max" value="120"/>
+        <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
+    </module>
     <module name="TreeWalker">
         <module name="SuppressionCommentFilter"/> <!-- baseline-gradle: README.md -->
         <module name="SuppressionCommentFilter">
@@ -193,10 +197,6 @@
             <property name="sortStaticImportsAlphabetically" value="true"/>
         </module>
         <module name="InnerAssignment"/> <!-- Java Coding Guidelines: Inner assignments: Not used -->
-        <module name="LineLength"> <!-- Java Style Guide: No line-wrapping -->
-            <property name="max" value="120"/>
-            <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
-        </module>
         <module name="MemberName"> <!-- Java Style Guide: Non-constant field names -->
             <property name="format" value="^[a-z][a-zA-Z0-9]+$"/>
             <message key="name.invalidPattern" value="Member name ''{0}'' must match pattern ''{1}''."/>
@@ -361,6 +361,7 @@
         <module name="RegexpSinglelineJava">
             <property name="format" value="\/\/TODO|\/\/ TODO(?!\([^()\s]+\): )"/>
             <property name="message" value="TODO format: // TODO(#issue): explanation"/>
+            <property name="ignoreCase" value="true"/>
         </module>
         <module name="RegexpSinglelineJava">
             <property name="format" value="(void setUp\(\))|(void setup\(\))|(void setupStatic\(\))|(void setUpStatic\(\))|(void beforeTest\(\))|(void teardown\(\))|(void tearDown\(\))|(void beforeStatic\(\))|(void afterStatic\(\))"/>
@@ -368,11 +369,11 @@
         </module>
         <module name="RightCurly"> <!-- Java Style Guide: Nonempty blocks: K & R style -->
             <property name="option" value="same"/>
-            <property name="tokens" value="LITERAL_TRY, LITERAL_CATCH, LITERAL_FINALLY, LITERAL_IF, LITERAL_ELSE, LITERAL_DO"/>
+            <property name="tokens" value="CLASS_DEF, METHOD_DEF, CTOR_DEF, LITERAL_TRY, LITERAL_CATCH, LITERAL_FINALLY, LITERAL_IF, LITERAL_ELSE, LITERAL_DO"/>
         </module>
         <module name="RightCurly"> <!-- Java Style Guide: Nonempty blocks: K & R style -->
             <property name="option" value="alone"/>
-            <property name="tokens" value="CLASS_DEF, METHOD_DEF, CTOR_DEF, LITERAL_FOR, LITERAL_WHILE, STATIC_INIT, INSTANCE_INIT"/>
+            <property name="tokens" value="LITERAL_FOR, LITERAL_WHILE, STATIC_INIT, INSTANCE_INIT"/>
         </module>
         <module name="SeparatorWrap"> <!-- Java Style Guide: Where to break -->
             <property name="tokens" value="DOT"/>
@@ -425,11 +426,8 @@
         <module name="JavadocMethod"> <!-- Java Style Guide: Where Javadoc is used -->
             <property name="scope" value="public"/>
             <property name="allowMissingParamTags" value="true"/>
-            <property name="allowMissingThrowsTags" value="true"/>
             <property name="allowMissingReturnTag" value="true"/>
-            <property name="minLineCount" value="99999999"/>
             <property name="allowedAnnotations" value="Override, Test"/>
-            <property name="allowThrowsTagsForSubclasses" value="true"/>
         </module>
         <module name="JavadocStyle"/> <!-- Java Style Guide: Javadoc -->
         <module name="JavadocTagContinuationIndentation"> <!-- Java Style Guide: At-clauses -->

@@ -58,7 +58,7 @@ dependencies {
 }
 
 tasks.withType(JavaCompile).configureEach {
-    options.errorprone.errorproneArgs += ['-Xep:StrictUnusedVariable:OFF']
+    options.errorprone.disable 'StrictUnusedVariable'
 }
 
 check.dependsOn buildPlugin, verifyPlugin
