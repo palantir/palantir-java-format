@@ -28,9 +28,9 @@ public class PalantirJavaFormatSpotlessPlugin implements Plugin<Project> {
     public void apply(Project project) {
         project.getRootProject().getPluginManager().apply(PalantirJavaFormatProviderPlugin.class);
 
-        project.getPluginManager().withPlugin("java", plugin -> {
+        project.getPluginManager().withPlugin("java", _javaPlugin -> {
             SPOTLESS_PLUGINS.forEach(
-                    spotlessPluginId -> project.getPluginManager().withPlugin(spotlessPluginId, spotlessPlugin -> {
+                    spotlessPluginId -> project.getPluginManager().withPlugin(spotlessPluginId, _spotlessPlugin -> {
                         SpotlessInterop.addSpotlessJavaStep(
                                 project, PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME);
                     }));
