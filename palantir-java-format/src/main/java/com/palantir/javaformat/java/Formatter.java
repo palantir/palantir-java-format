@@ -14,6 +14,8 @@
 
 package com.palantir.javaformat.java;
 
+import static com.google.common.base.StandardSystemProperty.JAVA_CLASS_VERSION;
+import static com.google.common.base.StandardSystemProperty.JAVA_SPECIFICATION_VERSION;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -46,6 +48,7 @@ import com.sun.tools.javac.util.Log;
 import com.sun.tools.javac.util.Options;
 import java.io.IOError;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.Collection;
 import javax.tools.Diagnostic;
@@ -136,7 +139,22 @@ public final class Formatter {
         // Output the compilation unit.
         javaInput.setCompilationUnit(unit);
         OpsBuilder opsBuilder = new OpsBuilder(javaInput);
-        new JavaInputAstVisitor(opsBuilder, options.indentationMultiplier()).scan(unit, null);
+
+        JavaInputAstVisitor visitor;
+        if (getMajor() >= 14) {
+            try {
+                visitor = Class.forName("com.palantir.javaformat.java.java14.Java14InputAstVisitor")
+                        .asSubclass(JavaInputAstVisitor.class)
+                        .getConstructor(OpsBuilder.class, int.class)
+                        .newInstance(opsBuilder, options.indentationMultiplier());
+            } catch (ReflectiveOperationException e) {
+                throw new LinkageError(e.getMessage(), e);
+            }
+        } else {
+            visitor = new JavaInputAstVisitor(opsBuilder, options.indentationMultiplier());
+        }
+
+        visitor.scan(unit, null);
         opsBuilder.sync(javaInput.getText().length());
         opsBuilder.drain();
         OpsOutput opsOutput = opsBuilder.build();
@@ -163,6 +181,7 @@ public final class Formatter {
     static JCCompilationUnit parseJcCompilationUnit(Context context, String sourceText) throws FormatterException {
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
         context.put(DiagnosticListener.class, diagnostics);
+        Options.instance(context).put("--enable-preview", "true");
         JCCompilationUnit unit;
         JavacFileManager fileManager = new JavacFileManager(context, true, UTF_8);
         try {
@@ -190,6 +209,24 @@ public final class Formatter {
             throw FormatterExceptions.fromJavacDiagnostics(errorDiagnostics);
         }
         return unit;
+    }
+
+    // Runtime.Version was added in JDK 9, so use reflection to access it to preserve source
+    // compatibility with Java 8.
+    @VisibleForTesting
+    static int getMajor() {
+        try {
+            Method versionMethod = Runtime.class.getMethod("version");
+            Object version = versionMethod.invoke(null);
+            return (int) version.getClass().getMethod("major").invoke(version);
+        } catch (Exception e) {
+            // continue below
+        }
+        int version = (int) Double.parseDouble(JAVA_CLASS_VERSION.value());
+        if (49 <= version && version <= 52) {
+            return version - (49 - 5);
+        }
+        throw new IllegalStateException("Unknown Java version: " + JAVA_SPECIFICATION_VERSION.value());
     }
 
     static boolean errorDiagnostic(Diagnostic<?> input) {

@@ -20,6 +20,7 @@ import static com.google.common.io.Files.getNameWithoutExtension;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.io.CharStreams;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ResourceInfo;
@@ -39,6 +40,8 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 
 @Execution(ExecutionMode.CONCURRENT)
 public final class FileBasedTests {
+    // Tests files that are only used when run with java 14 or higher
+    private static final ImmutableSet<String> JAVA_14_TESTS = ImmutableSet.of("java14");
 
     private final Class<?> testClass;
     /** The path prefix for all tests if loaded as resources. */
@@ -71,6 +74,9 @@ public final class FileBasedTests {
                         .isEqualTo(1);
                 String baseName = getNameWithoutExtension(subPath.getFileName().toString());
                 String extension = getFileExtension(subPath.getFileName().toString());
+                if (JAVA_14_TESTS.contains(baseName) && Formatter.getMajor() < 14) {
+                    continue;
+                }
                 String contents;
                 try (InputStream stream = testClass.getClassLoader().getResourceAsStream(resourceName)) {
                     contents = CharStreams.toString(new InputStreamReader(stream, UTF_8));
