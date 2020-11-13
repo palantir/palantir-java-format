@@ -6,4 +6,11 @@ class ExpressionSwitch {
       default -> { int y = x - 1; return odd(y); }
     };
   }
+
+  int yield() {
+    return switch (i) {
+      case 0: yield 0;
+      default: yield n/i;
+    };
+  }
 }
