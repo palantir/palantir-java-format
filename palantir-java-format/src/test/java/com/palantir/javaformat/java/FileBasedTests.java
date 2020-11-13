@@ -41,7 +41,8 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 @Execution(ExecutionMode.CONCURRENT)
 public final class FileBasedTests {
     // Tests files that are only used when run with java 14 or higher
-    private static final ImmutableSet<String> JAVA_14_TESTS = ImmutableSet.of("java14");
+    private static final ImmutableSet<String> JAVA_14_TESTS =
+            ImmutableSet.of("ExpressionSwitch", "RSL", "Records", "Var");
 
     private final Class<?> testClass;
     /** The path prefix for all tests if loaded as resources. */

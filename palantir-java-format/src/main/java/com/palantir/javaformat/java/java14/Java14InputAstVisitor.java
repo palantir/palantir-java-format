@@ -17,10 +17,11 @@
 package com.palantir.javaformat.java.java14;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.MoreCollectors.onlyElement;
+import static com.google.common.collect.MoreCollectors.toOptional;
 import static com.sun.source.tree.Tree.Kind.BLOCK;
 
 import com.google.common.base.Verify;
+import com.google.common.collect.ImmutableList;
 import com.palantir.javaformat.Op;
 import com.palantir.javaformat.OpsBuilder;
 import com.palantir.javaformat.java.JavaInputAstVisitor;
@@ -29,13 +30,11 @@ import com.sun.source.tree.CaseTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.InstanceOfTree;
-import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.SwitchExpressionTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.YieldTree;
 import com.sun.tools.javac.code.Flags;
 import com.sun.tools.javac.tree.JCTree;
-import com.sun.tools.javac.tree.JCTree.JCMethodDecl;
 import com.sun.tools.javac.tree.TreeInfo;
 import java.util.List;
 import java.util.Optional;
@@ -111,17 +110,16 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
             if (!node.getTypeParameters().isEmpty()) {
                 typeParametersRest(node.getTypeParameters(), hasSuperInterfaceTypes ? plusFour : ZERO);
             }
-            MethodTree constructor = node.getMembers().stream()
-                    .filter(JCMethodDecl.class::isInstance)
-                    .map(JCMethodDecl.class::cast)
-                    .filter(m -> (m.mods.flags & COMPACT_RECORD_CONSTRUCTOR) == COMPACT_RECORD_CONSTRUCTOR)
-                    .collect(onlyElement());
+            ImmutableList<JCTree.JCVariableDecl> parameters = compactRecordConstructor(node)
+                    .map(m -> ImmutableList.copyOf(m.getParameters()))
+                    .orElseGet(() -> recordVariables(node));
             token("(");
-            if (!constructor.getParameters().isEmpty() || constructor.getReceiverParameter() != null) {
+            if (!parameters.isEmpty()) {
                 // Break before args.
                 builder.breakToFill("");
             }
-            visitFormals(Optional.ofNullable(constructor.getReceiverParameter()), constructor.getParameters());
+            // record headers can't declare receiver parameters
+            visitFormals(/* receiver= */ Optional.empty(), parameters);
             token(")");
             if (hasSuperInterfaceTypes) {
                 builder.breakToFill(" ");
@@ -150,6 +148,22 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
             addBodyDeclarations(members, BracesOrNot.YES, FirstDeclarationsOrNot.YES);
         }
         dropEmptyDeclarations();
+    }
+
+    private static Optional<JCTree.JCMethodDecl> compactRecordConstructor(ClassTree node) {
+        return node.getMembers().stream()
+                .filter(JCTree.JCMethodDecl.class::isInstance)
+                .map(JCTree.JCMethodDecl.class::cast)
+                .filter(m -> (m.mods.flags & COMPACT_RECORD_CONSTRUCTOR) == COMPACT_RECORD_CONSTRUCTOR)
+                .collect(toOptional());
+    }
+
+    private static ImmutableList<JCTree.JCVariableDecl> recordVariables(ClassTree node) {
+        return node.getMembers().stream()
+                .filter(JCTree.JCVariableDecl.class::isInstance)
+                .map(JCTree.JCVariableDecl.class::cast)
+                .filter(m -> (m.mods.flags & RECORD) == RECORD)
+                .collect(toImmutableList());
     }
 
     @Override
