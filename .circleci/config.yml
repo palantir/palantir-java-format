@@ -97,8 +97,7 @@ jobs:
       - store_test_results: { path: ~/junit }
       - store_artifacts: { path: ~/artifacts }
 
-
-  unit-test-14:
+  unit-test-15:
     docker: [{ image: 'circleci/openjdk:11-node' }]
     resource_class: large
     environment:
@@ -106,20 +105,20 @@ jobs:
       CIRCLE_ARTIFACTS: /home/circleci/artifacts
       GRADLE_OPTS: -Dorg.gradle.jvmargs='-XX:MaxMetaspaceSize=256m' -Dorg.gradle.workers.max=4
       _JAVA_OPTIONS: -XX:ActiveProcessorCount=4 -Xmx1177m -XX:MaxMetaspaceSize=512m  -XX:ErrorFile=/home/circleci/artifacts/hs_err_pid%p.log -XX:HeapDumpPath=/home/circleci/artifacts
-      JAVA_HOME: /opt/java14
+      JAVA_HOME: /opt/java15
     steps:
       - checkout
       - run:
           name: Install Java
           command: |
             sudo mkdir -p /opt/java && cd /opt/java && sudo chown -R circleci:circleci .
-            curl https://cdn.azul.com/zulu/bin/zulu14.29.23-ca-jdk14.0.2-linux_x64.tar.gz | tar -xzf - -C /opt/java
-            sudo ln -s /opt/java/zulu*/ /opt/java14
+            curl https://cdn.azul.com/zulu/bin/zulu15.28.13-ca-jdk15.0.1-linux_x64.tar.gz | tar -xzf - -C /opt/java
+            sudo ln -s /opt/java/zulu*/ /opt/java15
       - restore_cache: { key: 'gradle-wrapper-v2-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
-      - restore_cache: { key: 'unit-test-14-gradle-cache-v2-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
+      - restore_cache: { key: 'unit-test-15-gradle-cache-v2-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
       - run: ./gradlew --parallel --stacktrace --continue test -Pcom.palantir.baseline-error-prone.disable
       - save_cache:
-          key: 'unit-test-14-gradle-cache-v2-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}'
+          key: 'unit-test-15-gradle-cache-v2-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}'
           paths: [ ~/.gradle/caches ]
       - run:
           command: mkdir -p ~/junit && find . -type f -regex ".*/build/.*TEST.*xml" -exec cp --parents {} ~/junit/ \;
@@ -190,7 +189,7 @@ workflows:
           requires: [ compile ]
           filters: { tags: { only: /.*/ } }
 
-      - unit-test-14:
+      - unit-test-15:
           filters: { tags: { only: /.*/ } }
 
       - check:
@@ -205,5 +204,5 @@ workflows:
           filters: { branches: { ignore: develop } }
 
       - publish:
-          requires: [ unit-test, unit-test-14, check, trial-publish ]
+          requires: [ unit-test, unit-test-15, check, trial-publish ]
           filters: { tags: { only: /.*/ }, branches: { only: develop } }
