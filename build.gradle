@@ -69,7 +69,13 @@ subprojects {
 idea.project.settings {
     compiler {
         javac {
-            moduleJavacAdditionalOptions = ['palantir-java-format': '--add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED']
+            moduleJavacAdditionalOptions = [
+                    'palantir-java-format': '--add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED ' +
+                            '--add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED ' +
+                            '--add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED ' +
+                            '--add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED ' +
+                            '--add-exports jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED ' +
+                            '--add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED']
         }
     }
 }

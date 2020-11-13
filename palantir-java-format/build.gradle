@@ -49,7 +49,7 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 tasks.withType(Javadoc).configureEach {
-    options.optionFiles << file('javadoc.options')
+    options.optionFiles << file('../gradle/javadoc.options')
     if (JavaVersion.current() < JavaVersion.VERSION_14) {
         exclude '**/Java14InputAstVisitor.java'
     }
