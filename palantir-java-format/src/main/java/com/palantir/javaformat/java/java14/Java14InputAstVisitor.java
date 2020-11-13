@@ -65,7 +65,7 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
     }
 
     @Override
-    public Void visitSwitchExpression(SwitchExpressionTree node, Void aVoid) {
+    public Void visitSwitchExpression(SwitchExpressionTree node, Void unused) {
         sync(node);
         visitSwitch(node.getExpression(), node.getCases());
         return null;
@@ -209,7 +209,7 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
                 token(">");
                 builder.space();
                 scan(node.getBody(), null);
-                token(";");
+                builder.guessToken(";");
                 break;
             default:
                 throw new AssertionError(node.getCaseKind());
