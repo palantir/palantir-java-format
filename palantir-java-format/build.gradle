@@ -43,13 +43,16 @@ tasks.withType(JavaCompile).configureEach {
         '--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED'
     ]
 
-    doFirst {
-      println "Args for for $name are $options.allCompilerArgs"
-   }
+    if (JavaVersion.current() < JavaVersion.VERSION_14) {
+        excludes = ['**/Java14InputAstVisitor.java']
+    }
 }
 
 tasks.withType(Javadoc).configureEach {
     options.optionFiles << file('javadoc.options')
+    if (JavaVersion.current() < JavaVersion.VERSION_14) {
+        exclude '**/Java14InputAstVisitor.java'
+    }
 }
 
 // false positives due to org.junit.runners.* in the test cases
