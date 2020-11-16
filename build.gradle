@@ -66,14 +66,18 @@ subprojects {
 
 /**
  * There is a bunch of truly snowflaky stuff going on this project, because we have this Java14InputAstVisitor class
- * which needs to implement some interface methods defined in com.sun.source.util.TreePathScanner. These new methods
- * are only accessible if
+ * which needs to implement some interface methods defined in com.sun.source.util.TreePathScanner, which varies
+ * depending on what JVM the formatter is running on!
  */
 idea.project.ipr.withXml { xml ->
+    /**
+     * Even though the p-j-f codebase has sourceCompat=11 and targetCompat=11, we have to convince IntelliJ to let us
+     * compile against methods from a newer JVM like visitYield, visitSwitchExpression etc. Hence why we turn off the
+     * --release flag (using USE_RELEASE_OPTION below)
+     */
     def compilerConfiguration = xml.asNode().component.find({ it.'@name' == 'CompilerConfiguration' })
     compilerConfiguration.value().add(new XmlParser().parseText('<option name="USE_RELEASE_OPTION" value="false" />'))
-    // compilerConfiguration.bytecodeTargetLevel[0].attributes().target = '11'
-    // compilerConfiguration.bytecodeTargetLevel.module.find({ it.'@name' == 'palantir-java-format' }).attributes().target = "14"
+    compilerConfiguration.bytecodeTargetLevel.module.find({ it.'@name' == 'palantir-java-format' }).attributes().target = "14"
 
     xml.asNode().value().add(new XmlParser().parseText('''
     <component name="JavacSettings">
