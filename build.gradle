@@ -49,6 +49,11 @@ subprojects {
     sourceCompatibility = 11
     targetCompatibility = 11
 
+    // if (JavaVersion.current() >= JavaVersion.VERSION_14) {
+    //     sourceCompatibility = 14
+    //     targetCompatibility = 14
+    // }
+
     tasks.withType(Checkstyle) {
         enabled = false
     }
@@ -62,19 +67,37 @@ subprojects {
     tasks.withType(Test) {
         systemProperty 'recreate', System.getProperty('recreate', 'false')
     }
+
+    idea {
+        module.languageLevel = new org.gradle.plugins.ide.idea.model.IdeaLanguageLevel(14)
+    }
 }
 
-idea.project.settings {
-    compiler {
-        javac {
-            // Tell idea about the exported internal javac apis
-            moduleJavacAdditionalOptions = [
-                    'palantir-java-format': '--add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED ' +
-                            '--add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED ' +
-                            '--add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED ' +
-                            '--add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED ' +
-                            '--add-exports jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED ' +
-                            '--add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED']
-        }
-    }
+idea.project.languageLevel = new org.gradle.plugins.ide.idea.model.IdeaLanguageLevel(14)
+
+    // idea.project.settings {
+    //     compiler {
+    //         javac {
+    //             // Tell idea about the exported internal javac apis
+    //             moduleJavacAdditionalOptions = [
+    //                     'palantir-java-format': '--add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED ' +
+    //                             '--add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED ' +
+    //                             '--add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED ' +
+    //                             '--add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED ' +
+    //                             '--add-exports jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED ' +
+    //                             '--add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED']
+    //         }
+    //     }
+    // }
+
+idea.project.ipr.withXml { xml ->
+    xml.asNode().component.find({ it.'@name' == 'CompilerConfiguration' }).value().add(new XmlParser().parseText('<option name="USE_RELEASE_OPTION" value="false" />'))
+    xml.asNode().value().add(new XmlParser().parseText('''
+    <component name="JavacSettings">
+        <option name="PREFER_TARGET_JDK_COMPILER" value="false" />
+        <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+        <module name="palantir-java-format" options="--add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED" />
+        </option>
+    </component>
+    '''))
 }
