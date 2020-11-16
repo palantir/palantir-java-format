@@ -49,11 +49,6 @@ subprojects {
     sourceCompatibility = 11
     targetCompatibility = 11
 
-    // if (JavaVersion.current() >= JavaVersion.VERSION_14) {
-    //     sourceCompatibility = 14
-    //     targetCompatibility = 14
-    // }
-
     tasks.withType(Checkstyle) {
         enabled = false
     }
@@ -67,31 +62,19 @@ subprojects {
     tasks.withType(Test) {
         systemProperty 'recreate', System.getProperty('recreate', 'false')
     }
-
-    idea {
-        module.languageLevel = new org.gradle.plugins.ide.idea.model.IdeaLanguageLevel(14)
-    }
 }
 
-idea.project.languageLevel = new org.gradle.plugins.ide.idea.model.IdeaLanguageLevel(14)
-
-    // idea.project.settings {
-    //     compiler {
-    //         javac {
-    //             // Tell idea about the exported internal javac apis
-    //             moduleJavacAdditionalOptions = [
-    //                     'palantir-java-format': '--add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED ' +
-    //                             '--add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED ' +
-    //                             '--add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED ' +
-    //                             '--add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED ' +
-    //                             '--add-exports jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED ' +
-    //                             '--add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED']
-    //         }
-    //     }
-    // }
-
+/**
+ * There is a bunch of truly snowflaky stuff going on this project, because we have this Java14InputAstVisitor class
+ * which needs to implement some interface methods defined in com.sun.source.util.TreePathScanner. These new methods
+ * are only accessible if
+ */
 idea.project.ipr.withXml { xml ->
-    xml.asNode().component.find({ it.'@name' == 'CompilerConfiguration' }).value().add(new XmlParser().parseText('<option name="USE_RELEASE_OPTION" value="false" />'))
+    def compilerConfiguration = xml.asNode().component.find({ it.'@name' == 'CompilerConfiguration' })
+    compilerConfiguration.value().add(new XmlParser().parseText('<option name="USE_RELEASE_OPTION" value="false" />'))
+    // compilerConfiguration.bytecodeTargetLevel[0].attributes().target = '11'
+    // compilerConfiguration.bytecodeTargetLevel.module.find({ it.'@name' == 'palantir-java-format' }).attributes().target = "14"
+
     xml.asNode().value().add(new XmlParser().parseText('''
     <component name="JavacSettings">
         <option name="PREFER_TARGET_JDK_COMPILER" value="false" />
