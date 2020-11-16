@@ -53,7 +53,7 @@ subprojects {
     }
 
     tasks.withType(JavaCompile) {
-        options.errorprone.disable 'PreconditionsConstantMessage', 'PreferSafeLoggableExceptions', 'PreferSafeLoggingPreconditions', 'SwitchStatementDefaultCase'
+        options.errorprone.disable 'PreconditionsConstantMessage', 'PreferSafeLoggableExceptions', 'PreferSafeLoggingPreconditions'
     }
 
     // Run `./gradlew test -Drecreate=true` to recreate all the expected
