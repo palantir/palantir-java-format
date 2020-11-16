@@ -67,6 +67,7 @@ subprojects {
 idea.project.settings {
     compiler {
         javac {
+            // Tell idea about the exported internal javac apis
             moduleJavacAdditionalOptions = [
                     'palantir-java-format': '--add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED ' +
                             '--add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED ' +
