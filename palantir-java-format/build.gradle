@@ -31,7 +31,7 @@ dependencies {
 }
 
 tasks.withType(JavaCompile).configureEach {
-    options.errorprone.errorproneArgs += ['-Xep:StrictUnusedVariable:OFF']
+    options.errorprone.disable 'StrictUnusedVariable'
 }
 
 // false positives due to org.junit.runners.* in the test cases
