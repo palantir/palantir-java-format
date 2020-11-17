@@ -77,7 +77,11 @@ idea.project.ipr.withXml { xml ->
      */
     def compilerConfiguration = xml.asNode().component.find({ it.'@name' == 'CompilerConfiguration' })
     compilerConfiguration.value().add(new XmlParser().parseText('<option name="USE_RELEASE_OPTION" value="false" />'))
-    compilerConfiguration.bytecodeTargetLevel.module.find({ it.'@name' == 'palantir-java-format' }).attributes().target = "14"
+    def module = compilerConfiguration.bytecodeTargetLevel.module.find({ it.'@name' == 'palantir-java-format' })
+    // Module is null on jdk11
+    if (module != null) {
+        module.attributes().target = "14"
+    }
 
     xml.asNode().value().add(new XmlParser().parseText('''
     <component name="JavacSettings">
