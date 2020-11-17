@@ -14,18 +14,20 @@
 
 package com.palantir.javaformat.java;
 
-import static com.palantir.javaformat.java.FileBasedTests.isRecreate;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.palantir.javaformat.Newlines;
 import com.palantir.javaformat.jupiter.ParameterizedClass;
-import java.io.IOException;
-import java.util.List;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
+
+import java.io.IOException;
+import java.util.List;
+
+import static com.palantir.javaformat.java.FileBasedTests.assumeJava14ForJava14Tests;
+import static com.palantir.javaformat.java.FileBasedTests.isRecreate;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(ParameterizedClass.class)
 @Execution(ExecutionMode.CONCURRENT)
@@ -68,6 +70,7 @@ public class FormatterIntegrationTest {
 
     @TestTemplate
     public void format() {
+        assumeJava14ForJava14Tests(name);
         try {
             String output = createFormatter().formatSource(input);
             if (isRecreate()) {
@@ -91,6 +94,7 @@ public class FormatterIntegrationTest {
 
     @TestTemplate
     public void idempotentLF() {
+        assumeJava14ForJava14Tests(name);
         Assumptions.assumeFalse(isRecreate(), "Not running when recreating test outputs");
         try {
             String mangled = expected.replace(separator, "\n");
@@ -103,6 +107,7 @@ public class FormatterIntegrationTest {
 
     @TestTemplate
     public void idempotentCR() {
+        assumeJava14ForJava14Tests(name);
         Assumptions.assumeFalse(isRecreate(), "Not running when recreating test outputs");
         try {
             String mangled = expected.replace(separator, "\r");
@@ -115,6 +120,7 @@ public class FormatterIntegrationTest {
 
     @TestTemplate
     public void idempotentCRLF() {
+        assumeJava14ForJava14Tests(name);
         Assumptions.assumeFalse(isRecreate(), "Not running when recreating test outputs");
         try {
             String mangled = expected.replace(separator, "\r\n");

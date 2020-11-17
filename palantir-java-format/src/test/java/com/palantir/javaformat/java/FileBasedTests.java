@@ -15,15 +15,14 @@
  */
 package com.palantir.javaformat.java;
 
-import static com.google.common.io.Files.getFileExtension;
-import static com.google.common.io.Files.getNameWithoutExtension;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.CharStreams;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ResourceInfo;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,8 +34,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import org.junit.jupiter.api.parallel.Execution;
-import org.junit.jupiter.api.parallel.ExecutionMode;
+
+import static com.google.common.io.Files.getFileExtension;
+import static com.google.common.io.Files.getNameWithoutExtension;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Execution(ExecutionMode.CONCURRENT)
 public final class FileBasedTests {
@@ -61,6 +63,12 @@ public final class FileBasedTests {
         this.fullTestPath = Paths.get("src/test/resources").resolve(resourcePrefix);
     }
 
+    public static void assumeJava14ForJava14Tests(String testName) {
+        if (JAVA_14_TESTS.contains(testName)) {
+            Assumptions.assumeTrue(Formatter.getMajor() >= 14, "Not running on jdk < 14");
+        }
+    }
+
     public List<Object[]> paramsAsNameInputOutput() throws IOException {
         ClassLoader classLoader = testClass.getClassLoader();
         Map<String, String> inputs = new TreeMap<>();
@@ -75,9 +83,6 @@ public final class FileBasedTests {
                         .isEqualTo(1);
                 String baseName = getNameWithoutExtension(subPath.getFileName().toString());
                 String extension = getFileExtension(subPath.getFileName().toString());
-                if (JAVA_14_TESTS.contains(baseName) && Formatter.getMajor() < 14) {
-                    continue;
-                }
                 String contents;
                 try (InputStream stream = testClass.getClassLoader().getResourceAsStream(resourceName)) {
                     contents = CharStreams.toString(new InputStreamReader(stream, UTF_8));
