@@ -14,19 +14,18 @@
 
 package com.palantir.javaformat.java;
 
+import static com.google.common.truth.Truth.assertThat;
+import static com.palantir.javaformat.java.FileBasedTests.assumeJava14ForJava14Tests;
+import static com.palantir.javaformat.java.FileBasedTests.isRecreate;
+
 import com.palantir.javaformat.jupiter.ParameterizedClass;
+import java.io.IOException;
+import java.util.List;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
-
-import java.io.IOException;
-import java.util.List;
-
-import static com.google.common.truth.Truth.assertThat;
-import static com.palantir.javaformat.java.FileBasedTests.assumeJava14ForJava14Tests;
-import static com.palantir.javaformat.java.FileBasedTests.isRecreate;
 
 @ExtendWith(ParameterizedClass.class)
 @Execution(ExecutionMode.CONCURRENT)
