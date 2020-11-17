@@ -64,17 +64,31 @@ subprojects {
     }
 }
 
-idea.project.settings {
-    compiler {
-        javac {
-            // Tell idea about the exported internal javac apis
-            moduleJavacAdditionalOptions = [
-                    'palantir-java-format': '--add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED ' +
-                            '--add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED ' +
-                            '--add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED ' +
-                            '--add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED ' +
-                            '--add-exports jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED ' +
-                            '--add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED']
-        }
+/**
+ * There is a bunch of truly snowflaky stuff going on this project, because we have this Java14InputAstVisitor class
+ * which needs to implement some interface methods defined in com.sun.source.util.TreePathScanner, which varies
+ * depending on what JVM the formatter is running on!
+ */
+idea.project.ipr.withXml { xml ->
+    /**
+     * Even though the p-j-f codebase has sourceCompat=11 and targetCompat=11, we have to convince IntelliJ to let us
+     * compile against methods from a newer JVM like visitYield, visitSwitchExpression etc. Hence why we turn off the
+     * --release flag (using USE_RELEASE_OPTION below)
+     */
+    def compilerConfiguration = xml.asNode().component.find({ it.'@name' == 'CompilerConfiguration' })
+    compilerConfiguration.value().add(new XmlParser().parseText('<option name="USE_RELEASE_OPTION" value="false" />'))
+    def module = compilerConfiguration.bytecodeTargetLevel.module.find({ it.'@name' == 'palantir-java-format' })
+    // Module is null on jdk11
+    if (module != null) {
+        module.attributes().target = "14"
     }
+
+    xml.asNode().value().add(new XmlParser().parseText('''
+    <component name="JavacSettings">
+        <option name="PREFER_TARGET_JDK_COMPILER" value="false" />
+        <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+        <module name="palantir-java-format" options="--add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED" />
+        </option>
+    </component>
+    '''))
 }

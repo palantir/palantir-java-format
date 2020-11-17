@@ -65,3 +65,8 @@ tasks.test {
     // https://junit.org/junit5/docs/current/user-guide/#writing-tests-parallel-execution
     systemProperty 'junit.jupiter.execution.parallel.mode.default', 'concurrent'
 }
+
+// necessary to compile Java14InputAstVisitor
+idea {
+    module.languageLevel = new org.gradle.plugins.ide.idea.model.IdeaLanguageLevel(14)
+}
