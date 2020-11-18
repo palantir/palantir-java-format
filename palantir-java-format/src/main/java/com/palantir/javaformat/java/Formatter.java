@@ -14,6 +14,8 @@
 
 package com.palantir.javaformat.java;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -22,10 +24,19 @@ import com.google.common.collect.RangeSet;
 import com.google.common.io.CharSink;
 import com.google.common.io.CharSource;
 import com.google.errorprone.annotations.Immutable;
-import com.palantir.javaformat.*;
+import com.palantir.javaformat.CommentsHelper;
+import com.palantir.javaformat.FormattingError;
+import com.palantir.javaformat.Op;
+import com.palantir.javaformat.OpsBuilder;
 import com.palantir.javaformat.OpsBuilder.OpsOutput;
-import com.palantir.javaformat.doc.*;
+import com.palantir.javaformat.Utils;
+import com.palantir.javaformat.doc.Doc;
+import com.palantir.javaformat.doc.DocBuilder;
+import com.palantir.javaformat.doc.Level;
+import com.palantir.javaformat.doc.NoopSink;
+import com.palantir.javaformat.doc.Obs;
 import com.palantir.javaformat.doc.Obs.Sink;
+import com.palantir.javaformat.doc.State;
 import com.sun.tools.javac.file.JavacFileManager;
 import com.sun.tools.javac.parser.JavacParser;
 import com.sun.tools.javac.parser.ParserFactory;
@@ -33,14 +44,16 @@ import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.Log;
 import com.sun.tools.javac.util.Options;
-
-import javax.tools.*;
 import java.io.IOError;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
+import javax.tools.Diagnostic;
+import javax.tools.DiagnosticCollector;
+import javax.tools.DiagnosticListener;
+import javax.tools.JavaFileObject;
+import javax.tools.SimpleJavaFileObject;
+import javax.tools.StandardLocation;
 
 /**
  * This is google-java-format, a new Java formatter that follows the Google Java Style Guide quite precisely---to the

@@ -10,12 +10,22 @@ class ExpressionSwitch {
         };
     }
 
-    int yield() {
+    int yield(int i) {
         return switch (i) {
             case 0:
                 yield 0;
             default:
                 yield n / i;
         };
+    }
+
+    int assignment(int j) {
+        boolean val =
+                switch (j) {
+                    case 0 -> true;
+                    case 1 -> false;
+                    default -> false;
+                };
+        return val;
     }
 }
