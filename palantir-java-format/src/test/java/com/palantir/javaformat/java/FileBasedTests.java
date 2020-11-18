@@ -15,15 +15,14 @@
  */
 package com.palantir.javaformat.java;
 
-import static com.google.common.io.Files.getFileExtension;
-import static com.google.common.io.Files.getNameWithoutExtension;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.CharStreams;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ResourceInfo;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,9 +34,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import org.junit.jupiter.api.Assumptions;
-import org.junit.jupiter.api.parallel.Execution;
-import org.junit.jupiter.api.parallel.ExecutionMode;
+
+import static com.google.common.io.Files.getFileExtension;
+import static com.google.common.io.Files.getNameWithoutExtension;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Execution(ExecutionMode.CONCURRENT)
 public final class FileBasedTests {
@@ -64,7 +65,7 @@ public final class FileBasedTests {
 
     public static void assumeJava14ForJava14Tests(String testName) {
         if (JAVA_14_TESTS.contains(testName)) {
-            Assumptions.assumeTrue(Formatter.getMajor() >= 14, "Not running on jdk < 14");
+            Assumptions.assumeTrue(Formatter.getRuntimeVersion() >= 14, "Not running on jdk 14 or later");
         }
     }
 

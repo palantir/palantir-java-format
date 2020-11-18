@@ -14,10 +14,6 @@
 
 package com.palantir.javaformat.java;
 
-import static com.google.common.base.StandardSystemProperty.JAVA_CLASS_VERSION;
-import static com.google.common.base.StandardSystemProperty.JAVA_SPECIFICATION_VERSION;
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -26,19 +22,10 @@ import com.google.common.collect.RangeSet;
 import com.google.common.io.CharSink;
 import com.google.common.io.CharSource;
 import com.google.errorprone.annotations.Immutable;
-import com.palantir.javaformat.CommentsHelper;
-import com.palantir.javaformat.FormattingError;
-import com.palantir.javaformat.Op;
-import com.palantir.javaformat.OpsBuilder;
+import com.palantir.javaformat.*;
 import com.palantir.javaformat.OpsBuilder.OpsOutput;
-import com.palantir.javaformat.Utils;
-import com.palantir.javaformat.doc.Doc;
-import com.palantir.javaformat.doc.DocBuilder;
-import com.palantir.javaformat.doc.Level;
-import com.palantir.javaformat.doc.NoopSink;
-import com.palantir.javaformat.doc.Obs;
+import com.palantir.javaformat.doc.*;
 import com.palantir.javaformat.doc.Obs.Sink;
-import com.palantir.javaformat.doc.State;
 import com.sun.tools.javac.file.JavacFileManager;
 import com.sun.tools.javac.parser.JavacParser;
 import com.sun.tools.javac.parser.ParserFactory;
@@ -46,17 +33,14 @@ import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.Log;
 import com.sun.tools.javac.util.Options;
+
+import javax.tools.*;
 import java.io.IOError;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.Collection;
-import javax.tools.Diagnostic;
-import javax.tools.DiagnosticCollector;
-import javax.tools.DiagnosticListener;
-import javax.tools.JavaFileObject;
-import javax.tools.SimpleJavaFileObject;
-import javax.tools.StandardLocation;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * This is google-java-format, a new Java formatter that follows the Google Java Style Guide quite precisely---to the
@@ -141,7 +125,7 @@ public final class Formatter {
         OpsBuilder opsBuilder = new OpsBuilder(javaInput);
 
         JavaInputAstVisitor visitor;
-        if (getMajor() >= 14) {
+        if (getRuntimeVersion() >= 14) {
             try {
                 visitor = Class.forName("com.palantir.javaformat.java.java14.Java14InputAstVisitor")
                         .asSubclass(JavaInputAstVisitor.class)
@@ -211,22 +195,9 @@ public final class Formatter {
         return unit;
     }
 
-    // Runtime.Version was added in JDK 9, so use reflection to access it to preserve source
-    // compatibility with Java 8.
     @VisibleForTesting
-    static int getMajor() {
-        try {
-            Method versionMethod = Runtime.class.getMethod("version");
-            Object version = versionMethod.invoke(null);
-            return (int) version.getClass().getMethod("major").invoke(version);
-        } catch (Exception e) {
-            // continue below
-        }
-        int version = (int) Double.parseDouble(JAVA_CLASS_VERSION.value());
-        if (49 <= version && version <= 52) {
-            return version - (49 - 5);
-        }
-        throw new IllegalStateException("Unknown Java version: " + JAVA_SPECIFICATION_VERSION.value());
+    static int getRuntimeVersion() {
+        return Runtime.version().feature();
     }
 
     static boolean errorDiagnostic(Diagnostic<?> input) {
