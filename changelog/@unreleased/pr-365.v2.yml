@@ -1,0 +1,9 @@
+type: break
+break:
+  description: |-
+    * Add support for java 14 language features.
+    * **Break:** Increase minimum source compatibility from java 8 to java 11.
+      * To use version 2.x of the formatter, you need to run on java 11 or higher.
+      * If you require the formatter to run on java 8, you won't be able to upgrade past version 1.x. Note that you can still produce java 8 jars from your repo but need to use at least java 11 to run the formatter.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/365
