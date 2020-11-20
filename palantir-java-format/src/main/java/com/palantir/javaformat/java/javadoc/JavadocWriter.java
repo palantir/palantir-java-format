@@ -29,7 +29,6 @@ import static com.palantir.javaformat.java.javadoc.Token.Type.PARAGRAPH_OPEN_TAG
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
-import com.palantir.javaformat.java.javadoc.Token.Type;
 
 /**
  * Stateful object that accepts "requests" and "writes," producing formatted Javadoc.
@@ -406,6 +405,6 @@ final class JavadocWriter {
      * The special pinning here is necessary because these tokens are not of type LITERAL (because they require other
      * special handling).
      */
-    private static final ImmutableSet<Type> START_OF_LINE_TOKENS =
+    private static final ImmutableSet<Token.Type> START_OF_LINE_TOKENS =
             immutableEnumSet(LIST_ITEM_OPEN_TAG, PARAGRAPH_OPEN_TAG, HEADER_OPEN_TAG);
 }

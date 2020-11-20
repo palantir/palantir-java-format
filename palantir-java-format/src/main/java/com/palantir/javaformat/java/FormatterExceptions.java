@@ -25,7 +25,7 @@ import org.openjdk.javax.tools.JavaFileObject;
 final class FormatterExceptions {
 
     static FormatterException fromJavacDiagnostics(Iterable<Diagnostic<? extends JavaFileObject>> diagnostics) {
-        return new FormatterException(Iterables.transform(diagnostics, d -> toFormatterDiagnostic(d)));
+        return new FormatterException(Iterables.transform(diagnostics, FormatterExceptions::toFormatterDiagnostic));
     }
 
     private static FormatterDiagnostic toFormatterDiagnostic(Diagnostic<?> input) {
