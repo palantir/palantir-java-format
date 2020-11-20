@@ -57,7 +57,6 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.TreeMap;
@@ -255,7 +254,7 @@ final class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
         TreeMap<TextRange, String> sorted = new TreeMap<>(comparing(TextRange::getStartOffset));
         sorted.putAll(replacements);
         WriteCommandAction.runWriteCommandAction(getProject(), () -> {
-            for (Entry<TextRange, String> entry : sorted.descendingMap().entrySet()) {
+            for (Map.Entry<TextRange, String> entry : sorted.descendingMap().entrySet()) {
                 document.replaceString(
                         entry.getKey().getStartOffset(), entry.getKey().getEndOffset(), entry.getValue());
             }

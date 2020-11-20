@@ -184,6 +184,8 @@ final class CommandLineOptions {
         private Optional<String> assumeFilename = Optional.empty();
         private boolean reflowLongStrings = true;
 
+        private Builder() {}
+
         ImmutableList.Builder<String> filesBuilder() {
             return files;
         }

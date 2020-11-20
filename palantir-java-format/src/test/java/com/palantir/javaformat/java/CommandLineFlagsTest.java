@@ -75,7 +75,7 @@ public class CommandLineFlagsTest {
 
         Main.processArgs("-help");
 
-        assertThatThrownBy(() -> Main.processArgs()).isInstanceOf(UsageException.class);
+        assertThatThrownBy(Main::processArgs).isInstanceOf(UsageException.class);
 
         assertThatThrownBy(() -> Main.processArgs("-aosp")).isInstanceOf(UsageException.class);
     }
