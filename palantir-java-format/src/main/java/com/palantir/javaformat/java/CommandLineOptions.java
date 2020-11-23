@@ -165,7 +165,7 @@ final class CommandLineOptions {
         return new Builder();
     }
 
-    static class Builder {
+    static final class Builder {
 
         private final ImmutableList.Builder<String> files = ImmutableList.builder();
         private final ImmutableRangeSet.Builder<Integer> lines = ImmutableRangeSet.builder();
