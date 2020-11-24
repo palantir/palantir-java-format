@@ -19,8 +19,8 @@ package com.palantir.javaformat.java;
 import static java.util.Locale.ENGLISH;
 
 import com.google.common.collect.Iterables;
-import org.openjdk.javax.tools.Diagnostic;
-import org.openjdk.javax.tools.JavaFileObject;
+import javax.tools.Diagnostic;
+import javax.tools.JavaFileObject;
 
 final class FormatterExceptions {
 

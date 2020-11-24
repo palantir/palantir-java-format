@@ -25,6 +25,18 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Range;
 import com.google.common.collect.TreeRangeMap;
 import com.palantir.javaformat.Newlines;
+import com.sun.source.tree.BinaryTree;
+import com.sun.source.tree.LiteralTree;
+import com.sun.source.tree.MemberSelectTree;
+import com.sun.source.tree.Tree;
+import com.sun.source.tree.Tree.Kind;
+import com.sun.source.util.TreePath;
+import com.sun.source.util.TreePathScanner;
+import com.sun.tools.javac.tree.JCTree;
+import com.sun.tools.javac.util.Context;
+import com.sun.tools.javac.util.Options;
+import com.sun.tools.javac.util.Position;
+import com.sun.tools.javac.util.Position.LineMap;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -33,18 +45,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
-import org.openjdk.source.tree.BinaryTree;
-import org.openjdk.source.tree.LiteralTree;
-import org.openjdk.source.tree.MemberSelectTree;
-import org.openjdk.source.tree.Tree;
-import org.openjdk.source.tree.Tree.Kind;
-import org.openjdk.source.util.TreePath;
-import org.openjdk.source.util.TreePathScanner;
-import org.openjdk.tools.javac.tree.JCTree;
-import org.openjdk.tools.javac.util.Context;
-import org.openjdk.tools.javac.util.Options;
-import org.openjdk.tools.javac.util.Position;
-import org.openjdk.tools.javac.util.Position.LineMap;
 
 /** Wraps string literals that exceed the column limit. */
 public final class StringWrapper {

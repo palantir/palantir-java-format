@@ -50,29 +50,29 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
     }
 
     def validJavaFile = '''\
-        package test;
-        
-        public class Test {
-            void test() {
-                int x = 1;
-                System.out.println("Hello");
-                Optional.of("hello").orElseGet(() -> {
-                    return "Hello World";
-                });
-            }
+    package test;
+    
+    public class Test {
+        void test() {
+            int x = 1;
+            System.out.println("Hello");
+            Optional.of("hello").orElseGet(() -> {
+                return "Hello World";
+            });
         }
+    }
     '''.stripIndent()
 
     def invalidJavaFile = '''
-        package test;
-        import com.java.unused;
-        public class Test { void test() {int x = 1;
-            System.out.println(
-                "Hello"
-            );
-            Optional.of("hello").orElseGet(() -> { 
-                return "Hello World";
-            });
-        } }
+    package test;
+    import com.java.unused;
+    public class Test { void test() {int x = 1;
+        System.out.println(
+            "Hello"
+        );
+        Optional.of("hello").orElseGet(() -> { 
+            return "Hello World";
+        });
+    } }
     '''.stripIndent()
 }

@@ -5,13 +5,13 @@
 version: 2.1
 jobs:
   compile:
-    docker: [{ image: 'circleci/openjdk:8u222-stretch-node' }]
+    docker: [{ image: 'circleci/openjdk:15-jdk-buster-node' }]
     resource_class: large
     environment:
       CIRCLE_TEST_REPORTS: /home/circleci/junit
       CIRCLE_ARTIFACTS: /home/circleci/artifacts
-      GRADLE_OPTS: -Dorg.gradle.jvmargs='-Xms6144m -Xmx6144m'
-      _JAVA_OPTIONS: -XX:ActiveProcessorCount=4 -XX:ErrorFile=/home/circleci/artifacts/hs_err_pid%p.log -XX:HeapDumpPath=/home/circleci/artifacts
+      GRADLE_OPTS: -Dorg.gradle.jvmargs='-XX:MaxMetaspaceSize=256m' -Dorg.gradle.workers.max=4
+      _JAVA_OPTIONS: -XX:ActiveProcessorCount=4 -Xmx1177m -XX:MaxMetaspaceSize=512m -XX:ErrorFile=/home/circleci/artifacts/hs_err_pid%p.log -XX:HeapDumpPath=/home/circleci/artifacts
     steps:
       - checkout
       - run:
@@ -54,12 +54,13 @@ jobs:
           paths: [ project, .gradle/init.gradle ]
 
   check:
-    docker: [{ image: 'circleci/openjdk:8u222-stretch-node' }]
+    docker: [{ image: 'circleci/openjdk:15-jdk-buster-node' }]
+    resource_class: medium
     environment:
       CIRCLE_TEST_REPORTS: /home/circleci/junit
       CIRCLE_ARTIFACTS: /home/circleci/artifacts
-      GRADLE_OPTS: -Dorg.gradle.jvmargs='-Xms3072m -Xmx3072m'
-      _JAVA_OPTIONS: -XX:ActiveProcessorCount=2 -XX:ErrorFile=/home/circleci/artifacts/hs_err_pid%p.log -XX:HeapDumpPath=/home/circleci/artifacts
+      GRADLE_OPTS: -Dorg.gradle.jvmargs='-XX:MaxMetaspaceSize=256m' -Dorg.gradle.workers.max=2
+      _JAVA_OPTIONS: -XX:ActiveProcessorCount=2 -Xmx938m -XX:MaxMetaspaceSize=512m -XX:ErrorFile=/home/circleci/artifacts/hs_err_pid%p.log -XX:HeapDumpPath=/home/circleci/artifacts
     steps:
       - attach_workspace: { at: /home/circleci }
       - restore_cache: { key: 'gradle-wrapper-v2-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
@@ -75,7 +76,7 @@ jobs:
       - store_artifacts: { path: ~/artifacts }
 
   unit-test:
-    docker: [{ image: 'circleci/openjdk:8u222-stretch-node' }]
+    docker: [{ image: 'circleci/openjdk:15-jdk-buster-node' }]
     resource_class: large
     environment:
       CIRCLE_TEST_REPORTS: /home/circleci/junit
@@ -119,17 +120,21 @@ jobs:
       - store_artifacts: { path: ~/artifacts }
 
   trial-publish:
-    docker: [{ image: 'circleci/openjdk:8u222-stretch-node' }]
+    docker: [{ image: 'circleci/openjdk:15-jdk-buster-node' }]
+    resource_class: medium
     environment:
       CIRCLE_TEST_REPORTS: /home/circleci/junit
       CIRCLE_ARTIFACTS: /home/circleci/artifacts
-      GRADLE_OPTS: -Dorg.gradle.jvmargs='-Xms3072m -Xmx3072m'
-      _JAVA_OPTIONS: -XX:ActiveProcessorCount=2 -XX:ErrorFile=/home/circleci/artifacts/hs_err_pid%p.log -XX:HeapDumpPath=/home/circleci/artifacts
+      GRADLE_OPTS: -Dorg.gradle.jvmargs='-XX:MaxMetaspaceSize=256m' -Dorg.gradle.workers.max=2
+      _JAVA_OPTIONS: -XX:ActiveProcessorCount=2 -Xmx938m -XX:MaxMetaspaceSize=512m -XX:ErrorFile=/home/circleci/artifacts/hs_err_pid%p.log -XX:HeapDumpPath=/home/circleci/artifacts
     steps:
       - attach_workspace: { at: /home/circleci }
       - restore_cache: { key: 'gradle-wrapper-v2-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
       - restore_cache: { key: 'trial-publish-gradle-cache-v2-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
       - run: ./gradlew --stacktrace publishToMavenLocal
+      - run:
+          command: git status --porcelain
+          when: always
       - save_cache:
           key: 'trial-publish-gradle-cache-v2-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}'
           paths: [ ~/.gradle/caches ]
@@ -137,18 +142,22 @@ jobs:
       - store_artifacts: { path: ~/artifacts }
 
   publish:
-    docker: [{ image: 'circleci/openjdk:8u222-stretch-node' }]
+    docker: [{ image: 'circleci/openjdk:15-jdk-buster-node' }]
+    resource_class: medium
     environment:
       CIRCLE_TEST_REPORTS: /home/circleci/junit
       CIRCLE_ARTIFACTS: /home/circleci/artifacts
-      GRADLE_OPTS: -Dorg.gradle.jvmargs='-Xms3072m -Xmx3072m'
-      _JAVA_OPTIONS: -XX:ActiveProcessorCount=2 -XX:ErrorFile=/home/circleci/artifacts/hs_err_pid%p.log -XX:HeapDumpPath=/home/circleci/artifacts
+      GRADLE_OPTS: -Dorg.gradle.jvmargs='-XX:MaxMetaspaceSize=256m' -Dorg.gradle.workers.max=2
+      _JAVA_OPTIONS: -XX:ActiveProcessorCount=2 -Xmx938m -XX:MaxMetaspaceSize=512m -XX:ErrorFile=/home/circleci/artifacts/hs_err_pid%p.log -XX:HeapDumpPath=/home/circleci/artifacts
     steps:
       - attach_workspace: { at: /home/circleci }
       - restore_cache: { key: 'gradle-wrapper-v2-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
       - restore_cache: { key: 'publish-gradle-cache-v2-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
       - deploy:
           command: ./gradlew --parallel --stacktrace --continue publish
+      - run:
+          command: git status --porcelain
+          when: always
       - save_cache:
           key: 'publish-gradle-cache-v2-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}'
           paths: [ ~/.gradle/caches ]
@@ -161,11 +170,6 @@ jobs:
       - checkout
       - run: /liche -d . -r . -v
 
-  circle-all:
-    docker: [{ image: 'circleci/openjdk:8u222-stretch-node' }]
-    resource_class: small
-    steps:
-      - run: {command: echo "All required jobs finished successfully"}
 
 workflows:
   version: 2
@@ -192,11 +196,6 @@ workflows:
           requires: [ compile ]
           filters: { branches: { ignore: develop } }
 
-      # Catch-all for all required checks
-      - circle-all:
-          requires: [ unit-test, unit-test-11, check, trial-publish ]
-          filters: { tags: { only: /.*/ } }
-
       - publish:
-          requires: [ circle-all ]
+          requires: [ unit-test, unit-test-11, check, trial-publish ]
           filters: { tags: { only: /.*/ }, branches: { only: develop } }

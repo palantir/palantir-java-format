@@ -15,6 +15,7 @@
 package com.palantir.javaformat.java;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.palantir.javaformat.java.FileBasedTests.assumeJava14ForJava14Tests;
 import static com.palantir.javaformat.java.FileBasedTests.isRecreate;
 
 import com.palantir.javaformat.jupiter.ParameterizedClass;
@@ -51,6 +52,7 @@ public class StringWrapperIntegrationTest {
 
     @TestTemplate
     public void test() throws Exception {
+        assumeJava14ForJava14Tests(name);
         String actualOutput = StringWrapper.wrap(40, formatter.formatSource(input), formatter);
         if (isRecreate()) {
             tests.writeFormatterOutput(name, actualOutput);
@@ -61,6 +63,7 @@ public class StringWrapperIntegrationTest {
 
     @TestTemplate
     public void testCR() throws Exception {
+        assumeJava14ForJava14Tests(name);
         Assumptions.assumeFalse(isRecreate(), "Not running when recreating test outputs");
         assertThat(StringWrapper.wrap(40, formatter.formatSource(input.replace("\n", "\r")), formatter))
                 .isEqualTo(output.replace("\n", "\r"));
@@ -68,6 +71,7 @@ public class StringWrapperIntegrationTest {
 
     @TestTemplate
     public void testCRLF() throws Exception {
+        assumeJava14ForJava14Tests(name);
         Assumptions.assumeFalse(isRecreate(), "Not running when recreating test outputs");
         assertThat(StringWrapper.wrap(40, formatter.formatSource(input.replace("\n", "\r\n")), formatter))
                 .isEqualTo(output.replace("\n", "\r\n"));
@@ -75,6 +79,7 @@ public class StringWrapperIntegrationTest {
 
     @TestTemplate
     public void idempotent() throws Exception {
+        assumeJava14ForJava14Tests(name);
         Assumptions.assumeFalse(isRecreate(), "Not running when recreating test outputs");
         String wrap = StringWrapper.wrap(40, formatter.formatSource(input), formatter);
         assertThat(formatter.formatSource(wrap)).isEqualTo(wrap);

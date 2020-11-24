@@ -26,13 +26,13 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.palantir.javaformat.Newlines;
 import com.palantir.javaformat.java.JavaInput.Tok;
+import com.sun.tools.javac.parser.Tokens.TokenKind;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.stream.Stream;
-import org.openjdk.tools.javac.parser.Tokens.TokenKind;
 
 /** Orders imports in Java source code. */
 public final class ImportOrderer {

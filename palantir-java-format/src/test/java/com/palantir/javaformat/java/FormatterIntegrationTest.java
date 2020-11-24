@@ -14,6 +14,7 @@
 
 package com.palantir.javaformat.java;
 
+import static com.palantir.javaformat.java.FileBasedTests.assumeJava14ForJava14Tests;
 import static com.palantir.javaformat.java.FileBasedTests.isRecreate;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -68,6 +69,7 @@ public class FormatterIntegrationTest {
 
     @TestTemplate
     public void format() {
+        assumeJava14ForJava14Tests(name);
         try {
             String output = createFormatter().formatSource(input);
             if (isRecreate()) {
@@ -91,6 +93,7 @@ public class FormatterIntegrationTest {
 
     @TestTemplate
     public void idempotentLF() {
+        assumeJava14ForJava14Tests(name);
         Assumptions.assumeFalse(isRecreate(), "Not running when recreating test outputs");
         try {
             String mangled = expected.replace(separator, "\n");
@@ -103,6 +106,7 @@ public class FormatterIntegrationTest {
 
     @TestTemplate
     public void idempotentCR() {
+        assumeJava14ForJava14Tests(name);
         Assumptions.assumeFalse(isRecreate(), "Not running when recreating test outputs");
         try {
             String mangled = expected.replace(separator, "\r");
@@ -115,6 +119,7 @@ public class FormatterIntegrationTest {
 
     @TestTemplate
     public void idempotentCRLF() {
+        assumeJava14ForJava14Tests(name);
         Assumptions.assumeFalse(isRecreate(), "Not running when recreating test outputs");
         try {
             String mangled = expected.replace(separator, "\r\n");

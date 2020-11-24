@@ -37,24 +37,23 @@ import com.palantir.javaformat.doc.NoopSink;
 import com.palantir.javaformat.doc.Obs;
 import com.palantir.javaformat.doc.Obs.Sink;
 import com.palantir.javaformat.doc.State;
+import com.sun.tools.javac.file.JavacFileManager;
+import com.sun.tools.javac.parser.JavacParser;
+import com.sun.tools.javac.parser.ParserFactory;
+import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
+import com.sun.tools.javac.util.Context;
+import com.sun.tools.javac.util.Log;
+import com.sun.tools.javac.util.Options;
 import java.io.IOError;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
-import org.openjdk.javax.tools.Diagnostic;
-import org.openjdk.javax.tools.DiagnosticCollector;
-import org.openjdk.javax.tools.DiagnosticListener;
-import org.openjdk.javax.tools.JavaFileObject;
-import org.openjdk.javax.tools.SimpleJavaFileObject;
-import org.openjdk.javax.tools.StandardLocation;
-import org.openjdk.tools.javac.file.JavacFileManager;
-import org.openjdk.tools.javac.main.Option;
-import org.openjdk.tools.javac.parser.JavacParser;
-import org.openjdk.tools.javac.parser.ParserFactory;
-import org.openjdk.tools.javac.tree.JCTree.JCCompilationUnit;
-import org.openjdk.tools.javac.util.Context;
-import org.openjdk.tools.javac.util.Log;
-import org.openjdk.tools.javac.util.Options;
+import javax.tools.Diagnostic;
+import javax.tools.DiagnosticCollector;
+import javax.tools.DiagnosticListener;
+import javax.tools.JavaFileObject;
+import javax.tools.SimpleJavaFileObject;
+import javax.tools.StandardLocation;
 
 /**
  * This is google-java-format, a new Java formatter that follows the Google Java Style Guide quite precisely---to the
@@ -137,7 +136,22 @@ public final class Formatter {
         // Output the compilation unit.
         javaInput.setCompilationUnit(unit);
         OpsBuilder opsBuilder = new OpsBuilder(javaInput);
-        new JavaInputAstVisitor(opsBuilder, options.indentationMultiplier()).scan(unit, null);
+
+        JavaInputAstVisitor visitor;
+        if (getRuntimeVersion() >= 14) {
+            try {
+                visitor = Class.forName("com.palantir.javaformat.java.java14.Java14InputAstVisitor")
+                        .asSubclass(JavaInputAstVisitor.class)
+                        .getConstructor(OpsBuilder.class, int.class)
+                        .newInstance(opsBuilder, options.indentationMultiplier());
+            } catch (ReflectiveOperationException e) {
+                throw new LinkageError(e.getMessage(), e);
+            }
+        } else {
+            visitor = new JavaInputAstVisitor(opsBuilder, options.indentationMultiplier());
+        }
+
+        visitor.scan(unit, null);
         opsBuilder.sync(javaInput.getText().length());
         opsBuilder.drain();
         OpsOutput opsOutput = opsBuilder.build();
@@ -164,10 +178,7 @@ public final class Formatter {
     static JCCompilationUnit parseJcCompilationUnit(Context context, String sourceText) throws FormatterException {
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
         context.put(DiagnosticListener.class, diagnostics);
-        // TODO(cushon): this should default to the latest supported source level, remove this after
-        // backing out
-        // https://github.com/google/error-prone-javac/commit/c97f34ddd2308302587ce2de6d0c984836ea5b9f
-        Options.instance(context).put(Option.SOURCE, "9");
+        Options.instance(context).put("--enable-preview", "true");
         JCCompilationUnit unit;
         JavacFileManager fileManager = new JavacFileManager(context, true, UTF_8);
         try {
@@ -195,6 +206,11 @@ public final class Formatter {
             throw FormatterExceptions.fromJavacDiagnostics(errorDiagnostics);
         }
         return unit;
+    }
+
+    @VisibleForTesting
+    static int getRuntimeVersion() {
+        return Runtime.version().feature();
     }
 
     static boolean errorDiagnostic(Diagnostic<?> input) {

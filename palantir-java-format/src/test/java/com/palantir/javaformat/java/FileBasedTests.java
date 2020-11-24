@@ -20,6 +20,7 @@ import static com.google.common.io.Files.getNameWithoutExtension;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.io.CharStreams;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ResourceInfo;
@@ -34,11 +35,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 
 @Execution(ExecutionMode.CONCURRENT)
 public final class FileBasedTests {
+    // Tests files that are only used when run with java 14 or higher
+    private static final ImmutableSet<String> JAVA_14_TESTS =
+            ImmutableSet.of("ExpressionSwitch", "RSL", "Records", "Var");
 
     private final Class<?> testClass;
     /** The path prefix for all tests if loaded as resources. */
@@ -55,6 +60,12 @@ public final class FileBasedTests {
                 Paths.get(testClass.getPackage().getName().replace('.', '/')).resolve(testDirName);
         this.testClass = testClass;
         this.fullTestPath = Paths.get("src/test/resources").resolve(resourcePrefix);
+    }
+
+    public static void assumeJava14ForJava14Tests(String testName) {
+        if (JAVA_14_TESTS.contains(testName)) {
+            Assumptions.assumeTrue(Formatter.getRuntimeVersion() >= 14, "Not running on jdk 14 or later");
+        }
     }
 
     public List<Object[]> paramsAsNameInputOutput() throws IOException {
