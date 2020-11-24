@@ -24,14 +24,13 @@ import com.google.common.collect.TreeRangeMap;
 import com.palantir.javaformat.Input.Tok;
 import com.palantir.javaformat.Input.Token;
 import com.sun.tools.javac.parser.Tokens.TokenKind;
-
-import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import javax.lang.model.element.Modifier;
 
 /** Fixes sequences of modifiers to be in JLS order. */
 final class ModifierOrderer {
