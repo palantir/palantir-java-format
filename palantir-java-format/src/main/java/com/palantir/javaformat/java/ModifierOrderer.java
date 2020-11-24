@@ -24,14 +24,14 @@ import com.google.common.collect.TreeRangeMap;
 import com.palantir.javaformat.Input.Tok;
 import com.palantir.javaformat.Input.Token;
 import com.sun.tools.javac.parser.Tokens.TokenKind;
+
+import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import javax.lang.model.element.Modifier;
 
 /** Fixes sequences of modifiers to be in JLS order. */
 final class ModifierOrderer {
@@ -157,7 +157,7 @@ final class ModifierOrderer {
             return javaInput;
         }
         StringBuilder sb = new StringBuilder(javaInput.getText());
-        for (Entry<Range<Integer>, String> entry : ranges.entrySet()) {
+        for (Map.Entry<Range<Integer>, String> entry : ranges.entrySet()) {
             Range<Integer> range = entry.getKey();
             sb.replace(range.lowerEndpoint(), range.upperEndpoint(), entry.getValue());
         }

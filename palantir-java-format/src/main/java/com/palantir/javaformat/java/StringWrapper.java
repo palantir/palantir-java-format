@@ -43,7 +43,6 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
@@ -99,7 +98,8 @@ public final class StringWrapper {
             TreeRangeMap<Integer, String> replacements) {
         ImmutableSet.Builder<Range<Integer>> outputRanges = ImmutableSet.builder();
         int offset = 0;
-        for (Entry<Range<Integer>, String> entry : replacements.asMapOfRanges().entrySet()) {
+        for (Map.Entry<Range<Integer>, String> entry :
+                replacements.asMapOfRanges().entrySet()) {
             Range<Integer> range = entry.getKey();
             String replacement = entry.getValue();
 
@@ -284,7 +284,7 @@ public final class StringWrapper {
         while (!input.isEmpty()) {
             int length = 0;
             List<String> line = new ArrayList<>();
-            if (input.stream().mapToInt(x -> x.length()).sum() <= width) {
+            if (input.stream().mapToInt(String::length).sum() <= width) {
                 width -= trailing;
             }
             while (!input.isEmpty()

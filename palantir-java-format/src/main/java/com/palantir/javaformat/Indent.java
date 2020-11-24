@@ -16,7 +16,6 @@ package com.palantir.javaformat;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.common.base.MoreObjects;
 import com.google.errorprone.annotations.Immutable;
@@ -30,7 +29,7 @@ import com.palantir.javaformat.doc.State;
  * expression whose value depends on whether or not a {@link Break} has been broken.
  */
 @Immutable
-@JsonTypeInfo(use = Id.NAME, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 public abstract class Indent {
 
     public abstract int eval(State state);
