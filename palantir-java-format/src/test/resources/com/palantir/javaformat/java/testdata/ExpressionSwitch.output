@@ -28,4 +28,25 @@ class ExpressionSwitch {
                 };
         return val;
     }
+
+    enum Wrapping {
+        THIS_IS_A_VERY_LONG_ENUM_VALUE_ONE,
+        THIS_IS_A_VERY_LONG_ENUM_VALUE_TWO,
+        THIS_IS_A_VERY_LONG_ENUM_VALUE_THREE,
+    }
+
+    int wrapping(Wrapping w) {
+        switch (w) {
+            case THIS_IS_A_VERY_LONG_ENUM_VALUE_ONE,
+                THIS_IS_A_VERY_LONG_ENUM_VALUE_TWO,
+                THIS_IS_A_VERY_LONG_ENUM_VALUE_THREE -> {}
+        }
+    }
+
+    Supplier<Integer> closeDelimiter(int k) {
+        return () -> switch (k) {
+            case 0 -> true;
+            default -> false;
+        };
+    }
 }
