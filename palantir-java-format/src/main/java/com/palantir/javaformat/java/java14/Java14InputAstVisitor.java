@@ -232,6 +232,7 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
                 token(">");
                 builder.space();
                 if (node.getBody().getKind() == BLOCK) {
+                    // Explicit call with {@link CollapseEmptyOrNot.YES} to handle empty case blocks.
                     visitBlock(
                             (BlockTree) node.getBody(),
                             CollapseEmptyOrNot.YES,
@@ -248,6 +249,11 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
         return null;
     }
 
+    /**
+     * TODO(fwindheuser): Collapse with
+     * {@link JavaInputAstVisitor#visitLambdaExpression(LambdaExpressionTree, Void)}} after dropping Java 11
+     * compatibility.
+     */
     @Override
     public Void visitLambdaExpression(LambdaExpressionTree node, Void unused) {
         sync(node);
