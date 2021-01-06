@@ -26,12 +26,15 @@ import com.palantir.javaformat.Op;
 import com.palantir.javaformat.OpsBuilder;
 import com.palantir.javaformat.java.JavaInputAstVisitor;
 import com.sun.source.tree.BindingPatternTree;
+import com.sun.source.tree.BlockTree;
 import com.sun.source.tree.CaseTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.InstanceOfTree;
+import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.SwitchExpressionTree;
 import com.sun.source.tree.Tree;
+import com.sun.source.tree.Tree.Kind;
 import com.sun.source.tree.YieldTree;
 import com.sun.tools.javac.code.Flags;
 import com.sun.tools.javac.tree.JCTree;
@@ -199,15 +202,17 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
         } else {
             token("case", plusTwo);
             builder.space();
+            builder.open(plusTwo);
             boolean first = true;
             for (ExpressionTree expression : node.getExpressions()) {
                 if (!first) {
                     token(",");
-                    builder.space();
+                    builder.breakOp(" ");
                 }
                 scan(expression, null);
                 first = false;
             }
+            builder.close();
         }
         switch (node.getCaseKind()) {
             case STATEMENT:
@@ -226,12 +231,36 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
                 token("-");
                 token(">");
                 builder.space();
-                scan(node.getBody(), null);
+                if (node.getBody().getKind() == BLOCK) {
+                    // Explicit call with {@link CollapseEmptyOrNot.YES} to handle empty case blocks.
+                    visitBlock(
+                            (BlockTree) node.getBody(),
+                            CollapseEmptyOrNot.YES,
+                            AllowLeadingBlankLine.NO,
+                            AllowTrailingBlankLine.NO);
+                } else {
+                    scan(node.getBody(), null);
+                }
                 builder.guessToken(";");
                 break;
             default:
                 throw new AssertionError(node.getCaseKind());
         }
+        return null;
+    }
+
+    /**
+     * TODO(fwindheuser): Collapse with
+     * {@link JavaInputAstVisitor#visitLambdaExpression(LambdaExpressionTree, Void)}} after dropping Java 11
+     * compatibility.
+     */
+    @Override
+    public Void visitLambdaExpression(LambdaExpressionTree node, Void unused) {
+        sync(node);
+        // Also format switch expressions as statement body instead of inlining them
+        boolean statementBody = node.getBodyKind() == LambdaExpressionTree.BodyKind.STATEMENT
+                || node.getBody().getKind() == Kind.SWITCH_EXPRESSION;
+        visitLambdaExpression(node, statementBody);
         return null;
     }
 }
