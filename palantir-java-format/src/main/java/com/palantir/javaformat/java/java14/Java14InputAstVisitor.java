@@ -26,6 +26,7 @@ import com.palantir.javaformat.Op;
 import com.palantir.javaformat.OpsBuilder;
 import com.palantir.javaformat.java.JavaInputAstVisitor;
 import com.sun.source.tree.BindingPatternTree;
+import com.sun.source.tree.BlockTree;
 import com.sun.source.tree.CaseTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
@@ -199,15 +200,17 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
         } else {
             token("case", plusTwo);
             builder.space();
+            builder.open(plusTwo);
             boolean first = true;
             for (ExpressionTree expression : node.getExpressions()) {
                 if (!first) {
                     token(",");
-                    builder.space();
+                    builder.breakOp(" ");
                 }
                 scan(expression, null);
                 first = false;
             }
+            builder.close();
         }
         switch (node.getCaseKind()) {
             case STATEMENT:
@@ -226,7 +229,15 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
                 token("-");
                 token(">");
                 builder.space();
-                scan(node.getBody(), null);
+                if (node.getBody().getKind() == BLOCK) {
+                    visitBlock(
+                            (BlockTree) node.getBody(),
+                            CollapseEmptyOrNot.YES,
+                            AllowLeadingBlankLine.NO,
+                            AllowTrailingBlankLine.NO);
+                } else {
+                    scan(node.getBody(), null);
+                }
                 builder.guessToken(";");
                 break;
             default:

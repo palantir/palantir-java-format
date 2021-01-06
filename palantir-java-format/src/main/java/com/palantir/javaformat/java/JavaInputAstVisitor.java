@@ -188,7 +188,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     }
 
     /** Whether to collapse empty blocks. */
-    enum CollapseEmptyOrNot {
+    protected enum CollapseEmptyOrNot {
         YES,
         NO;
 
@@ -202,7 +202,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     }
 
     /** Whether to allow leading blank lines in blocks. */
-    enum AllowLeadingBlankLine {
+    protected enum AllowLeadingBlankLine {
         YES,
         NO;
 
@@ -212,7 +212,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     }
 
     /** Whether to allow trailing blank lines in blocks. */
-    enum AllowTrailingBlankLine {
+    protected enum AllowTrailingBlankLine {
         YES,
         NO;
 
@@ -2111,7 +2111,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     }
 
     /** Helper method for blocks. */
-    private void visitBlock(
+    protected void visitBlock(
             BlockTree node,
             CollapseEmptyOrNot collapseEmptyOrNot,
             AllowLeadingBlankLine allowLeadingBlankLine,
