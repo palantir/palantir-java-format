@@ -127,7 +127,6 @@ import com.sun.source.tree.SwitchTree;
 import com.sun.source.tree.SynchronizedTree;
 import com.sun.source.tree.ThrowTree;
 import com.sun.source.tree.Tree;
-import com.sun.source.tree.Tree.Kind;
 import com.sun.source.tree.TryTree;
 import com.sun.source.tree.TypeCastTree;
 import com.sun.source.tree.TypeParameterTree;
@@ -1218,9 +1217,12 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     @Override
     public Void visitLambdaExpression(LambdaExpressionTree node, Void unused) {
         sync(node);
-        // Also format switch expressions as statement body instead of inlining them
-        boolean statementBody = node.getBodyKind() == LambdaExpressionTree.BodyKind.STATEMENT
-                || node.getBody().getKind() == Kind.SWITCH_EXPRESSION;
+        boolean statementBody = node.getBodyKind() == LambdaExpressionTree.BodyKind.STATEMENT;
+        visitLambdaExpression(node, statementBody);
+        return null;
+    }
+
+    protected void visitLambdaExpression(LambdaExpressionTree node, boolean statementBody) {
         boolean parens = builder.peekToken().equals(Optional.of("("));
         builder.open("lambda arguments", parens ? plusFour : ZERO);
         if (parens) {
@@ -1269,7 +1271,6 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             scan(node.getBody(), null);
         }
         builder.close();
-        return null;
     }
 
     @Override

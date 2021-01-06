@@ -31,8 +31,10 @@ import com.sun.source.tree.CaseTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.InstanceOfTree;
+import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.SwitchExpressionTree;
 import com.sun.source.tree.Tree;
+import com.sun.source.tree.Tree.Kind;
 import com.sun.source.tree.YieldTree;
 import com.sun.tools.javac.code.Flags;
 import com.sun.tools.javac.tree.JCTree;
@@ -243,6 +245,16 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
             default:
                 throw new AssertionError(node.getCaseKind());
         }
+        return null;
+    }
+
+    @Override
+    public Void visitLambdaExpression(LambdaExpressionTree node, Void unused) {
+        sync(node);
+        // Also format switch expressions as statement body instead of inlining them
+        boolean statementBody = node.getBodyKind() == LambdaExpressionTree.BodyKind.STATEMENT
+                || node.getBody().getKind() == Kind.SWITCH_EXPRESSION;
+        visitLambdaExpression(node, statementBody);
         return null;
     }
 }
