@@ -44,6 +44,18 @@
               <package name="" withSubpackages="true" static="false" />
             </value>
           </option>
+          <DO_NOT_IMPORT_INNER>
+            <CLASS name="Builder" />
+            <CLASS name="Callback" />
+            <CLASS name="Class" />
+            <CLASS name="Entry" />
+            <CLASS name="Enum" />
+            <CLASS name="Factory" />
+            <CLASS name="Type" />
+            <CLASS name="Key" />
+            <CLASS name="Id" />
+            <CLASS name="Provider" />
+          </DO_NOT_IMPORT_INNER>
         </GroovyCodeStyleSettings>
         <option name="JD_ALIGN_EXCEPTION_COMMENTS" value="false" />
         <option name="JD_ALIGN_PARAM_COMMENTS" value="false" />
