@@ -1,0 +1,6 @@
+public class MyClass {
+    Object myMethod() {
+        return new MyVeryLongClassNamexxxxxxxxxxxxxxxxxxxxxxxxxxxxx(
+                longishMethodA()::longishMethodBxxxxxxxxxxxxxxxxxxxxx);
+    }
+}
