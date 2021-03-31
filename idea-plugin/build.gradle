@@ -17,7 +17,7 @@
 apply plugin: 'maven-publish'
 apply plugin: 'org.jetbrains.intellij'
 
-apply from: rootProject.file('gradle/publish-jar.gradle')
+apply plugin: 'com.palantir.external-publish-jar'
 
 intellij {
     pluginName = "palantir-java-format"

@@ -1,5 +1,5 @@
 apply plugin: 'java-library'
-apply from: rootProject.file('gradle/publish-jar.gradle')
+apply plugin: 'com.palantir.external-publish-jar'
 apply plugin: 'com.palantir.revapi'
 
 dependencies {
