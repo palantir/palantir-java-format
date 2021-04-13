@@ -34,6 +34,7 @@ import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.InstanceOfTree;
 import com.sun.source.tree.LambdaExpressionTree;
+import com.sun.source.tree.ModifiersTree;
 import com.sun.source.tree.ModuleTree;
 import com.sun.source.tree.SwitchExpressionTree;
 import com.sun.source.tree.Tree;
@@ -80,12 +81,12 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
         try {
             VariableTree variableTree = (VariableTree)
                     BindingPatternTree.class.getMethod("getVariable").invoke(node);
-            visitBindingPattern(variableTree.getType(), variableTree.getName());
+            visitBindingPattern(variableTree.getModifiers(), variableTree.getType(), variableTree.getName());
         } catch (ReflectiveOperationException e1) {
             try {
                 Tree type = (Tree) BindingPatternTree.class.getMethod("getType").invoke(node);
                 Name name = (Name) BindingPatternTree.class.getMethod("getName").invoke(node);
-                visitBindingPattern(type, name);
+                visitBindingPattern(/* modifiers= */ null, type, name);
             } catch (ReflectiveOperationException e2) {
                 e2.addSuppressed(e1);
                 throw new LinkageError(e2.getMessage(), e2);
@@ -94,7 +95,10 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
         return null;
     }
 
-    private void visitBindingPattern(Tree type, Name name) {
+    private void visitBindingPattern(ModifiersTree modifiers, Tree type, Name name) {
+        if (modifiers != null) {
+            builder.addAll(visitModifiers(modifiers, Direction.HORIZONTAL, Optional.empty()));
+        }
         scan(type, null);
         builder.breakOp(" ");
         visit(name);

@@ -41,9 +41,10 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 
 @Execution(ExecutionMode.CONCURRENT)
 public final class FileBasedTests {
-    // Tests files that are only used when run with java 14 or higher
+    // Test files that are only used when run with a minimum Java version
     private static final ImmutableSet<String> JAVA_14_TESTS =
             ImmutableSet.of("ExpressionSwitch", "RSL", "Records", "Var");
+    private static final ImmutableSet<String> JAVA_16_TESTS = ImmutableSet.of("I588");
 
     private final Class<?> testClass;
     /** The path prefix for all tests if loaded as resources. */
@@ -62,9 +63,11 @@ public final class FileBasedTests {
         this.fullTestPath = Paths.get("src/test/resources").resolve(resourcePrefix);
     }
 
-    public static void assumeJava14ForJava14Tests(String testName) {
+    public static void assumeJavaVersionForTest(String testName) {
         if (JAVA_14_TESTS.contains(testName)) {
             Assumptions.assumeTrue(Formatter.getRuntimeVersion() >= 14, "Not running on jdk 14 or later");
+        } else if (JAVA_16_TESTS.contains(testName)) {
+            Assumptions.assumeTrue(Formatter.getRuntimeVersion() >= 16, "Not running on jdk 16 or later");
         }
     }
 
