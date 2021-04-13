@@ -43,7 +43,7 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 public final class FileBasedTests {
     // Test files that are only used when run with a minimum Java version
     private static final ImmutableSet<String> JAVA_14_TESTS =
-            ImmutableSet.of("ExpressionSwitch", "RSL", "Records", "Var");
+            ImmutableSet.of("ExpressionSwitch", "RSL", "Records", "Var", "I574");
     private static final ImmutableSet<String> JAVA_16_TESTS = ImmutableSet.of("I588");
 
     private final Class<?> testClass;
