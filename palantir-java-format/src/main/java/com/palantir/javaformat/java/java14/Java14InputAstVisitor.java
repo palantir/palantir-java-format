@@ -17,7 +17,6 @@
 package com.palantir.javaformat.java.java14;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.MoreCollectors.toOptional;
 import static com.sun.source.tree.Tree.Kind.BLOCK;
 
 import com.google.common.base.Verify;
@@ -43,6 +42,7 @@ import com.sun.source.tree.VariableTree;
 import com.sun.source.tree.YieldTree;
 import com.sun.tools.javac.code.Flags;
 import com.sun.tools.javac.tree.JCTree;
+import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.tree.TreeInfo;
 import java.util.List;
 import java.util.Optional;
@@ -161,9 +161,7 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
             if (!node.getTypeParameters().isEmpty()) {
                 typeParametersRest(node.getTypeParameters(), hasSuperInterfaceTypes ? plusFour : ZERO);
             }
-            ImmutableList<JCTree.JCVariableDecl> parameters = compactRecordConstructor(node)
-                    .map(m -> ImmutableList.copyOf(m.getParameters()))
-                    .orElseGet(() -> recordVariables(node));
+            ImmutableList<JCVariableDecl> parameters = recordVariables(node);
             token("(");
             if (!parameters.isEmpty()) {
                 // Break before args.
@@ -199,14 +197,6 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
             addBodyDeclarations(members, BracesOrNot.YES, FirstDeclarationsOrNot.YES);
         }
         dropEmptyDeclarations();
-    }
-
-    private static Optional<JCTree.JCMethodDecl> compactRecordConstructor(ClassTree node) {
-        return node.getMembers().stream()
-                .filter(JCTree.JCMethodDecl.class::isInstance)
-                .map(JCTree.JCMethodDecl.class::cast)
-                .filter(m -> (m.mods.flags & COMPACT_RECORD_CONSTRUCTOR) == COMPACT_RECORD_CONSTRUCTOR)
-                .collect(toOptional());
     }
 
     private static ImmutableList<JCTree.JCVariableDecl> recordVariables(ClassTree node) {
