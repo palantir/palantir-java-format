@@ -90,7 +90,7 @@ final class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
     }
 
     static Map<TextRange, String> getReplacements(
-            FormatterService formatter, String text, Collection<TextRange> ranges) {
+            FormatterService formatter, String text, Collection<? extends TextRange> ranges) {
         try {
             ImmutableMap.Builder<TextRange, String> replacements = ImmutableMap.builder();
             formatter.getFormatReplacements(text, toRanges(ranges)).forEach(replacement -> {
@@ -103,7 +103,7 @@ final class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
         }
     }
 
-    private static Collection<Range<Integer>> toRanges(Collection<TextRange> textRanges) {
+    private static Collection<Range<Integer>> toRanges(Collection<? extends TextRange> textRanges) {
         return textRanges.stream()
                 .map(textRange -> Range.closedOpen(textRange.getStartOffset(), textRange.getEndOffset()))
                 .collect(Collectors.toList());
@@ -125,7 +125,7 @@ final class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
     }
 
     @Override
-    public void reformatText(PsiFile file, Collection<TextRange> ranges) throws IncorrectOperationException {
+    public void reformatText(PsiFile file, Collection ranges) throws IncorrectOperationException {
         if (overrideFormatterForFile(file)) {
             formatInternal(file, ranges);
         } else {
@@ -140,7 +140,7 @@ final class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
     }
 
     @Override
-    public void reformatTextWithContext(PsiFile file, Collection<TextRange> ranges) {
+    public void reformatTextWithContext(PsiFile file, Collection ranges) {
         if (overrideFormatterForFile(file)) {
             formatInternal(file, ranges);
         } else {
@@ -176,7 +176,7 @@ final class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
                 && PalantirJavaFormatSettings.getInstance(getProject()).isEnabled();
     }
 
-    private void formatInternal(PsiFile file, Collection<TextRange> ranges) {
+    private void formatInternal(PsiFile file, Collection<? extends TextRange> ranges) {
         ApplicationManager.getApplication().assertWriteAccessAllowed();
         PsiDocumentManager documentManager = PsiDocumentManager.getInstance(getProject());
         documentManager.commitAllDocuments();
@@ -220,7 +220,7 @@ final class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
      * <p>Overriding methods will need to modify the document with the result of the external formatter (usually using
      * {@link #performReplacements(Document, Map)}.
      */
-    private void format(Document document, Collection<TextRange> ranges) {
+    private void format(Document document, Collection<? extends TextRange> ranges) {
         PalantirJavaFormatSettings settings = PalantirJavaFormatSettings.getInstance(getProject());
         FormatterService formatter = implementationCache.get(settings.getImplementationClassPath());
 
