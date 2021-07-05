@@ -45,7 +45,7 @@ import javax.annotation.Nullable;
  *
  * The https://github.com/JetBrains/intellij-community/commit/2d5740176cc9206db2d5ab5d8f67cec74b85a017
  * added a CodeManager#scheduleReformatWhenSettingsComputed(PsiFile) method in idea/202.5103.13 where the
- * default implementation throws an UnsuportedOperationException.
+ * default implementation throws an UnsupportedOperationException.
  * See https://youtrack.jetbrains.com/issue/IDEA-244645 for more details.
  */
 @SuppressWarnings("deprecation")
@@ -93,7 +93,7 @@ class CodeStyleManagerDecorator extends CodeStyleManagerImpl implements Formatti
     }
 
     @Override
-    public void reformatText(PsiFile file, Collection<TextRange> ranges) throws IncorrectOperationException {
+    public void reformatText(PsiFile file, Collection ranges) throws IncorrectOperationException {
         delegate.reformatText(file, ranges);
     }
 
@@ -104,7 +104,7 @@ class CodeStyleManagerDecorator extends CodeStyleManagerImpl implements Formatti
     }
 
     @Override
-    public void reformatTextWithContext(PsiFile file, Collection<TextRange> ranges) throws IncorrectOperationException {
+    public void reformatTextWithContext(PsiFile file, Collection ranges) throws IncorrectOperationException {
         delegate.reformatTextWithContext(file, ranges);
     }
 

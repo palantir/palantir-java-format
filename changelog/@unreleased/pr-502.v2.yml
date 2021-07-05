@@ -1,0 +1,7 @@
+type: fix
+fix:
+  description: Support Intellij 212 API level (2021.2 EAP). The type signature changed
+    from `Collection<TextRange>` to `Collection<? extends TextRange>`. This is inspired
+    by same fix in bazel intellij plugin to avoid compiling multiple versions
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/502
