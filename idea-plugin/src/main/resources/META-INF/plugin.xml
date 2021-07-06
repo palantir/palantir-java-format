@@ -10,14 +10,6 @@
    -->
   <depends>com.intellij.modules.java</depends>
 
-  <project-components>
-    <component>
-      <implementation-class>
-        com.palantir.javaformat.intellij.InitialConfigurationComponent
-      </implementation-class>
-    </component>
-  </project-components>
-
   <extensions defaultExtensionNs="com.intellij">
     <projectConfigurable instance="com.palantir.javaformat.intellij.PalantirJavaFormatConfigurable"
                          id="palantir-java-format.settings"
@@ -26,6 +18,7 @@
     <projectService serviceInterface="com.intellij.psi.codeStyle.CodeStyleManager"
                     serviceImplementation="com.palantir.javaformat.intellij.PalantirCodeStyleManager"
                     overrides="true"/>
+    <postStartupActivity implementation="com.palantir.javaformat.intellij.InitialConfigurationStartupActivity"/>
   </extensions>
 
 </idea-plugin>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * (c) Copyright 2021 Palantir Technologies Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,14 @@
 
 package com.palantir.javaformat.intellij;
 
-import com.intellij.openapi.components.ProjectComponent;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.startup.StartupActivity;
+import org.jetbrains.annotations.NotNull;
 
-final class InitialConfigurationComponent implements ProjectComponent {
-    private final PalantirJavaFormatSettings settings;
-
-    public InitialConfigurationComponent(PalantirJavaFormatSettings settings) {
-        this.settings = settings;
-    }
-
+public final class InitialConfigurationStartupActivity implements StartupActivity.DumbAware {
     @Override
-    public void projectOpened() {
+    public void runActivity(@NotNull Project project) {
+        PalantirJavaFormatSettings settings = PalantirJavaFormatSettings.getInstance(project);
         if (settings.isUninitialized()) {
             settings.setEnabled(false);
         }
