@@ -36,6 +36,10 @@ import com.palantir.javaformat.doc.Obs.Exploration;
 import com.palantir.javaformat.doc.Obs.ExplorationNode;
 import com.palantir.javaformat.doc.Obs.LevelNode;
 import com.palantir.javaformat.doc.StartsWithBreakVisitor.Result;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -754,8 +758,13 @@ public final class Level extends Doc {
                 .toString();
     }
 
-    @Value.Immutable
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.SOURCE)
     @Value.Style(overshadowImplementation = true)
+    @interface SplitsBreaksStyle {}
+
+    @SplitsBreaksStyle
+    @Value.Immutable
     interface SplitsBreaks {
         /** Groups of {@link Doc}s that are children of the current {@link Level}, separated by {@link Break}s. */
         ImmutableList<ImmutableList<Doc>> splits();
