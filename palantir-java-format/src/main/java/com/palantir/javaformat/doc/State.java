@@ -22,10 +22,16 @@ import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.Indent;
 import fj.data.Set;
 import fj.data.TreeMap;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import org.immutables.value.Value;
 import org.immutables.value.Value.Parameter;
 
 /** State for writing. */
+// Automatically suppressed to unblock enforcement in new code
+@SuppressWarnings("ImmutablesStyle")
 @Value.Immutable
 @Value.Style(overshadowImplementation = true)
 @JsonSerialize(as = ImmutableState.class)
@@ -219,8 +225,13 @@ public abstract class State {
         return new Builder();
     }
 
-    @Value.Immutable
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.SOURCE)
     @Value.Style(overshadowImplementation = true)
+    @interface BreakStateStyle {}
+
+    @BreakStateStyle
+    @Value.Immutable
     @JsonSerialize(as = ImmutableBreakState.class)
     interface BreakState {
         @Parameter
@@ -230,16 +241,26 @@ public abstract class State {
         int newIndent();
     }
 
-    @Value.Immutable
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.SOURCE)
     @Value.Style(overshadowImplementation = true)
+    @interface LevelStateStyle {}
+
+    @LevelStateStyle
+    @Value.Immutable
     interface LevelState {
         /** True if the entire {@link Level} fits on one line. */
         @Parameter
         boolean oneLine();
     }
 
-    @Value.Immutable
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.SOURCE)
     @Value.Style(overshadowImplementation = true)
+    @interface TokStateStyle {}
+
+    @TokStateStyle
+    @Value.Immutable
     interface TokState {
         @Parameter
         String text();

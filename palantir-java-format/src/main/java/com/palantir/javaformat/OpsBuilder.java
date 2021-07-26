@@ -35,6 +35,10 @@ import com.palantir.javaformat.doc.Token.RealOrImaginary;
 import com.palantir.javaformat.java.FormatterDiagnostic;
 import com.palantir.javaformat.java.InputMetadata;
 import com.palantir.javaformat.java.InputMetadataBuilder;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -494,8 +498,13 @@ public final class OpsBuilder {
 
     private static final NonBreakingSpace SPACE = NonBreakingSpace.make();
 
-    @Value.Immutable
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.SOURCE)
     @Value.Style(overshadowImplementation = true)
+    @interface OpsOutputStyle {}
+
+    @OpsOutputStyle
+    @Value.Immutable
     public interface OpsOutput {
         ImmutableList<Op> ops();
 

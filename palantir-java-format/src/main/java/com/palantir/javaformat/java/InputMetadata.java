@@ -26,6 +26,8 @@ import org.immutables.value.Value.Default;
  * Records metadata about the input, namely existing blank lines that we might want to preserve, as well as what ranges
  * can be partially formatted.
  */
+// Automatically suppressed to unblock enforcement in new code
+@SuppressWarnings("ImmutablesStyle")
 @Immutable
 @Value.Immutable
 @Value.Style(overshadowImplementation = true)

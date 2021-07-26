@@ -167,8 +167,8 @@ class CodeStyleManagerDecorator extends CodeStyleManagerImpl implements Formatti
     }
 
     @Override
-    public void reformatNewlyAddedElement(ASTNode block, ASTNode addedElement) throws IncorrectOperationException {
-        delegate.reformatNewlyAddedElement(block, addedElement);
+    public void reformatNewlyAddedElement(ASTNode parent, ASTNode addedElement) throws IncorrectOperationException {
+        delegate.reformatNewlyAddedElement(parent, addedElement);
     }
 
     @Override
