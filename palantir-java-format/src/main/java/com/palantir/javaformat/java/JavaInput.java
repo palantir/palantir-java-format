@@ -429,7 +429,8 @@ public final class JavaInput extends Input {
                 // contains Unicode escapes.
                 isToken = true;
                 isNumbered = true;
-                for (char c : tokText.toCharArray()) {
+                for (int i = 0; i < tokText.length(); i++) {
+                    char c = tokText.charAt(i);
                     strings.add(String.valueOf(c));
                 }
             }
