@@ -1,9 +1,32 @@
 apply plugin: 'application'
 apply plugin: 'com.palantir.external-publish-jar'
+//apply plugin: 'com.palantir.shadow-jar'
 
 mainClassName = 'com.palantir.javaformat.java.Main'
 
 description = 'Palantir Java Format'
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': mainClassName
+        )
+    }
+}
+
+task fatJar(type: Jar) {
+    manifest.from jar.manifest
+//    classifier = 'all'
+    from {
+        configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) }
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    } {
+        exclude "META-INF/*.SF"
+        exclude "META-INF/*.DSA"
+        exclude "META-INF/*.RSA"
+    }
+    with jar
+}
 
 dependencies {
     api project(':palantir-java-format-spi')
