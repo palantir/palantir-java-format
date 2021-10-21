@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: Fix java 16 compatibility
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/559
