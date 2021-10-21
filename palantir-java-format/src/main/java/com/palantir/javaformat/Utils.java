@@ -28,7 +28,6 @@ import java.util.Collection;
 import java.util.List;
 
 public final class Utils {
-
     private Utils() {}
 
     public static String applyReplacements(String input, Collection<Replacement> replacementsCollection) {
