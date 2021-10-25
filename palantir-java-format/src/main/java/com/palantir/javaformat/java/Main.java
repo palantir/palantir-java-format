@@ -96,7 +96,7 @@ public final class Main {
 
         // TODO(someone): update this to always use Style.PALANTIR
         JavaFormatterOptions options = JavaFormatterOptions.builder()
-                .style(parameters.aosp() ? Style.AOSP : Style.GOOGLE)
+                .style(parameters.aosp() ? Style.AOSP : parameters.palantirStyle() ? Style.PALANTIR : Style.GOOGLE)
                 .build();
 
         if (parameters.stdin()) {

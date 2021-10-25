@@ -25,7 +25,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.BoundType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Range;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
@@ -35,6 +34,9 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.projectRoots.JdkUtil;
+import com.intellij.openapi.projectRoots.Sdk;
+import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
@@ -45,21 +47,21 @@ import com.intellij.psi.impl.CheckUtil;
 import com.intellij.psi.impl.source.codeStyle.CodeStyleManagerImpl;
 import com.intellij.serviceContainer.NonInjectable;
 import com.intellij.util.IncorrectOperationException;
+import com.palantir.javaformat.bootstrap.BootstrappingFormatterService;
 import com.palantir.javaformat.java.FormatterException;
 import com.palantir.javaformat.java.FormatterService;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.ServiceLoader;
 import java.util.TreeMap;
+import java.util.jar.Attributes.Name;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
@@ -77,16 +79,20 @@ final class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
             PluginManager.getPlugin(PluginId.getId(PLUGIN_ID)), "Couldn't find our own plugin: %s", PLUGIN_ID);
 
     // Cache to avoid creating a URLClassloader every time we want to format from IntelliJ
-    private final LoadingCache<Optional<List<URI>>, FormatterService> implementationCache =
+    private final LoadingCache<FormatterCacheKey, FormatterService> implementationCache =
             Caffeine.newBuilder().maximumSize(1).build(PalantirCodeStyleManager::createFormatter);
+
+    private final Project project;
 
     public PalantirCodeStyleManager(@NotNull Project project) {
         super(project, new CodeStyleManagerImpl(project));
+        this.project = project;
     }
 
     @NonInjectable
     PalantirCodeStyleManager(@NotNull CodeStyleManager original) {
         super(original.getProject(), original);
+        this.project = original.getProject();
     }
 
     static Map<TextRange, String> getReplacements(
@@ -204,13 +210,13 @@ final class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
         }
     }
 
-    private static URL[] listDirAsUrlsUnchecked(Path dir) {
+    private static List<URL> listDirAsUrlsUnchecked(Path dir) {
         try (Stream<Path> list = Files.list(dir)) {
             return list.map(Path::toUri)
                     .map(PalantirCodeStyleManager::toUrlUnchecked)
-                    .toArray(URL[]::new);
+                    .collect(Collectors.toList());
         } catch (IOException e) {
-            throw new RuntimeException("Couldn't list dir: " + dir.toString(), e);
+            throw new RuntimeException("Couldn't list dir: " + dir, e);
         }
     }
 
@@ -222,31 +228,53 @@ final class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
      */
     private void format(Document document, Collection<? extends TextRange> ranges) {
         PalantirJavaFormatSettings settings = PalantirJavaFormatSettings.getInstance(getProject());
-        FormatterService formatter = implementationCache.get(settings.getImplementationClassPath());
+        FormatterService formatter = implementationCache.get(new FormatterCacheKey(
+                project, settings.getImplementationClassPath(), settings.injectedVersionIsOutdated()));
 
         performReplacements(document, getReplacements(formatter, document.getText(), ranges));
     }
 
-    private static FormatterService createFormatter(Optional<List<URI>> implementationClassPath) {
-        URL[] implementationUrls = implementationClassPath
-                .map(implementationUris -> {
-                    log.debug("Using palantir-java-format implementation defined by URIs: {}", implementationUris);
-                    return implementationUris.stream()
-                            .map(PalantirCodeStyleManager::toUrlUnchecked)
-                            .toArray(URL[]::new);
+    @SuppressWarnings("Slf4jConstantLogMessage")
+    private static FormatterService createFormatter(FormatterCacheKey cacheKey) {
+        List<URL> implementationUrls = getImplementationUrls(cacheKey);
+
+        Path jdkPath = deriveJdkPath(cacheKey.project);
+        Integer jdkVersion = deriveJdkVersion(cacheKey.project);
+        log.info("Running formatter with jdk version {} and path: {}", jdkVersion, jdkPath);
+
+        return new BootstrappingFormatterService(() -> jdkPath, () -> jdkVersion, () -> implementationUrls);
+    }
+
+    private static List<URL> getImplementationUrls(FormatterCacheKey cacheKey) {
+        if (cacheKey.useBundledImplementation) {
+            log.debug("Using palantir-java-format implementation bundled with plugin");
+            return getBundledImplementationUrls();
+        }
+        return cacheKey.implementationClassPath
+                .map(classpath -> {
+                    log.debug("Using palantir-java-format implementation defined by URIs: {}", classpath);
+                    return getProvidedImplementationUrls(classpath);
                 })
                 .orElseGet(() -> {
-                    // Load from the jars bundled with the plugin.
-                    Path implDir = PLUGIN.getPath().toPath().resolve("impl");
-                    log.debug("Using palantir-java-format implementation bundled with plugin: {}", implDir);
-                    return listDirAsUrlsUnchecked(implDir);
+                    log.debug("Using palantir-java-format implementation bundled with plugin");
+                    return getBundledImplementationUrls();
                 });
-        ClassLoader classLoader = new URLClassLoader(implementationUrls, PLUGIN.getPluginClassLoader());
-        return Iterables.getOnlyElement(ServiceLoader.load(FormatterService.class, classLoader));
+    }
+
+    private static List<URL> getProvidedImplementationUrls(List<URI> implementationClasspath) {
+        return implementationClasspath.stream()
+                .map(PalantirCodeStyleManager::toUrlUnchecked)
+                .collect(Collectors.toList());
+    }
+
+    private static List<URL> getBundledImplementationUrls() {
+        // Load from the jars bundled with the plugin.
+        Path implDir = PLUGIN.getPath().toPath().resolve("impl");
+        log.debug("Using palantir-java-format implementation bundled with plugin: {}", implDir);
+        return listDirAsUrlsUnchecked(implDir);
     }
 
     private void performReplacements(final Document document, final Map<TextRange, String> replacements) {
-
         if (replacements.isEmpty()) {
             return;
         }
@@ -260,5 +288,48 @@ final class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
             }
             PsiDocumentManager.getInstance(getProject()).commitDocument(document);
         });
+    }
+
+    private static Path deriveJdkPath(Project project) {
+        return getProjectJdk(project)
+                .map(Sdk::getHomePath)
+                .map(Path::of)
+                .map(sdkHome -> sdkHome.resolve("bin").resolve("java"))
+                .filter(Files::exists)
+                .orElseThrow(() -> new IllegalStateException("Could not determine jdk path for project " + project));
+    }
+
+    private static Integer deriveJdkVersion(Project project) {
+        return getProjectJdk(project)
+                .map(PalantirCodeStyleManager::parseSdkJavaVersion)
+                .orElseThrow(() -> new IllegalStateException("Could not determine jdk version for project " + project));
+    }
+
+    private static Integer parseSdkJavaVersion(Sdk sdk) {
+        // Parses the actual version out of "SDK#getVersionString" which returns 'java version "15"'.
+        String version = JdkUtil.getJdkMainAttribute(sdk, Name.IMPLEMENTATION_VERSION);
+        try {
+            return Integer.parseInt(version);
+        } catch (NumberFormatException e) {
+            log.error("Could not parse sdk version: {}", version, e);
+            return null;
+        }
+    }
+
+    private static Optional<Sdk> getProjectJdk(Project project) {
+        return Optional.ofNullable(ProjectRootManager.getInstance(project).getProjectSdk());
+    }
+
+    private static final class FormatterCacheKey {
+        private final Project project;
+        private final Optional<List<URI>> implementationClassPath;
+        private final boolean useBundledImplementation;
+
+        FormatterCacheKey(
+                Project project, Optional<List<URI>> implementationClassPath, boolean useBundledImplementation) {
+            this.project = project;
+            this.implementationClassPath = implementationClassPath;
+            this.useBundledImplementation = useBundledImplementation;
+        }
     }
 }

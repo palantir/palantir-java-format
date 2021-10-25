@@ -1,0 +1,13 @@
+dependencies {
+    annotationProcessor "org.immutables:value"
+
+    api project(':palantir-java-format-spi')
+    compileOnly 'org.immutables:value::annotations'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+    // So that we have pjf on our test classpath
+    testImplementation project(':palantir-java-format')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.assertj:assertj-core'
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind'
+}

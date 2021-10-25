@@ -14,6 +14,11 @@
 
 package com.palantir.javaformat.java;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.guava.GuavaModule;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
@@ -22,6 +27,9 @@ import java.util.concurrent.Callable;
 
 /** Encapsulates information about a file to be formatted, including which parts of the file to format. */
 class FormatFileCallable implements Callable<String> {
+    private final ObjectMapper MAPPER =
+            JsonMapper.builder().addModule(new GuavaModule()).build();
+
     private final String input;
     private final CommandLineOptions parameters;
     private final JavaFormatterOptions options;
@@ -39,6 +47,23 @@ class FormatFileCallable implements Callable<String> {
         }
 
         Formatter formatter = Formatter.createFormatter(options);
+        if (parameters.outputReplacements()) {
+            return formatReplacements(formatter);
+        }
+        return formatFile(formatter);
+    }
+
+    private String formatReplacements(Formatter formatter) throws FormatterException {
+        ImmutableList<Replacement> replacements =
+                formatter.getFormatReplacements(input, characterRanges(input).asRanges());
+        try {
+            return MAPPER.writeValueAsString(replacements);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Error serializing replacement output", e);
+        }
+    }
+
+    private String formatFile(Formatter formatter) throws FormatterException {
         String formatted = formatter.formatSource(input, characterRanges(input).asRanges());
         formatted = fixImports(formatted);
         if (parameters.reflowLongStrings()) {
@@ -60,12 +85,20 @@ class FormatFileCallable implements Callable<String> {
     private RangeSet<Integer> characterRanges(String input) {
         final RangeSet<Integer> characterRanges = TreeRangeSet.create();
 
-        if (parameters.lines().isEmpty() && parameters.offsets().isEmpty()) {
+        if (parameters.characterRanges().isEmpty()
+                && parameters.lines().isEmpty()
+                && parameters.offsets().isEmpty()) {
             characterRanges.add(Range.closedOpen(0, input.length()));
             return characterRanges;
         }
 
-        characterRanges.addAll(Utils.lineRangesToCharRanges(input, parameters.lines()));
+        if (!parameters.characterRanges().isEmpty()) {
+            characterRanges.addAll(parameters.characterRanges());
+        }
+
+        if (!parameters.lines().isEmpty()) {
+            characterRanges.addAll(Utils.lineRangesToCharRanges(input, parameters.lines()));
+        }
 
         for (int i = 0; i < parameters.offsets().size(); i++) {
             Integer length = parameters.lengths().get(i);
