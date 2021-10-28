@@ -1,3 +1,7 @@
+apply plugin: 'java-library'
+apply plugin: 'com.palantir.external-publish-jar'
+apply plugin: 'com.palantir.revapi'
+
 dependencies {
     annotationProcessor "org.immutables:value"
 

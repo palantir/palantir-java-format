@@ -48,6 +48,6 @@ public final class PalantirJavaFormatProviderPlugin implements Plugin<Project> {
             });
         });
 
-        rootProject.getExtensions().create("palantirJavaFormat", JavaFormatExtension.class, configuration);
+        rootProject.getExtensions().create("palantirJavaFormat", JavaFormatExtension.class, rootProject, configuration);
     }
 }

@@ -28,6 +28,8 @@ import java.util.List;
 final class ProcessRunner {
 
     static String runWithStdin(List<String> command, String input) throws IOException {
+        System.out.println(">>> CMD: " + String.join(" ", command));
+
         Process process = new ProcessBuilder().command(command).start();
 
         BufferedWriter processOutputStream =

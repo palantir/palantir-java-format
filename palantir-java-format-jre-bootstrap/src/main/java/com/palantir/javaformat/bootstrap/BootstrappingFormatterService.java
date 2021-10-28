@@ -91,6 +91,7 @@ public final class BootstrappingFormatterService implements FormatterService {
                 .jrePath(jrePath.get())
                 .withJvmArgsForVersion(jreMajorVersion.get())
                 .implementationClasspath(implementationClassPath.get())
+                .outputReplacements(false)
                 .build();
         return ProcessRunner.runWithStdin(command.toArgs(), input);
     }
