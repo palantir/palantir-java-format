@@ -42,7 +42,8 @@ final class ProcessRunner {
         if (process.exitValue() != 0) {
             String stderr = readToString(process.getErrorStream());
             throw new IOException(String.format(
-                    "Command terminated with exit code 1.\nStdout: \"%s\",\nStderr: \"%s\"", stdout, stderr));
+                    "Command terminated with exit code 1.\n" + "Stdout: \"%s\"\n" + "Stderr: \"%s\"\n" + "Command: %s",
+                    stdout, stderr, String.join(" ", command)));
         }
 
         return stdout;

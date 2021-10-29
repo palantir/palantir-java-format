@@ -27,7 +27,6 @@ import com.google.common.collect.Range;
 import com.palantir.javaformat.java.FormatterService;
 import com.palantir.javaformat.java.Replacement;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
@@ -42,9 +41,9 @@ public final class BootstrappingFormatterService implements FormatterService {
 
     private final Path jdkPath;
     private final Integer jdkMajorVersion;
-    private final List<URL> implementationClassPath;
+    private final List<Path> implementationClassPath;
 
-    public BootstrappingFormatterService(Path jdkPath, Integer jdkMajorVersion, List<URL> implementationClassPath) {
+    public BootstrappingFormatterService(Path jdkPath, Integer jdkMajorVersion, List<Path> implementationClassPath) {
         this.jdkPath = jdkPath;
         this.jdkMajorVersion = jdkMajorVersion;
         this.implementationClassPath = implementationClassPath;
@@ -108,7 +107,7 @@ public final class BootstrappingFormatterService implements FormatterService {
     interface FormatterCliArgs {
         Path jdkPath();
 
-        List<URL> implementationClasspath();
+        List<Path> implementationClasspath();
 
         List<String> characterRanges();
 
@@ -123,8 +122,8 @@ public final class BootstrappingFormatterService implements FormatterService {
                     .add(
                             "-cp",
                             implementationClasspath().stream()
-                                    .map(URL::toString)
-                                    .collect(Collectors.joining(":", "\"", "\"")))
+                                    .map(path -> path.toAbsolutePath().toString())
+                                    .collect(Collectors.joining(":")))
                     .add(FORMATTER_MAIN_CLASS);
 
             if (!characterRanges().isEmpty()) {

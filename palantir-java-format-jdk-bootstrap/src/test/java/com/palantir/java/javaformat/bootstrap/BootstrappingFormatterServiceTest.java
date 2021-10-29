@@ -24,9 +24,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import com.palantir.javaformat.bootstrap.BootstrappingFormatterService;
 import com.palantir.javaformat.java.Replacement;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -71,19 +69,13 @@ final class BootstrappingFormatterServiceTest {
         }
     }
 
-    private static List<URL> getClasspath() {
+    private static List<Path> getClasspath() {
         String classpath = System.getProperty("java.class.path");
         return Splitter.on(':')
                 .trimResults()
                 .omitEmptyStrings()
                 .splitToStream(classpath)
-                .map(path -> {
-                    try {
-                        return new URL("file:" + path);
-                    } catch (MalformedURLException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
+                .map(Path::of)
                 .collect(Collectors.toList());
     }
 

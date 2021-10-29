@@ -20,6 +20,7 @@ import com.google.common.base.Suppliers;
 import com.google.common.collect.Iterables;
 import com.palantir.javaformat.bootstrap.BootstrappingFormatterService;
 import com.palantir.javaformat.java.FormatterService;
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -63,24 +64,25 @@ public class JavaFormatExtension {
     private FormatterService loadBootstrappingJdkFormatter() {
         Path javaExecPath = Jvm.current().getJavaExecutable().toPath();
         int javaMajorVersion = Integer.parseInt(JavaVersion.current().getMajorVersion());
-        return new BootstrappingFormatterService(javaExecPath, javaMajorVersion, getJarUris());
+        return new BootstrappingFormatterService(javaExecPath, javaMajorVersion, getJarLocations());
     }
 
     private FormatterService serviceLoadFormatter() {
-        ClassLoader classLoader =
-                new URLClassLoader(getJarUris().toArray(URL[]::new), FormatterService.class.getClassLoader());
+        URL[] jarUris = getJarLocations().stream()
+                .map(path -> {
+                    try {
+                        return path.toUri().toURL();
+                    } catch (MalformedURLException e) {
+                        throw new RuntimeException("Unable to convert path to URL: " + path, e);
+                    }
+                })
+                .toArray(URL[]::new);
+
+        ClassLoader classLoader = new URLClassLoader(jarUris, FormatterService.class.getClassLoader());
         return Iterables.getOnlyElement(ServiceLoader.load(FormatterService.class, classLoader));
     }
 
-    private List<URL> getJarUris() {
-        return configuration.getFiles().stream()
-                .map(file -> {
-                    try {
-                        return file.toURI().toURL();
-                    } catch (MalformedURLException e) {
-                        throw new RuntimeException("Unable to convert URI to URL: " + file, e);
-                    }
-                })
-                .collect(Collectors.toList());
+    private List<Path> getJarLocations() {
+        return configuration.getFiles().stream().map(File::toPath).collect(Collectors.toList());
     }
 }

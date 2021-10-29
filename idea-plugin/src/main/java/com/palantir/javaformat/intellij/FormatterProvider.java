@@ -56,7 +56,7 @@ final class FormatterProvider {
     }
 
     private static FormatterService createFormatter(FormatterCacheKey cacheKey) {
-        List<URL> implementationUrls =
+        List<Path> implementationClasspath =
                 getImplementationUrls(cacheKey.implementationClassPath, cacheKey.useBundledImplementation);
         Path jdkPath = getJdkPath(cacheKey.project);
         Integer jdkMajorVersion = getSdkVersion(cacheKey.project);
@@ -65,29 +65,27 @@ final class FormatterProvider {
         // TODO(fwindheuser): Enable for all
         if (jdkMajorVersion >= 16) {
             log.debug("Running formatter with jdk version {} and path: {}", jdkMajorVersion, jdkPath);
-            return new BootstrappingFormatterService(jdkPath, jdkMajorVersion, implementationUrls);
+            return new BootstrappingFormatterService(jdkPath, jdkMajorVersion, implementationClasspath);
         }
 
         // Use "in-process" formatter service
-        ClassLoader classLoader =
-                new URLClassLoader(implementationUrls.toArray(URL[]::new), FormatterService.class.getClassLoader());
+        URL[] implementationUrls = toUrlsUnchecked(implementationClasspath);
+        ClassLoader classLoader = new URLClassLoader(implementationUrls, FormatterService.class.getClassLoader());
         return Iterables.getOnlyElement(ServiceLoader.load(FormatterService.class, classLoader));
     }
 
-    private static List<URL> getProvidedImplementationUrls(List<URI> implementationClasspath) {
-        return implementationClasspath.stream()
-                .map(FormatterProvider::toUrlUnchecked)
-                .collect(Collectors.toList());
+    private static List<Path> getProvidedImplementationUrls(List<URI> implementationClasspath) {
+        return implementationClasspath.stream().map(Path::of).collect(Collectors.toList());
     }
 
-    private static List<URL> getBundledImplementationUrls() {
+    private static List<Path> getBundledImplementationUrls() {
         // Load from the jars bundled with the plugin.
         Path implDir = PalantirCodeStyleManager.PLUGIN.getPath().toPath().resolve("impl");
         log.debug("Using palantir-java-format implementation bundled with plugin: {}", implDir);
         return listDirAsUrlsUnchecked(implDir);
     }
 
-    private static List<URL> getImplementationUrls(
+    private static List<Path> getImplementationUrls(
             Optional<List<URI>> implementationClassPath, boolean useBundledImplementation) {
         if (useBundledImplementation) {
             log.debug("Using palantir-java-format implementation bundled with plugin");
@@ -135,17 +133,21 @@ final class FormatterProvider {
         return Optional.ofNullable(ProjectRootManager.getInstance(project).getProjectSdk());
     }
 
-    private static URL toUrlUnchecked(URI uri) {
-        try {
-            return uri.toURL();
-        } catch (IllegalArgumentException | MalformedURLException e) {
-            throw new RuntimeException("Couldn't convert URI to URL: " + uri, e);
-        }
+    private static URL[] toUrlsUnchecked(List<Path> paths) {
+        return paths.stream()
+                .map(path -> {
+                    try {
+                        return path.toUri().toURL();
+                    } catch (IllegalArgumentException | MalformedURLException e) {
+                        throw new RuntimeException("Couldn't convert Path to URL: " + path, e);
+                    }
+                })
+                .toArray(URL[]::new);
     }
 
-    private static List<URL> listDirAsUrlsUnchecked(Path dir) {
+    private static List<Path> listDirAsUrlsUnchecked(Path dir) {
         try (Stream<Path> list = Files.list(dir)) {
-            return list.map(Path::toUri).map(FormatterProvider::toUrlUnchecked).collect(Collectors.toList());
+            return list.collect(Collectors.toList());
         } catch (IOException e) {
             throw new RuntimeException("Couldn't list dir: " + dir, e);
         }
