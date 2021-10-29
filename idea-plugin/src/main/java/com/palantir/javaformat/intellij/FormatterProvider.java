@@ -18,6 +18,7 @@ package com.palantir.javaformat.intellij;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.google.common.collect.Iterables;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.JdkUtil;
 import com.intellij.openapi.projectRoots.Sdk;
@@ -29,11 +30,13 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.ServiceLoader;
 import java.util.jar.Attributes.Name;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -56,10 +59,19 @@ final class FormatterProvider {
         List<URL> implementationUrls =
                 getImplementationUrls(cacheKey.implementationClassPath, cacheKey.useBundledImplementation);
         Path jdkPath = getJdkPath(cacheKey.project);
-        Integer jdkVersion = getSdkVersion(cacheKey.project);
+        Integer jdkMajorVersion = getSdkVersion(cacheKey.project);
 
-        log.debug("Running formatter with jdk version {} and path: {}", jdkVersion, jdkPath);
-        return new BootstrappingFormatterService(jdkPath, jdkVersion, implementationUrls);
+        // Just enable the bootstrapping formatter for projects using Java 16+
+        // TODO(fwindheuser): Enable for all
+        if (jdkMajorVersion >= 16) {
+            log.debug("Running formatter with jdk version {} and path: {}", jdkMajorVersion, jdkPath);
+            return new BootstrappingFormatterService(jdkPath, jdkMajorVersion, implementationUrls);
+        }
+
+        // Use "in-process" formatter service
+        ClassLoader classLoader =
+                new URLClassLoader(implementationUrls.toArray(URL[]::new), FormatterService.class.getClassLoader());
+        return Iterables.getOnlyElement(ServiceLoader.load(FormatterService.class, classLoader));
     }
 
     private static List<URL> getProvidedImplementationUrls(List<URI> implementationClasspath) {
