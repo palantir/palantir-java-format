@@ -51,7 +51,7 @@ configurations {
 }
 
 dependencies {
-    implementation project(':palantir-java-format-jre-bootstrap')
+    implementation project(':palantir-java-format-jdk-bootstrap')
     implementation 'com.github.ben-manes.caffeine:caffeine'
     implementation('com.palantir.sls.versions:sls-versions') {
         // Has class version conflicts with slf4j brought in by Intellij

@@ -31,7 +31,6 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.immutables.value.Value;
 
@@ -41,14 +40,13 @@ public final class BootstrappingFormatterService implements FormatterService {
 
     private static final String FORMATTER_MAIN_CLASS = "com.palantir.javaformat.java.Main";
 
-    private final Supplier<Path> jrePath;
-    private final Supplier<Integer> jreMajorVersion;
-    private final Supplier<List<URL>> implementationClassPath;
+    private final Path jdkPath;
+    private final Integer jdkMajorVersion;
+    private final List<URL> implementationClassPath;
 
-    public BootstrappingFormatterService(
-            Supplier<Path> jrePath, Supplier<Integer> jreMajorVersion, Supplier<List<URL>> implementationClassPath) {
-        this.jrePath = jrePath;
-        this.jreMajorVersion = jreMajorVersion;
+    public BootstrappingFormatterService(Path jdkPath, Integer jdkMajorVersion, List<URL> implementationClassPath) {
+        this.jdkPath = jdkPath;
+        this.jdkMajorVersion = jdkMajorVersion;
         this.implementationClassPath = implementationClassPath;
     }
 
@@ -73,9 +71,9 @@ public final class BootstrappingFormatterService implements FormatterService {
     private ImmutableList<Replacement> getFormatReplacementsInternal(String input, Collection<Range<Integer>> ranges)
             throws IOException {
         FormatterCliArgs command = FormatterCliArgs.builder()
-                .jrePath(jrePath.get())
-                .withJvmArgsForVersion(jreMajorVersion.get())
-                .implementationClasspath(implementationClassPath.get())
+                .jdkPath(jdkPath)
+                .withJvmArgsForVersion(jdkMajorVersion)
+                .implementationClasspath(implementationClassPath)
                 .outputReplacements(true)
                 .characterRanges(ranges.stream()
                         .map(BootstrappingFormatterService::toStringRange)
@@ -88,9 +86,9 @@ public final class BootstrappingFormatterService implements FormatterService {
 
     private String formatSourceReflowStringsAndFixImportsInternal(String input) throws IOException {
         FormatterCliArgs command = FormatterCliArgs.builder()
-                .jrePath(jrePath.get())
-                .withJvmArgsForVersion(jreMajorVersion.get())
-                .implementationClasspath(implementationClassPath.get())
+                .jdkPath(jdkPath)
+                .withJvmArgsForVersion(jdkMajorVersion)
+                .implementationClasspath(implementationClassPath)
                 .outputReplacements(false)
                 .build();
         return ProcessRunner.runWithStdin(command.toArgs(), input);
@@ -108,7 +106,7 @@ public final class BootstrappingFormatterService implements FormatterService {
 
     @Value.Immutable
     interface FormatterCliArgs {
-        Path jrePath();
+        Path jdkPath();
 
         List<URL> implementationClasspath();
 
@@ -120,7 +118,7 @@ public final class BootstrappingFormatterService implements FormatterService {
 
         default List<String> toArgs() {
             ImmutableList.Builder<String> args = ImmutableList.<String>builder()
-                    .add(jrePath().toAbsolutePath().toString())
+                    .add(jdkPath().toAbsolutePath().toString())
                     .addAll(jvmArgs())
                     .add(
                             "-cp",

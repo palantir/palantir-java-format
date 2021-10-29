@@ -41,33 +41,32 @@ public class JavaFormatExtension {
     public JavaFormatExtension(Project project, Configuration configuration) {
         this.project = project;
         this.configuration = configuration;
-        this.memoizedService = Suppliers.memoize(this::loadFormatterService);
+        this.memoizedService = Suppliers.memoize(this::loadFormatterServiceInternal);
     }
 
-    public FormatterService serviceLoad() {
+    public FormatterService loadFormatterService() {
         return memoizedService.get();
     }
 
-    private FormatterService loadFormatterService() {
-        // TODO(fwindheuser): Add comment
+    private FormatterService loadFormatterServiceInternal() {
         if (JavaVersion.current().compareTo(JavaVersion.VERSION_15) > 0) {
             project.getLogger()
-                    .lifecycle(
+                    .debug(
                             "Creating formatter that runs in bootstrapped JVM for java version {}",
                             JavaVersion.current());
             return loadBootstrappingJdkFormatter();
         }
-        project.getLogger().info("Creating formatter that runs in same JVM");
-        return serviceLoadInternal();
+        project.getLogger().debug("Creating formatter that runs in same JVM");
+        return serviceLoadFormatter();
     }
 
     private FormatterService loadBootstrappingJdkFormatter() {
         Path javaExecPath = Jvm.current().getJavaExecutable().toPath();
         int javaMajorVersion = Integer.parseInt(JavaVersion.current().getMajorVersion());
-        return new BootstrappingFormatterService(() -> javaExecPath, () -> javaMajorVersion, this::getJarUris);
+        return new BootstrappingFormatterService(javaExecPath, javaMajorVersion, getJarUris());
     }
 
-    private FormatterService serviceLoadInternal() {
+    private FormatterService serviceLoadFormatter() {
         ClassLoader classLoader =
                 new URLClassLoader(getJarUris().toArray(URL[]::new), FormatterService.class.getClassLoader());
         return Iterables.getOnlyElement(ServiceLoader.load(FormatterService.class, classLoader));

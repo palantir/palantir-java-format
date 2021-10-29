@@ -33,27 +33,33 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
-// TODO(fwindheuser): Don't make this so hacky
 final class BootstrappingFormatterServiceTest {
 
     @Test
-    void can_format_file() {
+    void can_format_file_with_replacement() {
         String input = getTestResourceContent("format.input");
         String expectedOutput = getTestResourceContent("format.output");
 
-        List<URL> classpath = getClasspath();
-        Path jrePath = javaBinPath();
-
-        System.out.println("Using java bin at: " + jrePath);
-
-        BootstrappingFormatterService formatter =
-                new BootstrappingFormatterService(() -> jrePath, () -> 17, () -> classpath);
-
         ImmutableList<Replacement> replacements =
-                formatter.getFormatReplacements(input, List.of(Range.open(0, input.length())));
+                getFormatter().getFormatReplacements(input, List.of(Range.open(0, input.length())));
 
         assertThat(replacements).hasSize(1);
         assertThat(replacements.get(0).getReplacementString()).isEqualTo(expectedOutput);
+    }
+
+    @Test
+    void can_format_full_file() {
+        String input = getTestResourceContent("format.input");
+        String expectedOutput = getTestResourceContent("format.output");
+
+        String formatted = getFormatter().formatSourceReflowStringsAndFixImports(input);
+
+        assertThat(formatted).isEqualTo(expectedOutput);
+    }
+
+    private BootstrappingFormatterService getFormatter() {
+        return new BootstrappingFormatterService(
+                javaBinPath(), Runtime.version().feature(), getClasspath());
     }
 
     private String getTestResourceContent(String resourceName) {
@@ -82,7 +88,7 @@ final class BootstrappingFormatterServiceTest {
     }
 
     private static Path javaBinPath() {
-        String javaHome = Preconditions.checkNotNull(System.getenv("JAVA_HOME"), "JAVA_HOME not set");
+        String javaHome = Preconditions.checkNotNull(System.getProperty("java.home"), "java.home property not set");
         return Path.of(javaHome).resolve("bin").resolve("java");
     }
 }

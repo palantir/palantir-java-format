@@ -37,7 +37,7 @@ public final class PalantirJavaFormatStep {
     /** Creates a step which formats everything - code, import order, and unused imports. */
     public static FormatterStep create(Configuration palantirJavaFormat, JavaFormatExtension extension) {
         ensureImplementationNotDirectlyLoadable();
-        Supplier<FormatterService> memoizedService = extension::serviceLoad;
+        Supplier<FormatterService> memoizedService = extension::loadFormatterService;
         return FormatterStep.createLazy(
                 NAME, () -> new State(palantirJavaFormat.getFiles(), memoizedService), State::createFormat);
     }

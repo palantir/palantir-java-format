@@ -16,27 +16,20 @@
 
 package com.palantir.javaformat.bootstrap;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 final class ProcessRunner {
 
     static String runWithStdin(List<String> command, String input) throws IOException {
-        System.out.println(">>> CMD: " + String.join(" ", command));
-
         Process process = new ProcessBuilder().command(command).start();
 
-        BufferedWriter processOutputStream =
-                new BufferedWriter(new OutputStreamWriter(process.getOutputStream(), StandardCharsets.UTF_8));
-
-        processOutputStream.write(input);
-        processOutputStream.close();
+        try (OutputStream outputStream = process.getOutputStream()) {
+            outputStream.write(input.getBytes(StandardCharsets.UTF_8));
+        }
 
         try {
             process.waitFor();
@@ -56,14 +49,8 @@ final class ProcessRunner {
     }
 
     private static String readToString(InputStream input) throws IOException {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8))) {
-            StringBuilder builder = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                builder.append(line);
-                builder.append("\n");
-            }
-            return builder.toString();
+        try (input) {
+            return new String(input.readAllBytes(), StandardCharsets.UTF_8);
         }
     }
 }
