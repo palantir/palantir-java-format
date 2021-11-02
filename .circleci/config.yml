@@ -40,7 +40,7 @@ jobs:
             echo "$TAGS_TO_DELETE" | while read -r TAG; do git tag -d "$TAG" 1>/dev/null; done
       - restore_cache: { key: 'gradle-wrapper-v2-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
       - restore_cache: { key: 'compile-gradle-cache-v2-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
-      - run: ./gradlew --parallel --stacktrace classes testClasses
+      - run: ./gradlew --parallel --stacktrace classes testClasses -Porg.gradle.java.installations.fromEnv=JAVA_8_HOME,JAVA_11_HOME,JAVA_15_HOME,JAVA_17_HOME,JAVA_HOME
       - save_cache:
           key: 'gradle-wrapper-v2-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}'
           paths: [ ~/.gradle/wrapper ]
@@ -65,7 +65,7 @@ jobs:
       - attach_workspace: { at: /home/circleci }
       - restore_cache: { key: 'gradle-wrapper-v2-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
       - restore_cache: { key: 'check-gradle-cache-v2-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
-      - run: ./gradlew --parallel --stacktrace --continue check idea -x test
+      - run: ./gradlew --parallel --stacktrace --continue check idea -x test -Porg.gradle.java.installations.fromEnv=JAVA_8_HOME,JAVA_11_HOME,JAVA_15_HOME,JAVA_17_HOME,JAVA_HOME
       - save_cache:
           key: 'check-gradle-cache-v2-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}'
           paths: [ ~/.gradle/caches ]
@@ -87,7 +87,7 @@ jobs:
       - attach_workspace: { at: /home/circleci }
       - restore_cache: { key: 'gradle-wrapper-v2-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
       - restore_cache: { key: 'unit-test-gradle-cache-v2-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
-      - run: ./gradlew --parallel --stacktrace --continue --max-workers=2 test
+      - run: ./gradlew --parallel --stacktrace --continue --max-workers=2 test -Porg.gradle.java.installations.fromEnv=JAVA_8_HOME,JAVA_11_HOME,JAVA_15_HOME,JAVA_17_HOME,JAVA_HOME
       - save_cache:
           key: 'unit-test-gradle-cache-v2-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}'
           paths: [ ~/.gradle/caches ]
@@ -109,7 +109,7 @@ jobs:
       - checkout
       - restore_cache: { key: 'gradle-wrapper-v2-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
       - restore_cache: { key: 'unit-test-11-gradle-cache-v2-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
-      - run: ./gradlew --parallel --stacktrace --continue test -Pcom.palantir.baseline-error-prone.disable
+      - run: ./gradlew --parallel --stacktrace --continue test -Pcom.palantir.baseline-error-prone.disable -Porg.gradle.java.installations.fromEnv=JAVA_8_HOME,JAVA_11_HOME,JAVA_15_HOME,JAVA_17_HOME,JAVA_HOME
       - save_cache:
           key: 'unit-test-11-gradle-cache-v2-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}'
           paths: [ ~/.gradle/caches ]
@@ -131,7 +131,7 @@ jobs:
       - attach_workspace: { at: /home/circleci }
       - restore_cache: { key: 'gradle-wrapper-v2-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
       - restore_cache: { key: 'trial-publish-gradle-cache-v2-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
-      - run: ./gradlew --stacktrace publishToMavenLocal
+      - run: ./gradlew --stacktrace publishToMavenLocal -Porg.gradle.java.installations.fromEnv=JAVA_8_HOME,JAVA_11_HOME,JAVA_15_HOME,JAVA_17_HOME,JAVA_HOME
       - run:
           command: git status --porcelain
           when: always
@@ -154,7 +154,7 @@ jobs:
       - restore_cache: { key: 'gradle-wrapper-v2-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
       - restore_cache: { key: 'publish-gradle-cache-v2-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
       - deploy:
-          command: ./gradlew --parallel --stacktrace --continue publish
+          command: ./gradlew --parallel --stacktrace --continue publish -Porg.gradle.java.installations.fromEnv=JAVA_8_HOME,JAVA_11_HOME,JAVA_15_HOME,JAVA_17_HOME,JAVA_HOME
       - run:
           command: git status --porcelain
           when: always
@@ -165,10 +165,10 @@ jobs:
       - store_artifacts: { path: ~/artifacts }
 
   markdown:
-    docker: [{ image: 'raviqqe/liche:0.1.1' }]
+    docker: [{ image: 'lycheeverse/lychee:0.6.0' }]
     steps:
       - checkout
-      - run: /liche -d . -r . -v
+      - run: lychee --exclude-all-private --exclude localhost --no-progress *.md **/*.md
 
 
 workflows:
