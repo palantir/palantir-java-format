@@ -1,3 +1,6 @@
+import java.util.function.Function
+import java.util.stream.Collectors
+
 apply plugin: 'application'
 apply plugin: 'com.palantir.external-publish-jar'
 
@@ -30,19 +33,26 @@ dependencies {
     annotationProcessor 'org.derive4j:derive4j'
 }
 
+def exports = [
+        'jdk.compiler/com.sun.tools.javac.file',
+        'jdk.compiler/com.sun.tools.javac.main',
+        'jdk.compiler/com.sun.tools.javac.parser',
+        'jdk.compiler/com.sun.tools.javac.tree',
+        'jdk.compiler/com.sun.tools.javac.util',
+        'jdk.compiler/com.sun.tools.javac.code',
+        'jdk.compiler/com.sun.tools.javac.api'
+]
+
 tasks.withType(JavaCompile).configureEach {
     options.errorprone.disable 'StrictUnusedVariable'
 
-    options.compilerArgs += [
-        // Allow access to internal javac apis
-        '--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED',
-        '--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED',
-        '--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED',
-        '--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED',
-        '--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED',
-        '--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED',
-        '--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED'
-    ]
+    // Allow access to internal javac apis
+    options.compilerArgs += exports.stream().map(new Function<String, String>() {
+        @Override
+        String apply(String value) {
+            return "--add-exports=${value}=ALL-UNNAMED"
+        }
+    }).collect(Collectors.toList())
 
     if (JavaVersion.current() < JavaVersion.VERSION_14) {
         excludes = ['**/Java14InputAstVisitor.java']
@@ -70,4 +80,12 @@ tasks.test {
 // necessary to compile Java14InputAstVisitor
 idea {
     module.languageLevel = new org.gradle.plugins.ide.idea.model.IdeaLanguageLevel(14)
+}
+
+// This block may be replaced by BaselineExportsExtension exports
+// once https://github.com/gradle/gradle/issues/18824 is resolved.
+jar {
+    manifest {
+        attributes('Add-Exports': exports.stream().collect(Collectors.joining(' ')))
+    }
 }
