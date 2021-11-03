@@ -4,4 +4,10 @@ apply plugin: 'com.palantir.revapi'
 
 dependencies {
     api 'com.google.guava:guava'
+    api 'com.fasterxml.jackson.core:jackson-annotations'
+    api 'com.fasterxml.jackson.datatype:jackson-datatype-guava'
+
+    testImplementation 'org.assertj:assertj-core'
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind'
 }

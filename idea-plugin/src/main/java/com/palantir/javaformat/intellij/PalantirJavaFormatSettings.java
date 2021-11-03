@@ -21,11 +21,16 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.project.Project;
+import com.palantir.javaformat.java.FormatterService;
 import com.palantir.javaformat.java.JavaFormatterOptions;
+import com.palantir.sls.versions.OrderableSlsVersion;
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
+import java.util.jar.JarFile;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 
 @State(
@@ -80,6 +85,43 @@ class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJav
      */
     Optional<List<URI>> getImplementationClassPath() {
         return state.implementationClassPath;
+    }
+
+    boolean injectedVersionIsOutdated() {
+        Optional<String> formatterVersion = computeFormatterVersion();
+        if (formatterVersion.isEmpty()) {
+            return true;
+        }
+
+        OrderableSlsVersion implementationVersion =
+                OrderableSlsVersion.valueOf(getImplementationVersion().replace(".dirty", ""));
+        OrderableSlsVersion injectedVersion = OrderableSlsVersion.valueOf(formatterVersion.get());
+
+        return injectedVersion.compareTo(implementationVersion) < 0;
+    }
+
+    String getImplementationVersion() {
+        return PalantirJavaFormatConfigurable.class.getPackage().getImplementationVersion();
+    }
+
+    Optional<String> computeFormatterVersion() {
+        return getImplementationClassPath().map(classpath -> classpath.stream()
+                .flatMap(uri -> {
+                    try {
+                        JarFile jar = new JarFile(uri.getPath());
+                        // Identify the implementation jar by the service it produces.
+                        if (jar.getEntry("META-INF/services/" + FormatterService.class.getName()) != null) {
+                            String implementationVersion =
+                                    jar.getManifest().getMainAttributes().getValue("Implementation-Version");
+                            return Stream.of(implementationVersion);
+                        }
+                        return Stream.empty();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Couldn't find implementation JAR")));
     }
 
     enum EnabledState {

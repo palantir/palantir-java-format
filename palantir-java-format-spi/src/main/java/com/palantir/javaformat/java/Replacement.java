@@ -17,6 +17,8 @@ package com.palantir.javaformat.java;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.Range;
 import java.util.Objects;
 
@@ -32,7 +34,10 @@ public final class Replacement {
     private final Range<Integer> replaceRange;
     private final String replacementString;
 
-    private Replacement(Range<Integer> replaceRange, String replacementString) {
+    @JsonCreator
+    Replacement(
+            @JsonProperty("replaceRange") Range<Integer> replaceRange,
+            @JsonProperty("replacementString") String replacementString) {
         this.replaceRange = checkNotNull(replaceRange, "Null replaceRange");
         this.replacementString = checkNotNull(replacementString, "Null replacementString");
     }
@@ -62,5 +67,12 @@ public final class Replacement {
     @Override
     public int hashCode() {
         return Objects.hash(replaceRange, replacementString);
+    }
+
+    @Override
+    public String toString() {
+        return "Replacement{" + "replaceRange="
+                + replaceRange + ", replacementString='"
+                + replacementString + '\'' + '}';
     }
 }

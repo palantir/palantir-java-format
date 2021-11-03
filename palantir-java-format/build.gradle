@@ -9,7 +9,8 @@ dependencies {
     api project(':palantir-java-format-spi')
     api 'com.google.guava:guava'
     implementation 'org.functionaljava:functionaljava'
-    implementation 'com.fasterxml.jackson.core:jackson-databind' // purely for the debugger
+    implementation 'com.fasterxml.jackson.core:jackson-core'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8'
     implementation 'com.fasterxml.jackson.module:jackson-module-parameter-names'
 

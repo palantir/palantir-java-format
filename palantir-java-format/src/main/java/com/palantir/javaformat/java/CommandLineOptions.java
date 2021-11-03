@@ -14,6 +14,7 @@
 
 package com.palantir.javaformat.java;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableRangeSet;
 import java.util.Optional;
@@ -28,9 +29,11 @@ final class CommandLineOptions {
     private final ImmutableList<String> files;
     private final boolean inPlace;
     private final ImmutableRangeSet<Integer> lines;
+    private final ImmutableRangeSet<Integer> characterRanges;
     private final ImmutableList<Integer> offsets;
     private final ImmutableList<Integer> lengths;
     private final boolean aosp;
+    private final boolean palantirStyle;
     private final boolean version;
     private final boolean help;
     private final boolean stdin;
@@ -41,14 +44,17 @@ final class CommandLineOptions {
     private final boolean setExitIfChanged;
     private final Optional<String> assumeFilename;
     private final boolean reflowLongStrings;
+    private final boolean outputReplacements;
 
     CommandLineOptions(
             ImmutableList<String> files,
             boolean inPlace,
             ImmutableRangeSet<Integer> lines,
+            ImmutableRangeSet<Integer> characterRanges,
             ImmutableList<Integer> offsets,
             ImmutableList<Integer> lengths,
             boolean aosp,
+            boolean palantirStyle,
             boolean version,
             boolean help,
             boolean stdin,
@@ -58,13 +64,16 @@ final class CommandLineOptions {
             boolean dryRun,
             boolean setExitIfChanged,
             Optional<String> assumeFilename,
-            boolean reflowLongStrings) {
+            boolean reflowLongStrings,
+            boolean outputReplacements) {
         this.files = files;
         this.inPlace = inPlace;
         this.lines = lines;
+        this.characterRanges = characterRanges;
         this.offsets = offsets;
         this.lengths = lengths;
         this.aosp = aosp;
+        this.palantirStyle = palantirStyle;
         this.version = version;
         this.help = help;
         this.stdin = stdin;
@@ -75,6 +84,7 @@ final class CommandLineOptions {
         this.setExitIfChanged = setExitIfChanged;
         this.assumeFilename = assumeFilename;
         this.reflowLongStrings = reflowLongStrings;
+        this.outputReplacements = outputReplacements;
     }
 
     /** The files to format. */
@@ -92,6 +102,11 @@ final class CommandLineOptions {
         return lines;
     }
 
+    /** Character ranges to format. */
+    ImmutableRangeSet<Integer> characterRanges() {
+        return characterRanges;
+    }
+
     /** Character offsets for partial formatting, paired with {@code lengths}. */
     ImmutableList<Integer> offsets() {
         return offsets;
@@ -105,6 +120,11 @@ final class CommandLineOptions {
     /** Use AOSP style instead of Google Style (4-space indentation). */
     boolean aosp() {
         return aosp;
+    }
+
+    /** Use Palantir style instead of Google Style. */
+    boolean palantirStyle() {
+        return palantirStyle;
     }
 
     /** Print the version. */
@@ -161,6 +181,10 @@ final class CommandLineOptions {
         return !lines().isEmpty() || !offsets().isEmpty() || !lengths().isEmpty();
     }
 
+    boolean outputReplacements() {
+        return outputReplacements;
+    }
+
     static Builder builder() {
         return new Builder();
     }
@@ -169,10 +193,12 @@ final class CommandLineOptions {
 
         private final ImmutableList.Builder<String> files = ImmutableList.builder();
         private final ImmutableRangeSet.Builder<Integer> lines = ImmutableRangeSet.builder();
+        private final ImmutableRangeSet.Builder<Integer> characterRanges = ImmutableRangeSet.builder();
         private final ImmutableList.Builder<Integer> offsets = ImmutableList.builder();
         private final ImmutableList.Builder<Integer> lengths = ImmutableList.builder();
         private boolean inPlace = false;
         private boolean aosp = false;
+        private boolean palantirStyle = false;
         private boolean version = false;
         private boolean help = false;
         private boolean stdin = false;
@@ -183,6 +209,7 @@ final class CommandLineOptions {
         private boolean setExitIfChanged = false;
         private Optional<String> assumeFilename = Optional.empty();
         private boolean reflowLongStrings = true;
+        private boolean outputReplacements = false;
 
         private Builder() {}
 
@@ -199,6 +226,10 @@ final class CommandLineOptions {
             return lines;
         }
 
+        ImmutableRangeSet.Builder<Integer> characterRangesBuilder() {
+            return characterRanges;
+        }
+
         Builder addOffset(Integer offset) {
             offsets.add(offset);
             return this;
@@ -211,6 +242,11 @@ final class CommandLineOptions {
 
         Builder aosp(boolean aosp) {
             this.aosp = aosp;
+            return this;
+        }
+
+        Builder palantirStyle(boolean palantirStyle) {
+            this.palantirStyle = palantirStyle;
             return this;
         }
 
@@ -264,14 +300,22 @@ final class CommandLineOptions {
             return this;
         }
 
+        Builder outputReplacements(boolean outputReplacements) {
+            this.outputReplacements = outputReplacements;
+            return this;
+        }
+
         CommandLineOptions build() {
+            Preconditions.checkArgument(!aosp || !palantirStyle, "Cannot use both aosp and palantir style");
             return new CommandLineOptions(
                     files.build(),
                     inPlace,
                     lines.build(),
+                    characterRanges.build(),
                     offsets.build(),
                     lengths.build(),
                     aosp,
+                    palantirStyle,
                     version,
                     help,
                     stdin,
@@ -281,7 +325,8 @@ final class CommandLineOptions {
                     dryRun,
                     setExitIfChanged,
                     assumeFilename,
-                    reflowLongStrings);
+                    reflowLongStrings,
+                    outputReplacements);
         }
     }
 }

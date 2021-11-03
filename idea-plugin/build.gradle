@@ -51,8 +51,12 @@ configurations {
 }
 
 dependencies {
-    implementation project(':palantir-java-format-spi')
+    implementation project(':palantir-java-format-jdk-bootstrap')
     implementation 'com.github.ben-manes.caffeine:caffeine'
+    implementation('com.palantir.sls.versions:sls-versions') {
+        // Has class version conflicts with slf4j brought in by Intellij
+        exclude group: 'org.slf4j', module: 'slf4j-api'
+    }
 
     formatter project(':palantir-java-format')
 }
@@ -70,7 +74,7 @@ tasks.withType(org.jetbrains.intellij.tasks.PrepareSandboxTask) {
 
     // Also pack the formatter in its own directory
     into("${pluginName}/impl") {
-        from configurations.formatter.filter { !configurations.runtimeClasspath.contains(it) }
+        from configurations.formatter
     }
 }
 

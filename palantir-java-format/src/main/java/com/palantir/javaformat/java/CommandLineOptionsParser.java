@@ -73,6 +73,12 @@ final class CommandLineOptionsParser {
                 case "-line":
                     parseRangeSet(optionsBuilder.linesBuilder(), getValue(flag, it, value));
                     break;
+                case "--character-ranges":
+                case "-character-ranges":
+                case "--character-range":
+                case "-character-range":
+                    parseRangeSet(optionsBuilder.characterRangesBuilder(), getValue(flag, it, value));
+                    break;
                 case "--offset":
                 case "-offset":
                     optionsBuilder.addOffset(parseInteger(it, flag, value));
@@ -85,6 +91,10 @@ final class CommandLineOptionsParser {
                 case "-aosp":
                 case "-a":
                     optionsBuilder.aosp(true);
+                    break;
+                case "--palantir":
+                case "-palantir":
+                    optionsBuilder.palantirStyle(true);
                     break;
                 case "--version":
                 case "-version":
@@ -121,6 +131,10 @@ final class CommandLineOptionsParser {
                 case "-assume-filename":
                 case "--assume-filename":
                     optionsBuilder.assumeFilename(getValue(flag, it, value));
+                    break;
+                case "-output-replacements":
+                case "--output-replacements":
+                    optionsBuilder.outputReplacements(true);
                     break;
                 default:
                     throw new IllegalArgumentException("unexpected flag: " + flag);

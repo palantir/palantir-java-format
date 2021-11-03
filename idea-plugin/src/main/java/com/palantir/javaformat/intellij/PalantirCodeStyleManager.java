@@ -19,13 +19,10 @@ package com.palantir.javaformat.intellij;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Comparator.comparing;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.BoundType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Range;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
@@ -47,21 +44,10 @@ import com.intellij.serviceContainer.NonInjectable;
 import com.intellij.util.IncorrectOperationException;
 import com.palantir.javaformat.java.FormatterException;
 import com.palantir.javaformat.java.FormatterService;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.ServiceLoader;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,20 +59,22 @@ import org.slf4j.LoggerFactory;
 final class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
     private static final Logger log = LoggerFactory.getLogger(PalantirCodeStyleManager.class);
     private static final String PLUGIN_ID = "palantir-java-format";
-    private static final IdeaPluginDescriptor PLUGIN = Preconditions.checkNotNull(
+    static final IdeaPluginDescriptor PLUGIN = Preconditions.checkNotNull(
             PluginManager.getPlugin(PluginId.getId(PLUGIN_ID)), "Couldn't find our own plugin: %s", PLUGIN_ID);
 
-    // Cache to avoid creating a URLClassloader every time we want to format from IntelliJ
-    private final LoadingCache<Optional<List<URI>>, FormatterService> implementationCache =
-            Caffeine.newBuilder().maximumSize(1).build(PalantirCodeStyleManager::createFormatter);
+    private final FormatterProvider formatterProvider = new FormatterProvider();
+
+    private final Project project;
 
     public PalantirCodeStyleManager(@NotNull Project project) {
         super(project, new CodeStyleManagerImpl(project));
+        this.project = project;
     }
 
     @NonInjectable
     PalantirCodeStyleManager(@NotNull CodeStyleManager original) {
         super(original.getProject(), original);
+        this.project = original.getProject();
     }
 
     static Map<TextRange, String> getReplacements(
@@ -196,24 +184,6 @@ final class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
         format(document, ranges);
     }
 
-    private static URL toUrlUnchecked(URI uri) {
-        try {
-            return uri.toURL();
-        } catch (IllegalArgumentException | MalformedURLException e) {
-            throw new RuntimeException("Couldn't convert URI to URL: " + uri, e);
-        }
-    }
-
-    private static URL[] listDirAsUrlsUnchecked(Path dir) {
-        try (Stream<Path> list = Files.list(dir)) {
-            return list.map(Path::toUri)
-                    .map(PalantirCodeStyleManager::toUrlUnchecked)
-                    .toArray(URL[]::new);
-        } catch (IOException e) {
-            throw new RuntimeException("Couldn't list dir: " + dir.toString(), e);
-        }
-    }
-
     /**
      * Format the ranges of the given document.
      *
@@ -222,31 +192,12 @@ final class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
      */
     private void format(Document document, Collection<? extends TextRange> ranges) {
         PalantirJavaFormatSettings settings = PalantirJavaFormatSettings.getInstance(getProject());
-        FormatterService formatter = implementationCache.get(settings.getImplementationClassPath());
+        FormatterService formatter = formatterProvider.get(project, settings);
 
         performReplacements(document, getReplacements(formatter, document.getText(), ranges));
     }
 
-    private static FormatterService createFormatter(Optional<List<URI>> implementationClassPath) {
-        URL[] implementationUrls = implementationClassPath
-                .map(implementationUris -> {
-                    log.debug("Using palantir-java-format implementation defined by URIs: {}", implementationUris);
-                    return implementationUris.stream()
-                            .map(PalantirCodeStyleManager::toUrlUnchecked)
-                            .toArray(URL[]::new);
-                })
-                .orElseGet(() -> {
-                    // Load from the jars bundled with the plugin.
-                    Path implDir = PLUGIN.getPath().toPath().resolve("impl");
-                    log.debug("Using palantir-java-format implementation bundled with plugin: {}", implDir);
-                    return listDirAsUrlsUnchecked(implDir);
-                });
-        ClassLoader classLoader = new URLClassLoader(implementationUrls, PLUGIN.getPluginClassLoader());
-        return Iterables.getOnlyElement(ServiceLoader.load(FormatterService.class, classLoader));
-    }
-
     private void performReplacements(final Document document, final Map<TextRange, String> replacements) {
-
         if (replacements.isEmpty()) {
             return;
         }

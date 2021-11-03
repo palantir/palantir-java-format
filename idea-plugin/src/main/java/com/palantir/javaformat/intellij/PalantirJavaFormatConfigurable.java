@@ -25,13 +25,7 @@ import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 import com.palantir.javaformat.intellij.PalantirJavaFormatSettings.EnabledState;
-import com.palantir.javaformat.java.FormatterService;
 import java.awt.Insets;
-import java.io.IOException;
-import java.net.URI;
-import java.util.List;
-import java.util.jar.JarFile;
-import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -103,30 +97,8 @@ class PalantirJavaFormatConfigurable extends BaseConfigurable implements Searcha
         PalantirJavaFormatSettings settings = PalantirJavaFormatSettings.getInstance(project);
         enable.setSelected(settings.isEnabled());
         styleComboBox.setSelectedItem(UiFormatterStyle.convert(settings.getStyle()));
-        pluginVersion.setText(PalantirJavaFormatConfigurable.class.getPackage().getImplementationVersion());
-        formatterVersion.setText(settings.getImplementationClassPath()
-                .map(this::computeFormatterVersion)
-                .orElse("(bundled)"));
-    }
-
-    private String computeFormatterVersion(List<URI> implementationClassPath) {
-        return implementationClassPath.stream()
-                .flatMap(uri -> {
-                    try {
-                        JarFile jar = new JarFile(uri.getPath());
-                        // Identify the implementation jar by the service it produces.
-                        if (jar.getEntry("META-INF/services/" + FormatterService.class.getName()) != null) {
-                            String implementationVersion =
-                                    jar.getManifest().getMainAttributes().getValue("Implementation-Version");
-                            return Stream.of(implementationVersion);
-                        }
-                        return Stream.empty();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Couldn't find implementation JAR"));
+        pluginVersion.setText(settings.getImplementationVersion());
+        formatterVersion.setText(getFormatterVersionText(settings));
     }
 
     @Override
@@ -138,6 +110,11 @@ class PalantirJavaFormatConfigurable extends BaseConfigurable implements Searcha
 
     @Override
     public void disposeUIResources() {}
+
+    private static String getFormatterVersionText(PalantirJavaFormatSettings settings) {
+        String suffix = settings.injectedVersionIsOutdated() ? " (using bundled)" : " (using injected)";
+        return settings.computeFormatterVersion().orElse("(bundled)") + suffix;
+    }
 
     private void createUIComponents() {
         styleComboBox = new ComboBox<>(UiFormatterStyle.values());
