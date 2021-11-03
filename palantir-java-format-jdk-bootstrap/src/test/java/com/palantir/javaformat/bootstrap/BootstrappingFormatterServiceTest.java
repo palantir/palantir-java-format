@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.palantir.java.javaformat.bootstrap;
+package com.palantir.javaformat.bootstrap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,7 +22,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
-import com.palantir.javaformat.bootstrap.BootstrappingFormatterService;
 import com.palantir.javaformat.java.Replacement;
 import java.net.URI;
 import java.nio.file.Files;

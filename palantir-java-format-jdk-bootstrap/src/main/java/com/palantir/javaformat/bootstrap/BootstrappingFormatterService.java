@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.immutables.value.Value;
 
@@ -79,8 +80,11 @@ public final class BootstrappingFormatterService implements FormatterService {
                         .collect(Collectors.toList()))
                 .build();
 
-        String output = ProcessRunner.runWithStdin(command.toArgs(), input);
-        return MAPPER.readValue(output, new TypeReference<>() {});
+        Optional<String> output = FormatterCommandRunner.runWithStdin(command.toArgs(), input);
+        if (output.isEmpty()) {
+            return ImmutableList.of();
+        }
+        return MAPPER.readValue(output.get(), new TypeReference<>() {});
     }
 
     private String formatSourceReflowStringsAndFixImportsInternal(String input) throws IOException {
@@ -90,7 +94,7 @@ public final class BootstrappingFormatterService implements FormatterService {
                 .implementationClasspath(implementationClassPath)
                 .outputReplacements(false)
                 .build();
-        return ProcessRunner.runWithStdin(command.toArgs(), input);
+        return FormatterCommandRunner.runWithStdin(command.toArgs(), input).orElse(input);
     }
 
     /** Returns a range representation as parsed by "com.palantir.javaformat.java.CommandLineOptionsParser". */
