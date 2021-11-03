@@ -18,7 +18,6 @@ package com.palantir.javaformat.gradle;
 
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Iterables;
-import com.palantir.javaformat.bootstrap.BootstrappingFormatterService;
 import com.palantir.javaformat.java.FormatterService;
 import java.io.File;
 import java.net.MalformedURLException;
@@ -29,42 +28,19 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import org.gradle.api.JavaVersion;
-import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
-import org.gradle.internal.jvm.Jvm;
 
 public class JavaFormatExtension {
-    private final Project project;
     private final Configuration configuration;
     private final Supplier<FormatterService> memoizedService;
 
-    public JavaFormatExtension(Project project, Configuration configuration) {
-        this.project = project;
+    public JavaFormatExtension(Configuration configuration) {
         this.configuration = configuration;
-        this.memoizedService = Suppliers.memoize(this::loadFormatterServiceInternal);
+        this.memoizedService = Suppliers.memoize(this::serviceLoadFormatter);
     }
 
     public FormatterService loadFormatterService() {
         return memoizedService.get();
-    }
-
-    private FormatterService loadFormatterServiceInternal() {
-        if (JavaVersion.current().compareTo(JavaVersion.VERSION_15) > 0) {
-            project.getLogger()
-                    .debug(
-                            "Creating formatter that runs in bootstrapped JVM for java version {}",
-                            JavaVersion.current());
-            return loadBootstrappingJdkFormatter();
-        }
-        project.getLogger().debug("Creating formatter that runs in same JVM");
-        return serviceLoadFormatter();
-    }
-
-    private FormatterService loadBootstrappingJdkFormatter() {
-        Path javaExecPath = Jvm.current().getJavaExecutable().toPath();
-        int javaMajorVersion = Integer.parseInt(JavaVersion.current().getMajorVersion());
-        return new BootstrappingFormatterService(javaExecPath, javaMajorVersion, getJarLocations());
     }
 
     private FormatterService serviceLoadFormatter() {
