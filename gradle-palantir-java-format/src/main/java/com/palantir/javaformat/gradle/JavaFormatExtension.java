@@ -19,15 +19,11 @@ package com.palantir.javaformat.gradle;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Iterables;
 import com.palantir.javaformat.java.FormatterService;
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.file.Path;
-import java.util.List;
 import java.util.ServiceLoader;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import org.gradle.api.artifacts.Configuration;
 
 public class JavaFormatExtension {
@@ -36,29 +32,25 @@ public class JavaFormatExtension {
 
     public JavaFormatExtension(Configuration configuration) {
         this.configuration = configuration;
-        this.memoizedService = Suppliers.memoize(this::serviceLoadFormatter);
+        this.memoizedService = Suppliers.memoize(this::serviceLoadInternal);
     }
 
-    public FormatterService loadFormatterService() {
+    public FormatterService serviceLoad() {
         return memoizedService.get();
     }
 
-    private FormatterService serviceLoadFormatter() {
-        URL[] jarUris = getJarLocations().stream()
-                .map(path -> {
+    private FormatterService serviceLoadInternal() {
+        URL[] jarUris = configuration.getFiles().stream()
+                .map(file -> {
                     try {
-                        return path.toUri().toURL();
+                        return file.toURI().toURL();
                     } catch (MalformedURLException e) {
-                        throw new RuntimeException("Unable to convert path to URL: " + path, e);
+                        throw new RuntimeException("Unable to convert URI to URL: " + file, e);
                     }
                 })
                 .toArray(URL[]::new);
 
         ClassLoader classLoader = new URLClassLoader(jarUris, FormatterService.class.getClassLoader());
         return Iterables.getOnlyElement(ServiceLoader.load(FormatterService.class, classLoader));
-    }
-
-    private List<Path> getJarLocations() {
-        return configuration.getFiles().stream().map(File::toPath).collect(Collectors.toList());
     }
 }

@@ -50,7 +50,7 @@ public final class PalantirJavaFormatPlugin implements Plugin<Project> {
         public final void formatDiff() throws IOException, InterruptedException {
             JavaFormatExtension extension =
                     getProject().getRootProject().getExtensions().getByType(JavaFormatExtension.class);
-            FormatterService formatterService = extension.loadFormatterService();
+            FormatterService formatterService = extension.serviceLoad();
             FormatDiff.formatDiff(getProject().getProjectDir().toPath(), formatterService);
         }
     }
