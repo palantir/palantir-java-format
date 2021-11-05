@@ -118,11 +118,15 @@ final class FormatterProvider {
     }
 
     private static Integer parseSdkJavaVersion(Sdk sdk) {
-        // Parses the actual version out of "SDK#getVersionString" which returns 'java version "15"'.
+        // Parses the actual version out of "SDK#getVersionString" which returns 'java version "15"'
+        // or 'openjdk version "15.0.2"'.
         String version = Preconditions.checkNotNull(
                 JdkUtil.getJdkMainAttribute(sdk, Name.IMPLEMENTATION_VERSION), "JDK version is null");
+        int indexOfVersionDelimiter = version.indexOf('.');
+        String normalizedVersion =
+                indexOfVersionDelimiter >= 0 ? version.substring(0, indexOfVersionDelimiter) : version;
         try {
-            return Integer.parseInt(version);
+            return Integer.parseInt(normalizedVersion);
         } catch (NumberFormatException e) {
             log.error("Could not parse sdk version: {}", version, e);
             return null;
