@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: 'Idea plugin: Fix NumberFormatException: For input string: "15.0.5"'
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/575
