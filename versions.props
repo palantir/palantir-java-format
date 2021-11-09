@@ -1,8 +1,8 @@
-com.diffplug.spotless:spotless-plugin-gradle = 5.17.1
+com.diffplug.spotless:spotless-plugin-gradle = 6.0.0
 com.github.ben-manes.caffeine:caffeine = 3.0.4
 com.google.auto.service:auto-service = 1.0.1
 com.google.code.findbugs:jsr305 = 3.0.2
-com.google.errorprone:error_prone_annotations = 2.9.0
+com.google.errorprone:error_prone_annotations = 2.10.0
 com.google.guava:guava = 31.0.1-jre
 com.google.guava:guava-testlib = 27.0.1-jre
 com.google.testing.compile:compile-testing = 0.15
