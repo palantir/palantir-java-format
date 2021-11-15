@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: Enable bootstrapping formatter on java 15+
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/580

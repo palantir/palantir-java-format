@@ -52,23 +52,26 @@ final class FormatterProvider {
 
     FormatterService get(Project project, PalantirJavaFormatSettings settings) {
         return implementationCache.get(new FormatterCacheKey(
-                project, settings.getImplementationClassPath(), settings.injectedVersionIsOutdated()));
+                project,
+                getSdkVersion(project),
+                settings.getImplementationClassPath(),
+                settings.injectedVersionIsOutdated()));
     }
 
     private static FormatterService createFormatter(FormatterCacheKey cacheKey) {
+        int jdkMajorVersion = cacheKey.jdkMajorVersion;
         List<Path> implementationClasspath =
                 getImplementationUrls(cacheKey.implementationClassPath, cacheKey.useBundledImplementation);
-        Path jdkPath = getJdkPath(cacheKey.project);
-        Integer jdkMajorVersion = getSdkVersion(cacheKey.project);
 
-        // Just enable the bootstrapping formatter for projects using Java 16+
-        // TODO(fwindheuser): Enable for all
-        if (jdkMajorVersion >= 16) {
-            log.debug("Running formatter with jdk version {} and path: {}", jdkMajorVersion, jdkPath);
+        // Enable the bootstrapping formatter for projects using Java 15+ as they might use new language features.
+        if (jdkMajorVersion >= 15) {
+            Path jdkPath = getJdkPath(cacheKey.project);
+            log.info("Using bootstrapping formatter with jdk version {} and path: {}", jdkMajorVersion, jdkPath);
             return new BootstrappingFormatterService(jdkPath, jdkMajorVersion, implementationClasspath);
         }
 
         // Use "in-process" formatter service
+        log.info("Using in-process formatter for jdk version {}", jdkMajorVersion);
         URL[] implementationUrls = toUrlsUnchecked(implementationClasspath);
         ClassLoader classLoader = new URLClassLoader(implementationUrls, FormatterService.class.getClassLoader());
         return Iterables.getOnlyElement(ServiceLoader.load(FormatterService.class, classLoader));
@@ -159,12 +162,17 @@ final class FormatterProvider {
 
     private static final class FormatterCacheKey {
         private final Project project;
+        private final int jdkMajorVersion;
         private final Optional<List<URI>> implementationClassPath;
         private final boolean useBundledImplementation;
 
         FormatterCacheKey(
-                Project project, Optional<List<URI>> implementationClassPath, boolean useBundledImplementation) {
+                Project project,
+                int jdkMajorVersion,
+                Optional<List<URI>> implementationClassPath,
+                boolean useBundledImplementation) {
             this.project = project;
+            this.jdkMajorVersion = jdkMajorVersion;
             this.implementationClassPath = implementationClassPath;
             this.useBundledImplementation = useBundledImplementation;
         }
@@ -178,14 +186,15 @@ final class FormatterProvider {
                 return false;
             }
             FormatterCacheKey that = (FormatterCacheKey) o;
-            return useBundledImplementation == that.useBundledImplementation
-                    && project.equals(that.project)
-                    && implementationClassPath.equals(that.implementationClassPath);
+            return jdkMajorVersion == that.jdkMajorVersion
+                    && useBundledImplementation == that.useBundledImplementation
+                    && Objects.equals(project, that.project)
+                    && Objects.equals(implementationClassPath, that.implementationClassPath);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(project, implementationClassPath, useBundledImplementation);
+            return Objects.hash(project, jdkMajorVersion, implementationClassPath, useBundledImplementation);
         }
     }
 }
