@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Revert using bootstrapping formatter for Java 15
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/582
