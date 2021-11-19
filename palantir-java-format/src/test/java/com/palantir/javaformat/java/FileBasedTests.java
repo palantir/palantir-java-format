@@ -15,12 +15,13 @@
  */
 package com.palantir.javaformat.java;
 
+import static com.google.common.collect.MoreCollectors.toOptional;
 import static com.google.common.io.Files.getFileExtension;
 import static com.google.common.io.Files.getNameWithoutExtension;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.io.CharStreams;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ResourceInfo;
@@ -34,6 +35,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.parallel.Execution;
@@ -42,10 +44,13 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 @Execution(ExecutionMode.CONCURRENT)
 public final class FileBasedTests {
     // Test files that are only used when run with a minimum Java version
-    private static final ImmutableSet<String> JAVA_14_TESTS =
-            ImmutableSet.of("ExpressionSwitch", "RSL", "Records", "Var", "I574", "I594");
-    private static final ImmutableSet<String> JAVA_15_TESTS = ImmutableSet.of("I603");
-    private static final ImmutableSet<String> JAVA_16_TESTS = ImmutableSet.of("I588");
+    private static final ImmutableMultimap<Integer, String> VERSIONED_TESTS =
+            ImmutableMultimap.<Integer, String>builder()
+                    .putAll(14, "Records", "RSL", "Var", "ExpressionSwitch", "I574", "I594")
+                    .putAll(15, "I603")
+                    .putAll(16, "I588")
+                    .putAll(17, "I683", "I684")
+                    .build();
 
     private final Class<?> testClass;
     /** The path prefix for all tests if loaded as resources. */
@@ -65,13 +70,10 @@ public final class FileBasedTests {
     }
 
     public static void assumeJavaVersionForTest(String testName) {
-        if (JAVA_14_TESTS.contains(testName)) {
-            Assumptions.assumeTrue(Formatter.getRuntimeVersion() >= 14, "Not running on jdk 14 or later");
-        } else if (JAVA_15_TESTS.contains(testName)) {
-            Assumptions.assumeTrue(Formatter.getRuntimeVersion() >= 15, "Not running on jdk 15 or later");
-        } else if (JAVA_16_TESTS.contains(testName)) {
-            Assumptions.assumeTrue(Formatter.getRuntimeVersion() >= 16, "Not running on jdk 16 or later");
-        }
+        Optional<Integer> maybeJavaVersion =
+                VERSIONED_TESTS.inverse().get(testName).stream().collect(toOptional());
+        maybeJavaVersion.ifPresent(version -> Assumptions.assumeTrue(
+                Formatter.getRuntimeVersion() >= version, String.format("Not running on jdk %d or later", version)));
     }
 
     public List<Object[]> paramsAsNameInputOutput() throws IOException {
