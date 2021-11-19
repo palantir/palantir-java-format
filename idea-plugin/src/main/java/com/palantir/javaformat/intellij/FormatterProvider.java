@@ -23,6 +23,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.JdkUtil;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.roots.ProjectRootManager;
+import com.palantir.javaformat.bootstrap.BootstrappingFormatterService;
 import com.palantir.javaformat.java.FormatterService;
 import com.palantir.logsafe.Preconditions;
 import java.io.IOException;
@@ -62,14 +63,12 @@ final class FormatterProvider {
         List<Path> implementationClasspath =
                 getImplementationUrls(cacheKey.implementationClassPath, cacheKey.useBundledImplementation);
 
-        // TODO(fwindheuser): Temporarily disable the bootstrapping formatter to debug it crashing intellij on
-        //  certain files
         // Enable the bootstrapping formatter for projects using Java 15+ as they might use new language features.
-        // if (jdkMajorVersion >= 15) {
-        //     Path jdkPath = getJdkPath(cacheKey.project);
-        //     log.info("Using bootstrapping formatter with jdk version {} and path: {}", jdkMajorVersion, jdkPath);
-        //     return new BootstrappingFormatterService(jdkPath, jdkMajorVersion, implementationClasspath);
-        // }
+        if (jdkMajorVersion >= 15) {
+            Path jdkPath = getJdkPath(cacheKey.project);
+            log.info("Using bootstrapping formatter with jdk version {} and path: {}", jdkMajorVersion, jdkPath);
+            return new BootstrappingFormatterService(jdkPath, jdkMajorVersion, implementationClasspath);
+        }
 
         // Use "in-process" formatter service
         log.info("Using in-process formatter for jdk version {}", jdkMajorVersion);

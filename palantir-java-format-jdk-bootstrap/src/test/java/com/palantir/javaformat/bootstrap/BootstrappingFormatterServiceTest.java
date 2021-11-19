@@ -54,6 +54,22 @@ final class BootstrappingFormatterServiceTest {
         assertThat(formatted).isEqualTo(expectedOutput);
     }
 
+    @Test
+    void can_format_large_input_file() {
+        String input = "class A {\n"
+                + "  void f(){\n"
+                + "    System.out.println(\"Test output\");\n".repeat(2000)
+                + "  }\n"
+                + "}\n";
+
+        ImmutableList<Replacement> replacements =
+                getFormatter().getFormatReplacements(input, List.of(Range.open(0, input.length())));
+
+        assertThat(replacements).singleElement().satisfies(replacement -> {
+            assertThat(replacement.getReplacementString()).startsWith("class A {\n    void f() {");
+        });
+    }
+
     private BootstrappingFormatterService getFormatter() {
         return new BootstrappingFormatterService(
                 javaBinPath(), Runtime.version().feature(), getClasspath());

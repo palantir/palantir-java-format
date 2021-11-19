@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Fix deadlock trying to format large input
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/583

@@ -34,13 +34,14 @@ final class FormatterCommandRunner {
             outputStream.write(input.getBytes(StandardCharsets.UTF_8));
         }
 
+        // Make sure to drain stdout before waiting for the process to exit as this can result in a deadlock otherwise.
+        String stdout = readToString(process.getInputStream());
+
         try {
             process.waitFor();
         } catch (InterruptedException e) {
             throw new RuntimeException("Interrupted while executing command", e);
         }
-
-        String stdout = readToString(process.getInputStream());
 
         if (process.exitValue() != 0) {
             String stderr = readToString(process.getErrorStream());
