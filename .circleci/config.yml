@@ -164,12 +164,6 @@ jobs:
       - store_test_results: { path: ~/junit }
       - store_artifacts: { path: ~/artifacts }
 
-  markdown:
-    docker: [{ image: 'lycheeverse/lychee:0.6.0' }]
-    steps:
-      - checkout
-      - run: lychee --exclude-all-private --exclude localhost --no-progress *.md **/*.md
-
 
 workflows:
   version: 2
@@ -187,9 +181,6 @@ workflows:
 
       - check:
           requires: [ compile ]
-          filters: { tags: { only: /.*/ } }
-
-      - markdown:
           filters: { tags: { only: /.*/ } }
 
       - trial-publish:
