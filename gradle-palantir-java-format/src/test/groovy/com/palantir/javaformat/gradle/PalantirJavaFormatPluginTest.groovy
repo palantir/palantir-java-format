@@ -35,6 +35,15 @@ class PalantirJavaFormatPluginTest extends IntegrationTestKitSpec {
             }
             apply plugin: 'idea'
         """.stripIndent()
+
+        // Add jvm args to allow spotless and formatter gradle plugins to run with Java 16+
+        file('gradle.properties') << """
+        org.gradle.jvmargs=--add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED \
+          --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED \
+          --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED \
+          --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED \
+          --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED
+        """.stripIndent()
     }
 
     def 'formatDiff updates only lines changed in git diff'() {
