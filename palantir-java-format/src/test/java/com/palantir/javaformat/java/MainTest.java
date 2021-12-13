@@ -43,6 +43,13 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 @Execution(ExecutionMode.CONCURRENT)
 public class MainTest {
 
+    private static final ImmutableList<String> ADD_EXPORTS = ImmutableList.of(
+            "--add-exports", "jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
+            "--add-exports", "jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED",
+            "--add-exports", "jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED",
+            "--add-exports", "jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
+            "--add-exports", "jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED");
+
     @TempDir
     public Path testFolder;
 
@@ -103,16 +110,7 @@ public class MainTest {
 
     @Test
     public void testMain() throws Exception {
-        Process process = new ProcessBuilder(ImmutableList.of(
-                        Paths.get(System.getProperty("java.home"))
-                                .resolve("bin/java")
-                                .toString(),
-                        "-cp",
-                        System.getProperty("java.class.path"),
-                        Main.class.getName()))
-                .redirectError(Redirect.PIPE)
-                .redirectOutput(Redirect.PIPE)
-                .start();
+        Process process = formatterMain().start();
         process.waitFor();
         String err = new String(ByteStreams.toByteArray(process.getErrorStream()), UTF_8);
         assertThat(err).contains("Usage: palantir-java-format");
@@ -418,20 +416,7 @@ public class MainTest {
     public void exitIfChangedStdin() throws Exception {
         Path path = Files.createFile(testFolder.resolve("Test.java"));
         Files.write(path, "class Test {\n}\n".getBytes(UTF_8));
-        Process process = new ProcessBuilder(ImmutableList.of(
-                        Paths.get(System.getProperty("java.home"))
-                                .resolve("bin/java")
-                                .toString(),
-                        "-cp",
-                        System.getProperty("java.class.path"),
-                        Main.class.getName(),
-                        "-n",
-                        "--set-exit-if-changed",
-                        "-"))
-                .redirectInput(path.toFile())
-                .redirectError(Redirect.PIPE)
-                .redirectOutput(Redirect.PIPE)
-                .start();
+        Process process = formatterMain("-").redirectInput(path.toFile()).start();
         process.waitFor();
         String err = new String(ByteStreams.toByteArray(process.getErrorStream()), UTF_8);
         String out = new String(ByteStreams.toByteArray(process.getInputStream()), UTF_8);
@@ -443,19 +428,7 @@ public class MainTest {
     public void exitIfChangedFiles() throws Exception {
         Path path = Files.createFile(testFolder.resolve("Test.java"));
         Files.write(path, "class Test {\n}\n".getBytes(UTF_8));
-        Process process = new ProcessBuilder(ImmutableList.of(
-                        Paths.get(System.getProperty("java.home"))
-                                .resolve("bin/java")
-                                .toString(),
-                        "-cp",
-                        System.getProperty("java.class.path"),
-                        Main.class.getName(),
-                        "-n",
-                        "--set-exit-if-changed",
-                        path.toAbsolutePath().toString()))
-                .redirectError(Redirect.PIPE)
-                .redirectOutput(Redirect.PIPE)
-                .start();
+        Process process = formatterMain(path.toAbsolutePath().toString()).start();
         process.waitFor();
         String err = new String(ByteStreams.toByteArray(process.getErrorStream()), UTF_8);
         String out = new String(ByteStreams.toByteArray(process.getInputStream()), UTF_8);
@@ -543,5 +516,21 @@ public class MainTest {
                 in);
         assertThat(main.format("--skip-reflowing-long-strings", "-")).isEqualTo(0);
         assertThat(out.toString()).isEqualTo(joiner.join(expected));
+    }
+
+    private static ProcessBuilder formatterMain(String... args) {
+        return new ProcessBuilder(ImmutableList.<String>builder()
+                        .add(Paths.get(System.getProperty("java.home"))
+                                .resolve("bin/java")
+                                .toString())
+                        .addAll(ADD_EXPORTS)
+                        .add("-cp", System.getProperty("java.class.path"))
+                        .add(Main.class.getName())
+                        .add("-n")
+                        .add("--set-exit-if-changed")
+                        .add(args)
+                        .build())
+                .redirectError(Redirect.PIPE)
+                .redirectOutput(Redirect.PIPE);
     }
 }
