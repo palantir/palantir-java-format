@@ -43,21 +43,27 @@ def exports = [
         'jdk.compiler/com.sun.tools.javac.api'
 ]
 
+def jvmArgList = exports.stream().map(new Function<String, String>() {
+    @Override
+    String apply(String value) {
+        return "--add-exports=${value}=ALL-UNNAMED"
+    }
+}).collect(Collectors.toList())
+
 tasks.withType(JavaCompile).configureEach {
     options.errorprone.disable 'StrictUnusedVariable'
 
     // Allow access to internal javac apis
-    options.compilerArgs += exports.stream().map(new Function<String, String>() {
-        @Override
-        String apply(String value) {
-            return "--add-exports=${value}=ALL-UNNAMED"
-        }
-    }).collect(Collectors.toList())
+    options.compilerArgs += jvmArgList
 
     if (JavaVersion.current() < JavaVersion.VERSION_14) {
         excludes = ['**/Java14InputAstVisitor.java']
     }
 }
+
+tasks.withType(Test).configureEach({
+    jvmArgs = jvmArgList
+})
 
 tasks.withType(Javadoc).configureEach {
     // Allow access to internal javac apis
