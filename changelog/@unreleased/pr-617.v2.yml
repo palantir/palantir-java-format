@@ -1,5 +1,5 @@
-type: improvement
-improvement:
+type: fix
+fix:
   description: palantir-java-format intellij plugin supports the new `PLUGIN_DIR/lib/*.jar`
     structure in addition to the old `PLUGIN_DIR/impl/*.jar` location
   links:
