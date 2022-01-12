@@ -75,7 +75,9 @@ tasks.withType(org.jetbrains.intellij.tasks.PrepareSandboxTask) {
 
     // Also pack the formatter in its own directory
     into("${name}/impl") {
-        from configurations.formatter.filter { !configurations.runtimeClasspath.contains(it) }
+        // Note that we don't filter down the jars in the impl directory due to behavior when
+        // the formatter is bootstrapped with jdk16+ exports.
+        from configurations.formatter
     }
 }
 
