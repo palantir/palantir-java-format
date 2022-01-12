@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Fix the intellij plugin when the bundled formatter is used
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/619

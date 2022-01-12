@@ -19,8 +19,9 @@ apply plugin: 'org.jetbrains.intellij'
 
 apply plugin: 'com.palantir.external-publish-jar'
 
+def name = "palantir-java-format"
 intellij {
-    pluginName = "palantir-java-format"
+    pluginName = name
     updateSinceUntilBuild = true
     version = "IU-202.6397.94"
     plugins = ['java']
@@ -73,8 +74,8 @@ tasks.withType(org.jetbrains.intellij.tasks.PrepareSandboxTask) {
     dependsOn configurations.runtimeClasspath
 
     // Also pack the formatter in its own directory
-    into("${pluginName}/impl") {
-        from configurations.formatter
+    into("${name}/impl") {
+        from configurations.formatter.filter { !configurations.runtimeClasspath.contains(it) }
     }
 }
 

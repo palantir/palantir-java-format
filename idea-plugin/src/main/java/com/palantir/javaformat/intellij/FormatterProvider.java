@@ -83,13 +83,9 @@ final class FormatterProvider {
 
     private static List<Path> getBundledImplementationUrls() {
         // Load from the jars bundled with the plugin.
-        Path pluginPath = PalantirCodeStyleManager.PLUGIN.getPluginPath();
-        Path implDir = pluginPath.resolve("impl");
-        // Directory appears to have been renamed from 'impl' to 'lib' in recent idea releases
-        Path pathToUse = Files.isDirectory(implDir) ? implDir : pluginPath.resolve("lib");
-
-        log.debug("Using palantir-java-format implementation bundled with plugin: {}", pathToUse);
-        return listDirAsUrlsUnchecked(pathToUse);
+        Path implDir = PalantirCodeStyleManager.PLUGIN.getPath().toPath().resolve("impl");
+        log.debug("Using palantir-java-format implementation bundled with plugin: {}", implDir);
+        return listDirAsUrlsUnchecked(implDir);
     }
 
     private static List<Path> getImplementationUrls(
