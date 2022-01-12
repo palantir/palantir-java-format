@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: Fix Idea plugin regression self-bootstrapping for jdk17
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/620
