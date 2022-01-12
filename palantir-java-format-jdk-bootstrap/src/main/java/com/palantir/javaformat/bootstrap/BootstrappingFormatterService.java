@@ -81,7 +81,7 @@ public final class BootstrappingFormatterService implements FormatterService {
                 .build();
 
         Optional<String> output = FormatterCommandRunner.runWithStdin(command.toArgs(), input);
-        if (output.isEmpty()) {
+        if (output.isEmpty() || output.get().isEmpty()) {
             return ImmutableList.of();
         }
         return MAPPER.readValue(output.get(), new TypeReference<>() {});
