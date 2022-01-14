@@ -60,6 +60,7 @@ dependencies {
     }
 
     formatter project(':palantir-java-format')
+    implementation 'com.palantir.safe-logging:logger'
 }
 
 tasks.withType(JavaCompile).configureEach {
