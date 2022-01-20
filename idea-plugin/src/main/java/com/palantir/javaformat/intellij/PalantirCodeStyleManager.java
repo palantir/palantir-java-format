@@ -44,20 +44,20 @@ import com.intellij.serviceContainer.NonInjectable;
 import com.intellij.util.IncorrectOperationException;
 import com.palantir.javaformat.java.FormatterException;
 import com.palantir.javaformat.java.FormatterService;
-import com.palantir.logsafe.logger.SafeLogger;
-import com.palantir.logsafe.logger.SafeLoggerFactory;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link CodeStyleManager} implementation which formats .java files with palantir-java-format. Formatting of all
  * other types of files is delegated to IJ's default implementation.
  */
 final class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
-    private static final SafeLogger log = SafeLoggerFactory.get(PalantirCodeStyleManager.class);
+    private static final Logger log = LoggerFactory.getLogger(PalantirCodeStyleManager.class);
     private static final String PLUGIN_ID = "palantir-java-format";
     static final IdeaPluginDescriptor PLUGIN = Preconditions.checkNotNull(
             PluginManager.getPlugin(PluginId.getId(PLUGIN_ID)), "Couldn't find our own plugin: %s", PLUGIN_ID);
