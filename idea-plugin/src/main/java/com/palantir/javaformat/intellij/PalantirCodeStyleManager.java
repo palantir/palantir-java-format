@@ -56,6 +56,7 @@ import org.slf4j.LoggerFactory;
  * A {@link CodeStyleManager} implementation which formats .java files with palantir-java-format. Formatting of all
  * other types of files is delegated to IJ's default implementation.
  */
+@SuppressWarnings("PreferSafeLogger")
 final class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
     private static final Logger log = LoggerFactory.getLogger(PalantirCodeStyleManager.class);
     private static final String PLUGIN_ID = "palantir-java-format";

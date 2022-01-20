@@ -64,6 +64,10 @@ dependencies {
 
 tasks.withType(JavaCompile).configureEach {
     options.errorprone.disable 'StrictUnusedVariable'
+    // opt out of safe-logging checks which don't map correctly to idea plugins
+    options.errorprone.disable 'PreferSafeLogger'
+    options.errorprone.disable 'PreferSafeLoggableExceptions'
+    options.errorprone.disable 'PreferSafeLoggingPreconditions'
 }
 
 check.dependsOn buildPlugin, verifyPlugin
