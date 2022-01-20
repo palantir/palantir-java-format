@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Fix idea plugin failures due to slf4j references
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/636
