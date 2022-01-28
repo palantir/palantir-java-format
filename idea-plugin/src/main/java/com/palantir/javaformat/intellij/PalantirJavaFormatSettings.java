@@ -16,6 +16,7 @@
 
 package com.palantir.javaformat.intellij;
 
+import com.google.common.base.Strings;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
@@ -89,19 +90,20 @@ class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJav
 
     boolean injectedVersionIsOutdated() {
         Optional<String> formatterVersion = computeFormatterVersion();
-        if (formatterVersion.isEmpty()) {
+        Optional<OrderableSlsVersion> implementationVersion = OrderableSlsVersion.safeValueOf(
+                getImplementationVersion().map(v -> v.replace(".dirty", "")).orElse(""));
+
+        if (formatterVersion.isEmpty() || implementationVersion.isEmpty()) {
             return true;
         }
 
-        OrderableSlsVersion implementationVersion =
-                OrderableSlsVersion.valueOf(getImplementationVersion().replace(".dirty", ""));
         OrderableSlsVersion injectedVersion = OrderableSlsVersion.valueOf(formatterVersion.get());
-
-        return injectedVersion.compareTo(implementationVersion) < 0;
+        return injectedVersion.compareTo(implementationVersion.get()) < 0;
     }
 
-    String getImplementationVersion() {
-        return PalantirJavaFormatConfigurable.class.getPackage().getImplementationVersion();
+    Optional<String> getImplementationVersion() {
+        return Optional.ofNullable(Strings.emptyToNull(
+                PalantirJavaFormatConfigurable.class.getPackage().getImplementationVersion()));
     }
 
     Optional<String> computeFormatterVersion() {
@@ -127,7 +129,7 @@ class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJav
     enum EnabledState {
         UNKNOWN,
         ENABLED,
-        DISABLED;
+        DISABLED
     }
 
     static class State {
