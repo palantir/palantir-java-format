@@ -90,13 +90,10 @@ class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJav
 
     boolean injectedVersionIsOutdated() {
         Optional<String> formatterVersion = computeFormatterVersion();
-        if (formatterVersion.isEmpty()) {
-            return true;
-        }
+        Optional<OrderableSlsVersion> implementationVersion = OrderableSlsVersion.safeValueOf(
+                getImplementationVersion().map(v -> v.replace(".dirty", "")).orElse(""));
 
-        Optional<OrderableSlsVersion> implementationVersion =
-                OrderableSlsVersion.safeValueOf(getImplementationVersion().replace(".dirty", ""));
-        if (implementationVersion.isEmpty()) {
+        if (formatterVersion.isEmpty() || implementationVersion.isEmpty()) {
             return true;
         }
 
@@ -104,9 +101,9 @@ class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJav
         return injectedVersion.compareTo(implementationVersion.get()) < 0;
     }
 
-    String getImplementationVersion() {
-        return Strings.nullToEmpty(
-                PalantirJavaFormatConfigurable.class.getPackage().getImplementationVersion());
+    Optional<String> getImplementationVersion() {
+        return Optional.ofNullable(Strings.emptyToNull(
+                PalantirJavaFormatConfigurable.class.getPackage().getImplementationVersion()));
     }
 
     Optional<String> computeFormatterVersion() {
@@ -132,7 +129,7 @@ class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJav
     enum EnabledState {
         UNKNOWN,
         ENABLED,
-        DISABLED;
+        DISABLED
     }
 
     static class State {

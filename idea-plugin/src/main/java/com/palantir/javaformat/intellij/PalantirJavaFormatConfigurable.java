@@ -97,7 +97,7 @@ class PalantirJavaFormatConfigurable extends BaseConfigurable implements Searcha
         PalantirJavaFormatSettings settings = PalantirJavaFormatSettings.getInstance(project);
         enable.setSelected(settings.isEnabled());
         styleComboBox.setSelectedItem(UiFormatterStyle.convert(settings.getStyle()));
-        pluginVersion.setText(settings.getImplementationVersion());
+        pluginVersion.setText(settings.getImplementationVersion().orElse("unknown"));
         formatterVersion.setText(getFormatterVersionText(settings));
     }
 
