@@ -29,7 +29,7 @@ org.derive4j:derive4j-annotation:1.1.1 (1 constraints: 0505f435)
 org.eclipse.jgit:org.eclipse.jgit:5.13.0.202109080827-r (2 constraints: 562b9625)
 org.functionaljava:functionaljava:4.8 (1 constraints: b0042b2c)
 org.immutables:value:2.9.0 (1 constraints: 0d051036)
-org.slf4j:slf4j-api:1.7.35 (2 constraints: bc134c7c)
+org.slf4j:slf4j-api:1.7.36 (2 constraints: bd13787c)
 
 [Test dependencies]
 cglib:cglib-nodep:3.3.0 (2 constraints: 7a1acf3c)
