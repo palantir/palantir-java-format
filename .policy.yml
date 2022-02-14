@@ -8,7 +8,7 @@ policy:
       - two admins have approved
       - changelog only and contributor approval
       - fixing excavator
-      - excavator only touched baseline, circle, gradle files, godel files, docker-compose-rule config or versions.props
+      - excavator only touched baseline, circle, gradle files, godel files, go dependencies, docker-compose-rule config or versions.props
       - excavator only touched config files
       - bots updated package.json and lock files
   disapproval:
@@ -60,7 +60,7 @@ approval_rules:
       has_author_in:
         users: [ "svc-excavator-bot" ]
 
-  - name: excavator only touched baseline, circle, gradle files, godel files, docker-compose-rule config or versions.props
+  - name: excavator only touched baseline, circle, gradle files, godel files, go dependencies, docker-compose-rule config or versions.props
     requires:
       count: 0
     if:
@@ -75,13 +75,18 @@ approval_rules:
           - "^\\.circleci/.*$"
           - "^\\.docker-compose-rule\\.yml$"
           - "^.*gradle$"
+          - "^\\.palantir/go-version$"
           - "^gradle/wrapper/.*"
           - "^gradlew$"
           - "^gradlew.bat$"
           - "^gradle.properties$"
           - "^settings.gradle$"
+          - "^go.mod$"
+          - "^go.sum$"
           - "^godelw$"
           - "^godel/config/godel.properties$"
+          - "^godel/config/godel.yml$"
+          - "^vendor/.*$"
           - "^versions.props$"
           - "^versions.lock$"
       has_valid_signatures_by_keys:
