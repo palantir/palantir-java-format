@@ -3,6 +3,7 @@
 policy:
   approval:
     - or:
+      - infrastructure-notify has been notified
       - one admin has approved (PR contributors not allowed)
       - two admins have approved
       - changelog only and contributor approval
@@ -15,6 +16,15 @@ policy:
       organizations: [ "palantir" ]
 
 approval_rules:
+  - name: infrastructure-notify has been notified
+    options:
+      allow_contributor: false
+      request_review:
+        enabled: true
+    requires:
+      count: 1
+      teams: [ "palantir/infrastructure-notify" ]
+
   - name: one admin has approved (PR contributors not allowed)
     options:
       allow_contributor: false
