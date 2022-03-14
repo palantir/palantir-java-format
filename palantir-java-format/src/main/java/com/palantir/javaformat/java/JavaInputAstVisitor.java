@@ -2255,7 +2255,12 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 builder.addAll(breakFillList(Optional.empty()));
             }
             if (nextIsModifier()) {
-                token(builder.peekToken().get());
+                String currentToken = builder.peekToken().get();
+                token(currentToken);
+                if (currentToken.equals("non")) {
+                    token(builder.peekToken().get());
+                    token(builder.peekToken().get());
+                }
             } else {
                 scan(annotations.removeFirst(), null);
                 lastWasAnnotation = true;
@@ -2281,7 +2286,8 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             case "strictfp":
             case "default":
             case "sealed":
-            case "non-sealed":
+            case "non":
+            case "-":
                 return true;
             default:
                 return false;
