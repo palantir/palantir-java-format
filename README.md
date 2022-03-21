@@ -134,6 +134,14 @@ allprojects {
 }
 ```
 
+Applying this automatically configures IntelliJ, whether you run `./gradlew idea`
+or import the project directly from IntelliJ, to use the correct version of the formatter
+when formatting java code.
+
+If using [com.palantir.baseline-idea](https://plugins.gradle.org/plugin/com.palantir.baseline-idea)
+in conjunction with this plugin, the Save Actions IntelliJ plugin will be recommended
+and automatically configured to auto-format all your java source files on save.
+
 ## Maven Integration via Spotless
 
 palantir-java-format is supported by [spotless](https://github.com/diffplug/spotless/blob/main/plugin-maven/README.md#palantir-java-format)
@@ -154,14 +162,6 @@ out of the box.
     </configuration>
 </plugin>
 ```
-
-Applying this automatically configures IntelliJ, whether you run `./gradlew idea`
-or import the project directly from IntelliJ, to use the correct version of the formatter
-when formatting java code.
-
-If using [com.palantir.baseline-idea](https://plugins.gradle.org/plugin/com.palantir.baseline-idea)
-in conjunction with this plugin, the Save Actions IntelliJ plugin will be recommended
-and automatically configured to auto-format all your java source files on save.
 
 ## IntelliJ plugin
 
