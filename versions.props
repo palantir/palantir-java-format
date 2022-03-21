@@ -17,4 +17,4 @@ org.immutables:value = 2.8.8
 org.junit.jupiter:* = 5.8.2
 org.junit.vintage:* = 5.8.2
 org.slf4j:slf4j-api = 1.7.36
-com.fasterxml.jackson.*:* = 2.11.1
+com.fasterxml.jackson.*:* = 2.13.2
