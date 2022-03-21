@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: bump jackson to 2.13.2
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/676
