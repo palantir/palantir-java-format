@@ -49,7 +49,7 @@ public final class FileBasedTests {
                     .putAll(14, "Records", "RSL", "Var", "ExpressionSwitch", "I574", "I594")
                     .putAll(15, "I603")
                     .putAll(16, "I588")
-                    .putAll(17, "I683", "I684")
+                    .putAll(17, "I683", "I684", "I696")
                     .build();
 
     private final Class<?> testClass;
