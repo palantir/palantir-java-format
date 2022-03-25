@@ -18,3 +18,4 @@ org.junit.jupiter:* = 5.8.2
 org.junit.vintage:* = 5.8.2
 org.slf4j:slf4j-api = 1.7.36
 com.fasterxml.jackson.*:* = 2.13.2
+com.fasterxml.jackson.core:jackson-databind = 2.13.2.1
