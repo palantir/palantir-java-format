@@ -2817,8 +2817,8 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         if (!e.getKind().equals(METHOD_INVOCATION)) {
             return false;
         }
-        return ((MethodInvocationTree) e).getArguments().stream()
-                .anyMatch(argExpr -> argExpr.getKind().equals(LAMBDA_EXPRESSION));
+        return ((MethodInvocationTree) e)
+                .getArguments().stream().anyMatch(argExpr -> argExpr.getKind().equals(LAMBDA_EXPRESSION));
     }
 
     // avoid formattings like:
