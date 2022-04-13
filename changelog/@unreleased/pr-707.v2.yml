@@ -1,0 +1,16 @@
+type: improvement
+improvement:
+  description: "Break on lambda argument in method chain\n\n## Before this PR\nChained
+    calls involving lambda expressions don't line break, which conflicts with checkstyle
+    (at least the gradle-baseline checkstyle config)\n\n```java\nclass PalantirLambdaInliningPrefersBreak
+    {\n    void foo() {\n        return hello.read(txn -> {\n                    doSomeWork();\n
+    \                   doSomeMoreWork();\n                })\n                .chainedCall(()
+    -> {\n                    doSomeWork();\n                });\n    }\n}\n\n```\n\n##
+    After this PR\n\n```java\nclass PalantirLambdaInliningPrefersBreak {\n    void
+    foo() {\n        return hello\n                .read(txn -> {\n                    doSomeWork();\n
+    \                   doSomeMoreWork();\n                })\n                .chainedCall(()
+    -> {\n                    doSomeWork();\n                });\n    }\n}\n```\n\n##
+    Possible downsides?\n\U0001F937‍♂️  I've also added a test to show that non-chained
+    lambda calls don't include a line break"
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/707
