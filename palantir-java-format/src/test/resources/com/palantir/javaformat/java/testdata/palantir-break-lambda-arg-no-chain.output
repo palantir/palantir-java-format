@@ -1,4 +1,4 @@
-class PalantirLambdaInliningPrefersBreak {
+class PalantirLambdaBreakChain {
     void foo() {
         return hello.read(txn -> {
             doSomeWork();
