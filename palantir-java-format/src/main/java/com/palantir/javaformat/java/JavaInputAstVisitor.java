@@ -35,6 +35,7 @@ import static com.sun.source.tree.Tree.Kind.ASSIGNMENT;
 import static com.sun.source.tree.Tree.Kind.BLOCK;
 import static com.sun.source.tree.Tree.Kind.EXTENDS_WILDCARD;
 import static com.sun.source.tree.Tree.Kind.IF;
+import static com.sun.source.tree.Tree.Kind.LAMBDA_EXPRESSION;
 import static com.sun.source.tree.Tree.Kind.METHOD_INVOCATION;
 import static com.sun.source.tree.Tree.Kind.NEW_ARRAY;
 import static com.sun.source.tree.Tree.Kind.NEW_CLASS;
@@ -2783,7 +2784,11 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         int length = needDot0 ? minLength : 0;
         for (ExpressionTree e : items) {
             if (needDot) {
-                if (length > minLength) {
+                // Also break if invoked with a lambda -- palantir-break-lambda-arg
+                // foo
+                //     .doSomething(() -> bar())
+                //     .doSomethingElse();
+                if (length > minLength || methodHasLambdaArg(e)) {
                     builder.breakOp(Break.builder()
                             .fillMode(FillMode.UNIFIED)
                             .flat("")
@@ -2806,6 +2811,14 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         if (!needDot0) {
             builder.close();
         }
+    }
+
+    private boolean methodHasLambdaArg(ExpressionTree e) {
+        if (!e.getKind().equals(METHOD_INVOCATION)) {
+            return false;
+        }
+        return ((MethodInvocationTree) e).getArguments().stream()
+                .anyMatch(argExpr -> argExpr.getKind().equals(LAMBDA_EXPRESSION));
     }
 
     // avoid formattings like:

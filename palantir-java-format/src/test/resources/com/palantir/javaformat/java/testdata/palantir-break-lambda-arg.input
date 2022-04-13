@@ -1,0 +1,11 @@
+class PalantirLambdaInliningPrefersBreak {
+    void foo() {
+        return hello.read(txn -> {
+                    doSomeWork();
+                    doSomeMoreWork();
+                })
+                .chainedCall(() -> {
+                    doSomeWork();
+                });
+    }
+}
