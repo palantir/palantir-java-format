@@ -1,0 +1,12 @@
+type: fix
+fix:
+  description: |-
+    Only apply line break to lambdas with statements
+
+    ## Before this PR
+    Previous PR #707 was a little aggressive and inserted line breaks for non-statement lambdas.
+
+    ## After this PR
+    Only multi-line lambdas cause a line-break in the method chain.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/708
