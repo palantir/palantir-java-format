@@ -7,7 +7,7 @@ buildscript {
     dependencies {
         classpath 'com.palantir.gradle.externalpublish:gradle-external-publish-plugin:1.11.0'
         classpath 'com.palantir.javaformat:gradle-palantir-java-format:2.22.0'
-        classpath 'com.palantir.gradle.revapi:gradle-revapi:1.6.0'
+        classpath 'com.palantir.gradle.revapi:gradle-revapi:1.7.0'
         classpath 'com.palantir.baseline:gradle-baseline-java:4.107.0'
         classpath 'gradle.plugin.org.inferred:gradle-processors:3.6.0'
         classpath 'com.palantir.gradle.gitversion:gradle-git-version:0.15.0'
