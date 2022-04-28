@@ -35,7 +35,6 @@ import static com.sun.source.tree.Tree.Kind.ASSIGNMENT;
 import static com.sun.source.tree.Tree.Kind.BLOCK;
 import static com.sun.source.tree.Tree.Kind.EXTENDS_WILDCARD;
 import static com.sun.source.tree.Tree.Kind.IF;
-import static com.sun.source.tree.Tree.Kind.LAMBDA_EXPRESSION;
 import static com.sun.source.tree.Tree.Kind.METHOD_INVOCATION;
 import static com.sun.source.tree.Tree.Kind.NEW_ARRAY;
 import static com.sun.source.tree.Tree.Kind.NEW_CLASS;
@@ -107,7 +106,6 @@ import com.sun.source.tree.InstanceOfTree;
 import com.sun.source.tree.IntersectionTypeTree;
 import com.sun.source.tree.LabeledStatementTree;
 import com.sun.source.tree.LambdaExpressionTree;
-import com.sun.source.tree.LambdaExpressionTree.BodyKind;
 import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.MemberReferenceTree;
 import com.sun.source.tree.MemberSelectTree;
@@ -2785,13 +2783,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         int length = needDot0 ? minLength : 0;
         for (ExpressionTree e : items) {
             if (needDot) {
-                // Also break if invoked with a multi-statement lambda -- palantir-break-lambda-arg
-                // foo
-                //     .doSomething(() -> {
-                //         bar();
-                //      })
-                //     .doSomethingElse();
-                if (length > minLength || methodHasMultiStatementLambdaArg(e)) {
+                if (length > minLength) {
                     builder.breakOp(Break.builder()
                             .fillMode(FillMode.UNIFIED)
                             .flat("")
@@ -2814,17 +2806,6 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         if (!needDot0) {
             builder.close();
         }
-    }
-
-    private boolean methodHasMultiStatementLambdaArg(ExpressionTree e) {
-        if (!e.getKind().equals(METHOD_INVOCATION)) {
-            return false;
-        }
-        return ((MethodInvocationTree) e)
-                .getArguments().stream()
-                        .filter(argExpr -> argExpr.getKind().equals(LAMBDA_EXPRESSION))
-                        .map(argExpr -> (LambdaExpressionTree) argExpr)
-                        .anyMatch(lambda -> lambda.getBodyKind().equals(BodyKind.STATEMENT));
     }
 
     // avoid formattings like:
