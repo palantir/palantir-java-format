@@ -1,7 +1,6 @@
 class PalantirLambdaBreakChain {
     void foo() {
-        return hello
-                .read(txn -> {
+        return hello.read(txn -> {
                     doSomeWork();
                     doSomeMoreWork();
                 })
