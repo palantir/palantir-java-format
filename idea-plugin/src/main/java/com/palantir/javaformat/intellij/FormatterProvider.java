@@ -23,6 +23,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.JdkUtil;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.roots.ProjectRootManager;
+import com.intellij.openapi.util.SystemInfo;
 import com.palantir.javaformat.bootstrap.BootstrappingFormatterService;
 import com.palantir.javaformat.java.FormatterService;
 import com.palantir.logsafe.Preconditions;
@@ -109,7 +110,7 @@ final class FormatterProvider {
         return getProjectJdk(project)
                 .map(Sdk::getHomePath)
                 .map(Path::of)
-                .map(sdkHome -> sdkHome.resolve("bin").resolve("java"))
+                .map(sdkHome -> sdkHome.resolve("bin").resolve("java" + (SystemInfo.isWindows ? ".exe" : "")))
                 .filter(Files::exists)
                 .orElseThrow(() -> new IllegalStateException("Could not determine jdk path for project " + project));
     }
