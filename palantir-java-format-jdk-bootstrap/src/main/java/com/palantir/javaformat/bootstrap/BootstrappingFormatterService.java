@@ -127,7 +127,7 @@ public final class BootstrappingFormatterService implements FormatterService {
                             "-cp",
                             implementationClasspath().stream()
                                     .map(path -> path.toAbsolutePath().toString())
-                                    .collect(Collectors.joining(":")))
+                                    .collect(Collectors.joining(System.getProperty("path.separator"))))
                     .add(FORMATTER_MAIN_CLASS);
 
             if (!characterRanges().isEmpty()) {

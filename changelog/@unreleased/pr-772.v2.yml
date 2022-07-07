@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Fix problems on windows
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/772

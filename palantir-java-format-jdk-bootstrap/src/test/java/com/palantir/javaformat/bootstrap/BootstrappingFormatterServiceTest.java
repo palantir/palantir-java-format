@@ -27,6 +27,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
@@ -96,6 +97,10 @@ final class BootstrappingFormatterServiceTest {
 
     private static Path javaBinPath() {
         String javaHome = Preconditions.checkNotNull(System.getProperty("java.home"), "java.home property not set");
-        return Path.of(javaHome).resolve("bin").resolve("java");
+        return Path.of(javaHome).resolve("bin").resolve("java" + (isWindows() ? ".exe" : ""));
+    }
+
+    private static boolean isWindows() {
+        return System.getProperty("os.name").toLowerCase(Locale.ROOT).startsWith("windows");
     }
 }
