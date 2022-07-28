@@ -1,4 +1,4 @@
-com.diffplug.spotless:spotless-plugin-gradle = 6.8.0
+com.diffplug.spotless:spotless-plugin-gradle = 6.9.0
 com.github.ben-manes.caffeine:caffeine = 3.1.1
 com.google.auto.service:auto-service = 1.0.1
 com.google.code.findbugs:jsr305 = 3.0.2
