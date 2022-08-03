@@ -28,9 +28,6 @@ import com.intellij.openapi.util.SystemInfo;
 import com.palantir.javaformat.bootstrap.BootstrappingFormatterService;
 import com.palantir.javaformat.java.FormatterService;
 import com.palantir.logsafe.Preconditions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -45,6 +42,8 @@ import java.util.ServiceLoader;
 import java.util.jar.Attributes.Name;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 final class FormatterProvider {
     private static final Logger log = LoggerFactory.getLogger(FormatterProvider.class);
