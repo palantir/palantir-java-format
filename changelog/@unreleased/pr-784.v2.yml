@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: Support ea versions of Java
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/784

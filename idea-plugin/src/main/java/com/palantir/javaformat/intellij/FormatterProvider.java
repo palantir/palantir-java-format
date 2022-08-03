@@ -18,6 +18,7 @@ package com.palantir.javaformat.intellij;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Iterables;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.JdkUtil;
@@ -126,9 +127,15 @@ final class FormatterProvider {
         // or 'openjdk version "15.0.2"'.
         String version = Preconditions.checkNotNull(
                 JdkUtil.getJdkMainAttribute(sdk, Name.IMPLEMENTATION_VERSION), "JDK version is null");
+        return parseSdkJavaVersion(version);
+    }
+
+    @VisibleForTesting
+    static Integer parseSdkJavaVersion(String version) {
         int indexOfVersionDelimiter = version.indexOf('.');
         String normalizedVersion =
                 indexOfVersionDelimiter >= 0 ? version.substring(0, indexOfVersionDelimiter) : version;
+        normalizedVersion = normalizedVersion.replaceAll("-ea", "");
         try {
             return Integer.parseInt(normalizedVersion);
         } catch (NumberFormatException e) {
