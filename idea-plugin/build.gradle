@@ -60,6 +60,9 @@ dependencies {
     }
 
     formatter project(':palantir-java-format')
+
+    testImplementation 'org.assertj:assertj-core'
+    testImplementation 'org.junit.jupiter:junit-jupiter'
 }
 
 tasks.withType(JavaCompile).configureEach {

@@ -18,6 +18,7 @@ package com.palantir.javaformat.intellij;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Iterables;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.JdkUtil;
@@ -27,6 +28,9 @@ import com.intellij.openapi.util.SystemInfo;
 import com.palantir.javaformat.bootstrap.BootstrappingFormatterService;
 import com.palantir.javaformat.java.FormatterService;
 import com.palantir.logsafe.Preconditions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -41,8 +45,6 @@ import java.util.ServiceLoader;
 import java.util.jar.Attributes.Name;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 final class FormatterProvider {
     private static final Logger log = LoggerFactory.getLogger(FormatterProvider.class);
@@ -126,9 +128,15 @@ final class FormatterProvider {
         // or 'openjdk version "15.0.2"'.
         String version = Preconditions.checkNotNull(
                 JdkUtil.getJdkMainAttribute(sdk, Name.IMPLEMENTATION_VERSION), "JDK version is null");
+        return parseSdkJavaVersion(version);
+    }
+
+    @VisibleForTesting
+    static Integer parseSdkJavaVersion(String version) {
         int indexOfVersionDelimiter = version.indexOf('.');
         String normalizedVersion =
                 indexOfVersionDelimiter >= 0 ? version.substring(0, indexOfVersionDelimiter) : version;
+        normalizedVersion = normalizedVersion.replaceAll("-ea", "");
         try {
             return Integer.parseInt(normalizedVersion);
         } catch (NumberFormatException e) {
