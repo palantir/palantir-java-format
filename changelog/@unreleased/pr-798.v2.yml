@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: Use bootstrapping formatter starting from Intellij 2022.2
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/798
