@@ -20,10 +20,12 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Iterables;
+import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.JdkUtil;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.roots.ProjectRootManager;
+import com.intellij.openapi.util.BuildNumber;
 import com.intellij.openapi.util.SystemInfo;
 import com.palantir.javaformat.bootstrap.BootstrappingFormatterService;
 import com.palantir.javaformat.java.FormatterService;
@@ -65,8 +67,10 @@ final class FormatterProvider {
         List<Path> implementationClasspath =
                 getImplementationUrls(cacheKey.implementationClassPath, cacheKey.useBundledImplementation);
 
-        // Enable the bootstrapping formatter for projects using Java 15+ as they might use new language features.
-        if (jdkMajorVersion >= 15) {
+        // When running with JDK 15+ or using newer language features, we use the bootstrapping formatter which injects
+        // required "--add-exports" args.
+        if (useBootstrappingFormatter(
+                jdkMajorVersion, ApplicationInfo.getInstance().getBuild())) {
             Path jdkPath = getJdkPath(cacheKey.project);
             log.info("Using bootstrapping formatter with jdk version {} and path: {}", jdkMajorVersion, jdkPath);
             return new BootstrappingFormatterService(jdkPath, jdkMajorVersion, implementationClasspath);
@@ -77,6 +81,17 @@ final class FormatterProvider {
         URL[] implementationUrls = toUrlsUnchecked(implementationClasspath);
         ClassLoader classLoader = new URLClassLoader(implementationUrls, FormatterService.class.getClassLoader());
         return Iterables.getOnlyElement(ServiceLoader.load(FormatterService.class, classLoader));
+    }
+
+    /**
+     * When projects use JDK 15+ as their SDK, they might use newer language features which are only supported by the
+     * bootstrapping formatter.
+     * Separately, starting from 2022.2 (branch number '222'), Intellij now runs with JDK 17 which also requires the
+     * bootstrapping formatter. See https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html for
+     * how the build number is formatted.
+     */
+    private static boolean useBootstrappingFormatter(int jdkMajorVersion, BuildNumber buildNumber) {
+        return jdkMajorVersion >= 15 || buildNumber.getBaselineVersion() >= 222;
     }
 
     private static List<Path> getProvidedImplementationUrls(List<URI> implementationClasspath) {
