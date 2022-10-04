@@ -41,6 +41,12 @@ jobs:
             echo "$TAGS_TO_DELETE" | while read -r TAG; do git tag -d "$TAG" 1>/dev/null; done
       - restore_cache: { key: 'gradle-wrapper-v1-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
       - restore_cache: { key: 'check-gradle-cache-v1-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
+      - run:
+          name: check-setup
+          command: |
+            if [ -x .circleci/check-setup.sh ]; then
+                echo "Running check-setup" && .circleci/check-setup.sh && echo "check-setup complete"
+            fi
       - run: ./gradlew --parallel --stacktrace --continue --max-workers=2 check -Porg.gradle.java.installations.fromEnv=JAVA_8_HOME,JAVA_11_HOME,JAVA_15_HOME,JAVA_17_HOME,JAVA_HOME
       - persist_to_workspace:
           root: /home/circleci
