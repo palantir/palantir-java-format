@@ -78,7 +78,7 @@ public abstract class OpenOp extends HasUniqueId implements Op {
      * But you can still get this (see test B20128760):
      *
      * <pre>
-     * Stream<ItemKey> itemIdsStream = stream(members).flatMap(m -> m.getFieldValues().entrySet().stream()
+     * {@code Stream<ItemKey> itemIdsStream = stream(members).flatMap(m -> m.getFieldValues().entrySet().stream()}
      *         .filter(...)
      *         .map(...));
      * </pre>
