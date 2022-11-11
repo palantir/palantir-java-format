@@ -1,0 +1,6 @@
+type: fix
+fix:
+  description: Write configuration to IPR file if it exists, as well as the .idea
+    directory, to avoid errors in legacy projects
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/810
