@@ -86,10 +86,22 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
             createOrUpdateIdeaXmlFile(
                     project.file(".idea/externalDependencies.xml"),
                     node -> ConfigureJavaFormatterXml.configureExternalDependencies(node));
+            updateIdeaXmlFileIfExists(project.file(project.getName() + ".ipr"), node -> {
+                ConfigureJavaFormatterXml.configureJavaFormat(node, uris);
+                ConfigureJavaFormatterXml.configureExternalDependencies(node);
+            });
         });
     }
 
     private static void createOrUpdateIdeaXmlFile(File configurationFile, Consumer<Node> configure) {
+        updateIdeaXmlFile(configurationFile, configure, true);
+    }
+
+    private static void updateIdeaXmlFileIfExists(File configurationFile, Consumer<Node> configure) {
+        updateIdeaXmlFile(configurationFile, configure, false);
+    }
+
+    private static void updateIdeaXmlFile(File configurationFile, Consumer<Node> configure, boolean createIfAbsent) {
         Node rootNode;
         if (configurationFile.isFile()) {
             try {
@@ -98,6 +110,9 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
                 throw new RuntimeException("Couldn't parse existing configuration file: " + configurationFile, e);
             }
         } else {
+            if (!createIfAbsent) {
+                return;
+            }
             rootNode = new Node(null, "project", ImmutableMap.of("version", "4"));
         }
 
