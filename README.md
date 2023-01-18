@@ -29,7 +29,7 @@ Many other languages have already adopted formatters enthusiastically, including
 
 ## Motivation & examples
 
-(1) before:
+(1) google-java-format output:
 
 ```java
 private static void configureResolvedVersionsWithVersionMapping(Project project) {
@@ -53,7 +53,7 @@ private static void configureResolvedVersionsWithVersionMapping(Project project)
 }
 ```
 
-(1) after:
+(1) palantir-java-format output:
 
 ```java
 private static void configureResolvedVersionsWithVersionMapping(Project project) {
@@ -69,7 +69,7 @@ private static void configureResolvedVersionsWithVersionMapping(Project project)
 }
 ```
 
-(2) before:
+(2) google-java-format output:
 
 ```java
 private static GradleException notFound(
@@ -87,7 +87,7 @@ private static GradleException notFound(
 }
 ```
 
-(2) after:
+(2) palantir-java-format output:
 
 ```java
 private static GradleException notFound(String group, String name, Configuration configuration) {
