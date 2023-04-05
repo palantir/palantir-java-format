@@ -35,12 +35,44 @@ class ConfigureJavaFormatterXml {
         matchOrCreateChild(externalDependencies, 'plugin', [id: 'palantir-java-format'])
     }
 
-    private static Node matchOrCreateChild(Node base, String name, Map attributes = [:], Map defaults = [:]) {
-        def child = base[name].find { it.attributes().entrySet().containsAll(attributes.entrySet()) }
-        if (child) {
-            return child
+    static void configureFormatOnSave(Node rootNode) {
+        def formatOnSaveOptions = matchOrCreateChild(rootNode, 'component', [name: 'FormatOnSaveOptions'])
+
+
+        def myRunOnSave = matchOrCreateChild(formatOnSaveOptions, 'option', [name: 'myRunOnSave'])
+
+        def myRunOnSaveAlreadySet = Optional.ofNullable(myRunOnSave.attribute('value'))
+                .map(Boolean::parseBoolean)
+                .orElse(false)
+
+        myRunOnSave.attributes().put('value', 'true')
+
+        def myAllFileTypesSelectedAlreadySet = matchChild(formatOnSaveOptions, 'option', [name: 'myAllFileTypesSelected'])
+                .map { Boolean.parseBoolean(it.attribute('value')) }
+                .orElse(true)
+
+        if (myRunOnSaveAlreadySet && myAllFileTypesSelectedAlreadySet) {
+            // If the user has already configured IntelliJ to format all file types, we
+            return
         }
 
-        return base.appendNode(name, attributes + defaults)
+        matchOrCreateChild(formatOnSaveOptions, 'option', [name: 'myAllFileTypesSelected']).attributes().put('value', 'false')
+
+
+        def mySelectedFileTypes = matchOrCreateChild(formatOnSaveOptions, 'option', [name: 'mySelectedFileTypes'])
+        def set = matchOrCreateChild(mySelectedFileTypes, 'set')
+        matchOrCreateChild(set, 'option', [value: 'JAVA'])
+    }
+
+    private static Node matchOrCreateChild(Node base, String name, Map attributes = [:], Map defaults = [:]) {
+        matchChild(base, name, attributes).orElseGet {
+            base.appendNode(name, attributes + defaults)
+        }
+    }
+
+    private static Optional<Node> matchChild(Node base, String name, Map attributes = [:]) {
+        def child = base[name].find { it.attributes().entrySet().containsAll(attributes.entrySet()) }
+
+        return Optional.ofNullable(child)
     }
 }
