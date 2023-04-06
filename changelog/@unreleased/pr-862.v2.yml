@@ -1,0 +1,6 @@
+type: fix
+fix:
+  description: Stop using the Save Actions plugin (broken in IntelliJ 2023.1) and
+    use native format on save (requires IntelliJ >=2021.2)
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/862
