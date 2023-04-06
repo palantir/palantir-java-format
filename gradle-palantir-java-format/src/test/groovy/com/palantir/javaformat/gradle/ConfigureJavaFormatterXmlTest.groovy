@@ -104,6 +104,104 @@ class ConfigureJavaFormatterXmlTest extends Specification {
         xmlToString(node) == EXPECTED
     }
 
+    void 'adds FormatOnSave block where none exists'() {
+        // language=xml
+        def node = new XmlParser().parseText '''
+            <root>
+            </root>
+        '''.stripIndent(true)
+
+        when:
+        ConfigureJavaFormatterXml.configureFormatOnSave(node)
+        def newXml = xmlToString(node).strip()
+
+        then:
+        // language=xml
+        def expected = '''
+            <root>
+              <component name="FormatOnSaveOptions">
+                <option name="myRunOnSave" value="true"/>
+                <option name="myAllFileTypesSelected" value="false"/>
+                <option name="mySelectedFileTypes">
+                  <set>
+                    <option value="JAVA"/>
+                  </set>
+                </option>
+              </component>
+            </root>
+        '''.stripIndent(true).strip()
+
+        newXml == expected
+    }
+
+    void 'adds Java to existing FormatOnSave block'() {
+        // language=xml
+        def node = new XmlParser().parseText '''
+            <root>
+              <component name="FormatOnSaveOptions">
+                <option name="myRunOnSave" value="true"/>
+                <option name="myAllFileTypesSelected" value="false"/>
+                <option name="mySelectedFileTypes">
+                  <set>
+                    <option value="Go"/>
+                  </set>
+                </option>
+              </component>
+            </root>
+        '''.stripIndent(true)
+
+        when:
+        ConfigureJavaFormatterXml.configureFormatOnSave(node)
+        def newXml = xmlToString(node).strip()
+
+        then:
+        // language=xml
+        def expected = '''
+            <root>
+              <component name="FormatOnSaveOptions">
+                <option name="myRunOnSave" value="true"/>
+                <option name="myAllFileTypesSelected" value="false"/>
+                <option name="mySelectedFileTypes">
+                  <set>
+                    <option value="Go"/>
+                    <option value="JAVA"/>
+                  </set>
+                </option>
+              </component>
+            </root>
+        '''.stripIndent(true).strip()
+
+        newXml == expected
+    }
+
+    void 'if all file types are already formatted on save, dont change anything'() {
+        // language=xml
+        def node = new XmlParser().parseText '''
+            <root>
+              <component name="FormatOnSaveOptions">
+                <option name="myRunOnSave" value="true"/>
+                <!-- if myAllFileTypesSelected does not exist, it defaults to true -->
+              </component>
+            </root>
+        '''.stripIndent(true)
+
+        when:
+        ConfigureJavaFormatterXml.configureFormatOnSave(node)
+        def newXml = xmlToString(node).strip()
+
+        then:
+        // language=xml
+        def expected = '''
+            <root>
+              <component name="FormatOnSaveOptions">
+                <option name="myRunOnSave" value="true"/>
+              </component>
+            </root>
+        '''.stripIndent(true).strip()
+
+        newXml == expected
+    }
+
     static String xmlToString(Node node) {
         StringWriter sw = new StringWriter();
         XmlNodePrinter nodePrinter = new XmlNodePrinter(new PrintWriter(sw));
