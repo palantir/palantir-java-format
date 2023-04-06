@@ -52,13 +52,16 @@ class ConfigureJavaFormatterXml {
                 .orElse(true)
 
         if (myRunOnSaveAlreadySet && myAllFileTypesSelectedAlreadySet) {
-            // If the user has already configured IntelliJ to format all file types, we
+            // If the user has already configured IntelliJ to format all file types and turned on formatting on save,
+            // we leave the configuration as is as it will format java code, and we don't want to disable formatting
+            // for other file types
             return
         }
 
+        // Otherwise we setup intellij to not format all files...
         matchOrCreateChild(formatOnSaveOptions, 'option', [name: 'myAllFileTypesSelected']).attributes().put('value', 'false')
 
-
+        // ...but ensure java is formatted
         def mySelectedFileTypes = matchOrCreateChild(formatOnSaveOptions, 'option', [name: 'mySelectedFileTypes'])
         def set = matchOrCreateChild(mySelectedFileTypes, 'set')
         matchOrCreateChild(set, 'option', [value: 'JAVA'])
