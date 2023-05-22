@@ -9,7 +9,6 @@
        See https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html#modules-specific-to-functionality
    -->
   <depends>com.intellij.modules.java</depends>
-  <idea-version since-build="193"/>
 
   <extensions defaultExtensionNs="com.intellij">
     <projectConfigurable instance="com.palantir.javaformat.intellij.PalantirJavaFormatConfigurable"
