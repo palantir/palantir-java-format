@@ -35,7 +35,7 @@ tasks.runIde {
 patchPluginXml {
     pluginDescription = "Formats source code using the palantir-java-format tool."
     version = project.version
-    sinceBuild = '182' // TODO: test against this version of IntelliJ to ensure no regressions
+    sinceBuild = '193' // TODO: test against this version of IntelliJ to ensure no regressions
     untilBuild = ''
 }
 
