@@ -1,0 +1,6 @@
+type: fix
+fix:
+  description: Update intellij compatibility range in IntelliJ plugin `plugin.xml`
+    metadata file, but hopefully correctly this time.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/875
