@@ -241,7 +241,7 @@ public class RemoveUnusedImports {
         return replacements;
     }
 
-    private static String getSimpleName(JCImport importTree) {
+    private static String getSimpleName(ImportTree importTree) {
         return importTree.getQualifiedIdentifier() instanceof JCIdent
                 ? ((JCIdent) importTree.getQualifiedIdentifier()).getName().toString()
                 : ((JCFieldAccess) importTree.getQualifiedIdentifier())
