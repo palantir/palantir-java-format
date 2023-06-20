@@ -44,8 +44,10 @@
               <package name="" withSubpackages="true" static="false" />
             </value>
           </option>
+          <!-- Should be a superset of https://github.com/google/error-prone/blob/c481b3f9c2da112db36ccfcbf64e755261a127ab/core/src/main/java/com/google/errorprone/bugpatterns/BadImport.java#L63 -->
           <DO_NOT_IMPORT_INNER>
             <CLASS name="Builder" />
+            <CLASS name="BuilderFactory" />
             <CLASS name="Callback" />
             <CLASS name="Class" />
             <CLASS name="Entry" />
@@ -54,6 +56,7 @@
             <CLASS name="Type" />
             <CLASS name="Key" />
             <CLASS name="Id" />
+            <CLASS name="Identifier" />
             <CLASS name="Provider" />
           </DO_NOT_IMPORT_INNER>
         </GroovyCodeStyleSettings>
