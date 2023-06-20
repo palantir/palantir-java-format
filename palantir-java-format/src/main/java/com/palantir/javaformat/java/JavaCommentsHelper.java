@@ -15,7 +15,6 @@
 package com.palantir.javaformat.java;
 
 import com.google.common.base.CharMatcher;
-import com.google.common.base.Strings;
 import com.palantir.javaformat.CommentsHelper;
 import com.palantir.javaformat.Input.Tok;
 import com.palantir.javaformat.Newlines;

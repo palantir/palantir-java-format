@@ -19,7 +19,6 @@ package com.palantir.javaformat.doc;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.DiscreteDomain;
 import com.google.common.collect.Range;
-import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.CommentsHelper;
 import com.palantir.javaformat.Input;
 import com.palantir.javaformat.Op;
@@ -40,8 +39,10 @@ public abstract class Doc extends HasUniqueId {
 
     @SuppressWarnings("Immutable") // Effectively immutable
     private final ImmutableSupplier<Float> memoizedWidth = Suppliers.memoize(this::computeWidth)::get;
+
     @SuppressWarnings("Immutable") // Effectively immutable
     private final ImmutableSupplier<String> memoizedFlat = Suppliers.memoize(this::computeFlat)::get;
+
     @SuppressWarnings("Immutable") // Effectively immutable
     private final ImmutableSupplier<Range<Integer>> memoizedRange = Suppliers.memoize(this::computeRange)::get;
 

@@ -26,7 +26,6 @@ import com.sun.source.util.TreePath;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.Pretty;
 import com.sun.tools.javac.tree.TreeInfo;
-import java.io.IOError;
 import java.io.IOException;
 import javax.lang.model.element.Name;
 

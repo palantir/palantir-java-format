@@ -44,7 +44,6 @@ import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.Log;
 import com.sun.tools.javac.util.Options;
-import java.io.IOError;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;

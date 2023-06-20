@@ -1159,9 +1159,10 @@ public final class JavadocFormattingTest {
     }
 
     @Test
+    @SuppressWarnings("UnicodeEscape")
     public void unicodeEscapesNotInterpretedBug() {
         /*
-         * In theory, \u003C should be treated exactly like <, and so too should the escaped versions of
+         * In theory, "\u003C" should be treated exactly like <, and so too should the escaped versions of
          * @, *, and other special chars. We don't recognize that, though, so we don't put what is
          * effectively "<p>" on a new line.
          */
@@ -1212,7 +1213,7 @@ public final class JavadocFormattingTest {
     }
 
     /**
-     * Test that a long {@code {@link #foo(many, arguments)}} while keeping {@code @link} and {@code foo(many} on the
+     * Test that a long {@code "{\@link #foo(many, arguments)}"} while keeping {@code @link} and {@code foo(many} on the
      * same line.
      */
     @Test

@@ -60,6 +60,7 @@ public final class Level extends Doc {
     private static final Collector<Level, ?, Optional<Level>> GET_LAST_COLLECTOR = Collectors.reducing((u, v) -> v);
 
     private final List<Doc> docs = new ArrayList<>(); // The elements of the level.
+
     @SuppressWarnings("Immutable") // Effectively immutable
     private final ImmutableSupplier<SplitsBreaks> memoizedSplitsBreaks =
             Suppliers.memoize(() -> splitByBreaks(docs))::get;

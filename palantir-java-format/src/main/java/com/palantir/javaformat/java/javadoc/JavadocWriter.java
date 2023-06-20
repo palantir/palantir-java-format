@@ -26,7 +26,6 @@ import static com.palantir.javaformat.java.javadoc.Token.Type.HEADER_OPEN_TAG;
 import static com.palantir.javaformat.java.javadoc.Token.Type.LIST_ITEM_OPEN_TAG;
 import static com.palantir.javaformat.java.javadoc.Token.Type.PARAGRAPH_OPEN_TAG;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
 
