@@ -16,7 +16,6 @@
 
 package com.palantir.javaformat.doc;
 
-import com.google.common.base.Strings;
 import com.palantir.javaformat.BreakBehaviours;
 import com.palantir.javaformat.Indent;
 import com.palantir.javaformat.LastLevelBreakability;
@@ -94,6 +93,6 @@ public final class LevelDelimitedFlatValueDocVisitor implements DocVisitor<Strin
     }
 
     private void generateIndent(StringBuilder builder) {
-        builder.append(Strings.repeat(" ", indent));
+        builder.append(" ".repeat(indent));
     }
 }

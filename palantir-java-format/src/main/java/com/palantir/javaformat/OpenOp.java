@@ -134,7 +134,7 @@ public abstract class OpenOp extends HasUniqueId implements Op {
         builder.open(this);
     }
 
-    /** @see ImmutableOpenOp.Builder#Builder() */
+    /** Builder @see ImmutableOpenOp.Builder#Builder(). */
     public static Builder builder() {
         return new Builder();
     }

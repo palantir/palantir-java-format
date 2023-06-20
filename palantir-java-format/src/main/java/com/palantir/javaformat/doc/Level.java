@@ -60,6 +60,8 @@ public final class Level extends Doc {
     private static final Collector<Level, ?, Optional<Level>> GET_LAST_COLLECTOR = Collectors.reducing((u, v) -> v);
 
     private final List<Doc> docs = new ArrayList<>(); // The elements of the level.
+
+    @SuppressWarnings("Immutable") // Effectively immutable
     private final ImmutableSupplier<SplitsBreaks> memoizedSplitsBreaks =
             Suppliers.memoize(() -> splitByBreaks(docs))::get;
     /** The immutable characteristics of this level determined before the level contents are available. */
@@ -147,7 +149,7 @@ public final class Level extends Doc {
                 column = newWidth.get();
                 continue;
             }
-            column += doc.getWidth();
+            column = (int) (column + doc.getWidth());
         }
         // Make an additional check that widthBeforeLastBreak fits in the column limit
         if (getColumnLimitBeforeLastBreak().isPresent()

@@ -417,7 +417,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 visitEnumDeclaration(tree);
                 break;
             default:
-                throw new AssertionError(tree.getKind());
+                throw new IllegalArgumentException(tree.getKind().name());
         }
         return null;
     }
@@ -941,7 +941,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 token("new");
                 break;
             default:
-                throw new AssertionError(node.getMode());
+                throw new IllegalArgumentException(node.getMode().name());
         }
         builder.close();
         builder.close();
@@ -1774,7 +1774,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 token("void");
                 break;
             default:
-                throw new AssertionError(node.getPrimitiveTypeKind());
+                throw new RuntimeException(node.getPrimitiveTypeKind().name());
         }
         return null;
     }
@@ -3378,6 +3378,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     }
 
     /** Declare one variable or variable-like thing. */
+    @SuppressWarnings("TooManyArguments")
     int declareOne(
             DeclarationKind kind,
             Direction annotationsDirection,

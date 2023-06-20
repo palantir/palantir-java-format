@@ -18,7 +18,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.common.io.ByteStreams;
 import com.palantir.javaformat.java.JavaFormatterOptions.Style;
-import java.io.IOError;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
@@ -183,7 +182,7 @@ public final class Main {
         try {
             input = new String(ByteStreams.toByteArray(inStream), UTF_8);
         } catch (IOException e) {
-            throw new IOError(e);
+            throw new RuntimeException(e);
         }
         String stdinFilename = parameters.assumeFilename().orElse(STDIN_FILENAME);
         boolean ok = true;

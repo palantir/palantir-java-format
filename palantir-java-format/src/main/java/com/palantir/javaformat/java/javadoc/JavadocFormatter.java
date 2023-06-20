@@ -137,7 +137,7 @@ public final class JavadocFormatter {
                 case OPTIONAL_LINE_BREAK:
                     break;
                 default:
-                    throw new AssertionError(token.getType());
+                    throw new IllegalArgumentException(token.getType().name());
             }
         }
         throw new IllegalStateException();

@@ -47,7 +47,7 @@ import org.immutables.value.Value;
 /** An {@code OpsBuilder} creates a list of {@link Op}s, which is turned into a {@link Doc} by {@link DocBuilder}. */
 public final class OpsBuilder {
 
-    /** @return the actual size of the AST node at position, including comments. */
+    /** Return the actual size of the AST node at position, including comments. */
     public int actualSize(int position, int length) {
         Input.Token startToken = input.getPositionTokenMap().get(position);
         int start = startToken.getTok().getPosition();
@@ -66,7 +66,7 @@ public final class OpsBuilder {
         return end - start;
     }
 
-    /** @return the start column of the token at {@code position}, including leading comments. */
+    /** Return the start column of the token at {@code position}, including leading comments. */
     public Integer actualStartColumn(int position) {
         Input.Token startToken = input.getPositionTokenMap().get(position);
         int start = startToken.getTok().getPosition();
