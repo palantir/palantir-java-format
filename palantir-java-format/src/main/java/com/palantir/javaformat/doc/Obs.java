@@ -53,6 +53,7 @@ public final class Obs {
                 Optional<State> incomingState);
 
         /**
+         * Write the given level node
          * @param levelNodeId the unique ID of the {@link LevelNode}. There can be multiple LevelNodes per
          *     {@link Level}.
          * @param parentExplorationId what exploration is this {@link LevelNode} a part of

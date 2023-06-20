@@ -318,7 +318,7 @@ public final class StringWrapper {
                 .collect(joining(
                         "\""
                                 + separator
-                                + Strings.repeat(" ", (first0 ? firstLineStartColumn + 4 : textStartColumn - 2))
+                                + " ".repeat(first0 ? firstLineStartColumn + 4 : textStartColumn - 2)
                                 + "+ \"",
                         "\"",
                         "\""));

@@ -30,7 +30,7 @@ public abstract class Output extends InputOutput {
     /**
      * Output a string.
      *
-     * @param state
+     * @param state the current state
      * @param text the string
      * @param range the {@link Range} corresponding to the string
      */

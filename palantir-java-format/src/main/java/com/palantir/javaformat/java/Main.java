@@ -183,7 +183,7 @@ public final class Main {
         try {
             input = new String(ByteStreams.toByteArray(inStream), UTF_8);
         } catch (IOException e) {
-            throw new IOError(e);
+            throw new RuntimeException(e);
         }
         String stdinFilename = parameters.assumeFilename().orElse(STDIN_FILENAME);
         boolean ok = true;

@@ -83,7 +83,7 @@ public final class JavaCommentsHelper implements CommentsHelper {
 
         // output all trailing lines with plausible indentation
         for (int i = 1; i < lines.size(); ++i) {
-            builder.append(lineSeparator).append(Strings.repeat(" ", column0));
+            builder.append(lineSeparator).append(" ".repeat(column0));
             // check that startCol is valid index, e.g. for blank lines
             if (lines.get(i).length() >= startCol) {
                 builder.append(lines.get(i).substring(startCol));
@@ -99,7 +99,7 @@ public final class JavaCommentsHelper implements CommentsHelper {
         lines = wrapLineComments(lines, column0);
         StringBuilder builder = new StringBuilder();
         builder.append(lines.get(0).trim());
-        String indentString = Strings.repeat(" ", column0);
+        String indentString = " ".repeat(column0);
         for (int i = 1; i < lines.size(); ++i) {
             builder.append(lineSeparator)
                     .append(indentString)
@@ -120,7 +120,7 @@ public final class JavaCommentsHelper implements CommentsHelper {
             Matcher matcher = LINE_COMMENT_MISSING_SPACE_PREFIX.matcher(line);
             if (matcher.find()) {
                 int length = matcher.group(1).length();
-                line = Strings.repeat("/", length) + " " + line.substring(length);
+                line = "/".repeat(length) + " " + line.substring(length);
             }
             if (line.startsWith("// MOE:")) {
                 // don't wrap comments for https://github.com/google/MOE
@@ -150,7 +150,7 @@ public final class JavaCommentsHelper implements CommentsHelper {
         StringBuilder builder = new StringBuilder();
         builder.append(lines.get(0).trim());
         int indent = column0 + 1;
-        String indentString = Strings.repeat(" ", indent);
+        String indentString = " ".repeat(indent);
         for (int i = 1; i < lines.size(); ++i) {
             builder.append(lineSeparator).append(indentString);
             String line = lines.get(i).trim();

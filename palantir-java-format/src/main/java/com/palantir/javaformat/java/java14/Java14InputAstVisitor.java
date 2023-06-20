@@ -105,7 +105,7 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
             Name name = (Name) invoke(BINDING_PATTERN_TREE_GET_BINDING, node);
             visitBindingPattern(/* modifiers= */ null, type, name);
         } else {
-            throw new LinkageError(
+            throw new RuntimeException(
                     "BindingPatternTree must have either getVariable() or both getType() and getBinding(),"
                             + " but does not");
         }
@@ -155,7 +155,7 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
                 visitRecordDeclaration(tree);
                 break;
             default:
-                throw new AssertionError(tree.getKind());
+                throw new IllegalArgumentException(tree.getKind().name());
         }
         return null;
     }
@@ -305,7 +305,7 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
                 builder.guessToken(";");
                 break;
             default:
-                throw new AssertionError(node.getCaseKind());
+                throw new IllegalArgumentException(node.getCaseKind().name());
         }
         return null;
     }
@@ -337,7 +337,7 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
         try {
             return m.invoke(target);
         } catch (ReflectiveOperationException e) {
-            throw new LinkageError(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 }

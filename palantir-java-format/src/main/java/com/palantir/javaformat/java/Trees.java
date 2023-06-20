@@ -54,7 +54,7 @@ class Trees {
         try {
             source = path.getCompilationUnit().getSourceFile().getCharContent(false);
         } catch (IOException e) {
-            throw new IOError(e);
+            throw new RuntimeException(e);
         }
         return source.subSequence(getStartPosition(node), getEndPosition(node, path))
                 .toString();

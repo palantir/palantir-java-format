@@ -145,7 +145,7 @@ public final class Formatter {
                         .getConstructor(OpsBuilder.class, int.class)
                         .newInstance(opsBuilder, options.indentationMultiplier());
             } catch (ReflectiveOperationException e) {
-                throw new LinkageError(e.getMessage(), e);
+                throw new RuntimeException(e.getMessage(), e);
             }
         } else {
             visitor = new JavaInputAstVisitor(opsBuilder, options.indentationMultiplier());
@@ -185,7 +185,7 @@ public final class Formatter {
             fileManager.setLocation(StandardLocation.PLATFORM_CLASS_PATH, ImmutableList.of());
         } catch (IOException e) {
             // impossible
-            throw new IOError(e);
+            throw new RuntimeException(e);
         }
         SimpleJavaFileObject source = new SimpleJavaFileObject(URI.create("source"), JavaFileObject.Kind.SOURCE) {
             @Override

@@ -141,7 +141,7 @@ class JavacTokens {
                         .getMethod("getRawCharacters", int.class, int.class)
                         .invoke(instance, beginIndex, endIndex);
             } catch (ReflectiveOperationException e) {
-                throw new LinkageError(e.getMessage(), e);
+                throw new RuntimeException(e.getMessage(), e);
             }
         }
     }

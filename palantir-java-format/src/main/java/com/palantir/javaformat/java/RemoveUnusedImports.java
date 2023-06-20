@@ -109,7 +109,7 @@ public class RemoveUnusedImports {
                 try {
                     scan((List<? extends Tree>) CASE_TREE_GET_LABELS.invoke(tree), null);
                 } catch (ReflectiveOperationException e) {
-                    throw new LinkageError(e.getMessage(), e);
+                    throw new RuntimeException(e.getMessage(), e);
                 }
             }
             return super.visitCase(tree, null);

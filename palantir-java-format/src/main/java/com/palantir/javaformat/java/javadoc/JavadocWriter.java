@@ -394,7 +394,7 @@ final class JavadocWriter {
 
     // If this is a hotspot, keep a String of many spaces around, and call append(string, start, end).
     private void appendSpaces(int count) {
-        output.append(Strings.repeat(" ", count));
+        output.append(" ".repeat(count));
     }
 
     /**
