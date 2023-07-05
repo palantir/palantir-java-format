@@ -96,6 +96,9 @@ final class CommandLineOptionsParser {
                 case "-palantir":
                     optionsBuilder.palantirStyle(true);
                     break;
+                case "--max-line-length":
+                    optionsBuilder.maxLineLength(parseInteger(it, flag, value));
+                    break;
                 case "--version":
                 case "-version":
                 case "-v":

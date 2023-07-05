@@ -34,6 +34,7 @@ final class CommandLineOptions {
     private final ImmutableList<Integer> lengths;
     private final boolean aosp;
     private final boolean palantirStyle;
+    private final int maxLineLength;
     private final boolean version;
     private final boolean help;
     private final boolean stdin;
@@ -55,6 +56,7 @@ final class CommandLineOptions {
             ImmutableList<Integer> lengths,
             boolean aosp,
             boolean palantirStyle,
+            int maxLineLength,
             boolean version,
             boolean help,
             boolean stdin,
@@ -74,6 +76,7 @@ final class CommandLineOptions {
         this.lengths = lengths;
         this.aosp = aosp;
         this.palantirStyle = palantirStyle;
+        this.maxLineLength = maxLineLength;
         this.version = version;
         this.help = help;
         this.stdin = stdin;
@@ -125,6 +128,11 @@ final class CommandLineOptions {
     /** Use Palantir style instead of Google Style. */
     boolean palantirStyle() {
         return palantirStyle;
+    }
+
+    /** Use a custom max line length. */
+    int maxLineLength() {
+        return maxLineLength;
     }
 
     /** Print the version. */
@@ -199,6 +207,7 @@ final class CommandLineOptions {
         private boolean inPlace = false;
         private boolean aosp = false;
         private boolean palantirStyle = false;
+        private int maxLineLength = -1;
         private boolean version = false;
         private boolean help = false;
         private boolean stdin = false;
@@ -247,6 +256,11 @@ final class CommandLineOptions {
 
         Builder palantirStyle(boolean palantirStyle) {
             this.palantirStyle = palantirStyle;
+            return this;
+        }
+
+        Builder maxLineLength(int maxLineLength) {
+            this.maxLineLength = maxLineLength;
             return this;
         }
 
@@ -316,6 +330,7 @@ final class CommandLineOptions {
                     lengths.build(),
                     aosp,
                     palantirStyle,
+                    maxLineLength,
                     version,
                     help,
                     stdin,

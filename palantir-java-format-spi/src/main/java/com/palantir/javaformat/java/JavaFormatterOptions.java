@@ -57,8 +57,11 @@ public final class JavaFormatterOptions {
 
     private final Style style;
 
-    private JavaFormatterOptions(Style style) {
+    private final int maxLineLength;
+
+    private JavaFormatterOptions(Style style, int maxLineLength) {
         this.style = style;
+        this.maxLineLength = maxLineLength >= 0 ? maxLineLength : style.maxLineLength();
     }
 
     /** Returns the multiplier for the unit of indent. */
@@ -67,7 +70,7 @@ public final class JavaFormatterOptions {
     }
 
     public int maxLineLength() {
-        return style.maxLineLength();
+        return maxLineLength;
     }
 
     /** Returns the code style. */
@@ -90,6 +93,8 @@ public final class JavaFormatterOptions {
         // default is still GOOGLE just because lots of hand-rolled tests rely on this behaviour
         private Style style = Style.GOOGLE;
 
+        private int maxLineLength = -1;
+
         private Builder() {}
 
         public Builder style(Style style) {
@@ -97,8 +102,13 @@ public final class JavaFormatterOptions {
             return this;
         }
 
+        public Builder maxLineLength(int maxLineLength) {
+            this.maxLineLength = maxLineLength;
+            return this;
+        }
+
         public JavaFormatterOptions build() {
-            return new JavaFormatterOptions(style);
+            return new JavaFormatterOptions(style, maxLineLength);
         }
     }
 }

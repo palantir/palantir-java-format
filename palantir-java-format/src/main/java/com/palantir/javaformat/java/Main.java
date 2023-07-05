@@ -96,6 +96,7 @@ public final class Main {
         // TODO(someone): update this to always use Style.PALANTIR
         JavaFormatterOptions options = JavaFormatterOptions.builder()
                 .style(parameters.aosp() ? Style.AOSP : parameters.palantirStyle() ? Style.PALANTIR : Style.GOOGLE)
+                .maxLineLength(parameters.maxLineLength())
                 .build();
 
         if (parameters.stdin()) {
