@@ -1,17 +1,18 @@
-versionOverrides: {}
 acceptedBreaks:
   "0.3.9":
-    com.palantir.javaformat:palantir-java-format-spi: []
     com.palantir.javaformat:gradle-palantir-java-format:
-      - code: "java.class.removed"
-        old: "class com.palantir.javaformat.gradle.ConfigureExternalDependenciesXml"
-        new: null
-        justification: "nobody used this directly"
-      - code: "java.class.removed"
-        old: "class com.palantir.javaformat.gradle.ConfigurePalantirJavaFormatXml"
-        new: null
-        justification: "nobody used this directly"
-      - code: "java.class.removed"
-        old: "class com.palantir.javaformat.gradle.UpdateIntellijXmlTask"
-        new: null
-        justification: "nobody used this directly"
+    - code: "java.class.removed"
+      old: "class com.palantir.javaformat.gradle.ConfigureExternalDependenciesXml"
+      justification: "nobody used this directly"
+    - code: "java.class.removed"
+      old: "class com.palantir.javaformat.gradle.ConfigurePalantirJavaFormatXml"
+      justification: "nobody used this directly"
+    - code: "java.class.removed"
+      old: "class com.palantir.javaformat.gradle.UpdateIntellijXmlTask"
+      justification: "nobody used this directly"
+  "2.33.0":
+    com.palantir.javaformat:gradle-palantir-java-format:
+    - code: "java.method.visibilityReduced"
+      old: "method void com.palantir.javaformat.gradle.ConfigureJavaFormatterXml::configureFormatOnSave(groovy.util.Node)"
+      new: "method void com.palantir.javaformat.gradle.ConfigureJavaFormatterXml::configureFormatOnSave(groovy.util.Node)"
+      justification: "Not public api, not split over multiple jars"
