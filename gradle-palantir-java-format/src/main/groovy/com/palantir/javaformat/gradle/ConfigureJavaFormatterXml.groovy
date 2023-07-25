@@ -35,11 +35,21 @@ class ConfigureJavaFormatterXml {
         matchOrCreateChild(externalDependencies, 'plugin', [id: 'palantir-java-format'])
     }
 
-    static void configureFormatOnSave(Node rootNode) {
-        def formatOnSaveOptions = matchOrCreateChild(rootNode, 'component', [name: 'FormatOnSaveOptions'])
+    static void configureWorkspaceXml(Node rootNode) {
+        configureFormatOnSave(rootNode)
+        configureOptimizeOnSave(rootNode)
+    }
 
+    private static void configureFormatOnSave(Node rootNode) {
+        configureOnSaveAction(matchOrCreateChild(rootNode, 'component', [name: 'FormatOnSaveOptions']))
+    }
 
-        def myRunOnSave = matchOrCreateChild(formatOnSaveOptions, 'option', [name: 'myRunOnSave'])
+    private static void configureOptimizeOnSave(Node rootNode) {
+        configureOnSaveAction(matchOrCreateChild(rootNode, 'component', [name: 'OptimizeOnSaveOptions']))
+    }
+
+    private static void configureOnSaveAction(Node onSaveOptions) {
+        def myRunOnSave = matchOrCreateChild(onSaveOptions, 'option', [name: 'myRunOnSave'])
 
         def myRunOnSaveAlreadySet = Optional.ofNullable(myRunOnSave.attribute('value'))
                 .map(Boolean::parseBoolean)
@@ -47,7 +57,7 @@ class ConfigureJavaFormatterXml {
 
         myRunOnSave.attributes().put('value', 'true')
 
-        def myAllFileTypesSelectedAlreadySet = matchChild(formatOnSaveOptions, 'option', [name: 'myAllFileTypesSelected'])
+        def myAllFileTypesSelectedAlreadySet = matchChild(onSaveOptions, 'option', [name: 'myAllFileTypesSelected'])
                 .map { Boolean.parseBoolean(it.attribute('value')) }
                 .orElse(true)
 
@@ -59,10 +69,10 @@ class ConfigureJavaFormatterXml {
         }
 
         // Otherwise we setup intellij to not format all files...
-        matchOrCreateChild(formatOnSaveOptions, 'option', [name: 'myAllFileTypesSelected']).attributes().put('value', 'false')
+        matchOrCreateChild(onSaveOptions, 'option', [name: 'myAllFileTypesSelected']).attributes().put('value', 'false')
 
         // ...but ensure java is formatted
-        def mySelectedFileTypes = matchOrCreateChild(formatOnSaveOptions, 'option', [name: 'mySelectedFileTypes'])
+        def mySelectedFileTypes = matchOrCreateChild(onSaveOptions, 'option', [name: 'mySelectedFileTypes'])
         def set = matchOrCreateChild(mySelectedFileTypes, 'set')
         matchOrCreateChild(set, 'option', [value: 'JAVA'])
     }

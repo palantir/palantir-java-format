@@ -68,7 +68,7 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
         });
 
         ideaModel.getWorkspace().getIws().withXml(xmlProvider -> {
-            ConfigureJavaFormatterXml.configureFormatOnSave(xmlProvider.asNode());
+            ConfigureJavaFormatterXml.configureWorkspaceXml(xmlProvider.asNode());
         });
     }
 
@@ -91,7 +91,7 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
                     project.file(".idea/externalDependencies.xml"),
                     node -> ConfigureJavaFormatterXml.configureExternalDependencies(node));
             createOrUpdateIdeaXmlFile(
-                    project.file(".idea/workspace.xml"), node -> ConfigureJavaFormatterXml.configureFormatOnSave(node));
+                    project.file(".idea/workspace.xml"), node -> ConfigureJavaFormatterXml.configureWorkspaceXml(node));
 
             // Still configure legacy idea if using intellij import
             updateIdeaXmlFileIfExists(project.file(project.getName() + ".ipr"), node -> {
@@ -99,7 +99,7 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
                 ConfigureJavaFormatterXml.configureExternalDependencies(node);
             });
             updateIdeaXmlFileIfExists(project.file(project.getName() + ".iws"), node -> {
-                ConfigureJavaFormatterXml.configureFormatOnSave(node);
+                ConfigureJavaFormatterXml.configureWorkspaceXml(node);
             });
         });
     }
