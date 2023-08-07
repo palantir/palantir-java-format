@@ -253,7 +253,7 @@ public class RemoveUnusedImports {
             JCCompilationUnit unit,
             Set<String> usedNames,
             Multimap<String, Range<Integer>> usedInJavadoc,
-            JCImport importTree,
+            ImportTree importTree,
             String simpleName) {
         String qualifier = ((JCFieldAccess) importTree.getQualifiedIdentifier())
                 .getExpression()
