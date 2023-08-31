@@ -32,12 +32,10 @@ public final class JavaCommentsHelper implements CommentsHelper {
     private final JavaFormatterOptions options;
     private final JavadocFormatter javadocFormatter;
 
-    public JavaCommentsHelper(
-            String lineSeparator, JavaFormatterOptions options, JavaFormatterInternalOptions internalOptions) {
+    public JavaCommentsHelper(String lineSeparator, JavaFormatterOptions options) {
         this.lineSeparator = lineSeparator;
         this.options = options;
-        this.javadocFormatter =
-                internalOptions.reformatJavadoc() ? new JavadocFormatter(options.maxLineLength()) : null;
+        this.javadocFormatter = options.formatJavadoc() ? new JavadocFormatter(options.maxLineLength()) : null;
     }
 
     @Override
