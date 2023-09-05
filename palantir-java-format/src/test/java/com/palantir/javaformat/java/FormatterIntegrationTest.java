@@ -87,8 +87,7 @@ public class FormatterIntegrationTest {
                 JavaFormatterOptions.builder()
                         .style(JavaFormatterOptions.Style.PALANTIR)
                         .build(),
-                isDebugMode(),
-                JavaFormatterInternalOptions.builder().build());
+                isDebugMode());
     }
 
     @TestTemplate

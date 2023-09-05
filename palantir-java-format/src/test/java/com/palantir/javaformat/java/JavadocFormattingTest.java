@@ -31,9 +31,9 @@ public final class JavadocFormattingTest {
     private final Formatter formatter = new Formatter(
             JavaFormatterOptions.builder()
                     .style(JavaFormatterOptions.Style.GOOGLE)
+                    .formatJavadoc(true)
                     .build(),
-            false,
-            JavaFormatterInternalOptions.builder().reformatJavadoc(true).build());
+            false);
 
     @Test
     public void notJavadoc() {

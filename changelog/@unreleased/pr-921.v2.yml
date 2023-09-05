@@ -1,0 +1,5 @@
+type: feature
+feature:
+  description: Add option to format javadoc
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/921

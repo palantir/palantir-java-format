@@ -57,8 +57,11 @@ public final class JavaFormatterOptions {
 
     private final Style style;
 
-    private JavaFormatterOptions(Style style) {
+    private final boolean formatJavadoc;
+
+    private JavaFormatterOptions(Style style, boolean formatJavadoc) {
         this.style = style;
+        this.formatJavadoc = formatJavadoc;
     }
 
     /** Returns the multiplier for the unit of indent. */
@@ -68,6 +71,10 @@ public final class JavaFormatterOptions {
 
     public int maxLineLength() {
         return style.maxLineLength();
+    }
+
+    public boolean formatJavadoc() {
+        return formatJavadoc;
     }
 
     /** Returns the code style. */
@@ -90,6 +97,8 @@ public final class JavaFormatterOptions {
         // default is still GOOGLE just because lots of hand-rolled tests rely on this behaviour
         private Style style = Style.GOOGLE;
 
+        private boolean formatJavadoc = false;
+
         private Builder() {}
 
         public Builder style(Style style) {
@@ -97,8 +106,13 @@ public final class JavaFormatterOptions {
             return this;
         }
 
+        public Builder formatJavadoc(boolean formatJavadoc) {
+            this.formatJavadoc = formatJavadoc;
+            return this;
+        }
+
         public JavaFormatterOptions build() {
-            return new JavaFormatterOptions(style);
+            return new JavaFormatterOptions(style, formatJavadoc);
         }
     }
 }
