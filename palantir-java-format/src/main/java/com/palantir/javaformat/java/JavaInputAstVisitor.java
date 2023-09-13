@@ -1237,7 +1237,10 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 token(",");
                 builder.breakOp(" ");
             }
-            scan(parameter, null);
+            visitVariables(
+                    ImmutableList.of(parameter),
+                    DeclarationKind.NONE,
+                    inlineAnnotationDirection(parameter.getModifiers()));
             first = false;
         }
         if (parens) {
