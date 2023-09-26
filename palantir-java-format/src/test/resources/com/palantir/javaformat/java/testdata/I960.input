@@ -1,0 +1,12 @@
+public class I960 {
+
+   record Result(String a){}
+
+  public void thisIsNotFormattedCorrectly(Object something){
+
+    if(something instanceof Result(String somethingAsString) ){
+         return;
+    }
+
+  }
+}

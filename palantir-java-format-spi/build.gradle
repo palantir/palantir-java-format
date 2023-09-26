@@ -2,6 +2,11 @@ apply plugin: 'java-library'
 apply plugin: 'com.palantir.external-publish-jar'
 apply plugin: 'com.palantir.revapi'
 
+java{
+    sourceCompatibility = 11
+    targetCompatibility = 11
+}
+
 dependencies {
     api 'com.google.guava:guava'
     api 'com.fasterxml.jackson.core:jackson-annotations'

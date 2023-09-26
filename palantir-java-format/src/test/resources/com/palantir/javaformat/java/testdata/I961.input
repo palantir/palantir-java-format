@@ -1,0 +1,19 @@
+public class I961 {
+
+
+  public void thisIsNotFormattedCorrectly(Object something){
+
+
+
+    switch (something){
+        case Integer i when i > 10-> System.out.println(i.toString());
+        case Integer i -> System.out.println(i.toString());
+        case String s -> System.out.println(s);
+        default -> System.out.println(something.toString());
+    }
+
+
+
+
+  }
+}
