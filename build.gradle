@@ -1,5 +1,6 @@
 buildscript {
     repositories {
+        mavenLocal() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
         mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
         gradlePluginPortal() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
     }
@@ -7,7 +8,7 @@ buildscript {
     dependencies {
         classpath 'com.palantir.jakartapackagealignment:jakarta-package-alignment:0.5.0'
         classpath 'com.gradle.publish:plugin-publish-plugin:1.2.1'
-        classpath 'com.palantir.baseline:gradle-baseline-java:5.20.0'
+        classpath 'com.palantir.baseline:gradle-baseline-java:5.21.0'
         classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:2.15.0'
         classpath 'com.palantir.gradle.externalpublish:gradle-external-publish-plugin:1.12.0'
         classpath 'com.palantir.gradle.gitversion:gradle-git-version:3.0.0'
@@ -37,6 +38,7 @@ allprojects {
     version = rootProject.version
 
     repositories {
+        mavenLocal() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
         mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
     }
 }
@@ -45,8 +47,7 @@ subprojects {
     apply plugin: 'java-library'
     apply plugin: 'org.inferred.processors'
 
-    sourceCompatibility = 11
-    targetCompatibility = 11
+
 
     tasks.withType(Checkstyle) {
         enabled = false

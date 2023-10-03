@@ -1,0 +1,13 @@
+com.github.ben-manes.caffeine:caffeine = 3.1.8
+com.google.code.findbugs:jsr305 = 3.0.2
+com.google.errorprone:error_prone_annotations = 2.22.0
+com.google.guava:guava = 32.1.2-jre
+com.google.guava:guava-testlib = 27.0.1-jre
+com.google.testing.compile:compile-testing = 0.15
+com.google.truth:truth = 1.1.5
+junit:junit = 4.13.2
+org.assertj:assertj-core = 3.24.2
+org.functionaljava:functionaljava = 4.8
+org.junit.jupiter:* = 5.10.0
+com.fasterxml.jackson.*:* = 2.15.2
+com.fasterxml.jackson.core:jackson-databind = 2.15.2

@@ -1,0 +1,11 @@
+rootProject.name = 'palantir-java-format21'
+
+include ':idea-plugin'
+
+
+boolean isCiServer = System.getenv().containsKey('CI')
+buildCache {
+    local {
+        enabled = !isCiServer
+    }
+}

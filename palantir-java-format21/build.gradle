@@ -1,0 +1,123 @@
+import java.util.function.Function
+import java.util.stream.Collectors
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
+        gradlePluginPortal() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
+    }
+
+    dependencies {
+        classpath 'com.palantir.jakartapackagealignment:jakarta-package-alignment:0.5.0'
+        classpath 'com.gradle.publish:plugin-publish-plugin:1.2.1'
+        classpath 'com.palantir.baseline:gradle-baseline-java:5.21.0'
+        classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:2.15.0'
+        classpath 'com.palantir.gradle.externalpublish:gradle-external-publish-plugin:1.12.0'
+        classpath 'com.palantir.gradle.gitversion:gradle-git-version:3.0.0'
+        //classpath 'com.palantir.javaformat:gradle-palantir-java-format:2.38.0'
+        classpath 'com.palantir.gradle.revapi:gradle-revapi:1.7.0'
+        //classpath 'com.palantir.javaformat:gradle-palantir-java-format:2.38.0'
+        classpath 'gradle.plugin.org.inferred:gradle-processors:3.7.0'
+    }
+}
+
+plugins {
+    id "org.jetbrains.intellij" version "1.3.0" apply false
+    id 'org.jetbrains.gradle.plugin.idea-ext' version "1.1.1"
+}
+
+apply plugin: 'com.palantir.git-version'
+apply plugin: 'com.palantir.baseline'
+apply plugin: 'com.palantir.consistent-versions'
+
+apply plugin: 'application'
+apply plugin: 'com.palantir.external-publish-jar'
+apply plugin: 'com.palantir.external-publish'
+
+
+repositories {
+    mavenLocal()
+    mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
+    gradlePluginPortal() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
+}
+
+group = 'com.palantir.javaformat'
+
+version System.env.CIRCLE_TAG ?: gitVersion()
+
+mainClassName = 'com.palantir.javaformat.java.Main'
+
+description = 'Palantir Java Format Java 21'
+
+dependencies {
+    implementation "com.palantir.javaformat:palantir-java-format:2.39"
+    testImplementation 'com.google.guava:guava-testlib'
+    testImplementation 'com.google.truth:truth'
+    testImplementation 'com.google.testing.compile:compile-testing'
+    testImplementation 'org.assertj:assertj-core'
+    testImplementation 'org.junit.jupiter:junit-jupiter-migrationsupport'
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+
+def exports = [
+        'jdk.compiler/com.sun.tools.javac.file',
+        'jdk.compiler/com.sun.tools.javac.main',
+        'jdk.compiler/com.sun.tools.javac.parser',
+        'jdk.compiler/com.sun.tools.javac.tree',
+        'jdk.compiler/com.sun.tools.javac.util',
+        'jdk.compiler/com.sun.tools.javac.code',
+        'jdk.compiler/com.sun.tools.javac.api'
+]
+
+def jvmArgList = exports.stream().map(new Function<String, String>() {
+    @Override
+    String apply(String value) {
+        return "--add-exports=${value}=ALL-UNNAMED"
+    }
+}).collect(Collectors.toList())
+
+
+java{
+    sourceCompatibility = 21
+    targetCompatibility = 21
+}
+tasks.withType(JavaCompile).configureEach {
+    options.errorprone.disable 'StrictUnusedVariable'
+
+    // Allow access to internal javac apis
+    options.compilerArgs += jvmArgList
+    options.compilerArgs += "--enable-preview"
+}
+
+tasks.withType(Test).configureEach {
+    jvmArgs = jvmArgList
+    jvmArgs += "--enable-preview"
+    maxParallelForks = 1
+}
+
+tasks.withType(Javadoc){
+    enabled = false
+}
+
+// false positives due to org.junit.runners.* in the test cases
+//tasks.checkJUnitDependencies.enabled = false
+
+tasks.test {
+    // Run all classes and tests in parallel
+    // https://junit.org/junit5/docs/current/user-guide/#writing-tests-parallel-execution
+    //systemProperty 'junit.jupiter.execution.parallel.mode.default', 'concurrent'
+}
+
+// necessary to compile Java14InputAstVisitor
+idea {
+    module.languageLevel = new org.gradle.plugins.ide.idea.model.IdeaLanguageLevel(21)
+}
+
+// This block may be replaced by BaselineExportsExtension exports
+// once https://github.com/gradle/gradle/issues/18824 is resolved.
+jar {
+    manifest {
+        attributes('Add-Exports': exports.stream().collect(Collectors.joining(' ')))
+    }
+}

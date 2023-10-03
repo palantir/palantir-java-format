@@ -1,0 +1,7 @@
+public class I965 {
+
+    public void thisIsNotFormattedCorrectly2(Object something) {
+        System.out.println(STR."mytemplate1 \{something}");
+        System.out.println(STR."mytemplate2 \{something} ---");
+    }
+}

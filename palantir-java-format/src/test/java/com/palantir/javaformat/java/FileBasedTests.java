@@ -50,6 +50,8 @@ public final class FileBasedTests {
                     .putAll(15, "I603")
                     .putAll(16, "I588")
                     .putAll(17, "I683", "I684", "I696")
+                    // .putAll(19, "I959", "I960", "I961")
+                    .putAll(21, "I959", "I960", "I961")
                     .build();
 
     private final Class<?> testClass;

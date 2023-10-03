@@ -370,22 +370,60 @@ public final class JavaInput extends Input {
         List<Tok> toks = new ArrayList<>();
         int charI = 0;
         int columnI = 0;
+        int stringFragmentEndPos = -1;
+
         for (RawTok t : rawToks) {
             if (stopTokens.contains(t.kind())) {
                 break;
             }
             int charI0 = t.pos();
+
+            /**
+             *  String Templates : https://openjdk.org/jeps/430
+             *  "String Template" tokenize like that :  {STRINGFRAGMENT}{literal}{STRINGFRAGMENT} and after list of parameters
+             *  for exemple:
+             *  `String s = STR."\{fruit[0]} is nice";`
+             *   will give this token  (STRINGFRAGMENT)""" , (literal)fruit[0] ,(STRINGFRAGMENT)" is nice" and after "fruit[0]" again with a potion of fruit[0] on file
+             *
+             *   for this reason we comme back after the position of the last  STRINGFRAGMENT
+             */
+            if (t.pos() < stringFragmentEndPos && stringFragmentEndPos < t.endPos()) {
+                // case System.out.println(STR."  \{o} ---"  );
+                // on this case  tokTex == " ---\"  " but we already add the token " ---\""
+                // it is why we recreate a new token with only "  " (after \" )
+
+                charI0 = stringFragmentEndPos;
+                t = new RawTok("", t.kind(), stringFragmentEndPos, t.endPos());
+            }
+
+            if (t.pos() == stringFragmentEndPos) {
+                // reset when it come back exactly to the same position: System.out.println(STR."  \{o}");
+                stringFragmentEndPos = -1;
+            }
+
+            // drop token when after STRINGFRAGMENT when it comme back
+            if (t.pos() < stringFragmentEndPos) {
+                continue;
+            }
+            boolean stringFragmentKind =
+                    (t.kind() != null && "STRINGFRAGMENT".equals(t.kind().name()));
+
+            // end String Templates
+
             // Get string, possibly with Unicode escapes.
             String originalTokText = text.substring(charI0, t.endPos());
-            String tokText = t.kind() == TokenKind.STRINGLITERAL
+
+            String tokText = (t.kind() == TokenKind.STRINGLITERAL)
                     ? t.stringVal() // Unicode escapes removed.
                     : originalTokText;
+
             char tokText0 = tokText.charAt(0); // The token's first character.
             final boolean isToken; // Is this tok a token?
             final boolean isNumbered; // Is this tok numbered? (tokens and comments)
             String extraNewline = null; // Extra newline at end?
             List<String> strings = new ArrayList<>();
-            if (Character.isWhitespace(tokText0)) {
+
+            if (Character.isWhitespace(tokText0) && !stringFragmentKind) {
                 isToken = false;
                 isNumbered = false;
                 Iterator<String> it = Newlines.lineIterator(originalTokText);
@@ -402,10 +440,14 @@ public final class JavaInput extends Input {
                         strings.add(line);
                     }
                 }
-            } else if (tokText.startsWith("'") || tokText.startsWith("\"")) {
+            } else if (tokText.startsWith("'") || tokText.startsWith("\"") || stringFragmentKind) {
                 isToken = true;
                 isNumbered = true;
                 strings.add(originalTokText);
+                if (stringFragmentKind) {
+                    stringFragmentEndPos = t.endPos();
+                }
+
             } else if (tokText.startsWith("//") || tokText.startsWith("/*")) {
                 // For compatibility with an earlier lexer, the newline after a // comment is its own tok.
                 if (tokText.startsWith("//") && (originalTokText.endsWith("\n") || originalTokText.endsWith("\r"))) {

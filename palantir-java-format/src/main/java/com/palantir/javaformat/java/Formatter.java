@@ -131,7 +131,17 @@ public final class Formatter {
         OpsBuilder opsBuilder = new OpsBuilder(javaInput);
 
         JavaInputAstVisitor visitor;
-        if (getRuntimeVersion() >= 14) {
+
+        if (getRuntimeVersion() >= 21) {
+            try {
+                visitor = Class.forName("com.palantir.javaformat.java.java21.Java21InputAstVisitor")
+                        .asSubclass(JavaInputAstVisitor.class)
+                        .getConstructor(OpsBuilder.class, int.class)
+                        .newInstance(opsBuilder, options.indentationMultiplier());
+            } catch (ReflectiveOperationException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+        } else if (getRuntimeVersion() >= 14) {
             try {
                 visitor = Class.forName("com.palantir.javaformat.java.java14.Java14InputAstVisitor")
                         .asSubclass(JavaInputAstVisitor.class)

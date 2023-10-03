@@ -1,0 +1,16 @@
+
+public class I966 {
+
+
+  public void recursiveTemplate(Object something){
+
+
+    int index = 0;
+    String data = STR."\{index++}, \{index++}, \{index++}, \{index++}";
+
+    String[] fruit = { "apples", "oranges", "peaches" };
+    String s = STR."\{fruit[0]}, \{STR."\{fruit[1]}, \{fruit[2]}"}";
+   }
+
+
+}
