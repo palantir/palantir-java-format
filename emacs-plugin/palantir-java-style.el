@@ -10,6 +10,8 @@
 
 ;;; Code:
 
+(require 'rx)
+
 ;;;###autoload
 (defun palantir-java-style-lineup-anchor (langelem)
   (vector (c-langelem-col langelem :preserve-point)))
