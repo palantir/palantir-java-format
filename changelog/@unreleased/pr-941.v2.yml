@@ -1,0 +1,5 @@
+type: feature
+feature:
+  description: Add emacs plugin
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/941
