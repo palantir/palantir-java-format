@@ -17,5 +17,5 @@ org.immutables:value = 2.10.0
 org.junit.jupiter:* = 5.10.0
 org.junit.vintage:* = 5.10.0
 org.slf4j:* = 1.7.36
-com.fasterxml.jackson.*:* = 2.15.2
-com.fasterxml.jackson.core:jackson-databind = 2.15.2
+com.fasterxml.jackson.*:* = 2.15.3
+com.fasterxml.jackson.core:jackson-databind = 2.15.3
