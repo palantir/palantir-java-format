@@ -23,7 +23,7 @@
       '++)))
 
 ;;;###autoload
-(defun palantir-java-style-lineup-cascaded-calls (langelem)
+(defun palantir-java-style-lineup-cascaded-calls (_langelem)
   (save-excursion
     (back-to-indentation)
     (when (looking-at (rx ?.))
