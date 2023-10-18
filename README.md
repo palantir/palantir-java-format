@@ -183,6 +183,10 @@ When enabled, it will replace the normal `Reformat Code` action, which can be
 triggered from the `Code` menu or with the Ctrl-Alt-L (by default) keyboard
 shortcut.
 
+## Emacs plugin
+
+An Emacs plugin is included in this repository. To use it, load [palantir-java-style.el](https://github.com/palantir/palantir-java-format/blob/develop/emacs-plugin/palantir-java-style.el). Afterwards, you can switch to the style for any Java file with <kbd>C-c</kbd> <kbd>.</kbd> `palantir`. See [Choosing a Style](https://www.gnu.org/software/emacs/manual/html_node/ccmode/Choosing-a-Style.html) to make it the default style.
+
 ## Future works
 
 - [ ] preserve [NON-NLS markers][] - these are comments that are used when implementing NLS internationalisation, and need to stay on the same line with the strings they come after.
