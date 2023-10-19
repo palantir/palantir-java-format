@@ -37,10 +37,11 @@
     (indent-tabs-mode . nil)
     (c-basic-offset . 4)
     (c-offsets-alist . ((statement-cont . ++)
-			(arglist-cont . (first palantir-java-style-lineup-cascaded-calls 0))
 			(arglist-intro . (add palantir-java-style-lineup-anchor ++ palantir-java-style-lineup-single-arg))
+			(arglist-cont . (first palantir-java-style-lineup-cascaded-calls 0))
 			(arglist-cont-nonempty . ++)
-			(template-args-cont . 16)))))
+			(template-args-cont . 16)
+			(topmost-intro-cont . 0)))))
 
 ;;;###autoload
 (c-add-style "palantir" palantir-java-style)
