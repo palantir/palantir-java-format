@@ -138,6 +138,8 @@ Applying this automatically configures IntelliJ, whether you run `./gradlew idea
 or import the project directly from IntelliJ, to use the correct version of the formatter
 when formatting java code.
 
+`./gradlew format` can be enabled by using the [com.palantir.baseline-format](https://github.com/palantir/gradle-baseline#compalantirbaseline-format) Gradle plugin.
+
 ## Maven Integration via Spotless
 
 palantir-java-format is supported by [spotless](https://github.com/diffplug/spotless/blob/main/plugin-maven/README.md#palantir-java-format)
