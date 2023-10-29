@@ -10,10 +10,7 @@ configurations {
         canBeResolved = true
     }
 }
-java{
-    sourceCompatibility = 11
-    targetCompatibility = 11
-}
+
 
 dependencies {
     compileOnly 'com.diffplug.spotless:spotless-plugin-gradle'

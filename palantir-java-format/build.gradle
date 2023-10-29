@@ -53,6 +53,7 @@ tasks.withType(JavaCompile).configureEach {
     if (JavaVersion.current() < JavaVersion.VERSION_14) {
         excludes = ['**/Java14InputAstVisitor.java']
     }
+
 }
 
 tasks.withType(Test).configureEach {
@@ -94,8 +95,7 @@ tasks.named("jar", Jar) {
 
 tasks.named('jar', Jar){
     // hack to get java21 Class ...
-    // the build script should be completely review to handle java 21
+    // the build script should be completely rewritten to handle java 21
     from ('build/classes/java/main', '../palantir-java-format21/build/classes/java/main')
-
     include('**/*')
 }

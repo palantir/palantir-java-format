@@ -61,10 +61,6 @@ configurations {
     }
 }
 
-java{
-    sourceCompatibility = 11
-    targetCompatibility = 11
-}
 
 dependencies {
     implementation project(':palantir-java-format-jdk-bootstrap')

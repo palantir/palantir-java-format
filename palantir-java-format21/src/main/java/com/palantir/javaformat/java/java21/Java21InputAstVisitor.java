@@ -78,8 +78,6 @@ public class Java21InputAstVisitor extends Java14InputAstVisitor {
 
         Void r = scan(node.getDeconstructor(), unused);
         token("(");
-
-        // r = scanAndReduceVoid(, unused, r);
         boolean firstInRow = true;
         for (PatternTree item : node.getNestedPatterns()) {
             if (!firstInRow) {
