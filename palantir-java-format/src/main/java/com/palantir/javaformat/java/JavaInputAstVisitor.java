@@ -394,7 +394,6 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
 
     /** Skips over extra semi-colons at the top-level, or in a class member declaration lists. */
     protected void dropEmptyDeclarations() {
-
         if (builder.peekToken().equals(Optional.of(";"))) {
             while (builder.peekToken().equals(Optional.of(";"))) {
                 builder.forcedBreak();

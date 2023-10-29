@@ -447,7 +447,6 @@ public final class JavaInput extends Input {
                 if (stringFragmentKind) {
                     stringFragmentEndPos = t.endPos();
                 }
-
             } else if (tokText.startsWith("//") || tokText.startsWith("/*")) {
                 // For compatibility with an earlier lexer, the newline after a // comment is its own tok.
                 if (tokText.startsWith("//") && (originalTokText.endsWith("\n") || originalTokText.endsWith("\r"))) {

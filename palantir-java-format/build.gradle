@@ -43,10 +43,6 @@ def exports = [
         'jdk.compiler/com.sun.tools.javac.api'
 ]
 
-java{
-    sourceCompatibility = 11
-    targetCompatibility = 11
-}
 
 def jvmArgList = exports.stream().map(new Function<String, String>() {
     @Override
@@ -64,7 +60,6 @@ tasks.withType(JavaCompile).configureEach {
     if (JavaVersion.current() < JavaVersion.VERSION_14) {
         exclude '**/Java14InputAstVisitor.java'
     }
-
 }
 
 tasks.withType(Test).configureEach {
@@ -93,7 +88,7 @@ tasks.test {
 
 // necessary to compile Java14InputAstVisitor
 idea {
-    module.languageLevel = new org.gradle.plugins.ide.idea.model.IdeaLanguageLevel(17)
+    module.languageLevel = new org.gradle.plugins.ide.idea.model.IdeaLanguageLevel(14)
 }
 
 // This block may be replaced by BaselineExportsExtension exports
@@ -106,8 +101,7 @@ jar {
 
 tasks.named('jar', Jar){
     // hack to get java21 Class ...
-    // the build script should be completely review to handle java 21
+    // the build script should be completely rewritten to handle java 21
     from ('build/classes/java/main', '../palantir-java-format21/build/classes/java/main')
-
     include('**/*')
 }

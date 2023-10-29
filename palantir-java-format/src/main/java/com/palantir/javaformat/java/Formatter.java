@@ -131,7 +131,6 @@ public final class Formatter {
         OpsBuilder opsBuilder = new OpsBuilder(javaInput);
 
         JavaInputAstVisitor visitor;
-
         if (getRuntimeVersion() >= 21) {
             try {
                 visitor = Class.forName("com.palantir.javaformat.java.java21.Java21InputAstVisitor")

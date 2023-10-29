@@ -8,10 +8,7 @@ configurations {
     implicitDependencies
     pluginClasspath
 }
-java{
-    sourceCompatibility = 11
-    targetCompatibility = 11
-}
+
 
 dependencies {
     implementation gradleApi()
