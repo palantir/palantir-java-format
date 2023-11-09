@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension point="org.eclipse.jdt.core.javaFormatter">
-   <javaFormatter
-         class="com.palantir.javaformat.java.PalantirJavaFormatter"
-         id="com.palantir.javaformat.java.PalantirJavaFormatter"
-         name="google-java-format">
-   </javaFormatter>
-   </extension>
+  <extension point="org.eclipse.jdt.core.javaFormatter">
+    <javaFormatter class="com.palantir.javaformat.java.PalantirJavaFormatter"
+                   id="com.palantir.javaformat.java.PalantirJavaFormatter"
+                   name="palantir-java-format"/>
+  </extension>
 </plugin>

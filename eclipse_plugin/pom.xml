@@ -17,30 +17,27 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>com.palantir.javaformat</groupId>
-    <artifactId>palantir-java-format-parent</artifactId>
-    <version>1.6</version>
-  </parent>
-
+  <groupId>com.palantir.javaformat</groupId>
   <artifactId>palantir-java-format-eclipse-plugin</artifactId>
-  <version>1.6.0</version>
+  <version>2.38.0</version>
   <packaging>eclipse-plugin</packaging>
-  <name>palantir-java-format Plugin for Eclipse 4.5+</name>
+  <name>palantir-java-format Plugin for Eclipse 4.17+</name>
 
   <description>
     A Java source code formatter that follows Palantir Java Style.
   </description>
 
   <properties>
-    <tycho-version>0.26.0</tycho-version>
+    <maven.compiler.release>11</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <tycho-version>4.0.3</tycho-version>
   </properties>
 
   <repositories>
     <repository>
-      <id>mars</id>
+      <id>2020-09</id>
       <layout>p2</layout>
-      <url>http://download.eclipse.org/releases/mars</url>
+      <url>https://download.eclipse.org/releases/2020-09</url>
     </repository>
   </repositories>
 
@@ -48,7 +45,17 @@
     <dependency>
       <groupId>com.palantir.javaformat</groupId>
       <artifactId>palantir-java-format</artifactId>
-      <version>1.6</version>
+      <version>2.38.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.guava</groupId>
+          <artifactId>failureaccess</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.google.guava</groupId>
+          <artifactId>listenablefuture</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 
@@ -63,6 +70,25 @@
       </plugin>
 
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.6.1</version>
+        <executions>
+          <execution>
+            <id>copy-embedded-dependencies</id>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <includeScope>runtime</includeScope>
+              <outputDirectory>${project.basedir}/lib</outputDirectory>
+              <stripVersion>true</stripVersion>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>target-platform-configuration</artifactId>
         <version>${tycho-version}</version>
@@ -71,17 +97,7 @@
             <environment>
               <os>linux</os>
               <ws>gtk</ws>
-              <arch>x86</arch>
-            </environment>
-            <environment>
-              <os>linux</os>
-              <ws>gtk</ws>
               <arch>x86_64</arch>
-            </environment>
-            <environment>
-              <os>win32</os>
-              <ws>win32</ws>
-              <arch>x86</arch>
             </environment>
             <environment>
               <os>win32</os>

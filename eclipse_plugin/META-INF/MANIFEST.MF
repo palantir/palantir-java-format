@@ -2,14 +2,15 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: palantir-java-format
 Bundle-SymbolicName: palantir-java-format-eclipse-plugin;singleton:=true
-Bundle-Version: 1.6.0
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Require-Bundle: org.eclipse.jdt.core;bundle-version="3.10.0",
+Bundle-Version: 2.38.0
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Require-Bundle: org.eclipse.jdt.core;bundle-version="3.23.0",
  org.eclipse.jface,
  org.eclipse.text,
  org.eclipse.ui,
  org.eclipse.equinox.common
 Bundle-ClassPath: .,
- lib/guava-22.0.jar,
- lib/javac-shaded-9+181-r4173-1.jar,
- lib/google-java-format-1.6.jar
+ lib/functionaljava.jar,
+ lib/guava.jar,
+ lib/palantir-java-format.jar,
+ lib/palantir-java-format-spi.jar
