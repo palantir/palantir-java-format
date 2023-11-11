@@ -14,8 +14,7 @@
 
 package com.palantir.javaformat.java;
 
-import java.util.ArrayList;
-import java.util.List;
+import static com.google.common.collect.ImmutableList.toImmutableList;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Preconditions;
@@ -25,8 +24,8 @@ import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
 import com.palantir.javaformat.java.JavaFormatterOptions.Style;
-
-import static com.google.common.collect.ImmutableList.toImmutableList;
+import java.util.ArrayList;
+import java.util.List;
 
 /** Formats a subset of a compilation unit. */
 public class SnippetFormatter {
@@ -39,7 +38,7 @@ public class SnippetFormatter {
         EXPRESSION
     }
 
-    private class SnippetWrapper {
+    private final class SnippetWrapper {
         int offset;
         final StringBuilder contents = new StringBuilder();
 

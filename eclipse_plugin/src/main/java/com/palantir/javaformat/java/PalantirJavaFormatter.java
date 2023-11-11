@@ -14,12 +14,11 @@
 
 package com.palantir.javaformat.java;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Range;
 import com.palantir.javaformat.java.SnippetFormatter.SnippetKind;
+import java.util.ArrayList;
+import java.util.List;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.formatter.CodeFormatter;
 import org.eclipse.jface.text.IRegion;
@@ -35,13 +34,13 @@ public class PalantirJavaFormatter extends CodeFormatter {
 
     @Override
     public TextEdit format(
-            int kind, String source, int offset, int length, int indentationLevel, String lineSeparator) {
+            int kind, String source, int offset, int length, int indentationLevel, String _lineSeparator) {
         IRegion[] regions = new IRegion[] {new Region(offset, length)};
         return formatInternal(kind, source, regions, indentationLevel);
     }
 
     @Override
-    public TextEdit format(int kind, String source, IRegion[] regions, int indentationLevel, String lineSeparator) {
+    public TextEdit format(int kind, String source, IRegion[] regions, int indentationLevel, String _lineSeparator) {
         return formatInternal(kind, source, regions, indentationLevel);
     }
 
