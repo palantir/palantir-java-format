@@ -8,5 +8,5 @@ Clear steps to reproduce the behaviour are always helpful too!
 ## What did you want to happen?
 
 <!--
-Suggest better behaviour
+Suggest better behavior
 -->
