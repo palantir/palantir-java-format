@@ -1,4 +1,8 @@
-<p align="right">
+<p align="center">
+<a href="https://central.sonatype.com/search?q=com.palantir.javaformat"><img src="https://img.shields.io/maven-central/v/com.palantir.javaformat/palantir-java-format" alt="Maven Central"/></a>
+<a href="https://plugins.gradle.org/plugin/com.palantir.java-format"><img src="https://img.shields.io/gradle-plugin-portal/v/com.palantir.java-format" alt="Gradle Plugin Portal"/></a>
+<a href="https://plugins.jetbrains.com/plugin/13180-palantir-java-format"><img src="https://img.shields.io/jetbrains/plugin/v/13180" alt="Jetbrains Plugin"/></a>
+<a href="LICENSE"><img src="https://img.shields.io/github/license/palantir/palantir-java-format" alt="License"/></a>
 <a href="https://autorelease.general.dmz.palantir.tech/palantir/palantir-java-format"><img src="https://img.shields.io/badge/Perform%20an-Autorelease-success.svg" alt="Autorelease"></a>
 </p>
 
