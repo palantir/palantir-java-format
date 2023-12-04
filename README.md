@@ -123,7 +123,7 @@ var foo = SomeType.builder()
         .build();
 ```
 
-## com.palantir.java-format gradle plugin
+## Palantir Java Format Gradle Plugin
 
 You should apply this plugin to all projects where you want your java code formatted, e.g.
 
