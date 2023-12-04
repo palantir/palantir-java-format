@@ -6,7 +6,7 @@
 <a href="https://autorelease.general.dmz.palantir.tech/palantir/palantir-java-format"><img src="https://img.shields.io/badge/Perform%20an-Autorelease-success.svg" alt="Autorelease"></a>
 </p>
 
-# palantir-java-format
+# Palantir Java Format
 
 _A modern, lambda-friendly, 120 character Java formatter._
 
@@ -123,7 +123,7 @@ var foo = SomeType.builder()
         .build();
 ```
 
-## Palantir Java Format Gradle Plugin
+## Palantir Java format Gradle plugin
 
 You should apply this plugin to all projects where you want your java code formatted, e.g.
 
