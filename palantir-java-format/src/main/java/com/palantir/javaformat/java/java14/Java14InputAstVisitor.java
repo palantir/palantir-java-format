@@ -31,6 +31,7 @@ import com.sun.source.tree.BlockTree;
 import com.sun.source.tree.CaseTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
+import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.InstanceOfTree;
 import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.ModifiersTree;
@@ -275,6 +276,15 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
             }
             builder.close();
         }
+
+        final ExpressionTree guard = getGuard(node);
+        if (guard != null) {
+            builder.space();
+            token("when");
+            builder.space();
+            scan(guard, null);
+        }
+
         switch (node.getCaseKind()) {
             case STATEMENT:
                 token(":");
@@ -340,5 +350,9 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    protected ExpressionTree getGuard(final CaseTree node) {
+        return null;
     }
 }

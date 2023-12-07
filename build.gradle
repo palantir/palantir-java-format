@@ -97,6 +97,6 @@ jdks {
 }
 
 javaVersions {
-    libraryTarget = 17
+    libraryTarget = 21
     runtime = 21
 }
