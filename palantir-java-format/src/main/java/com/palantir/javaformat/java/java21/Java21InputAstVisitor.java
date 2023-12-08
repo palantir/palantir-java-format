@@ -19,7 +19,13 @@ package com.palantir.javaformat.java.java21;
 import com.palantir.javaformat.OpsBuilder;
 import com.palantir.javaformat.java.java14.Java14InputAstVisitor;
 import com.sun.source.tree.CaseTree;
+import com.sun.source.tree.ConstantCaseLabelTree;
+import com.sun.source.tree.DeconstructionPatternTree;
+import com.sun.source.tree.DefaultCaseLabelTree;
 import com.sun.source.tree.ExpressionTree;
+import com.sun.source.tree.PatternCaseLabelTree;
+import com.sun.source.tree.PatternTree;
+
 /**
  * Extends {@link Java14InputAstVisitor} with support for AST nodes that were added or modified in
  * Java 21.
@@ -32,5 +38,43 @@ public class Java21InputAstVisitor extends Java14InputAstVisitor {
     @Override
     protected ExpressionTree getGuard(final CaseTree node) {
         return node.getGuard();
+    }
+
+    @Override
+    public Void visitDefaultCaseLabel(DefaultCaseLabelTree node, Void unused) {
+        token("default");
+        return null;
+    }
+
+    @Override
+    public Void visitPatternCaseLabel(PatternCaseLabelTree node, Void unused) {
+        scan(node.getPattern(), null);
+        return null;
+    }
+
+    @Override
+    public Void visitConstantCaseLabel(ConstantCaseLabelTree node, Void aVoid) {
+        scan(node.getConstantExpression(), null);
+        return null;
+    }
+
+    @Override
+    public Void visitDeconstructionPattern(DeconstructionPatternTree node, Void unused) {
+        scan(node.getDeconstructor(), null);
+        builder.open(plusFour);
+        token("(");
+        builder.breakOp();
+        boolean first = true;
+        for (PatternTree pattern : node.getNestedPatterns()) {
+            if (!first) {
+                token(",");
+                builder.breakOp(" ");
+            }
+            first = false;
+            scan(pattern, null);
+        }
+        builder.close();
+        token(")");
+        return null;
     }
 }

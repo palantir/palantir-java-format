@@ -50,7 +50,7 @@ public final class FileBasedTests {
                     .putAll(15, "I603")
                     .putAll(16, "I588")
                     .putAll(17, "I683", "I684", "I696")
-                    .putAll(21, "SwitchGuardClause")
+                    .putAll(21, "SwitchGuardClause", "SwitchRecord", "SwitchDouble", "SwitchUnderscore", "I880")
                     .build();
 
     private final Class<?> testClass;
