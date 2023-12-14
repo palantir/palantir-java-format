@@ -3,6 +3,20 @@
 # To manually manage the CircleCI configuration for this project, remove the .circleci/template.sh file.
 
 version: 2.1
+
+aliases:
+  - &check-no-files-changed
+    run:
+      name: Check that no git-tracked files were modified
+      command: |
+        FILES_MODIFIED="$(git status --porcelain)"
+        if [[ -n "$FILES_MODIFIED" ]]; then
+          echo "The following files were modified or added during the build process:"
+          echo "$FILES_MODIFIED"
+          echo "This will likely prevent successful publishing. Please run the build locally and include these changes in your pull request. (If new files are created, consider whether they should be checked in or .gitignored.)"
+          exit 1
+        fi
+
 jobs:
 
   check:
@@ -48,6 +62,7 @@ jobs:
                 echo "Running check-setup" && .circleci/check-setup.sh && echo "check-setup complete"
             fi
       - run: ./gradlew --parallel --stacktrace --continue --max-workers=2 check -Porg.gradle.java.installations.fromEnv=JAVA_8_HOME,JAVA_11_HOME,JAVA_15_HOME,JAVA_17_HOME,JAVA_HOME
+      - *check-no-files-changed
       - persist_to_workspace:
           root: /home/circleci
           paths: [ project ]
