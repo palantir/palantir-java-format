@@ -10,6 +10,7 @@
 
 _A modern, lambda-friendly, 120 character Java formatter._
 
+- [Eclipse plugin](https://github.com/palantir/palantir-java-format/tree/develop/eclipse_plugin)
 - [IntelliJ plugin](https://plugins.jetbrains.com/plugin/13180-palantir-java-format)
 - [Gradle plugin](https://github.com/palantir/gradle-baseline#compalantirbaseline-format)
 - [Spotless](#spotless)

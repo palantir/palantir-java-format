@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: palantir-java-format
+Bundle-SymbolicName: palantir-java-format-eclipse-plugin;singleton:=true
+Bundle-Version: 2.38.0
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Import-Package: org.eclipse.jdt.core.dom,
+ org.eclipse.jdt.core.formatter,
+ org.eclipse.jface.text,
+ org.eclipse.text.edits
+Bundle-ClassPath: .,
+ lib/functionaljava.jar,
+ lib/guava.jar,
+ lib/palantir-java-format.jar,
+ lib/palantir-java-format-spi.jar
