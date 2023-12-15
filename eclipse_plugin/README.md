@@ -1,26 +1,20 @@
-# google-java-format Eclipse Plugin
+# palantir-java-format Eclipse Plugin
 
-## Enabling
+## Installation
 
-See https://github.com/google/google-java-format#eclipse
-
-## Development
-
-1) Uncomment `<module>eclipse_plugin</module>` in the parent `pom.xml`
-
-2) Run `mvn install`, which will copy the dependences of the plugin to
-`eclipse_plugin/lib`.
-
-2) If you are using Java 9, add
-
-    ```
-    -vm
-    /Library/Java/JavaVirtualMachines/jdk1.8.0_91.jdk/Contents/Home/bin/java
-    ```
-
-    to `/Applications/Eclipse.app/Contents/Eclipse/eclipse.ini`.
-
-3) Open the `eclipse_plugin` project in a recent Eclipse SDK build.
-
-4) From `File > Export` select `Plugin-in Development > Deployable plugin-ins
-and fragments` and follow the wizard to export a plugin jar.
+1. Run `./gradlew :eclipse_plugin:build` in the main folder,
+1. If running Eclipse under JRE 17 or later add these options to `eclipse.ini` after `-vmargs`:
+   ```
+   --add-exports
+   jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED
+   --add-exports
+   jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED
+   --add-exports
+   jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED
+   --add-exports
+   jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED
+   --add-exports
+   jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED
+   ```
+1. Copy `build/libs/palantir-java-format-eclipse-plugin-<version>.jar` to the `dropins` folder of your Eclipse installation,
+1. Run `eclipse -clean`.

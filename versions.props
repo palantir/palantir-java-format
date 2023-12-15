@@ -1,4 +1,4 @@
-com.diffplug.spotless:spotless-plugin-gradle = 6.22.0
+com.diffplug.spotless:spotless-plugin-gradle = 6.23.3
 com.github.ben-manes.caffeine:caffeine = 3.1.8
 com.google.auto.service:auto-service = 1.1.1
 com.google.code.findbugs:jsr305 = 3.0.2
@@ -14,8 +14,8 @@ org.assertj:assertj-core = 3.24.2
 org.derive4j:* = 1.1.1
 org.functionaljava:functionaljava = 4.8
 org.immutables:value = 2.10.0
-org.junit.jupiter:* = 5.10.0
-org.junit.vintage:* = 5.10.0
+org.junit.jupiter:* = 5.10.1
+org.junit.vintage:* = 5.10.1
 org.slf4j:* = 1.7.36
 com.fasterxml.jackson.*:* = 2.15.3
 com.fasterxml.jackson.core:jackson-databind = 2.15.3

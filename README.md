@@ -1,14 +1,19 @@
-<p align="right">
+<p align="center">
+<a href="https://central.sonatype.com/search?q=com.palantir.javaformat"><img src="https://img.shields.io/maven-central/v/com.palantir.javaformat/palantir-java-format" alt="Maven Central"/></a>
+<a href="https://plugins.gradle.org/plugin/com.palantir.java-format"><img src="https://img.shields.io/gradle-plugin-portal/v/com.palantir.java-format" alt="Gradle Plugin Portal"/></a>
+<a href="https://plugins.jetbrains.com/plugin/13180-palantir-java-format"><img src="https://img.shields.io/jetbrains/plugin/v/13180" alt="Jetbrains Plugin"/></a>
+<a href="LICENSE"><img src="https://img.shields.io/github/license/palantir/palantir-java-format" alt="License"/></a>
 <a href="https://autorelease.general.dmz.palantir.tech/palantir/palantir-java-format"><img src="https://img.shields.io/badge/Perform%20an-Autorelease-success.svg" alt="Autorelease"></a>
 </p>
 
-# palantir-java-format
+# Palantir Java Format
 
 _A modern, lambda-friendly, 120 character Java formatter._
 
+- [Eclipse plugin](https://github.com/palantir/palantir-java-format/tree/develop/eclipse_plugin)
 - [IntelliJ plugin](https://plugins.jetbrains.com/plugin/13180-palantir-java-format)
 - [Gradle plugin](#compalantirjava-format-gradle-plugin)
-- [Maven plugin via Spotless](#maven-integration-via-spotless)
+- [Spotless](#spotless)
 
 It is based on the excellent [google-java-format](https://github.com/google/google-java-format), and benefits from the work of all the [original authors](https://github.com/google/google-java-format/graphs/contributors). palantir-java-format is available under the same [Apache 2.0 License](./LICENSE).
 
@@ -119,7 +124,7 @@ var foo = SomeType.builder()
         .build();
 ```
 
-## com.palantir.java-format gradle plugin
+## Palantir Java format Gradle plugin
 
 You should apply this plugin to all projects where you want your java code formatted, e.g.
 
@@ -140,26 +145,10 @@ when formatting java code.
 
 `./gradlew format` can be enabled by using the [com.palantir.baseline-format](https://github.com/palantir/gradle-baseline#compalantirbaseline-format) Gradle plugin.
 
-## Maven Integration via Spotless
+## Spotless
 
-palantir-java-format is supported by [spotless](https://github.com/diffplug/spotless/blob/main/plugin-maven/README.md#palantir-java-format)
-out of the box.
-
-```xml
-<plugin>
-    <groupId>com.diffplug.spotless</groupId>
-    <artifactId>spotless-maven-plugin</artifactId>
-    <version>${spotless.version}</version>
-    <configuration>
-      <java>
-        <palantirJavaFormat>
-            <!-- Optionally specify a version -->
-            <version>${palantirJavaFormat.version}</version>
-        </palantirJavaFormat>
-      </java>
-    </configuration>
-</plugin>
-```
+- See [integration in Spotless Gradle plugin](https://github.com/diffplug/spotless/tree/main/plugin-gradle#palantir-java-format).
+- See [integration in Spotless Maven plugin](https://github.com/diffplug/spotless/tree/main/plugin-maven#palantir-java-format).
 
 ## IntelliJ plugin
 
