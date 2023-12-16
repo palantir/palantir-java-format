@@ -12,7 +12,7 @@ _A modern, lambda-friendly, 120 character Java formatter._
 
 - [Eclipse plugin](https://github.com/palantir/palantir-java-format/tree/develop/eclipse_plugin)
 - [IntelliJ plugin](https://plugins.jetbrains.com/plugin/13180-palantir-java-format)
-- [Gradle plugin](https://github.com/palantir/gradle-baseline#compalantirbaseline-format)
+- [Gradle plugin](#palantir-java-format-gradle-plugin)
 - [Spotless](#spotless)
 
 It is based on the excellent [google-java-format](https://github.com/google/google-java-format), and benefits from the work of all the [original authors](https://github.com/google/google-java-format/graphs/contributors). palantir-java-format is available under the same [Apache 2.0 License](./LICENSE).
@@ -142,6 +142,8 @@ allprojects {
 Applying this automatically configures IntelliJ, whether you run `./gradlew idea`
 or import the project directly from IntelliJ, to use the correct version of the formatter
 when formatting java code.
+
+`./gradlew format` can be enabled by using the [com.palantir.baseline-format](https://github.com/palantir/gradle-baseline#compalantirbaseline-format) Gradle plugin.
 
 ## Spotless
 
