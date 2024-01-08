@@ -85,7 +85,7 @@ final class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
             formatter.getFormatReplacements(text, toRanges(ranges)).forEach(replacement -> {
                 replacements.put(toTextRange(replacement.getReplaceRange()), replacement.getReplacementString());
             });
-            return replacements.build();
+            return replacements.buildOrThrow();
         } catch (FormatterException e) {
             log.debug("Formatter failed, no replacements", e);
             return ImmutableMap.of();

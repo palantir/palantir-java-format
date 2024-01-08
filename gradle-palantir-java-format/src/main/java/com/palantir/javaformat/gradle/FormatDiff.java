@@ -28,7 +28,6 @@ import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.Streams;
 import com.google.common.collect.TreeRangeSet;
-import com.google.common.io.ByteStreams;
 import com.palantir.javaformat.java.FormatterException;
 import com.palantir.javaformat.java.FormatterService;
 import com.palantir.javaformat.java.Replacement;
@@ -138,7 +137,7 @@ final class FormatDiff {
         Preconditions.checkState(process.exitValue() == 0, "Expected return code of 0");
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ByteStreams.copy(process.getInputStream(), baos);
+        process.getInputStream().transferTo(baos);
         return new String(baos.toByteArray(), UTF_8).trim();
     }
 
