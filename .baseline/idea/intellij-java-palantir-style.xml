@@ -58,6 +58,7 @@
             <CLASS name="Id" />
             <CLASS name="Identifier" />
             <CLASS name="Provider" />
+            <CLASS name="Visitor" />
           </DO_NOT_IMPORT_INNER>
         </GroovyCodeStyleSettings>
         <option name="JD_ALIGN_EXCEPTION_COMMENTS" value="false" />

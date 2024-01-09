@@ -78,6 +78,7 @@ final class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
         this.project = original.getProject();
     }
 
+    @SuppressWarnings("ImmutableMapDuplicateKeyStrategy")
     static Map<TextRange, String> getReplacements(
             FormatterService formatter, String text, Collection<? extends TextRange> ranges) {
         try {
