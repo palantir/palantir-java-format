@@ -39,6 +39,13 @@ allprojects {
     repositories {
         mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
     }
+    pluginManager.withPlugin('java') {
+        tasks.withType(JavaCompile) {
+            options.errorprone {
+                enabled = false
+            }
+        }
+    }
 }
 
 subprojects {
