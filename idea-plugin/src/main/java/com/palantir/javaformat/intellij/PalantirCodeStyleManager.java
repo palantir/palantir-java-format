@@ -197,7 +197,7 @@ final class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
         PalantirJavaFormatSettings settings = PalantirJavaFormatSettings.getInstance(getProject());
         Optional<FormatterService> formatter = formatterProvider.get(project, settings);
         if (formatter.isEmpty()) {
-            // Return early if we couldn't find a formatter.
+            log.warn("Could not find a formatter! Making no changes");
             return;
         }
 
