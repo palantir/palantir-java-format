@@ -35,4 +35,9 @@ public final class FormatterProviderTest {
     void testParseSdkJavaVersion_ea() {
         assertThat(FormatterProvider.parseSdkJavaVersion("15-ea")).hasValue(15);
     }
+
+    @Test
+    void testParseSdkJavaVersion_invalidVersion_isEmpty() {
+        assertThat(FormatterProvider.parseSdkJavaVersion("not-a-version")).isEmpty();
+    }
 }

@@ -159,7 +159,7 @@ final class FormatterProvider {
             return OptionalInt.of(Integer.parseInt(normalizedVersion));
         } catch (NumberFormatException e) {
             log.error("Could not parse sdk version: {}", version, e);
-            return null;
+            return OptionalInt.empty();
         }
     }
 
