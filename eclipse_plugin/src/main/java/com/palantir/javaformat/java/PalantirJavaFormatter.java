@@ -19,6 +19,7 @@ import com.google.common.collect.Range;
 import com.palantir.javaformat.java.SnippetFormatter.SnippetKind;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.formatter.CodeFormatter;
 import org.eclipse.jface.text.IRegion;
@@ -32,6 +33,7 @@ public class PalantirJavaFormatter extends CodeFormatter {
 
     private static final int INDENTATION_SIZE = 4;
 
+    @Nullable
     @Override
     public TextEdit format(
             int kind, String source, int offset, int length, int indentationLevel, String _lineSeparator) {
@@ -39,6 +41,7 @@ public class PalantirJavaFormatter extends CodeFormatter {
         return formatInternal(kind, source, regions, indentationLevel);
     }
 
+    @Nullable
     @Override
     public TextEdit format(int kind, String source, IRegion[] regions, int indentationLevel, String _lineSeparator) {
         return formatInternal(kind, source, regions, indentationLevel);
@@ -57,6 +60,7 @@ public class PalantirJavaFormatter extends CodeFormatter {
     }
 
     /** Runs the Google Java formatter on the given source, with only the given ranges specified. */
+    @Nullable
     private TextEdit formatInternal(int kind, String source, IRegion[] regions, int initialIndent) {
         try {
             boolean includeComments = (kind & CodeFormatter.F_INCLUDE_COMMENTS) == CodeFormatter.F_INCLUDE_COMMENTS;

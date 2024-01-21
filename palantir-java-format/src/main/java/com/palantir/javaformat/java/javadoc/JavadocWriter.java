@@ -28,6 +28,7 @@ import static com.palantir.javaformat.java.javadoc.Token.Type.PARAGRAPH_OPEN_TAG
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Ordering;
+import javax.annotation.Nullable;
 
 /**
  * Stateful object that accepts "requests" and "writes," producing formatted Javadoc.
@@ -53,7 +54,10 @@ final class JavadocWriter {
     private int remainingOnLine;
     private boolean atStartOfLine;
     private RequestedWhitespace requestedWhitespace = NONE;
+
+    @Nullable
     private Token requestedMoeBeginStripComment;
+
     private int indentForMoeEndStripComment;
     private boolean wroteAnythingSignificant;
 

@@ -28,6 +28,8 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -130,7 +132,7 @@ public final class Main {
             }
         }
 
-        for (Map.Entry<Path, Future<String>> result : results.entrySet()) {
+        for (Entry<Path, Future<String>> result : results.entrySet()) {
             Path path = result.getKey();
             String formatted;
             try {
@@ -145,8 +147,11 @@ public final class Main {
                         errWriter.println(path + ":" + diagnostic.toString());
                     }
                 } else {
-                    errWriter.println(path + ": error: " + e.getCause().getMessage());
-                    e.getCause().printStackTrace(errWriter);
+                    errWriter.println(path + ": error: "
+                            + Optional.ofNullable(e.getCause())
+                                    .map(Throwable::getMessage)
+                                    .orElse("null"));
+                    Optional.ofNullable(e.getCause()).ifPresent(cause -> cause.printStackTrace(errWriter));
                 }
                 allOk = false;
                 continue;
@@ -215,10 +220,10 @@ public final class Main {
         try {
             parameters = CommandLineOptionsParser.parse(Arrays.asList(args));
         } catch (IllegalArgumentException e) {
-            throw new UsageException(e.getMessage());
+            throw new UsageException(Optional.ofNullable(e.getMessage()).orElse("null"));
         } catch (Throwable t) {
             t.printStackTrace();
-            throw new UsageException(t.getMessage());
+            throw new UsageException(Optional.ofNullable(t.getMessage()).orElse("null"));
         }
         int filesToFormat = parameters.files().size();
         if (parameters.stdin()) {

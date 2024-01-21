@@ -31,6 +31,7 @@ apply plugin: 'com.palantir.consistent-versions'
 version System.env.CIRCLE_TAG ?: gitVersion()
 
 allprojects {
+    apply plugin: 'com.palantir.baseline-null-away'
     apply plugin: 'com.palantir.java-format'
     apply plugin: 'com.palantir.jakarta-package-alignment'
     group = 'com.palantir.javaformat'
