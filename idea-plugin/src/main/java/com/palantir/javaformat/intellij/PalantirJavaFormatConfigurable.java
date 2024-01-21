@@ -25,21 +25,23 @@ import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 import com.palantir.javaformat.intellij.PalantirJavaFormatSettings.EnabledState;
-import java.awt.Insets;
+import org.jetbrains.annotations.Nls;
+import org.jetbrains.annotations.NotNull;
+
 import javax.annotation.Nullable;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import org.jetbrains.annotations.Nls;
-import org.jetbrains.annotations.NotNull;
+import java.awt.Insets;
 
 class PalantirJavaFormatConfigurable extends BaseConfigurable implements SearchableConfigurable {
 
     private final Project project;
     private JPanel panel;
     private JCheckBox enable;
+    private JCheckBox formatJavadoc;
     private JComboBox styleComboBox;
     private JLabel formatterVersion;
     private JLabel pluginVersion;
@@ -82,6 +84,7 @@ class PalantirJavaFormatConfigurable extends BaseConfigurable implements Searcha
     public void apply() throws ConfigurationException {
         PalantirJavaFormatSettings settings = PalantirJavaFormatSettings.getInstance(project);
         settings.setEnabled(enable.isSelected() ? EnabledState.ENABLED : getDisabledState());
+        settings.setFormatJavadoc(formatJavadoc.isSelected());
         settings.setStyle(((UiFormatterStyle) styleComboBox.getSelectedItem()).convert());
     }
 
@@ -96,6 +99,7 @@ class PalantirJavaFormatConfigurable extends BaseConfigurable implements Searcha
     public void reset() {
         PalantirJavaFormatSettings settings = PalantirJavaFormatSettings.getInstance(project);
         enable.setSelected(settings.isEnabled());
+        formatJavadoc.setSelected(settings.isFormatJavadoc());
         styleComboBox.setSelectedItem(UiFormatterStyle.convert(settings.getStyle()));
         pluginVersion.setText(settings.getImplementationVersion().orElse("unknown"));
         formatterVersion.setText(getFormatterVersionText(settings));
@@ -105,6 +109,7 @@ class PalantirJavaFormatConfigurable extends BaseConfigurable implements Searcha
     public boolean isModified() {
         PalantirJavaFormatSettings settings = PalantirJavaFormatSettings.getInstance(project);
         return enable.isSelected() != settings.isEnabled()
+                || formatJavadoc.isSelected() != settings.isFormatJavadoc()
                 || !styleComboBox.getSelectedItem().equals(UiFormatterStyle.convert(settings.getStyle()));
     }
 
@@ -155,11 +160,29 @@ class PalantirJavaFormatConfigurable extends BaseConfigurable implements Searcha
                         null,
                         0,
                         false));
+        formatJavadoc = new JCheckBox();
+        formatJavadoc.setText("Format JavaDoc");
+        panel.add(
+                formatJavadoc,
+                new GridConstraints(
+                        1,
+                        0,
+                        1,
+                        2,
+                        GridConstraints.ANCHOR_WEST,
+                        GridConstraints.FILL_NONE,
+                        GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW,
+                        GridConstraints.SIZEPOLICY_FIXED,
+                        null,
+                        null,
+                        null,
+                        0,
+                        false));
         final Spacer spacer1 = new Spacer();
         panel.add(
                 spacer1,
                 new GridConstraints(
-                        4,
+                        5,
                         0,
                         1,
                         2,
@@ -177,7 +200,7 @@ class PalantirJavaFormatConfigurable extends BaseConfigurable implements Searcha
         panel.add(
                 label1,
                 new GridConstraints(
-                        1,
+                        2,
                         0,
                         1,
                         1,
@@ -193,7 +216,7 @@ class PalantirJavaFormatConfigurable extends BaseConfigurable implements Searcha
         panel.add(
                 styleComboBox,
                 new GridConstraints(
-                        1,
+                        2,
                         1,
                         1,
                         1,
@@ -211,7 +234,7 @@ class PalantirJavaFormatConfigurable extends BaseConfigurable implements Searcha
         panel.add(
                 label2,
                 new GridConstraints(
-                        3,
+                        4,
                         0,
                         1,
                         1,
@@ -229,7 +252,7 @@ class PalantirJavaFormatConfigurable extends BaseConfigurable implements Searcha
         panel.add(
                 formatterVersion,
                 new GridConstraints(
-                        3,
+                        4,
                         1,
                         1,
                         1,
@@ -247,7 +270,7 @@ class PalantirJavaFormatConfigurable extends BaseConfigurable implements Searcha
         panel.add(
                 label3,
                 new GridConstraints(
-                        2,
+                        3,
                         0,
                         1,
                         1,
@@ -265,7 +288,7 @@ class PalantirJavaFormatConfigurable extends BaseConfigurable implements Searcha
         panel.add(
                 pluginVersion,
                 new GridConstraints(
-                        2,
+                        3,
                         1,
                         1,
                         1,

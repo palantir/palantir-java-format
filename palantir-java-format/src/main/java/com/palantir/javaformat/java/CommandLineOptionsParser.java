@@ -115,6 +115,10 @@ final class CommandLineOptionsParser {
                 case "--skip-removing-unused-imports":
                     optionsBuilder.removeUnusedImports(false);
                     break;
+                case "-format-javadoc":
+                case "--format-javadoc":
+                    optionsBuilder.formatJavadoc(true);
+                    break;
                 case "--skip-reflowing-long-strings":
                     optionsBuilder.reflowLongStrings(false);
                     break;

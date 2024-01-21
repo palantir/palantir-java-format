@@ -68,6 +68,14 @@ class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJav
         state.enabled = enabled;
     }
 
+    boolean isFormatJavadoc() {
+        return state.formatJavadoc;
+    }
+
+    void setFormatJavadoc(boolean formatJavadoc) {
+        state.formatJavadoc = formatJavadoc;
+    }
+
     boolean isUninitialized() {
         return state.enabled.equals(EnabledState.UNKNOWN);
     }
@@ -137,6 +145,7 @@ class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJav
         private EnabledState enabled = EnabledState.UNKNOWN;
         private Optional<List<URI>> implementationClassPath = Optional.empty();
 
+        private boolean formatJavadoc = false;
         public JavaFormatterOptions.Style style = JavaFormatterOptions.Style.PALANTIR;
 
         public void setImplementationClassPath(@Nullable List<String> value) {
@@ -172,11 +181,21 @@ class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJav
             }
         }
 
+        public boolean isFormatJavadoc() {
+            return formatJavadoc;
+        }
+
+        public void setFormatJavadoc(boolean formatJavadoc) {
+            this.formatJavadoc = formatJavadoc;
+        }
+
         @Override
         public String toString() {
             return "PalantirJavaFormatSettings{"
                     + "enabled="
                     + enabled
+                    + ", formatJavadoc="
+                    + formatJavadoc
                     + ", formatterPath="
                     + implementationClassPath
                     + ", style="

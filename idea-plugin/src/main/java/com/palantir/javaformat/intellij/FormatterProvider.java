@@ -19,6 +19,7 @@ package com.palantir.javaformat.intellij;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Functions;
 import com.google.common.collect.Iterables;
 import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.project.Project;
@@ -29,6 +30,7 @@ import com.intellij.openapi.util.BuildNumber;
 import com.intellij.openapi.util.SystemInfo;
 import com.palantir.javaformat.bootstrap.BootstrappingFormatterService;
 import com.palantir.javaformat.java.FormatterService;
+import com.palantir.javaformat.java.JavaFormatterOptions;
 import com.palantir.logsafe.Preconditions;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -59,7 +61,9 @@ final class FormatterProvider {
                 project,
                 getSdkVersion(project),
                 settings.getImplementationClassPath(),
-                settings.injectedVersionIsOutdated()));
+                settings.injectedVersionIsOutdated(),
+                settings.getStyle(),
+                settings.isFormatJavadoc()));
     }
 
     private static FormatterService createFormatter(FormatterCacheKey cacheKey) {
@@ -67,20 +71,26 @@ final class FormatterProvider {
         List<Path> implementationClasspath =
                 getImplementationUrls(cacheKey.implementationClassPath, cacheKey.useBundledImplementation);
 
+        JavaFormatterOptions options = JavaFormatterOptions.builder()
+                .formatJavadoc(cacheKey.formatJavadoc)
+                .style(cacheKey.style != null ? cacheKey.style : JavaFormatterOptions.Style.PALANTIR)
+                .build();
+
         // When running with JDK 15+ or using newer language features, we use the bootstrapping formatter which injects
         // required "--add-exports" args.
         if (useBootstrappingFormatter(
                 jdkMajorVersion, ApplicationInfo.getInstance().getBuild())) {
             Path jdkPath = getJdkPath(cacheKey.project);
             log.info("Using bootstrapping formatter with jdk version {} and path: {}", jdkMajorVersion, jdkPath);
-            return new BootstrappingFormatterService(jdkPath, jdkMajorVersion, implementationClasspath);
+            return new BootstrappingFormatterService(jdkPath, jdkMajorVersion, implementationClasspath, options);
         }
 
         // Use "in-process" formatter service
         log.info("Using in-process formatter for jdk version {}", jdkMajorVersion);
         URL[] implementationUrls = toUrlsUnchecked(implementationClasspath);
         ClassLoader classLoader = new URLClassLoader(implementationUrls, FormatterService.class.getClassLoader());
-        return Iterables.getOnlyElement(ServiceLoader.load(FormatterService.class, classLoader));
+        return Iterables.getOnlyElement(ServiceLoader.load(FormatterService.class, classLoader))
+                .withOptions(Functions.constant(options));
     }
 
     /**
@@ -188,16 +198,22 @@ final class FormatterProvider {
         private final int jdkMajorVersion;
         private final Optional<List<URI>> implementationClassPath;
         private final boolean useBundledImplementation;
+        private final boolean formatJavadoc;
+        private final JavaFormatterOptions.Style style;
 
         FormatterCacheKey(
                 Project project,
                 int jdkMajorVersion,
                 Optional<List<URI>> implementationClassPath,
-                boolean useBundledImplementation) {
+                boolean useBundledImplementation,
+                JavaFormatterOptions.Style style,
+                boolean formatJavadoc) {
             this.project = project;
             this.jdkMajorVersion = jdkMajorVersion;
             this.implementationClassPath = implementationClassPath;
             this.useBundledImplementation = useBundledImplementation;
+            this.style = style;
+            this.formatJavadoc = formatJavadoc;
         }
 
         @Override
@@ -212,12 +228,15 @@ final class FormatterProvider {
             return jdkMajorVersion == that.jdkMajorVersion
                     && useBundledImplementation == that.useBundledImplementation
                     && Objects.equals(project, that.project)
-                    && Objects.equals(implementationClassPath, that.implementationClassPath);
+                    && Objects.equals(implementationClassPath, that.implementationClassPath)
+                    && Objects.equals(style, that.style)
+                    && Objects.equals(formatJavadoc, that.formatJavadoc);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(project, jdkMajorVersion, implementationClassPath, useBundledImplementation);
+            return Objects.hash(
+                    project, jdkMajorVersion, implementationClassPath, useBundledImplementation, style, formatJavadoc);
         }
     }
 }

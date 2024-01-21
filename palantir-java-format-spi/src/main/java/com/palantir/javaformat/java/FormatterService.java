@@ -18,6 +18,7 @@ package com.palantir.javaformat.java;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import java.util.Collection;
+import java.util.function.Function;
 
 /**
  * A stable facade for palantir-java-format. The implementation must be ServiceLoaded, to ensure its classpath remains
@@ -48,4 +49,22 @@ public interface FormatterService {
      *     Style Guide - 3.3.3 Import ordering and spacing</a>
      */
     String formatSourceReflowStringsAndFixImports(String input) throws FormatterException;
+
+    /**
+     * Derives a new formatter service from this service with the given options. Note
+     * that formatter services are immutable, this instance can still be used with the
+     * old settings.
+     * <p>
+     * Note: The default implementation exists for backwards compatibility and simply returns
+     * this instance.
+     * @param optionsTransformer An operator that is given the current set of options and returns the new set of
+     * options. You can either ignore the given options and build a new set of options from scratch, or use
+     * {@link JavaFormatterOptions.Builder#from(JavaFormatterOptions) JavaFormatterOptions.Builder.from()} to modify
+     * only some options.
+     * @return A formatter service that formats code with the given options.
+     */
+    default FormatterService withOptions(
+            Function<? super JavaFormatterOptions, ? extends JavaFormatterOptions> optionsTransformer) {
+        return this;
+    }
 }
