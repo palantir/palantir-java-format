@@ -25,16 +25,15 @@ import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 import com.palantir.javaformat.intellij.PalantirJavaFormatSettings.EnabledState;
-import org.jetbrains.annotations.Nls;
-import org.jetbrains.annotations.NotNull;
-
+import java.awt.Insets;
 import javax.annotation.Nullable;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import java.awt.Insets;
+import org.jetbrains.annotations.Nls;
+import org.jetbrains.annotations.NotNull;
 
 class PalantirJavaFormatConfigurable extends BaseConfigurable implements SearchableConfigurable {
 
