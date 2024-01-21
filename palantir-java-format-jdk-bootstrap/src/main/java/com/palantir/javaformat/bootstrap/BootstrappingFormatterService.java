@@ -27,8 +27,6 @@ import com.google.common.collect.Range;
 import com.palantir.javaformat.java.FormatterService;
 import com.palantir.javaformat.java.JavaFormatterOptions;
 import com.palantir.javaformat.java.Replacement;
-import org.immutables.value.Value;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -37,6 +35,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.immutables.value.Value;
 
 public final class BootstrappingFormatterService implements FormatterService {
     private static final ObjectMapper MAPPER =
