@@ -185,6 +185,7 @@ public final class Main {
     }
 
     private void warnIfDurationExceedsThreshold(CommandLineOptions parameters, Path path, FormatFileResult fileResult) {
+        outWriter.println(path + ": took " + fileResult.duration().toMillis() + "ms to format");
         if (fileResult.duration().toMillis() > Duration.ofSeconds(2).toMillis()) {
             errWriter.println(path + ": took " + fileResult.duration().toMillis() + "ms to format, "
                     + "which is longer than the threshold of "
