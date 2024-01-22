@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -184,9 +185,7 @@ public final class Main {
     }
 
     private void warnIfDurationExceedsThreshold(CommandLineOptions parameters, Path path, FormatFileResult fileResult) {
-        if (parameters.warnOnExpensiveFileDurationMillis().isPresent()
-                && fileResult.duration().toMillis()
-                        > parameters.warnOnExpensiveFileDurationMillis().get()) {
+        if (fileResult.duration().toMillis() > Duration.ofSeconds(2).toMillis()) {
             errWriter.println(path + ": took " + fileResult.duration().toMillis() + "ms to format, "
                     + "which is longer than the threshold of "
                     + parameters.warnOnExpensiveFileDurationMillis().get() + "ms");
