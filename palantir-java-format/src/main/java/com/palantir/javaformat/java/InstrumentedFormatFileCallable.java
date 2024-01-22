@@ -33,10 +33,12 @@ public class InstrumentedFormatFileCallable implements Callable<FormatFileResult
     }
 
     @Override
-    public FormatFileResult call() {
+    public FormatFileResult call() throws FormatterException {
         long start = System.currentTimeMillis();
         try {
             String _result = delegate.call();
+        } catch (FormatterException e) {
+            throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
