@@ -37,6 +37,9 @@ public class InstrumentedFormatFileCallable implements Callable<FormatFileResult
         long start = System.currentTimeMillis();
         String result = delegate.call();
         Duration duration = Duration.ofMillis(System.currentTimeMillis() - start);
+        if (duration.toMillis() > Duration.ofSeconds(1).toMillis()) {
+            throw new IllegalArgumentException("Formatting took too long: " + duration.toMillis() + "ms");
+        }
         return FormatFileResult.of(result, duration);
     }
 
