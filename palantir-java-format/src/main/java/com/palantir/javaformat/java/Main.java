@@ -203,7 +203,8 @@ public final class Main {
         String stdinFilename = parameters.assumeFilename().orElse(STDIN_FILENAME);
         boolean ok = true;
         try {
-            String output = new FormatFileCallable(parameters, input, options).call();
+            String output =
+                    new InstrumentedFormatFileCallable(new FormatFileCallable(parameters, input, options)).call();
             boolean changed = !input.equals(output);
             if (changed && parameters.setExitIfChanged()) {
                 ok = false;
