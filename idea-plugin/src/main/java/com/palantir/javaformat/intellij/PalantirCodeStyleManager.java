@@ -46,6 +46,7 @@ import com.palantir.javaformat.java.FormatterException;
 import com.palantir.javaformat.java.FormatterService;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
@@ -194,9 +195,13 @@ final class PalantirCodeStyleManager extends CodeStyleManagerDecorator {
      */
     private void format(Document document, Collection<? extends TextRange> ranges) {
         PalantirJavaFormatSettings settings = PalantirJavaFormatSettings.getInstance(getProject());
-        FormatterService formatter = formatterProvider.get(project, settings);
+        Optional<FormatterService> formatter = formatterProvider.get(project, settings);
+        if (formatter.isEmpty()) {
+            log.warn("Could not find a formatter! Making no changes");
+            return;
+        }
 
-        performReplacements(document, getReplacements(formatter, document.getText(), ranges));
+        performReplacements(document, getReplacements(formatter.get(), document.getText(), ranges));
     }
 
     private void performReplacements(final Document document, final Map<TextRange, String> replacements) {

@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Fix "Could not determine jdk version for project" error
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/980
