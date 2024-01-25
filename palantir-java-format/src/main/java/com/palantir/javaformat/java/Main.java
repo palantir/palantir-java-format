@@ -28,6 +28,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -219,10 +220,10 @@ public final class Main {
         try {
             parameters = CommandLineOptionsParser.parse(Arrays.asList(args));
         } catch (IllegalArgumentException e) {
-            throw new UsageException(Optional.ofNullable(e.getMessage()).orElse("null"));
+            throw new UsageException(Objects.requireNonNullElse(e.getMessage(), "null"));
         } catch (Throwable t) {
             t.printStackTrace();
-            throw new UsageException(Optional.ofNullable(t.getMessage()).orElse("null"));
+            throw new UsageException(Objects.requireNonNullElse(t.getMessage(), "null"));
         }
         int filesToFormat = parameters.files().size();
         if (parameters.stdin()) {
