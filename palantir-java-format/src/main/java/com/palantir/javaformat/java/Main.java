@@ -28,7 +28,6 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -132,7 +131,7 @@ public final class Main {
             }
         }
 
-        for (Entry<Path, Future<String>> result : results.entrySet()) {
+        for (Map.Entry<Path, Future<String>> result : results.entrySet()) {
             Path path = result.getKey();
             String formatted;
             try {
