@@ -19,7 +19,6 @@ package com.palantir.javaformat.intellij;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Iterables;
 import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.JdkUtil;
@@ -40,6 +39,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.ServiceLoader;
 import java.util.jar.Attributes.Name;
 import java.util.stream.Collectors;
@@ -51,10 +51,10 @@ final class FormatterProvider {
     private static final Logger log = LoggerFactory.getLogger(FormatterProvider.class);
 
     // Cache to avoid creating a URLClassloader every time we want to format from IntelliJ
-    private final LoadingCache<FormatterCacheKey, FormatterService> implementationCache =
+    private final LoadingCache<FormatterCacheKey, Optional<FormatterService>> implementationCache =
             Caffeine.newBuilder().maximumSize(1).build(FormatterProvider::createFormatter);
 
-    FormatterService get(Project project, PalantirJavaFormatSettings settings) {
+    Optional<FormatterService> get(Project project, PalantirJavaFormatSettings settings) {
         return implementationCache.get(new FormatterCacheKey(
                 project,
                 getSdkVersion(project),
@@ -62,8 +62,12 @@ final class FormatterProvider {
                 settings.injectedVersionIsOutdated()));
     }
 
-    private static FormatterService createFormatter(FormatterCacheKey cacheKey) {
-        int jdkMajorVersion = cacheKey.jdkMajorVersion;
+    private static Optional<FormatterService> createFormatter(FormatterCacheKey cacheKey) {
+        if (cacheKey.jdkMajorVersion.isEmpty()) {
+            return Optional.empty();
+        }
+
+        int jdkMajorVersion = cacheKey.jdkMajorVersion.getAsInt();
         List<Path> implementationClasspath =
                 getImplementationUrls(cacheKey.implementationClassPath, cacheKey.useBundledImplementation);
 
@@ -73,14 +77,14 @@ final class FormatterProvider {
                 jdkMajorVersion, ApplicationInfo.getInstance().getBuild())) {
             Path jdkPath = getJdkPath(cacheKey.project);
             log.info("Using bootstrapping formatter with jdk version {} and path: {}", jdkMajorVersion, jdkPath);
-            return new BootstrappingFormatterService(jdkPath, jdkMajorVersion, implementationClasspath);
+            return Optional.of(new BootstrappingFormatterService(jdkPath, jdkMajorVersion, implementationClasspath));
         }
 
         // Use "in-process" formatter service
         log.info("Using in-process formatter for jdk version {}", jdkMajorVersion);
         URL[] implementationUrls = toUrlsUnchecked(implementationClasspath);
         ClassLoader classLoader = new URLClassLoader(implementationUrls, FormatterService.class.getClassLoader());
-        return Iterables.getOnlyElement(ServiceLoader.load(FormatterService.class, classLoader));
+        return ServiceLoader.load(FormatterService.class, classLoader).findFirst();
     }
 
     /**
@@ -131,13 +135,13 @@ final class FormatterProvider {
                 .orElseThrow(() -> new IllegalStateException("Could not determine jdk path for project " + project));
     }
 
-    private static Integer getSdkVersion(Project project) {
+    private static OptionalInt getSdkVersion(Project project) {
         return getProjectJdk(project)
                 .map(FormatterProvider::parseSdkJavaVersion)
                 .orElseThrow(() -> new IllegalStateException("Could not determine jdk version for project " + project));
     }
 
-    private static Integer parseSdkJavaVersion(Sdk sdk) {
+    private static OptionalInt parseSdkJavaVersion(Sdk sdk) {
         // Parses the actual version out of "SDK#getVersionString" which returns 'java version "15"'
         // or 'openjdk version "15.0.2"'.
         String version = Preconditions.checkNotNull(
@@ -146,16 +150,16 @@ final class FormatterProvider {
     }
 
     @VisibleForTesting
-    static Integer parseSdkJavaVersion(String version) {
+    static OptionalInt parseSdkJavaVersion(String version) {
         int indexOfVersionDelimiter = version.indexOf('.');
         String normalizedVersion =
                 indexOfVersionDelimiter >= 0 ? version.substring(0, indexOfVersionDelimiter) : version;
         normalizedVersion = normalizedVersion.replaceAll("-ea", "");
         try {
-            return Integer.parseInt(normalizedVersion);
+            return OptionalInt.of(Integer.parseInt(normalizedVersion));
         } catch (NumberFormatException e) {
             log.error("Could not parse sdk version: {}", version, e);
-            return null;
+            return OptionalInt.empty();
         }
     }
 
@@ -185,13 +189,13 @@ final class FormatterProvider {
 
     private static final class FormatterCacheKey {
         private final Project project;
-        private final int jdkMajorVersion;
+        private final OptionalInt jdkMajorVersion;
         private final Optional<List<URI>> implementationClassPath;
         private final boolean useBundledImplementation;
 
         FormatterCacheKey(
                 Project project,
-                int jdkMajorVersion,
+                OptionalInt jdkMajorVersion,
                 Optional<List<URI>> implementationClassPath,
                 boolean useBundledImplementation) {
             this.project = project;
@@ -209,7 +213,7 @@ final class FormatterProvider {
                 return false;
             }
             FormatterCacheKey that = (FormatterCacheKey) o;
-            return jdkMajorVersion == that.jdkMajorVersion
+            return Objects.equals(jdkMajorVersion, that.jdkMajorVersion)
                     && useBundledImplementation == that.useBundledImplementation
                     && Objects.equals(project, that.project)
                     && Objects.equals(implementationClassPath, that.implementationClassPath);
