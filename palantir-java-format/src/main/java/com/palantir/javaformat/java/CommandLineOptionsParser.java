@@ -28,6 +28,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import javax.annotation.Nullable;
 
 /** A parser for {@link CommandLineOptions}. */
 final class CommandLineOptionsParser {
@@ -50,7 +51,7 @@ final class CommandLineOptionsParser {
                 break;
             }
             String flag;
-            String value;
+            @Nullable String value;
             int idx = option.indexOf('=');
             if (idx >= 0) {
                 flag = option.substring(0, idx);
@@ -151,7 +152,7 @@ final class CommandLineOptionsParser {
         }
     }
 
-    private static String getValue(String flag, Iterator<String> it, String value) {
+    private static String getValue(String flag, Iterator<String> it, @Nullable String value) {
         if (value != null) {
             return value;
         }
