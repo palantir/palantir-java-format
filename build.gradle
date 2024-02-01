@@ -49,17 +49,17 @@ subprojects {
     sourceCompatibility = 11
     targetCompatibility = 11
 
-    tasks.withType(Checkstyle) {
+    tasks.withType(Checkstyle).configureEach {
         enabled = false
     }
 
-    tasks.withType(JavaCompile) {
+    tasks.withType(JavaCompile).configureEach {
         options.errorprone.disable 'PreconditionsConstantMessage', 'PreferSafeLoggableExceptions', 'PreferSafeLoggingPreconditions'
     }
 
     // Run `./gradlew test -Drecreate=true` to recreate all the expected
     // generated code that we have checked into the repo.
-    tasks.withType(Test) {
+    tasks.withType(Test).configureEach {
         systemProperty 'recreate', System.getProperty('recreate', 'false')
     }
 }

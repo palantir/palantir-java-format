@@ -1,6 +1,3 @@
-import java.util.function.Function
-import java.util.stream.Collectors
-
 apply plugin: 'application'
 apply plugin: 'com.palantir.external-publish-jar'
 
@@ -43,12 +40,7 @@ def exports = [
         'jdk.compiler/com.sun.tools.javac.api'
 ]
 
-def jvmArgList = exports.stream().map(new Function<String, String>() {
-    @Override
-    String apply(String value) {
-        return "--add-exports=${value}=ALL-UNNAMED"
-    }
-}).collect(Collectors.toList())
+def jvmArgList = exports.collect { value -> "--add-exports=${value}=ALL-UNNAMED".toString() }
 
 tasks.withType(JavaCompile).configureEach {
     options.errorprone.disable 'StrictUnusedVariable'
@@ -75,9 +67,11 @@ tasks.withType(Javadoc).configureEach {
 }
 
 // false positives due to org.junit.runners.* in the test cases
-tasks.checkJUnitDependencies.enabled = false
+tasks.named("checkJUnitDependencies") {
+    enabled = false
+}
 
-tasks.test {
+tasks.named("test") {
     // Run all classes and tests in parallel
     // https://junit.org/junit5/docs/current/user-guide/#writing-tests-parallel-execution
     systemProperty 'junit.jupiter.execution.parallel.mode.default', 'concurrent'
@@ -90,8 +84,8 @@ idea {
 
 // This block may be replaced by BaselineExportsExtension exports
 // once https://github.com/gradle/gradle/issues/18824 is resolved.
-jar {
+tasks.named("jar", Jar) {
     manifest {
-        attributes('Add-Exports': exports.stream().collect(Collectors.joining(' ')))
+        attributes('Add-Exports': exports.join(' '))
     }
 }

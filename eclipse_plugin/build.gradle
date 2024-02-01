@@ -29,17 +29,15 @@ dependencies {
     implementation project(':palantir-java-format')
 }
 
-jar {
+tasks.named("jar", Jar) {
     archiveBaseName = 'palantir-java-format-eclipse-plugin'
     manifest {
         from 'src/main/resources/META-INF/MANIFEST.MF'
     }
     // We embed some dependencies into the JAR file
-    from(configurations.runtimeClasspath.filter {
-        var name = it.getName()
-        name.startsWith('functionaljava') || name.startsWith('guava') || name.startsWith('palantir')
-    }) {
+    from(configurations.runtimeClasspath) {
         into 'lib'
+        include('functionaljava*', 'guava*', 'palantir*')
         // The libraries are listed without a version in the manifest
         rename('(.*)-[0-9b.]+(\\.dirty|-jre)?\\.jar', '$1.jar')
     }
