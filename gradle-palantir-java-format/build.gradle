@@ -4,6 +4,13 @@ apply plugin: 'com.palantir.external-publish-jar'
 apply plugin: 'com.palantir.external-publish-gradle-plugin'
 apply plugin: 'com.palantir.revapi'
 
+configurations {
+    pluginClasspath {
+        canBeConsumed = false
+        canBeResolved = true
+    }
+}
+
 dependencies {
     compileOnly 'com.diffplug.spotless:spotless-plugin-gradle'
 
@@ -18,7 +25,7 @@ dependencies {
     testImplementation 'org.assertj:assertj-core'
     testImplementation project(':palantir-java-format')
 
-    testRuntimeOnly 'com.diffplug.spotless:spotless-plugin-gradle'
+    pluginClasspath 'com.diffplug.spotless:spotless-plugin-gradle'
 }
 
 gradlePlugin {
@@ -54,6 +61,10 @@ gradlePlugin {
             tags.set(['java', 'style'])
         }
     }
+}
+
+tasks.withType(PluginUnderTestMetadata).configureEach {
+    pluginClasspath.from += configurations.pluginClasspath
 }
 
 configurations {
