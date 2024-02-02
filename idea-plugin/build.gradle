@@ -27,9 +27,13 @@ intellij {
     plugins = ['java']
 }
 
-tasks.runIde {
+def buildPlugin = tasks.named("buildPlugin")
+
+tasks.named("runIde") {
     // Allow debugging
     jvmArgs '--add-exports=java.base/jdk.internal.vm=ALL-UNNAMED'
+
+    dependsOn(buildPlugin)
 }
 
 patchPluginXml {
@@ -39,15 +43,21 @@ patchPluginXml {
     untilBuild = ''
 }
 
-publishPlugin {
+def publishPlugin = tasks.named("publishPlugin") {
+    onlyIf { versionDetails().isCleanTag }
+
     token = System.env.JETBRAINS_PLUGIN_REPO_TOKEN
 }
-tasks.publishPlugin.onlyIf { versionDetails().isCleanTag }
-tasks.publish.dependsOn publishPlugin
+tasks.named("publish") {
+    dependsOn(publishPlugin)
+}
 
 configurations {
     formatter {
         description = 'The default implementation of palantir-java-format, used if the user doesn\'t specify an explicit classpath.'
+
+        canBeConsumed = false
+        canBeResolved = true
     }
 }
 
@@ -73,11 +83,13 @@ tasks.withType(JavaCompile).configureEach {
     options.errorprone.disable 'PreferSafeLoggingPreconditions'
 }
 
-check.dependsOn buildPlugin, verifyPlugin
+tasks.named("check") {
+    dependsOn(buildPlugin, tasks.named("verifyPlugin"))
+}
 // This task will resolve runtimeClasspath without telling Gradle that it depends on it, therefore dependent jars won't
 // be created beforehand. Therefore, ensure that it knows about it.
 // see https://github.com/JetBrains/gradle-intellij-plugin/blob/master/src/main/groovy/org/jetbrains/intellij/tasks/PrepareSandboxTask.groovy
-tasks.withType(org.jetbrains.intellij.tasks.PrepareSandboxTask) {
+tasks.withType(org.jetbrains.intellij.tasks.PrepareSandboxTask).configureEach {
     dependsOn configurations.runtimeClasspath
 
     // Also pack the formatter in its own directory
@@ -88,9 +100,9 @@ tasks.withType(org.jetbrains.intellij.tasks.PrepareSandboxTask) {
     }
 }
 
-runIde.dependsOn buildPlugin
-
-buildSearchableOptions.enabled = false
+tasks.named("buildSearchableOptions") {
+    enabled = false
+}
 
 // Prevent nebula.maven-publish from trying to publish components.java - we are publishing our own different artifact
 ext."nebulaPublish.maven.jar" = false
@@ -109,4 +121,6 @@ versionsLock {
 }
 
 // Javadoc fails if there are no public classes to javadoc, so make it stop complaining.
-tasks.javadoc.failOnError = false
+tasks.named("javadoc", Javadoc) {
+    failOnError = false
+}
