@@ -61,7 +61,7 @@ jobs:
             if [ -x .circleci/check-setup.sh ]; then
                 echo "Running check-setup" && .circleci/check-setup.sh && echo "check-setup complete"
             fi
-      - run: ./gradlew --parallel --stacktrace --continue --max-workers=2 check -Porg.gradle.java.installations.fromEnv=JAVA_8_HOME,JAVA_11_HOME,JAVA_15_HOME,JAVA_17_HOME,JAVA_HOME
+      - run: ./gradlew --parallel --stacktrace --continue --max-workers=2 build -Porg.gradle.java.installations.fromEnv=JAVA_8_HOME,JAVA_11_HOME,JAVA_15_HOME,JAVA_17_HOME,JAVA_HOME
       - *check-no-files-changed
       - persist_to_workspace:
           root: /home/circleci
