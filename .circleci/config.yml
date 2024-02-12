@@ -79,50 +79,10 @@ jobs:
       - store_artifacts: { path: ~/artifacts }
 
   trial-publish:
-    docker: [{ image: 'cimg/openjdk:17.0.1-node' }]
-    resource_class: medium
-    environment:
-      CIRCLE_TEST_REPORTS: /home/circleci/junit
-      CIRCLE_ARTIFACTS: /home/circleci/artifacts
-      GRADLE_OPTS: -Dorg.gradle.workers.max=1 -Dorg.gradle.jvmargs='-Xmx2g --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED'
-      _JAVA_OPTIONS: -XX:ActiveProcessorCount=2 -XX:MaxRAM=4g -XX:+CrashOnOutOfMemoryError -XX:ErrorFile=/home/circleci/artifacts/hs_err_pid%p.log -XX:HeapDumpPath=/home/circleci/artifacts
+    docker: [ { image: 'busybox:1.36.1@sha256:6d9ac9237a84afe1516540f40a0fafdc86859b2141954b4d643af7066d598b74' } ]
+    resource_class: small
     steps:
-      - checkout
-      - run:
-          name: delete_unrelated_tags
-          command: |
-            ALL_TAGS=$(git tag --points-at HEAD)
-
-            if [ -z "$ALL_TAGS" ]; then
-                echo "No-op as there are no tags on the current commit ($(git rev-parse HEAD))"
-                exit 0
-            fi
-
-            if [ -z "${CIRCLE_TAG:+x}" ]; then
-                echo "Non-tag build, deleting all tags which point to HEAD: [${ALL_TAGS/$'\n'/,}]"
-                echo "$ALL_TAGS" | while read -r TAG; do git tag -d "$TAG" 1>/dev/null; done
-                exit 0
-            fi
-
-            TAGS_TO_DELETE=$(echo "$ALL_TAGS" | grep -v "^$CIRCLE_TAG$" || :)
-            if [ -z "$TAGS_TO_DELETE" ]; then
-                echo "No-op as exactly one tag ($CIRCLE_TAG) points to HEAD"
-                exit 0
-            fi
-
-            echo "Detected tag build, deleting all tags except '$CIRCLE_TAG' which point to HEAD: [${TAGS_TO_DELETE/$'\n'/,}]"
-            echo "$TAGS_TO_DELETE" | while read -r TAG; do git tag -d "$TAG" 1>/dev/null; done
-      - restore_cache: { key: 'gradle-wrapper-v1-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
-      - restore_cache: { key: 'trial-publish-gradle-cache-v1-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
-      - run: ./gradlew --stacktrace publishToMavenLocal -Porg.gradle.java.installations.fromEnv=JAVA_8_HOME,JAVA_11_HOME,JAVA_15_HOME,JAVA_17_HOME,JAVA_HOME
-      - run:
-          command: git status --porcelain
-          when: always
-      - save_cache:
-          key: 'trial-publish-gradle-cache-v1-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}'
-          paths: [ ~/.gradle/caches ]
-      - store_test_results: { path: ~/junit }
-      - store_artifacts: { path: ~/artifacts }
+      - run: { command: echo "Dummy job so repos that require the `trial-publish` job to merge PRs still see a passing `trial-publish`. Should be replaced by a `circle-all` job at some point." }
 
   publish:
     docker: [{ image: 'cimg/openjdk:17.0.1-node' }]
