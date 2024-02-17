@@ -47,7 +47,7 @@ org.eclipse.platform:org.eclipse.equinox.supplement:1.10.0 (1 constraints: 34052
 org.eclipse.platform:org.eclipse.osgi:3.18.300 (2 constraints: 990fcaaf)
 org.eclipse.platform:org.eclipse.text:3.10.300 (1 constraints: 99053a46)
 org.functionaljava:functionaljava:4.8 (1 constraints: b0042b2c)
-org.immutables:value:2.10.0 (1 constraints: 35052f3b)
+org.immutables:value:2.10.1 (1 constraints: 3605303b)
 org.jetbrains:annotations:13.0 (1 constraints: df0e795c)
 org.jetbrains.kotlin:kotlin-stdlib:1.9.10 (2 constraints: c2210fe1)
 org.jetbrains.kotlin:kotlin-stdlib-common:1.9.10 (2 constraints: 3f1b4b83)
