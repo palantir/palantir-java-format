@@ -16,29 +16,38 @@
 package com.palantir.javaformat.java;
 
 import com.google.auto.service.AutoService;
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
+import com.palantir.javaformat.java.JavaFormatterOptions.Style;
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 
 @AutoService(FormatterService.class)
 public final class FormatterServiceImpl implements FormatterService {
 
+    private final Formatter formatter;
+
     public FormatterServiceImpl() {
-        //        JavaFormatterOptions options =
-        //                JavaFormatterOptions.builder().style(Style.PALANTIR).build();
-        //        Formatter formatter = Formatter.createFormatter(options);
+        JavaFormatterOptions options =
+                JavaFormatterOptions.builder().style(Style.PALANTIR).build();
+        formatter = Formatter.createFormatter(options);
     }
 
     @Override
     public ImmutableList<Replacement> getFormatReplacements(String text, Collection<Range<Integer>> toRanges)
             throws FormatterException {
-        throw new RuntimeException("Hit the right format service impl");
-        //            return formatter.getFormatReplacements(text, toRanges);
+        return formatter.getFormatReplacements(text, toRanges);
     }
 
     @Override
     public String formatSourceReflowStringsAndFixImports(String input) throws FormatterException {
-        throw new RuntimeException("Hit the right format service impl - on fix imports path");
-        //        return formatter.formatSourceAndFixImports(input);
+        Stopwatch stopwatch = Stopwatch.createStarted();
+        String output = formatter.formatSourceAndFixImports(input);
+        stopwatch.stop();
+        if (stopwatch.elapsed(TimeUnit.MILLISECONDS) > 200) {
+            throw new RuntimeException("Spent more than 200 millis on formatting file: " + input);
+        }
+        return output;
     }
 }
