@@ -51,9 +51,6 @@ public class JavaFormatExtension {
                 .toArray(URL[]::new);
 
         ClassLoader classLoader = new URLClassLoader(jarUris, FormatterService.class.getClassLoader());
-        FormatterService loadedFormatter =
-                Iterables.getOnlyElement(ServiceLoader.load(FormatterService.class, classLoader));
-        throw new RuntimeException(
-                "Loaded formatter of type: " + loadedFormatter.getClass().getName());
+        return Iterables.getOnlyElement(ServiceLoader.load(FormatterService.class, classLoader));
     }
 }
