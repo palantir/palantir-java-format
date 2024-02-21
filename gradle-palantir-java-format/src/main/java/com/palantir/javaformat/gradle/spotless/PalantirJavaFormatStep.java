@@ -38,8 +38,9 @@ public final class PalantirJavaFormatStep {
     public static FormatterStep create(Configuration palantirJavaFormat, JavaFormatExtension extension) {
         ensureImplementationNotDirectlyLoadable();
         Supplier<FormatterService> memoizedService = extension::serviceLoad;
-        return FormatterStep.createLazy(
+        FormatterStep formatterStep = FormatterStep.createLazy(
                 NAME, () -> new State(palantirJavaFormat.getFiles(), memoizedService), State::createFormat);
+        throw new RuntimeException("Failed to get formatter" + formatterStep.getName());
     }
 
     static final class State implements Serializable {
