@@ -103,7 +103,8 @@ public final class Main {
         if (parameters.stdin()) {
             return formatStdin(parameters, options);
         } else {
-            return formatFiles(parameters, options);
+            throw new UnsupportedOperationException("Failure!");
+            //            return formatFiles(parameters, options);
         }
     }
 
