@@ -53,7 +53,8 @@ final class FormatterCommandRunner {
             throw new IOException(getErrorMessage(command, stdout, stderr));
         }
 
-        return Optional.of(stdout);
+        throw new RuntimeException("Failed to run formatter");
+        //        return Optional.of(stdout);
     }
 
     /**

@@ -101,7 +101,8 @@ public final class Main {
                 .build();
 
         if (parameters.stdin()) {
-            return formatStdin(parameters, options);
+            throw new UnsupportedOperationException("Failure!");
+            //            return formatStdin(parameters, options);
         } else {
             throw new UnsupportedOperationException("Failure!");
             //            return formatFiles(parameters, options);
@@ -195,6 +196,7 @@ public final class Main {
         }
     }
 
+    @SuppressWarnings("UnusedMethod")
     private int formatStdin(CommandLineOptions parameters, JavaFormatterOptions options) {
         String input;
         try {
