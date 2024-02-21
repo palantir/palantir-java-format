@@ -22,6 +22,7 @@ import static java.util.Comparator.comparing;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Range;
@@ -36,6 +37,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -65,7 +67,15 @@ final class FormatDiff {
                 .filter(diff -> diff.path.toString().endsWith(".java"))
                 .map(diff -> new SingleFileDiff(gitTopLevelDir.resolve(diff.path), diff.lineRanges))
                 .filter(diff -> Files.exists(diff.path))
-                .forEach(diff -> format(formatter, diff));
+                .forEach(diff -> {
+                    Stopwatch stopwatch = Stopwatch.createStarted();
+                    format(formatter, diff);
+                    Duration duration = stopwatch.stop().elapsed();
+                    if (duration.toMillis() > Duration.ofMillis(500).toMillis()) {
+                        System.err.println(
+                                "Large file detected: " + diff.path + " duration in second: " + duration.toSeconds());
+                    }
+                });
     }
 
     /** Parses the filenames and edited ranges out of `git diff -U0`. */
