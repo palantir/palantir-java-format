@@ -49,12 +49,13 @@ public final class FormatterServiceImpl implements FormatterService {
         stopwatch.stop();
 
         if (stopwatch.elapsed(TimeUnit.MILLISECONDS) > 200) {
-            Pattern pattern = Pattern.compile("class\\s+.*\\s");
+            Pattern pattern = Pattern.compile("class\\s+(.*)\\s");
             Matcher matcher = pattern.matcher(output);
             if (matcher.find()) {
-                throw new RuntimeException(stopwatch.elapsed(TimeUnit.MILLISECONDS) + " on class: " + matcher.group());
+                System.err.println(
+                        "[MT]" + stopwatch.elapsed(TimeUnit.MILLISECONDS) + " on class: " + matcher.group(1));
             } else {
-                throw new RuntimeException(stopwatch.elapsed(TimeUnit.MILLISECONDS) + " on unknown class");
+                System.err.println("[MT]" + stopwatch.elapsed(TimeUnit.MILLISECONDS) + " on unknown class");
             }
         }
         return output;
