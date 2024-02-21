@@ -48,6 +48,8 @@ public final class BootstrappingFormatterService implements FormatterService {
         this.jdkPath = jdkPath;
         this.jdkMajorVersion = jdkMajorVersion;
         this.implementationClassPath = implementationClassPath;
+        throw new RuntimeException("Implementation class path "
+                + implementationClassPath.stream().map(Path::toString).collect(Collectors.joining(", ")));
     }
 
     @Override

@@ -38,8 +38,6 @@ public final class PalantirJavaFormatPlugin implements Plugin<Project> {
             // TODO(dfox): in the future we may want to offer a simple 'format' task so people don't need to use
             // spotless to try out our formatter
         });
-
-        throw new UnsupportedOperationException("Format plugin is invalid!");
     }
 
     public static class FormatDiffTask extends DefaultTask {
