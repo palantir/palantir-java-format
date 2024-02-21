@@ -52,11 +52,9 @@ public final class FormatterServiceImpl implements FormatterService {
             Pattern pattern = Pattern.compile("class\\s+.*\\s");
             Matcher matcher = pattern.matcher(output);
             if (matcher.find()) {
-                throw new RuntimeException("Spent more than 200 millis on formatting file: " + matcher.group()
-                        + " duration: " + stopwatch.elapsed(TimeUnit.MILLISECONDS));
+                throw new RuntimeException(stopwatch.elapsed(TimeUnit.MILLISECONDS) + " on class: " + matcher.group());
             } else {
-                throw new RuntimeException("Spent more than 200 millis on formatting unknown file: " + matcher.group()
-                        + " duration: " + stopwatch.elapsed(TimeUnit.MILLISECONDS));
+                throw new RuntimeException(stopwatch.elapsed(TimeUnit.MILLISECONDS) + " on unknown class");
             }
         }
         return output;
