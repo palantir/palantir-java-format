@@ -49,7 +49,7 @@ public final class FormatterServiceImpl implements FormatterService {
         stopwatch.stop();
 
         if (stopwatch.elapsed(TimeUnit.MILLISECONDS) > 200) {
-            Pattern pattern = Pattern.compile("(record|enum|class|interface) ([A-Z][a-zA-Z0-9]+)( |\\n|$)");
+            Pattern pattern = Pattern.compile("(record|enum|class|interface) ([A-Z][a-zA-Z0-9]+)( |\\n|$|<)");
             Matcher matcher = pattern.matcher(output);
             if (matcher.find()) {
                 System.out.println(stopwatch.elapsed(TimeUnit.MILLISECONDS) + " on class: " + matcher.group(2));
