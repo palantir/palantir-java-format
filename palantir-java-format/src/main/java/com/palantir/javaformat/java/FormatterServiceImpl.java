@@ -54,7 +54,7 @@ public final class FormatterServiceImpl implements FormatterService {
             if (matcher.find()) {
                 System.out.println(stopwatch.elapsed(TimeUnit.MILLISECONDS) + " on class: " + matcher.group(2));
             } else {
-                System.out.println(stopwatch.elapsed(TimeUnit.MILLISECONDS) + " on unknown class");
+                System.out.println(stopwatch.elapsed(TimeUnit.MILLISECONDS) + " on unknown class: " + output);
             }
         }
         return output;
