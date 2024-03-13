@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: Add instrumentation to allow warning on files that take long to format
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/989
