@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Fix error message link for filing bugs
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/1037
