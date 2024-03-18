@@ -83,7 +83,7 @@ public final class StringWrapper {
             if (!expected.equals(actual)) {
                 throw new FormatterException(String.format(
                         "Something has gone terribly wrong. Please file a bug: "
-                                + "https://github.com/google/google-java-format/issues/new"
+                                + "https://github.com/palantir/palantir-java-format/issues/new"
                                 + "\n\n=== Actual: ===\n%s\n=== Expected: ===\n%s\n",
                         actual, expected));
             }
