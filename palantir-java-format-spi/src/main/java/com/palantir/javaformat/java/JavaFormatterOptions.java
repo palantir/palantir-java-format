@@ -92,6 +92,15 @@ public final class JavaFormatterOptions {
         return new Builder();
     }
 
+    /**
+     * Creates a new builder derived from the settings of this instance.
+     * @return Returns a builder for {@link JavaFormatterOptions} with the defaults
+     * taken from these options.
+     */
+    public Builder toBuilder() {
+        return Builder.from(this);
+    }
+
     /** A builder for {@link JavaFormatterOptions}. */
     public static final class Builder {
         // default is still GOOGLE just because lots of hand-rolled tests rely on this behaviour
@@ -113,6 +122,18 @@ public final class JavaFormatterOptions {
 
         public JavaFormatterOptions build() {
             return new JavaFormatterOptions(style, formatJavadoc);
+        }
+
+        /**
+         * Creates a new builder with the defaults taken from the given options.
+         * @param options Options to use the default for the new builder.
+         * @return A new builder with the given defaults.
+         */
+        public static Builder from(JavaFormatterOptions options) {
+            Builder builder = new Builder();
+            builder.formatJavadoc = options.formatJavadoc;
+            builder.style = options.style;
+            return builder;
         }
     }
 }

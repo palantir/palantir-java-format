@@ -20,16 +20,21 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import com.palantir.javaformat.java.JavaFormatterOptions.Style;
 import java.util.Collection;
+import java.util.function.Function;
 
 @AutoService(FormatterService.class)
 public final class FormatterServiceImpl implements FormatterService {
 
     private final Formatter formatter;
+    private final JavaFormatterOptions options;
 
     public FormatterServiceImpl() {
-        JavaFormatterOptions options =
-                JavaFormatterOptions.builder().style(Style.PALANTIR).build();
+        this(JavaFormatterOptions.builder().style(Style.PALANTIR).build());
+    }
+
+    private FormatterServiceImpl(JavaFormatterOptions options) {
         formatter = Formatter.createFormatter(options);
+        this.options = options;
     }
 
     @Override
@@ -41,5 +46,12 @@ public final class FormatterServiceImpl implements FormatterService {
     @Override
     public String formatSourceReflowStringsAndFixImports(String input) throws FormatterException {
         return formatter.formatSourceAndFixImports(input);
+    }
+
+    @Override
+    public FormatterService withOptions(
+            Function<? super JavaFormatterOptions, ? extends JavaFormatterOptions> optionsTransformer) {
+        JavaFormatterOptions newOptions = optionsTransformer.apply(options);
+        return new FormatterServiceImpl(newOptions);
     }
 }

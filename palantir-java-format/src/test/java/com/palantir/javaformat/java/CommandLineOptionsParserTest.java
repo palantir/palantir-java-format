@@ -15,7 +15,6 @@
 package com.palantir.javaformat.java;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth8.assertThat;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.fail;
 
@@ -133,6 +132,15 @@ public class CommandLineOptionsParserTest {
         assertThat(CommandLineOptionsParser.parse(Arrays.asList("--skip-removing-unused-imports"))
                         .removeUnusedImports())
                 .isFalse();
+    }
+
+    @Test
+    public void formatJavadoc() {
+        assertThat(CommandLineOptionsParser.parse(Arrays.asList()).formatJavadoc())
+                .isFalse();
+        assertThat(CommandLineOptionsParser.parse(Arrays.asList("--format-javadoc"))
+                        .formatJavadoc())
+                .isTrue();
     }
 
     @Test

@@ -22,6 +22,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
+import com.palantir.javaformat.java.FormatterException;
 import com.palantir.javaformat.java.Replacement;
 import java.net.URI;
 import java.nio.file.Files;
@@ -43,6 +44,18 @@ final class BootstrappingFormatterServiceTest {
 
         assertThat(replacements).hasSize(1);
         assertThat(replacements.get(0).getReplacementString()).isEqualTo(expectedOutput);
+    }
+
+    @Test
+    void can_format_file_with_format_javadoc() throws FormatterException {
+        String input = getTestResourceContent("formatJavadoc.input");
+        String expectedOutput = getTestResourceContent("formatJavadoc.output");
+
+        String actualOutput = getFormatter()
+                .withOptions(o -> o.toBuilder().formatJavadoc(true).build())
+                .formatSourceReflowStringsAndFixImports(input);
+
+        assertThat(actualOutput).isEqualTo(expectedOutput);
     }
 
     @Test
