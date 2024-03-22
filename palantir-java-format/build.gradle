@@ -1,3 +1,8 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'java'
+}
+
 apply plugin: 'application'
 apply plugin: 'com.palantir.external-publish-jar'
 
@@ -87,5 +92,14 @@ idea {
 tasks.named("jar", Jar) {
     manifest {
         attributes('Add-Exports': exports.join(' '))
+    }
+}
+
+shadowJar {
+    archiveBaseName.set('palantir-java-format')
+    archiveClassifier.set('all-deps')
+    minimize()
+    manifest {
+        attributes 'Main-Class': 'com.palantir.javaformat.java.Main'
     }
 }
