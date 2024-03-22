@@ -20,7 +20,7 @@ aliases:
 jobs:
 
   check:
-    docker: [{ image: 'cimg/openjdk:17.0.1-node' }]
+    docker: [{ image: 'cimg/openjdk:17.0.10-node' }]
     resource_class: large
     environment:
       CIRCLE_TEST_REPORTS: /home/circleci/junit
