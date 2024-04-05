@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Properly format switch expressions
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/1069

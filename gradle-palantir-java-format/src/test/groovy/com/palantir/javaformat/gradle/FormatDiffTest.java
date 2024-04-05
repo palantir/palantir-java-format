@@ -63,6 +63,7 @@ class FormatDiffTest {
         runCommandInRepo("git", "init");
         runCommandInRepo("git", "config", "user.name", "Test User");
         runCommandInRepo("git", "config", "user.email", "test-user@palantir.com");
+        runCommandInRepo("git", "config", "commit.gpgsign", "false");
         runCommandInRepo("git", "commit", "--allow-empty", "-m", "Init");
 
         Path subdir = repo.resolve("subdir");
