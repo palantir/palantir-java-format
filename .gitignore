@@ -53,6 +53,9 @@ generated_src/
 generated_testSrc/
 generated/
 
+# VSCode
+.vscode/
+
 # Blueprint theme
 __init__.pyc
 
