@@ -57,3 +57,4 @@ generated/
 __init__.pyc
 
 node_modules/
+/.profileconfig.json

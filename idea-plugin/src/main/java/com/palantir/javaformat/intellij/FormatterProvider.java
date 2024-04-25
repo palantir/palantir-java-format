@@ -146,6 +146,7 @@ final class FormatterProvider {
         // or 'openjdk version "15.0.2"'.
         String version = Preconditions.checkNotNull(
                 JdkUtil.getJdkMainAttribute(sdk, Name.IMPLEMENTATION_VERSION), "JDK version is null");
+        log.error("Version is: {}", version);
         return parseSdkJavaVersion(version);
     }
 

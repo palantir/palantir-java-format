@@ -48,8 +48,8 @@ subprojects {
     apply plugin: 'java-library'
     apply plugin: 'org.inferred.processors'
 
-    sourceCompatibility = 11
-    targetCompatibility = 11
+    sourceCompatibility = 17
+    targetCompatibility = 17
 
     tasks.withType(Checkstyle).configureEach {
         enabled = false

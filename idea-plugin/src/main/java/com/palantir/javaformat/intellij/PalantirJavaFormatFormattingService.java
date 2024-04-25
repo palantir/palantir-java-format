@@ -16,15 +16,21 @@
 
 package com.palantir.javaformat.intellij;
 
+import static java.util.Comparator.comparing;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import com.intellij.formatting.service.AsyncDocumentFormattingService;
 import com.intellij.formatting.service.AsyncFormattingRequest;
+import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.NlsSafe;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiFile;
+import com.palantir.javaformat.java.FormatterException;
 import com.palantir.javaformat.java.FormatterService;
+import com.palantir.javaformat.java.Replacement;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +39,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-final class PalantirJavaFormatFormattingService extends AsyncDocumentFormattingService {
+class PalantirJavaFormatFormattingService extends AsyncDocumentFormattingService {
     private static final Logger log = LoggerFactory.getLogger(PalantirJavaFormatFormattingService.class);
     private final FormatterProvider formatterProvider = new FormatterProvider();
 
@@ -42,26 +48,28 @@ final class PalantirJavaFormatFormattingService extends AsyncDocumentFormattingS
         Project project = request.getContext().getProject();
         PalantirJavaFormatSettings settings = PalantirJavaFormatSettings.getInstance(project);
         Optional<FormatterService> formatter = formatterProvider.get(project, settings);
+        return new PalantirJavaFormatFormattingTask(request, formatter);
     }
 
     @Override
     protected @NotNull String getNotificationGroupId() {
-        return null;
+        return Notifications.PARSING_ERROR_NOTIFICATION_GROUP;
     }
 
     @Override
     protected @NotNull @NlsSafe String getName() {
-        return null;
+        return "palantir-java-format";
     }
 
     @Override
     public @NotNull Set<Feature> getFeatures() {
-        return null;
+        return Set.of(Feature.AD_HOC_FORMATTING, Feature.FORMAT_FRAGMENTS, Feature.OPTIMIZE_IMPORTS);
     }
 
     @Override
     public boolean canFormat(@NotNull PsiFile file) {
-        return false;
+        return JavaFileType.INSTANCE.equals(file.getFileType())
+                && PalantirJavaFormatSettings.getInstance(file.getProject()).isEnabled();
     }
 
     private static final class PalantirJavaFormatFormattingTask implements FormattingTask {
@@ -80,6 +88,32 @@ final class PalantirJavaFormatFormattingService extends AsyncDocumentFormattingS
                 request.onError("palantir-java-format", "Failed to format file with palantir-java-format");
                 return;
             }
+
+            try {
+                String formattedText = applyReplacements(
+                        request.getDocumentText(),
+                        formatterService.get().getFormatReplacements(request.getDocumentText(), toRanges(request)));
+                request.onTextReady(formattedText);
+            } catch (FormatterException e) {
+                request.onError(
+                        Notifications.PARSING_ERROR_TITLE,
+                        Notifications.parsingErrorMessage(
+                                request.getContext().getContainingFile().getName()));
+            }
+        }
+
+        public static String applyReplacements(String input, Collection<Replacement> replacementsCollection) {
+            List<Replacement> replacements = new ArrayList<>(replacementsCollection);
+            replacements.sort(comparing((Replacement r) -> r.getReplaceRange().lowerEndpoint())
+                    .reversed());
+            StringBuilder writer = new StringBuilder(input);
+            for (Replacement replacement : replacements) {
+                writer.replace(
+                        replacement.getReplaceRange().lowerEndpoint(),
+                        replacement.getReplaceRange().upperEndpoint(),
+                        replacement.getReplacementString());
+            }
+            return writer.toString();
         }
 
         private static Collection<Range<Integer>> toRanges(AsyncFormattingRequest request) {
