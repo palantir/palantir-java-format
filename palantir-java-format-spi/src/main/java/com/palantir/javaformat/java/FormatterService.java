@@ -44,8 +44,6 @@ public interface FormatterService {
      * @param input the input string
      * @return the output string
      * @throws FormatterException if the input string cannot be parsed
-     * @see <a href="https://google.github.io/styleguide/javaguide.html#s3.3.3-import-ordering-and-spacing">Google Java
-     *     Style Guide - 3.3.3 Import ordering and spacing</a>
      */
     String formatSourceReflowStringsAndFixImports(String input) throws FormatterException;
 
@@ -55,8 +53,6 @@ public interface FormatterService {
      * @param input the input string
      * @return the output string
      * @throws FormatterException if the input string cannot be parsed
-     * @see <a href="https://google.github.io/styleguide/javaguide.html#s3.3.3-import-ordering-and-spacing">Google Java
-     *     Style Guide - 3.3.3 Import ordering and spacing</a>
      */
     String fixImports(String input) throws FormatterException;
 }
