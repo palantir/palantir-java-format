@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Move the plugin to the FormattingService & ImportOptimizer APIs
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/1078
