@@ -1,5 +1,5 @@
 type: fix
 fix:
-  description: Move the plugin to the FormattingService & ImportOptimizer APIs
+  description: Fix palantir-java-format not running on IntelliJ >=2024.1 by moving to new APIs.
   links:
   - https://github.com/palantir/palantir-java-format/pull/1078
