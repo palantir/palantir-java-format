@@ -23,7 +23,7 @@ def name = "palantir-java-format"
 intellij {
     pluginName = name
     updateSinceUntilBuild = true
-    version = "2024.1"
+    version = "2021.3"
     plugins = ['java']
 }
 
