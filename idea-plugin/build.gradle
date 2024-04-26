@@ -23,7 +23,7 @@ def name = "palantir-java-format"
 intellij {
     pluginName = name
     updateSinceUntilBuild = true
-    version = "IU-202.6397.94"
+    version = "2024.1"
     plugins = ['java']
 }
 
@@ -39,7 +39,7 @@ tasks.named("runIde") {
 patchPluginXml {
     pluginDescription = "Formats source code using the palantir-java-format tool."
     version = project.version
-    sinceBuild = '193' // TODO: test against this version of IntelliJ to ensure no regressions
+    sinceBuild = '213' // TODO: test against this version of IntelliJ to ensure no regressions
     untilBuild = ''
 }
 
@@ -73,6 +73,7 @@ dependencies {
 
     testImplementation 'org.assertj:assertj-core'
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.withType(JavaCompile).configureEach {

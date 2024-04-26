@@ -16,3 +16,9 @@ acceptedBreaks:
       old: "method void com.palantir.javaformat.gradle.ConfigureJavaFormatterXml::configureFormatOnSave(groovy.util.Node)"
       new: "method void com.palantir.javaformat.gradle.ConfigureJavaFormatterXml::configureFormatOnSave(groovy.util.Node)"
       justification: "Not public api, not split over multiple jars"
+  "2.43.0":
+    com.palantir.javaformat:palantir-java-format-spi:
+    - code: "java.method.addedToInterface"
+      new: "method java.lang.String com.palantir.javaformat.java.FormatterService::fixImports(java.lang.String)\
+        \ throws com.palantir.javaformat.java.FormatterException"
+      justification: "new fixImports only method added to spi"
