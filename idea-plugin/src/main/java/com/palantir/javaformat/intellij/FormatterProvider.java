@@ -54,8 +54,6 @@ final class FormatterProvider {
     private static final Logger log = LoggerFactory.getLogger(FormatterProvider.class);
 
     private static final String PLUGIN_ID = "palantir-java-format";
-    static final IdeaPluginDescriptor PLUGIN = Preconditions.checkNotNull(
-            PluginManager.getPlugin(PluginId.getId(PLUGIN_ID)), "Couldn't find our own plugin: %s", PLUGIN_ID);
 
     // Cache to avoid creating a URLClassloader every time we want to format from IntelliJ
     private final LoadingCache<FormatterCacheKey, Optional<FormatterService>> implementationCache =
@@ -111,7 +109,9 @@ final class FormatterProvider {
 
     private static List<Path> getBundledImplementationUrls() {
         // Load from the jars bundled with the plugin.
-        Path implDir = PLUGIN.getPath().toPath().resolve("impl");
+        IdeaPluginDescriptor ourPlugin = Preconditions.checkNotNull(
+                PluginManager.getPlugin(PluginId.getId(PLUGIN_ID)), "Couldn't find our own plugin: %s", PLUGIN_ID);
+        Path implDir = ourPlugin.getPath().toPath().resolve("impl");
         log.debug("Using palantir-java-format implementation bundled with plugin: {}", implDir);
         return listDirAsUrlsUnchecked(implDir);
     }
