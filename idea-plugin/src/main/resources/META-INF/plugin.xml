@@ -16,9 +16,6 @@
                          id="palantir-java-format.settings"
                          displayName="palantir-java-format Settings"/>
     <projectService serviceImplementation="com.palantir.javaformat.intellij.PalantirJavaFormatSettings"/>
-    <projectService serviceInterface="com.intellij.psi.codeStyle.CodeStyleManager"
-                    serviceImplementation="com.palantir.javaformat.intellij.PalantirCodeStyleManager"
-                    overrides="true"/>
     <postStartupActivity implementation="com.palantir.javaformat.intellij.InitialConfigurationStartupActivity"/>
     <notificationGroup displayType="BALLOON" id="palantir-java-format parsing error"
                        isLogByDefault="false"/>
