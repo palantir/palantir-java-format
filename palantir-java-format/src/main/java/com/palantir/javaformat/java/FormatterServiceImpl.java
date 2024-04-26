@@ -42,4 +42,9 @@ public final class FormatterServiceImpl implements FormatterService {
     public String formatSourceReflowStringsAndFixImports(String input) throws FormatterException {
         return formatter.formatSourceAndFixImports(input);
     }
+
+    @Override
+    public String fixImports(String input) throws FormatterException {
+        return formatter.fixImports(input);
+    }
 }

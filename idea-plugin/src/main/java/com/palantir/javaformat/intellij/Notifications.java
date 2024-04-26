@@ -21,6 +21,7 @@ import com.intellij.openapi.project.Project;
 
 class Notifications {
 
+    static final String GENERIC_ERROR_NOTIFICATION_GROUP = "palantir-java-format error"
     static final String PARSING_ERROR_NOTIFICATION_GROUP = "palantir-java-format parsing error";
     static final String PARSING_ERROR_TITLE = PARSING_ERROR_NOTIFICATION_GROUP;
 

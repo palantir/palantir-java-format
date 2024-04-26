@@ -265,6 +265,19 @@ public final class Formatter {
     }
 
     /**
+     * Fixes imports (e.g. ordering, spacing, and removal of unused import statements).
+     *
+     * @param input the input string
+     * @return the output string
+     * @throws FormatterException if the input string cannot be parsed
+     * @see <a href="https://google.github.io/styleguide/javaguide.html#s3.3.3-import-ordering-and-spacing">Google Java
+     *     Style Guide - 3.3.3 Import ordering and spacing</a>
+     */
+    public String fixImports(String input) throws FormatterException {
+        return ImportOrderer.reorderImports(RemoveUnusedImports.removeUnusedImports(input), options.style());
+    }
+
+    /**
      * Format an input string (a Java compilation unit), for only the specified character ranges. These ranges are
      * extended as necessary (e.g., to encompass whole lines).
      *
