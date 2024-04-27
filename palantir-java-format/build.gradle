@@ -42,16 +42,94 @@ def exports = [
 
 def jvmArgList = exports.collect { value -> "--add-exports=${value}=ALL-UNNAMED".toString() }
 
-tasks.withType(JavaCompile).configureEach {
-    options.errorprone.disable 'StrictUnusedVariable'
-
-    // Allow access to internal javac apis
-    options.compilerArgs += jvmArgList
-
-    if (JavaVersion.current() < JavaVersion.VERSION_14) {
-        excludes = ['**/Java14InputAstVisitor.java']
+//register compileJava21 on the same source code
+tasks.register("compileJava21", JavaCompile) {
+    javaCompiler = javaToolchains.compilerFor {
+        languageVersion = JavaLanguageVersion.of(21)
     }
+
+    source(sourceSets["main"].java)
+    classpath = sourceSets["main"].compileClasspath
+    destinationDirectory.set(sourceSets["main"].java.destinationDirectory)
+
 }
+
+tasks.register("compileTestJava21", JavaCompile) {
+    javaCompiler = javaToolchains.compilerFor {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+
+    source(sourceSets["test-21"].java)
+    classpath = sourceSets["test-21"].compileClasspath
+    destinationDirectory.set(sourceSets["test-21"].java.destinationDirectory)
+
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java']
+        }
+        resources {
+            srcDirs = ['src/main/resources']
+        }
+    }
+    test {
+        java {
+            srcDirs = ['src/test/java']
+        }
+        resources {
+            srcDirs = ['src/test/resources']
+        }
+    }
+
+    'test-21' {
+        java {
+            srcDirs = ['src/test-21/java']
+        }
+        resources {
+            srcDirs = ['src/test-21/resources']
+        }
+    }
+
+}
+
+
+tasks.named("classes") {
+    dependsOn("compileJava21")
+}
+
+tasks.named("testClasses") {
+    dependsOn("compileTestJava21")
+}
+
+tasks.withType(JavaCompile).configureEach {
+    config ->
+        {
+
+            def currentLanguageVersion = config.javaCompiler.get().getMetadata().languageVersion.asInt()
+            println("JavaCompile name:" + config.name + " version:" + currentLanguageVersion)
+
+
+            options.errorprone.disable 'StrictUnusedVariable'
+
+            // Allow access to internal javac apis
+            options.compilerArgs += jvmArgList
+
+            if (currentLanguageVersion < 14) {
+                excludes = ['**/java14/*.java', '**/java21/*.java']
+            }
+            if (14< currentLanguageVersion && currentLanguageVersion < 21) {
+                excludes = ['**/java21/*.java']
+            }
+
+            if (21 <= currentLanguageVersion ) {
+                includes = ['**/java/java21/*.java']
+                excludes = ['**/java/JavaInputAstVisitor.java']
+            }
+        }
+}
+
 
 tasks.withType(Test).configureEach {
     jvmArgs = jvmArgList
