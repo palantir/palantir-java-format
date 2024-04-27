@@ -50,7 +50,7 @@ mainClassName = 'com.palantir.javaformat.java.Main'
 description = 'Palantir Java Format Java 21'
 
 dependencies {
-    implementation "com.palantir.javaformat:palantir-java-format:2.39"
+    implementation "com.palantir.javaformat:palantir-java-format:2.44.0-3-gc5a0bc7.dirty"
     testImplementation 'com.google.guava:guava-testlib'
     testImplementation 'com.google.truth:truth'
     testImplementation 'com.google.testing.compile:compile-testing'
