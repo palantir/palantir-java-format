@@ -54,4 +54,9 @@ public final class FormatterServiceImpl implements FormatterService {
         JavaFormatterOptions newOptions = optionsTransformer.apply(options);
         return new FormatterServiceImpl(newOptions);
     }
+
+    @Override
+    public String fixImports(String input) throws FormatterException {
+        return formatter.fixImports(input);
+    }
 }

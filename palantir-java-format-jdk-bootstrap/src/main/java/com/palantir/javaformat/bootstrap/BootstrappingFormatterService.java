@@ -24,6 +24,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.BoundType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
+import com.palantir.javaformat.java.FormatterException;
 import com.palantir.javaformat.java.FormatterService;
 import com.palantir.javaformat.java.JavaFormatterOptions;
 import com.palantir.javaformat.java.Replacement;
@@ -79,7 +80,16 @@ public final class BootstrappingFormatterService implements FormatterService {
     @Override
     public String formatSourceReflowStringsAndFixImports(String input) {
         try {
-            return formatSourceReflowStringsAndFixImportsInternal(input);
+            return runFormatterCommand(input);
+        } catch (IOException e) {
+            throw new RuntimeException("Error running formatter command", e);
+        }
+    }
+
+    @Override
+    public String fixImports(String input) throws FormatterException {
+        try {
+            return runFormatterCommand(input);
         } catch (IOException e) {
             throw new RuntimeException("Error running formatter command", e);
         }
@@ -113,7 +123,7 @@ public final class BootstrappingFormatterService implements FormatterService {
         return MAPPER.readValue(output.get(), new TypeReference<>() {});
     }
 
-    private String formatSourceReflowStringsAndFixImportsInternal(String input) throws IOException {
+    private String runFormatterCommand(String input) throws IOException {
         FormatterCliArgs command = FormatterCliArgs.builder()
                 .jdkPath(jdkPath)
                 .withJvmArgsForVersion(jdkMajorVersion)

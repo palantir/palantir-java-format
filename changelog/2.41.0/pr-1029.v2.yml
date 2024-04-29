@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Avoid computing expensive debug info for all checkState() calls
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/1029

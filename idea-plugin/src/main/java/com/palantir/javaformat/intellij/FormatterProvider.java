@@ -20,7 +20,11 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Functions;
+import com.google.common.base.Preconditions;
+import com.intellij.ide.plugins.IdeaPluginDescriptor;
+import com.intellij.ide.plugins.PluginManager;
 import com.intellij.openapi.application.ApplicationInfo;
+import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.JdkUtil;
 import com.intellij.openapi.projectRoots.Sdk;
@@ -30,7 +34,6 @@ import com.intellij.openapi.util.SystemInfo;
 import com.palantir.javaformat.bootstrap.BootstrappingFormatterService;
 import com.palantir.javaformat.java.FormatterService;
 import com.palantir.javaformat.java.JavaFormatterOptions;
-import com.palantir.logsafe.Preconditions;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -51,6 +54,8 @@ import org.slf4j.LoggerFactory;
 
 final class FormatterProvider {
     private static final Logger log = LoggerFactory.getLogger(FormatterProvider.class);
+
+    private static final String PLUGIN_ID = "palantir-java-format";
 
     // Cache to avoid creating a URLClassloader every time we want to format from IntelliJ
     private final LoadingCache<FormatterCacheKey, Optional<FormatterService>> implementationCache =
@@ -116,7 +121,9 @@ final class FormatterProvider {
 
     private static List<Path> getBundledImplementationUrls() {
         // Load from the jars bundled with the plugin.
-        Path implDir = PalantirCodeStyleManager.PLUGIN.getPath().toPath().resolve("impl");
+        IdeaPluginDescriptor ourPlugin = Preconditions.checkNotNull(
+                PluginManager.getPlugin(PluginId.getId(PLUGIN_ID)), "Couldn't find our own plugin: %s", PLUGIN_ID);
+        Path implDir = ourPlugin.getPath().toPath().resolve("impl");
         log.debug("Using palantir-java-format implementation bundled with plugin: {}", implDir);
         return listDirAsUrlsUnchecked(implDir);
     }

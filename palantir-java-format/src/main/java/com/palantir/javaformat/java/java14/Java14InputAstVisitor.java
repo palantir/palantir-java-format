@@ -303,6 +303,7 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
                     scan(node.getBody(), null);
                 }
                 builder.guessToken(";");
+                builder.forcedBreak(minusTwo);
                 break;
             default:
                 throw new IllegalArgumentException(node.getCaseKind().name());

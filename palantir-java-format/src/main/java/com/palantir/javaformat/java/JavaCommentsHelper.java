@@ -24,12 +24,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.annotation.Nullable;
 
 /** {@code JavaCommentsHelper} extends {@link CommentsHelper} to rewrite Java comments. */
 public final class JavaCommentsHelper implements CommentsHelper {
 
     private final String lineSeparator;
     private final JavaFormatterOptions options;
+
+    @Nullable
     private final JavadocFormatter javadocFormatter;
 
     public JavaCommentsHelper(String lineSeparator, JavaFormatterOptions options) {

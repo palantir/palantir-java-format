@@ -17,6 +17,7 @@ package com.palantir.javaformat.java;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Joiner;
+import javax.annotation.Nullable;
 
 /** Checked exception class for formatter command-line usage errors. */
 final class UsageException extends Exception {
@@ -90,7 +91,7 @@ final class UsageException extends Exception {
         super(buildMessage(checkNotNull(message)));
     }
 
-    private static String buildMessage(String message) {
+    private static String buildMessage(@Nullable String message) {
         StringBuilder builder = new StringBuilder();
         if (message != null) {
             builder.append(message).append('\n');
