@@ -146,7 +146,8 @@ class PalantirJavaFormatFormattingService extends AsyncDocumentFormattingService
 
         @Override
         public boolean isRunUnderProgress() {
-            return true;
+            // Ensure annoying pop-up window does not pop-up, just format in the background
+            return false;
         }
 
         @Override
