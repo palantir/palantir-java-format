@@ -1,0 +1,5 @@
+type: feature
+fix:
+  description: Add option to IDEA plugin (and CLI) to format JavaDoc
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/986
