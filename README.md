@@ -174,6 +174,14 @@ When enabled, it will replace the normal `Reformat Code` action, which can be
 triggered from the `Code` menu or with the Ctrl-Alt-L (by default) keyboard
 shortcut.
 
+### Running a pre-release version of the IntelliJ plugin
+
+1. Clone this repo
+2. run `./gradlew :idea-plugin:build`
+3. In IntelliJ, install a plugin from disk. Build artifacts are located in `./idea-plugin/build/distributions/`
+
+![Install plugin from disk](./docs/images/install_plugin_from_disk.png)
+
 ## Future works
 
 - [ ] preserve [NON-NLS markers][] - these are comments that are used when implementing NLS internationalisation, and need to stay on the same line with the strings they come after.
