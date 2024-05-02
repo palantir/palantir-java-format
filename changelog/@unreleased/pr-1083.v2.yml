@@ -1,5 +1,5 @@
 type: fix
 fix:
-  description: Remove AD_HOC_FORMATTING
+  description: Removing Feature.AD_HOC_FORMATTING from FormattingService
   links:
   - https://github.com/palantir/palantir-java-format/pull/1083
