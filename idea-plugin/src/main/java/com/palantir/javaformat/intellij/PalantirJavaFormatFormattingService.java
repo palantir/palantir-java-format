@@ -23,7 +23,6 @@ import com.google.common.collect.Range;
 import com.intellij.formatting.service.AsyncDocumentFormattingService;
 import com.intellij.formatting.service.AsyncFormattingRequest;
 import com.intellij.ide.highlighter.JavaFileType;
-import com.intellij.lang.ImportOptimizer;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.NlsSafe;
 import com.intellij.openapi.util.TextRange;
@@ -61,21 +60,13 @@ class PalantirJavaFormatFormattingService extends AsyncDocumentFormattingService
 
     @Override
     public @NotNull Set<Feature> getFeatures() {
-        return Set.of(Feature.FORMAT_FRAGMENTS, Feature.OPTIMIZE_IMPORTS);
+        return Set.of(Feature.FORMAT_FRAGMENTS);
     }
 
     @Override
     public boolean canFormat(@NotNull PsiFile file) {
         return JavaFileType.INSTANCE.equals(file.getFileType())
                 && PalantirJavaFormatSettings.getInstance(file.getProject()).isEnabled();
-    }
-
-    @Override
-    public @NotNull Set<ImportOptimizer> getImportOptimizers(@NotNull PsiFile file) {
-        Project project = file.getProject();
-        PalantirJavaFormatSettings settings = PalantirJavaFormatSettings.getInstance(project);
-        Optional<FormatterService> formatter = formatterProvider.get(project, settings);
-        return Set.of(new PalantirJavaFormatImportOptimizer(formatter));
     }
 
     private static final class PalantirJavaFormatFormattingTask implements FormattingTask {
