@@ -46,6 +46,7 @@ import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class PalantirJavaFormatImportOptimizerTest {
@@ -95,6 +96,7 @@ public class PalantirJavaFormatImportOptimizerTest {
     }
 
     @Test
+    @Disabled("Disabled the import optimization via palantir-java-format")
     public void removesUnusedImports() throws Exception {
         PsiFile file = createPsiFile(
                 "com/foo/ImportTest.java",
@@ -119,6 +121,7 @@ public class PalantirJavaFormatImportOptimizerTest {
     }
 
     @Test
+    @Disabled("Disabled the import optimization via palantir-java-format")
     public void reordersImports() throws Exception {
         PsiFile file = createPsiFile(
                 "com/foo/ImportTest.java",
