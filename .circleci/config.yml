@@ -78,12 +78,6 @@ jobs:
       - store_test_results: { path: ~/junit }
       - store_artifacts: { path: ~/artifacts }
 
-  trial-publish:
-    docker: [ { image: 'busybox:1.36.1@sha256:6d9ac9237a84afe1516540f40a0fafdc86859b2141954b4d643af7066d598b74' } ]
-    resource_class: small
-    steps:
-      - run: { command: echo "Dummy job so repos that require the `trial-publish` job to merge PRs still see a passing `trial-publish`. Should be replaced by a `circle-all` job at some point." }
-
   publish:
     docker: [{ image: 'cimg/openjdk:17.0.10-node' }]
     resource_class: medium
@@ -107,6 +101,11 @@ jobs:
       - store_test_results: { path: ~/junit }
       - store_artifacts: { path: ~/artifacts }
 
+  circle-all:
+    docker: [{ image: 'busybox:1.36.1@sha256:6d9ac9237a84afe1516540f40a0fafdc86859b2141954b4d643af7066d598b74' }]
+    resource_class: small
+    steps:
+      - run: {command: echo "All required jobs finished successfully"}
 
 workflows:
   version: 2
@@ -115,9 +114,10 @@ workflows:
       - check:
           filters: { tags: { only: /.*/ } }
 
-      - trial-publish:
-          filters: { branches: { ignore: develop } }
+      - circle-all:
+          requires: [ check ]
+          filters: { tags: { only: /.*/ } }
 
       - publish:
-          requires: [ check, trial-publish ]
+          requires: [ circle-all ]
           filters: { tags: { only: /.*/ }, branches: { only: develop } }
