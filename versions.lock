@@ -1,4 +1,4 @@
-# Run ./gradlew writeVersionsLock to regenerate this file
+# Run ./gradlew writeVersionsLocks to regenerate this file
 com.diffplug.durian:durian-collect:1.2.0 (3 constraints: 4d313bd2)
 com.diffplug.durian:durian-core:1.2.0 (4 constraints: 2640ae56)
 com.diffplug.durian:durian-io:1.2.0 (1 constraints: 1313c62d)
