@@ -49,19 +49,18 @@ class ConfigureJavaFormatterXml {
     }
 
     private static void configureOnSaveAction(Node onSaveOptions) {
-        def myRunOnSave = matchOrCreateChild(onSaveOptions, 'option', [name: 'myRunOnSave'])
-
-        def myRunOnSaveAlreadySet = Optional.ofNullable(myRunOnSave.attribute('value'))
-                .map(Boolean::parseBoolean)
-                .orElse(false)
-
-        myRunOnSave.attributes().put('value', 'true')
+        // If myRunOnSave is set to true, IntelliJ removes it. If it's set to false, we still need it to run.
+        // So we should just remove it so we do run on save.
+        matchChild(onSaveOptions, 'option', [name: 'myRunOnSave']).ifPresent { myRunOnSave ->
+            onSaveOptions.remove(myRunOnSave)
+        }
 
         def myAllFileTypesSelectedAlreadySet = matchChild(onSaveOptions, 'option', [name: 'myAllFileTypesSelected'])
                 .map { Boolean.parseBoolean(it.attribute('value')) }
-                .orElse(true)
+                // If myAllFileTypesSelected is elided then it is disabled by default
+                .orElse(false)
 
-        if (myRunOnSaveAlreadySet && myAllFileTypesSelectedAlreadySet) {
+        if (myAllFileTypesSelectedAlreadySet) {
             // If the user has already configured IntelliJ to format all file types and turned on formatting on save,
             // we leave the configuration as is as it will format java code, and we don't want to disable formatting
             // for other file types
