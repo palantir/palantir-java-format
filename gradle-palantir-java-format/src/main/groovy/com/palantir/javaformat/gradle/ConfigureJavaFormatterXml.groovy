@@ -49,27 +49,26 @@ class ConfigureJavaFormatterXml {
     }
 
     private static void configureOnSaveAction(Node onSaveOptions) {
-        def myRunOnSave = matchOrCreateChild(onSaveOptions, 'option', [name: 'myRunOnSave'])
+        // If myRunOnSave is set to true, IntelliJ removes it. If it's set to false, we still need to remove it to run
+        // the formatter. So we should just remove it so we do run on save.
+        matchChild(onSaveOptions, 'option', [name: 'myRunOnSave']).ifPresent { myRunOnSave ->
+            onSaveOptions.remove(myRunOnSave)
+        }
 
-        def myRunOnSaveAlreadySet = Optional.ofNullable(myRunOnSave.attribute('value'))
-                .map(Boolean::parseBoolean)
+        def myAllFilesTypesSelected = matchChild(onSaveOptions, 'option', [name: 'myAllFileTypesSelected'])
+        def myAllFileTypesSelectedAlreadySet = myAllFilesTypesSelected
+                .map { Boolean.parseBoolean(it.attribute('value')) }
+                // If myAllFileTypesSelected is elided then it is disabled by default
                 .orElse(false)
 
-        myRunOnSave.attributes().put('value', 'true')
-
-        def myAllFileTypesSelectedAlreadySet = matchChild(onSaveOptions, 'option', [name: 'myAllFileTypesSelected'])
-                .map { Boolean.parseBoolean(it.attribute('value')) }
-                .orElse(true)
-
-        if (myRunOnSaveAlreadySet && myAllFileTypesSelectedAlreadySet) {
+        if (myAllFileTypesSelectedAlreadySet) {
             // If the user has already configured IntelliJ to format all file types and turned on formatting on save,
             // we leave the configuration as is as it will format java code, and we don't want to disable formatting
             // for other file types
             return
         }
 
-        // Otherwise we setup intellij to not format all files...
-        matchOrCreateChild(onSaveOptions, 'option', [name: 'myAllFileTypesSelected']).attributes().put('value', 'false')
+        myAllFilesTypesSelected.ifPresent { onSaveOptions.remove(it) }
 
         // ...but ensure java is formatted
         def mySelectedFileTypes = matchOrCreateChild(onSaveOptions, 'option', [name: 'mySelectedFileTypes'])

@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: The formatter should now always been enabled on save in intellij.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/1110
