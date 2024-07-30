@@ -49,8 +49,8 @@ class ConfigureJavaFormatterXml {
     }
 
     private static void configureOnSaveAction(Node onSaveOptions) {
-        // If myRunOnSave is set to true, IntelliJ removes it. If it's set to false, we still need it to run.
-        // So we should just remove it so we do run on save.
+        // If myRunOnSave is set to true, IntelliJ removes it. If it's set to false, we still need to remove it to run
+        // the formatter. So we should just remove it so we do run on save.
         matchChild(onSaveOptions, 'option', [name: 'myRunOnSave']).ifPresent { myRunOnSave ->
             onSaveOptions.remove(myRunOnSave)
         }
