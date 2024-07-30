@@ -55,7 +55,8 @@ class ConfigureJavaFormatterXml {
             onSaveOptions.remove(myRunOnSave)
         }
 
-        def myAllFileTypesSelectedAlreadySet = matchChild(onSaveOptions, 'option', [name: 'myAllFileTypesSelected'])
+        def myAllFilesTypesSelected = matchChild(onSaveOptions, 'option', [name: 'myAllFileTypesSelected'])
+        def myAllFileTypesSelectedAlreadySet = myAllFilesTypesSelected
                 .map { Boolean.parseBoolean(it.attribute('value')) }
                 // If myAllFileTypesSelected is elided then it is disabled by default
                 .orElse(false)
@@ -67,8 +68,7 @@ class ConfigureJavaFormatterXml {
             return
         }
 
-        // Otherwise we setup intellij to not format all files...
-        matchOrCreateChild(onSaveOptions, 'option', [name: 'myAllFileTypesSelected']).attributes().put('value', 'false')
+        myAllFilesTypesSelected.ifPresent { onSaveOptions.remove(it) }
 
         // ...but ensure java is formatted
         def mySelectedFileTypes = matchOrCreateChild(onSaveOptions, 'option', [name: 'mySelectedFileTypes'])

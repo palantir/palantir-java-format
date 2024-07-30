@@ -122,8 +122,6 @@ class ConfigureJavaFormatterXmlTest extends Specification {
         then:
         def expected = """
             <component name="${action}OnSaveOptions">
-              <option name="myRunOnSave" value="true"/>
-              <option name="myAllFileTypesSelected" value="false"/>
               <option name="mySelectedFileTypes">
                 <set>
                   <option value="JAVA"/>
@@ -143,8 +141,6 @@ class ConfigureJavaFormatterXmlTest extends Specification {
         def node = new XmlParser().parseText """
             <root>
               <component name="${action}OnSaveOptions">
-                <option name="myRunOnSave" value="true"/>
-                <option name="myAllFileTypesSelected" value="false"/>
                 <option name="mySelectedFileTypes">
                   <set>
                     <option value="Go"/>
@@ -161,8 +157,6 @@ class ConfigureJavaFormatterXmlTest extends Specification {
         then:
         def expected = """
             <component name="${action}OnSaveOptions">
-              <option name="myRunOnSave" value="true"/>
-              <option name="myAllFileTypesSelected" value="false"/>
               <option name="mySelectedFileTypes">
                 <set>
                   <option value="Go"/>
@@ -183,8 +177,7 @@ class ConfigureJavaFormatterXmlTest extends Specification {
         def node = new XmlParser().parseText """
             <root>
               <component name="${action}OnSaveOptions">
-                <option name="myRunOnSave" value="true"/>
-                <!-- if myAllFileTypesSelected does not exist, it defaults to true -->
+                <option name="myAllFileTypesSelected" value="true"/>
               </component>
             </root>
         """.stripIndent(true)
@@ -196,7 +189,7 @@ class ConfigureJavaFormatterXmlTest extends Specification {
         then:
         def expected = """
             <component name="${action}OnSaveOptions">
-              <option name="myRunOnSave" value="true"/>
+              <option name="myAllFileTypesSelected" value="true"/>
             </component>
         """.stripIndent(true).strip()
 
