@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Ensure Actions on Save is configured properly in IntelliJ <=2023.3.6
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/1112
