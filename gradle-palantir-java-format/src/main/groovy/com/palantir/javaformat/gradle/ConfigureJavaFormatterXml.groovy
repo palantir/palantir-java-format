@@ -49,28 +49,21 @@ class ConfigureJavaFormatterXml {
     }
 
     private static void configureOnSaveAction(Node onSaveOptions) {
-        // If myRunOnSave is set to true, IntelliJ removes it. If it's set to false, we still need to remove it to run
-        // the formatter. So we should just remove it so we do run on save.
-        matchChild(onSaveOptions, 'option', [name: 'myRunOnSave']).ifPresent { myRunOnSave ->
-            onSaveOptions.remove(myRunOnSave)
-        }
+        // In IntelliJ <2023.3.7, the myRunOnSave option is default false.
+        // In IntelliJ >=2023.3.7, it is default true, and if it is set to true IntelliJ will remove it from the XML
+        //     the next time the file is saved or the actions on save options window is saved.
+        // So to cover all cases, we always write it out and ensure it is true
+        def myRunOnSave = matchOrCreateChild(onSaveOptions, 'option', [name: 'myRunOnSave'])
+        myRunOnSave.attributes().put('value', 'true')
 
-        def myAllFilesTypesSelected = matchChild(onSaveOptions, 'option', [name: 'myAllFileTypesSelected'])
-        def myAllFileTypesSelectedAlreadySet = myAllFilesTypesSelected
-                .map { Boolean.parseBoolean(it.attribute('value')) }
-                // If myAllFileTypesSelected is elided then it is disabled by default
-                .orElse(false)
+        // In IntelliJ <2023.3.7, the myAllFileTypesSelected option is default true.
+        // In IntelliJ >=2023.3.7, it is default false, and if it is set to false IntelliJ will remove it from the XML
+        //     the next time the file is saved or the actions on save options window is saved.
+        // People may have manually set this to true, so we respect that setting is so. However, if it doesn't exist,
+        //     we make sure it is explicitly set false to work in all IntelliJ versions.
+        matchOrCreateChild(onSaveOptions, 'option', [name: 'myAllFileTypesSelected'], [value: 'false'])
 
-        if (myAllFileTypesSelectedAlreadySet) {
-            // If the user has already configured IntelliJ to format all file types and turned on formatting on save,
-            // we leave the configuration as is as it will format java code, and we don't want to disable formatting
-            // for other file types
-            return
-        }
-
-        myAllFilesTypesSelected.ifPresent { onSaveOptions.remove(it) }
-
-        // ...but ensure java is formatted
+        // Ensure that is per-file type settings are enabled, we ensure JAVA is part of the list.
         def mySelectedFileTypes = matchOrCreateChild(onSaveOptions, 'option', [name: 'mySelectedFileTypes'])
         def set = matchOrCreateChild(mySelectedFileTypes, 'set')
         matchOrCreateChild(set, 'option', [value: 'JAVA'])

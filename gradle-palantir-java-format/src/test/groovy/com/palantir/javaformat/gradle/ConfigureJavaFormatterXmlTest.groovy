@@ -122,6 +122,8 @@ class ConfigureJavaFormatterXmlTest extends Specification {
         then:
         def expected = """
             <component name="${action}OnSaveOptions">
+              <option name="myRunOnSave" value="true"/>
+              <option name="myAllFileTypesSelected" value="false"/>
               <option name="mySelectedFileTypes">
                 <set>
                   <option value="JAVA"/>
@@ -163,6 +165,8 @@ class ConfigureJavaFormatterXmlTest extends Specification {
                   <option value="JAVA"/>
                 </set>
               </option>
+              <option name="myRunOnSave" value="true"/>
+              <option name="myAllFileTypesSelected" value="false"/>
             </component>
         """.stripIndent(true).strip()
 
@@ -190,6 +194,51 @@ class ConfigureJavaFormatterXmlTest extends Specification {
         def expected = """
             <component name="${action}OnSaveOptions">
               <option name="myAllFileTypesSelected" value="true"/>
+              <option name="myRunOnSave" value="true"/>
+              <option name="mySelectedFileTypes">
+                <set>
+                  <option value="JAVA"/>
+                </set>
+              </option>
+            </component>
+        """.stripIndent(true).strip()
+
+        newXml == expected
+
+        where:
+        action << ACTIONS_ON_SAVE
+    }
+
+    @Unroll
+    def 'if the myRunOnSave for #action on save is explicitly disabled, turn it on'() {
+        def node = new XmlParser().parseText """
+            <root>
+              <component name="${action}OnSaveOptions">
+                <option name="myRunOnSave" value="false"/>
+                <option name="myAllFileTypesSelected" value="false"/>
+                <option name="mySelectedFileTypes">
+                  <set>
+                    <option value="JAVA"/>
+                  </set>
+                </option>
+              </component>
+            </root>
+        """.stripIndent(true)
+
+        when:
+        ConfigureJavaFormatterXml.configureWorkspaceXml(node)
+        def newXml = xmlSubcomponentToString(node, "${action}OnSaveOptions")
+
+        then:
+        def expected = """
+            <component name="${action}OnSaveOptions">
+              <option name="myRunOnSave" value="true"/>
+              <option name="myAllFileTypesSelected" value="false"/>
+              <option name="mySelectedFileTypes">
+                <set>
+                  <option value="JAVA"/>
+                </set>
+              </option>
             </component>
         """.stripIndent(true).strip()
 
