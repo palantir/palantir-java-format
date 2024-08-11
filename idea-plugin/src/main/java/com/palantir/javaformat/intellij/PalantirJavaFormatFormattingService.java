@@ -92,7 +92,7 @@ class PalantirJavaFormatFormattingService extends AsyncDocumentFormattingService
                 String formattedText = applyReplacements(
                         request.getDocumentText(),
                         formatterService.get().getFormatReplacements(request.getDocumentText(), toRanges(request)));
-                request.onTextReady(formattedText);
+                request.onTextReady(formattedText.trim() + "\n");
             } catch (FormatterException e) {
                 request.onError(
                         Notifications.PARSING_ERROR_TITLE,
