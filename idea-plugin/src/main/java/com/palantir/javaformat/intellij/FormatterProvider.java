@@ -139,13 +139,20 @@ final class FormatterProvider {
                 .map(Path::of)
                 .map(sdkHome -> sdkHome.resolve("bin").resolve("java" + (SystemInfo.isWindows ? ".exe" : "")))
                 .filter(Files::exists)
-                .orElseThrow(() -> new IllegalStateException("Could not determine jdk path for project " + project));
+                .orElseThrow(() ->
+                        new IllegalStateException("Could not determine JDK path for project: " + project.getName()));
     }
 
     private static OptionalInt getSdkVersion(Project project) {
         return getProjectJdk(project)
                 .map(FormatterProvider::parseSdkJavaVersion)
-                .orElseThrow(() -> new IllegalStateException("Could not determine jdk version for project " + project));
+                .orElseThrow(() ->
+                        // This is not that common as our Gradle infrastructure should setup an SDK, but it does
+                        // happen on occassion and it manifests as the plugin ceasing to format. Give a slight
+                        // nudge for the manual remediation.
+                        new IllegalStateException("Could not determine SDK version for project: " + project.getName()
+                                + ". Ensure you have an SDK set in "
+                                + "'Project Structure' -> 'Project Settings' -> 'Project' -> 'SDK'"));
     }
 
     private static OptionalInt parseSdkJavaVersion(Sdk sdk) {
