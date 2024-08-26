@@ -1,22 +1,14 @@
 class B24702438 {
 
-    @Inject
-    int x;
+    @Inject int x;
 
-    @Inject
-    int y;
+    @Inject int y;
 
-    @Inject
-    int z;
+    @Inject int z;
 
-    @Inject
-    int x;
-
-    @Inject
-    int y;
-
-    @Inject
-    int z;
+    @Inject int x;
+    @Inject int y;
+    @Inject int z;
 
     // this is a comment
 
@@ -47,17 +39,17 @@ class B24702438 {
 
     void f(
             int a,
-            @Nullable @Deprecated
+            @Deprecated @Nullable
                     ImmutableList<String> veryVeryLooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong,
-            @Nullable @Deprecated
+            @Deprecated @Nullable
                     ImmutableList<String> veryVeryLooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong,
-            @Nullable @Deprecated
+            @Deprecated @Nullable
                     ImmutableList<String> veryVeryLooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong,
             int c) {}
 
     void g(
-            @Nullable @Deprecated
+            @Deprecated @Nullable
                     ImmutableList<String> veryVeryLooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong,
-            @Nullable @Deprecated
+            @Deprecated @Nullable
                     ImmutableList<String> veryVeryLoooooooooooooooooooooooooooooooooooooooooooooooooooooooong) {}
 }
