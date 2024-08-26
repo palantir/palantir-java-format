@@ -17,6 +17,7 @@ package com.palantir.javaformat.java;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.common.io.ByteStreams;
+import com.palantir.javaformat.java.InstrumentedFormatFileCallable.FormatFileResult;
 import com.palantir.javaformat.java.JavaFormatterOptions.Style;
 import java.io.IOException;
 import java.io.InputStream;
@@ -112,7 +113,7 @@ public final class Main {
         ExecutorService executorService = Executors.newFixedThreadPool(numThreads);
 
         Map<Path, String> inputs = new LinkedHashMap<>();
-        Map<Path, Future<String>> results = new LinkedHashMap<>();
+        Map<Path, Future<FormatFileResult>> results = new LinkedHashMap<>();
         boolean allOk = true;
 
         for (String fileName : parameters.files()) {
@@ -125,18 +126,23 @@ public final class Main {
             try {
                 input = new String(Files.readAllBytes(path), UTF_8);
                 inputs.put(path, input);
-                results.put(path, executorService.submit(new FormatFileCallable(parameters, input, options)));
+                results.put(
+                        path,
+                        executorService.submit(new InstrumentedFormatFileCallable(
+                                new FormatFileCallable(parameters, input, options))));
             } catch (IOException e) {
                 errWriter.println(fileName + ": could not read file: " + e.getMessage());
                 allOk = false;
             }
         }
 
-        for (Map.Entry<Path, Future<String>> result : results.entrySet()) {
+        for (Map.Entry<Path, Future<FormatFileResult>> result : results.entrySet()) {
             Path path = result.getKey();
             String formatted;
             try {
-                formatted = result.getValue().get();
+                FormatFileResult fileResult = result.getValue().get();
+                formatted = fileResult.result();
+                warnIfDurationExceedsThreshold(parameters, path, fileResult);
             } catch (InterruptedException e) {
                 errWriter.println(e.getMessage());
                 allOk = false;
@@ -180,6 +186,16 @@ public final class Main {
             }
         }
         return allOk ? 0 : 1;
+    }
+
+    private void warnIfDurationExceedsThreshold(CommandLineOptions parameters, Path path, FormatFileResult fileResult) {
+        if (parameters.warnOnExpensiveFileDurationMillis().isPresent()
+                && fileResult.duration().toMillis()
+                        > parameters.warnOnExpensiveFileDurationMillis().get()) {
+            errWriter.println(path + ": took " + fileResult.duration().toMillis() + "ms to format, "
+                    + "which is longer than the threshold of "
+                    + parameters.warnOnExpensiveFileDurationMillis().get() + "ms");
+        }
     }
 
     private int formatStdin(CommandLineOptions parameters, JavaFormatterOptions options) {
