@@ -1,0 +1,11 @@
+public class I964 {
+
+    record Point(int x, int y) {}
+
+    public void JEP395(Object obj) {
+
+        if (obj instanceof Point(int x, _)) {
+            System.out.println(x);
+        }
+    }
+}

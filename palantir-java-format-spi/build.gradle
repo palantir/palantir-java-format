@@ -2,6 +2,7 @@ apply plugin: 'java-library'
 apply plugin: 'com.palantir.external-publish-jar'
 apply plugin: 'com.palantir.revapi'
 
+
 dependencies {
     api 'com.google.guava:guava'
     api 'com.fasterxml.jackson.core:jackson-annotations'

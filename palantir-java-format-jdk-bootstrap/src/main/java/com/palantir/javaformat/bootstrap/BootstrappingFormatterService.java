@@ -163,11 +163,17 @@ public final class BootstrappingFormatterService implements FormatterService {
             Builder withJvmArgsForVersion(Integer majorJvmVersion) {
                 if (majorJvmVersion >= 16) {
                     addJvmArgs(
-                            "--add-exports", "jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
-                            "--add-exports", "jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED",
-                            "--add-exports", "jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED",
-                            "--add-exports", "jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
-                            "--add-exports", "jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED");
+                            "--enable-preview",
+                            "--add-exports",
+                            "jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
+                            "--add-exports",
+                            "jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED",
+                            "--add-exports",
+                            "jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED",
+                            "--add-exports",
+                            "jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
+                            "--add-exports",
+                            "jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED");
                 }
                 return this;
             }

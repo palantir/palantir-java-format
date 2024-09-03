@@ -61,6 +61,7 @@ configurations {
     }
 }
 
+
 dependencies {
     implementation project(':palantir-java-format-jdk-bootstrap')
     implementation 'com.github.ben-manes.caffeine:caffeine'

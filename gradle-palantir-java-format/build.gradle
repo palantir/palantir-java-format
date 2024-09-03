@@ -11,6 +11,7 @@ configurations {
     }
 }
 
+
 dependencies {
     compileOnly 'com.diffplug.spotless:spotless-plugin-gradle'
 

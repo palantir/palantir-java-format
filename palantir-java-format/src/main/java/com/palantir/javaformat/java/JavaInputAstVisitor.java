@@ -390,7 +390,8 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         return null;
     }
 
-    protected void handleModule(boolean first, CompilationUnitTree node) {}
+    protected void handleModule(boolean first, CompilationUnitTree node) {
+    }
 
     /** Skips over extra semi-colons at the top-level, or in a class member declaration lists. */
     protected void dropEmptyDeclarations() {
@@ -1005,7 +1006,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         builder.open(plusFour);
         builder.open(
                 node.getInitializer().size() > 1
-                                && node.getInitializer().get(0).getKind() == Tree.Kind.EXPRESSION_STATEMENT
+                        && node.getInitializer().get(0).getKind() == Tree.Kind.EXPRESSION_STATEMENT
                         ? plusFour
                         : ZERO);
         if (!node.getInitializer().isEmpty()) {
@@ -1611,12 +1612,12 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
 
     private static List<Long> handleStream(List<ExpressionTree> parts) {
         return indexes(parts.stream(), p -> {
-                    if (!(p instanceof MethodInvocationTree)) {
-                        return false;
-                    }
-                    Name name = getMethodName((MethodInvocationTree) p);
-                    return Stream.of("stream", "parallelStream", "toBuilder").anyMatch(name::contentEquals);
-                })
+            if (!(p instanceof MethodInvocationTree)) {
+                return false;
+            }
+            Name name = getMethodName((MethodInvocationTree) p);
+            return Stream.of("stream", "parallelStream", "toBuilder").anyMatch(name::contentEquals);
+        })
                 .collect(toList());
     }
 
@@ -1783,7 +1784,12 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     }
 
     public boolean visit(Name name) {
-        token(name.toString());
+        String value = name.toString();
+        if (value.isEmpty()) {
+            token("_");
+        } else {
+            token(value);
+        }
         return false;
     }
 
@@ -2471,8 +2477,8 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 markForPartialFormat();
                 builder.blankLineWanted(
                         previousDirective
-                                        .map(k -> !k.equals(directiveTree.getKind()))
-                                        .orElse(false)
+                                .map(k -> !k.equals(directiveTree.getKind()))
+                                .orElse(false)
                                 ? BlankLineWanted.YES
                                 : BlankLineWanted.NO);
                 builder.forcedBreak();
@@ -2926,7 +2932,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
      *   <li>{@code foo().bar()[0]}
      *   <li>{@code foo().bar()[0][0]}
      * </ul>
-     *
+     * <p>
      * Whereas an expression like a name {@code com.palantir.foo.bar.Baz} would not.
      */
     private boolean shouldHaveColumnLimit(ExpressionTree expr) {
@@ -3413,8 +3419,8 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
 
         builder.open(
                 kind == DeclarationKind.PARAMETER
-                                && (modifiers.isPresent()
-                                        && !modifiers.get().getAnnotations().isEmpty())
+                        && (modifiers.isPresent()
+                        && !modifiers.get().getAnnotations().isEmpty())
                         ? plusFour
                         : ZERO);
         {
@@ -3519,7 +3525,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
      *
      * @param dimExpressions an ordered list of dimension expressions (e.g. the {@code 0} in {@code new int[0]}
      * @param annotations an ordered list of type annotations grouped by dimension (e.g. {@code [[@A, @B], [@C]]} for
-     *     {@code int @A [] @B @C []}
+     * {@code int @A [] @B @C []}
      */
     private void maybeAddDims(Deque<ExpressionTree> dimExpressions, Deque<List<? extends AnnotationTree>> annotations) {
         boolean lastWasAnnotation = false;
@@ -3675,6 +3681,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             }
         }
     }
+
     /** Gets the permits clause for the given node. This is only available in Java 15 and later. */
     protected List<? extends Tree> getPermitsClause(ClassTree node) {
         return ImmutableList.of();
@@ -3762,7 +3769,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             }
         }
         return markerAnnotations <= 1
-                        && markerAnnotations == modifiers.getAnnotations().size()
+                && markerAnnotations == modifiers.getAnnotations().size()
                 ? Direction.HORIZONTAL
                 : Direction.VERTICAL;
     }

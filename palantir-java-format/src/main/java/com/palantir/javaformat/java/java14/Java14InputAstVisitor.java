@@ -291,6 +291,7 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
                 builder.space();
                 token("-");
                 token(">");
+
                 builder.space();
                 if (node.getBody().getKind() == BLOCK) {
                     // Explicit call with {@link CollapseEmptyOrNot.YES} to handle empty case blocks.

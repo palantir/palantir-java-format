@@ -1,5 +1,6 @@
 buildscript {
     repositories {
+        mavenLocal() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
         mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
         gradlePluginPortal() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
     }
@@ -37,9 +38,10 @@ allprojects {
     apply plugin: 'com.palantir.java-format'
     apply plugin: 'com.palantir.jakarta-package-alignment'
     group = 'com.palantir.javaformat'
-    version = rootProject.version
+    version = "2.44.1"
 
     repositories {
+        mavenLocal() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
         mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
     }
 }
