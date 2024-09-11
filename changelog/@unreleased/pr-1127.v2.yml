@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: Use com.palantir.external-publish-intellij for idea plugins
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/1127
