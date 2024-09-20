@@ -12,6 +12,8 @@ buildscript {
         classpath 'com.palantir.gradle.externalpublish:gradle-external-publish-plugin:1.19.0'
         classpath 'com.palantir.gradle.failure-reports:gradle-failure-reports:1.13.0'
         classpath 'com.palantir.gradle.gitversion:gradle-git-version:3.1.0'
+        classpath 'com.palantir.gradle.jdks:gradle-jdks:0.47.0'
+        classpath 'com.palantir.gradle.jdkslatest:gradle-jdks-latest:0.15.0'
         classpath 'com.palantir.javaformat:gradle-palantir-java-format:2.40.0'
         classpath 'com.palantir.gradle.revapi:gradle-revapi:1.8.0'
         classpath 'com.palantir.javaformat:gradle-palantir-java-format:2.40.0'
@@ -22,6 +24,8 @@ buildscript {
 apply plugin: 'com.palantir.external-publish'
 apply plugin: 'com.palantir.failure-reports'
 apply plugin: 'com.palantir.git-version'
+apply plugin: 'com.palantir.jdks'
+apply plugin: 'com.palantir.jdks.latest'
 apply plugin: 'com.palantir.baseline'
 apply plugin: 'com.palantir.consistent-versions'
 
@@ -88,4 +92,8 @@ idea.project.ipr.withXml { xml ->
         </option>
     </component>
     '''))
+}
+
+jdks {
+    daemonTarget = 17
 }
