@@ -58,3 +58,6 @@ __init__.pyc
 
 node_modules/
 /.profileconfig.json
+
+# Gradle JDKs setup
+!gradle/*
