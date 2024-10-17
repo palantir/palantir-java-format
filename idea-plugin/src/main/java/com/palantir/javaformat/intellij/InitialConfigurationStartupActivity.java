@@ -26,6 +26,7 @@ public final class InitialConfigurationStartupActivity implements StartupActivit
         PalantirJavaFormatSettings settings = PalantirJavaFormatSettings.getInstance(project);
         if (settings.isUninitialized()) {
             settings.setEnabled(false);
+            settings.setFormatJavadoc(false);
         }
     }
 }

@@ -26,12 +26,15 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import com.palantir.javaformat.java.FormatterException;
 import com.palantir.javaformat.java.FormatterService;
+import com.palantir.javaformat.java.JavaFormatterOptions;
 import com.palantir.javaformat.java.Replacement;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.immutables.value.Value;
 
@@ -45,10 +48,24 @@ public final class BootstrappingFormatterService implements FormatterService {
     private final Integer jdkMajorVersion;
     private final List<Path> implementationClassPath;
 
+    private final JavaFormatterOptions options;
+
     public BootstrappingFormatterService(Path jdkPath, Integer jdkMajorVersion, List<Path> implementationClassPath) {
+        this(
+                jdkPath,
+                jdkMajorVersion,
+                implementationClassPath,
+                JavaFormatterOptions.builder()
+                        .style(JavaFormatterOptions.Style.PALANTIR)
+                        .build());
+    }
+
+    public BootstrappingFormatterService(
+            Path jdkPath, Integer jdkMajorVersion, List<Path> implementationClassPath, JavaFormatterOptions options) {
         this.jdkPath = jdkPath;
         this.jdkMajorVersion = jdkMajorVersion;
         this.implementationClassPath = implementationClassPath;
+        this.options = Objects.requireNonNull(options, "Formatter options are required");
     }
 
     @Override
@@ -78,6 +95,13 @@ public final class BootstrappingFormatterService implements FormatterService {
         }
     }
 
+    @Override
+    public FormatterService withOptions(
+            Function<? super JavaFormatterOptions, ? extends JavaFormatterOptions> optionsTransformer) {
+        JavaFormatterOptions newOptions = optionsTransformer.apply(options);
+        return new BootstrappingFormatterService(jdkPath, jdkMajorVersion, implementationClassPath, newOptions);
+    }
+
     private ImmutableList<Replacement> getFormatReplacementsInternal(String input, Collection<Range<Integer>> ranges)
             throws IOException {
         FormatterCliArgs command = FormatterCliArgs.builder()
@@ -85,6 +109,8 @@ public final class BootstrappingFormatterService implements FormatterService {
                 .withJvmArgsForVersion(jdkMajorVersion)
                 .implementationClasspath(implementationClassPath)
                 .outputReplacements(true)
+                .formatJavadoc(options.formatJavadoc())
+                .style(options.style())
                 .characterRanges(ranges.stream()
                         .map(BootstrappingFormatterService::toStringRange)
                         .collect(Collectors.toList()))
@@ -103,6 +129,8 @@ public final class BootstrappingFormatterService implements FormatterService {
                 .withJvmArgsForVersion(jdkMajorVersion)
                 .implementationClasspath(implementationClassPath)
                 .outputReplacements(false)
+                .formatJavadoc(options.formatJavadoc())
+                .style(options.style())
                 .build();
         return FormatterCommandRunner.runWithStdin(command.toArgs(), input).orElse(input);
     }
@@ -129,6 +157,10 @@ public final class BootstrappingFormatterService implements FormatterService {
 
         boolean outputReplacements();
 
+        boolean formatJavadoc();
+
+        JavaFormatterOptions.Style style();
+
         default List<String> toArgs() {
             ImmutableList.Builder<String> args = ImmutableList.<String>builder()
                     .add(jdkPath().toAbsolutePath().toString())
@@ -146,10 +178,16 @@ public final class BootstrappingFormatterService implements FormatterService {
             if (outputReplacements()) {
                 args.add("--output-replacements");
             }
+            if (formatJavadoc()) {
+                args.add("--format-javadoc");
+            }
+            if (style() == JavaFormatterOptions.Style.AOSP) {
+                args.add("--aosp");
+            } else if (style() == JavaFormatterOptions.Style.PALANTIR) {
+                args.add("--palantir");
+            }
 
             return args
-                    // Use palantir style
-                    .add("--palantir")
                     // Trailing "-" enables formatting stdin -> stdout
                     .add("-")
                     .build();

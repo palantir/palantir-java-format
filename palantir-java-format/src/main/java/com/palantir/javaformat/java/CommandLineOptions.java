@@ -40,6 +40,7 @@ final class CommandLineOptions {
     private final boolean fixImportsOnly;
     private final boolean sortImports;
     private final boolean removeUnusedImports;
+    private final boolean formatJavadoc;
     private final boolean dryRun;
     private final boolean setExitIfChanged;
     private final Optional<String> assumeFilename;
@@ -61,6 +62,7 @@ final class CommandLineOptions {
             boolean fixImportsOnly,
             boolean sortImports,
             boolean removeUnusedImports,
+            boolean formatJavadoc,
             boolean dryRun,
             boolean setExitIfChanged,
             Optional<String> assumeFilename,
@@ -80,6 +82,7 @@ final class CommandLineOptions {
         this.fixImportsOnly = fixImportsOnly;
         this.sortImports = sortImports;
         this.removeUnusedImports = removeUnusedImports;
+        this.formatJavadoc = formatJavadoc;
         this.dryRun = dryRun;
         this.setExitIfChanged = setExitIfChanged;
         this.assumeFilename = assumeFilename;
@@ -157,6 +160,11 @@ final class CommandLineOptions {
         return removeUnusedImports;
     }
 
+    /** Format JavaDoc comments as well */
+    boolean formatJavadoc() {
+        return formatJavadoc;
+    }
+
     /** Print the paths of the files whose contents would change if the formatter were run normally. */
     boolean dryRun() {
         return dryRun;
@@ -205,6 +213,7 @@ final class CommandLineOptions {
         private boolean fixImportsOnly = false;
         private boolean sortImports = true;
         private boolean removeUnusedImports = true;
+        private boolean formatJavadoc = false;
         private boolean dryRun = false;
         private boolean setExitIfChanged = false;
         private Optional<String> assumeFilename = Optional.empty();
@@ -280,6 +289,11 @@ final class CommandLineOptions {
             return this;
         }
 
+        Builder formatJavadoc(boolean formatJavadoc) {
+            this.formatJavadoc = formatJavadoc;
+            return this;
+        }
+
         Builder dryRun(boolean dryRun) {
             this.dryRun = dryRun;
             return this;
@@ -322,6 +336,7 @@ final class CommandLineOptions {
                     fixImportsOnly,
                     sortImports,
                     removeUnusedImports,
+                    formatJavadoc,
                     dryRun,
                     setExitIfChanged,
                     assumeFilename,
