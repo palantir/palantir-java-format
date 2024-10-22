@@ -131,15 +131,10 @@ public final class Formatter {
         OpsBuilder opsBuilder = new OpsBuilder(javaInput);
 
         JavaInputAstVisitor visitor;
-        if (getRuntimeVersion() >= 14) {
-            try {
-                visitor = Class.forName("com.palantir.javaformat.java.java14.Java14InputAstVisitor")
-                        .asSubclass(JavaInputAstVisitor.class)
-                        .getConstructor(OpsBuilder.class, int.class)
-                        .newInstance(opsBuilder, options.indentationMultiplier());
-            } catch (ReflectiveOperationException e) {
-                throw new RuntimeException(e.getMessage(), e);
-            }
+        if (getRuntimeVersion() >= 21) {
+            visitor = createVisitor("com.palantir.javaformat.java.java21.Java21InputAstVisitor", opsBuilder, options);
+        } else if (getRuntimeVersion() >= 14) {
+            visitor = createVisitor("com.palantir.javaformat.java.java14.Java14InputAstVisitor", opsBuilder, options);
         } else {
             visitor = new JavaInputAstVisitor(opsBuilder, options.indentationMultiplier());
         }
@@ -204,6 +199,18 @@ public final class Formatter {
     @VisibleForTesting
     static int getRuntimeVersion() {
         return Runtime.version().feature();
+    }
+
+    private static JavaInputAstVisitor createVisitor(
+            final String className, final OpsBuilder builder, final JavaFormatterOptions options) {
+        try {
+            return Class.forName(className)
+                    .asSubclass(JavaInputAstVisitor.class)
+                    .getConstructor(OpsBuilder.class, int.class)
+                    .newInstance(builder, options.indentationMultiplier());
+        } catch (ReflectiveOperationException e) {
+            throw new LinkageError(e.getMessage(), e);
+        }
     }
 
     static boolean errorDiagnostic(Diagnostic<?> input) {
