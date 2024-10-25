@@ -4,7 +4,7 @@ buildscript {
         gradlePluginPortal() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
     }
     dependencies {
-        classpath 'com.palantir.gradle.jdks:gradle-jdks-settings:0.51.0'
+        classpath 'com.palantir.gradle.jdks:gradle-jdks-settings:0.52.0'
     }
 }
 apply plugin: 'com.palantir.jdks.settings'
