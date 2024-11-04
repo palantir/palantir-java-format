@@ -123,44 +123,49 @@ install_and_setup_jdks() {
     # Check if distribution exists in $GRADLE_JDKS_HOME
     jdk_installation_directory="$GRADLE_JDKS_HOME"/"$distribution_local_path"
     if [ ! -d "$jdk_installation_directory" ]; then
-      # Download and extract the distribution into a temporary directory
       echo "JDK installation '$jdk_installation_directory' does not exist, installing '$distribution_url' in progress ..."
-      in_progress_dir="$TMP_WORK_DIR/$distribution_local_path.in-progress"
-      mkdir -p "$in_progress_dir"
-      cd "$in_progress_dir" || die "failed to change dir to $in_progress_dir"
-      if command -v curl > /dev/null 2>&1; then
-        echo "Using curl to download $distribution_url"
-        case "$distribution_url" in
-          *.zip)
-            distribution_name=${distribution_url##*/}
-            curl -C - "$distribution_url" -o "$distribution_name"
-            tar -xzf "$distribution_name"
-            ;;
-          *)
-            curl -C - "$distribution_url" | tar -xzf -
-            ;;
-        esac
-      elif command -v wget > /dev/null 2>&1; then
-        echo "Using wget to download $distribution_url"
-        case "$distribution_url" in
-          *.zip)
-            distribution_name=${distribution_url##*/}
-            wget -c "$distribution_url" -O "$distribution_name"
-            tar -xzf "$distribution_name"
-            ;;
-          *)
-            wget -qO- -c "$distribution_url" | tar -xzf -
-            ;;
-        esac
-      else
-        die "ERROR: Neither curl nor wget are installed, Could not set up JAVA_HOME"
-      fi
-      cd - || exit
-
-      # Finding the java_home
-      java_home=$(get_java_home "$in_progress_dir")
-      "$java_home"/bin/java -cp "$scripts_dir"/gradle-jdks-setup.jar com.palantir.gradle.jdks.setup.GradleJdkInstallationSetup jdkSetup "$jdk_installation_directory" || die "Failed to set up JDK $jdk_installation_directory"
-      echo "Successfully installed JDK distribution in $jdk_installation_directory"
+    elif [ ! -f "$jdk_installation_directory/bin/java" ]; then
+      echo "Java executable not found in $jdk_installation_directory/bin/java, re-installing the JDK...."
+    else
+      echo "JDK installation $jdk_installation_directory was already configured"
+      continue
     fi
+    # Download and extract the distribution into a temporary directory
+    in_progress_dir="$TMP_WORK_DIR/$distribution_local_path.in-progress"
+    mkdir -p "$in_progress_dir"
+    cd "$in_progress_dir" || die "failed to change dir to $in_progress_dir"
+    if command -v curl > /dev/null 2>&1; then
+      echo "Using curl to download $distribution_url"
+      case "$distribution_url" in
+        *.zip)
+          distribution_name=${distribution_url##*/}
+          curl -C - "$distribution_url" -o "$distribution_name"
+          tar -xzf "$distribution_name"
+          ;;
+        *)
+          curl -k -C - "$distribution_url" | tar -xzf -
+          ;;
+      esac
+    elif command -v wget > /dev/null 2>&1; then
+      echo "Using wget to download $distribution_url"
+      case "$distribution_url" in
+        *.zip)
+          distribution_name=${distribution_url##*/}
+          wget -c "$distribution_url" -O "$distribution_name"
+          tar -xzf "$distribution_name"
+          ;;
+        *)
+          wget -qO- -c "$distribution_url" | tar -xzf -
+          ;;
+      esac
+    else
+      die "ERROR: Neither curl nor wget are installed, Could not set up JAVA_HOME"
+    fi
+    cd - || exit
+
+    # Finding the java_home
+    java_home=$(get_java_home "$in_progress_dir")
+    "$java_home"/bin/java -cp "$scripts_dir"/gradle-jdks-setup.jar com.palantir.gradle.jdks.setup.GradleJdkInstallationSetup jdkSetup "$jdk_installation_directory" || die "Failed to set up JDK $jdk_installation_directory"
+    echo "Successfully installed JDK distribution in $jdk_installation_directory"
   done
 }
