@@ -127,7 +127,6 @@ install_and_setup_jdks() {
     elif [ ! -f "$jdk_installation_directory/bin/java" ]; then
       echo "Java executable not found in $jdk_installation_directory/bin/java, re-installing the JDK...."
     else
-      echo "JDK installation $jdk_installation_directory was already configured"
       continue
     fi
     # Download and extract the distribution into a temporary directory
