@@ -253,8 +253,7 @@ public final class FormatterTest {
                 + "import java.util.List;\n"
                 + "import javax.annotations.Nullable;\n\n"
                 + "public class ExampleTest {\n"
-                + "  @Nullable\n"
-                + "  List<?> xs;\n"
+                + "  @Nullable List<?> xs;\n"
                 + "}\n";
         assertThat(output).isEqualTo(expect);
     }
