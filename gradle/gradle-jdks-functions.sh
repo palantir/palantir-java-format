@@ -25,14 +25,17 @@ fi
 TMP_WORK_DIR=$(mktemp -d)
 export TMP_WORK_DIR
 
+# writing to stderr
+write() { echo "$*" >&2; }
+
 cleanup() {
   [ -d "$TMP_WORK_DIR" ] && rm -rf "$TMP_WORK_DIR"
 }
 
 die() {
-    echo
-    echo "$*"
-    echo
+    write
+    write "$*"
+    write
     cleanup
     exit 1
 } >&2
@@ -115,7 +118,7 @@ install_and_setup_jdks() {
     major_version_dir=${dir%*/}
     major_version=${major_version_dir##*/}
     if [ "$major_version" = "8" ]; then
-      echo "Skipping JDK 8 installation as it is not supported by Gradle JDKs Setup."
+      write "Skipping JDK 8 installation as it is not supported by Gradle JDKs Setup."
       continue
     fi
     distribution_local_path=$(read_value "$major_version_dir"/"$OS"/"$ARCH"/local-path)
@@ -123,9 +126,9 @@ install_and_setup_jdks() {
     # Check if distribution exists in $GRADLE_JDKS_HOME
     jdk_installation_directory="$GRADLE_JDKS_HOME"/"$distribution_local_path"
     if [ ! -d "$jdk_installation_directory" ]; then
-      echo "JDK installation '$jdk_installation_directory' does not exist, installing '$distribution_url' in progress ..."
+      write "JDK installation '$jdk_installation_directory' does not exist, installing '$distribution_url' in progress ..."
     elif [ ! -f "$jdk_installation_directory/bin/java" ]; then
-      echo "Java executable not found in $jdk_installation_directory/bin/java, re-installing the JDK...."
+      write "Java executable not found in $jdk_installation_directory/bin/java, re-installing the JDK...."
     else
       continue
     fi
@@ -134,7 +137,7 @@ install_and_setup_jdks() {
     mkdir -p "$in_progress_dir"
     cd "$in_progress_dir" || die "failed to change dir to $in_progress_dir"
     if command -v curl > /dev/null 2>&1; then
-      echo "Using curl to download $distribution_url"
+      write "Using curl to download $distribution_url"
       case "$distribution_url" in
         *.zip)
           distribution_name=${distribution_url##*/}
@@ -142,11 +145,11 @@ install_and_setup_jdks() {
           tar -xzf "$distribution_name"
           ;;
         *)
-          curl -k -C - "$distribution_url" | tar -xzf -
+          curl -C - "$distribution_url" | tar -xzf -
           ;;
       esac
     elif command -v wget > /dev/null 2>&1; then
-      echo "Using wget to download $distribution_url"
+      write "Using wget to download $distribution_url"
       case "$distribution_url" in
         *.zip)
           distribution_name=${distribution_url##*/}
@@ -160,11 +163,11 @@ install_and_setup_jdks() {
     else
       die "ERROR: Neither curl nor wget are installed, Could not set up JAVA_HOME"
     fi
-    cd - || exit
+    cd - > /dev/null || die "failed to change dir to old pwd: $OLDPWD"
 
     # Finding the java_home
     java_home=$(get_java_home "$in_progress_dir")
     "$java_home"/bin/java -cp "$scripts_dir"/gradle-jdks-setup.jar com.palantir.gradle.jdks.setup.GradleJdkInstallationSetup jdkSetup "$jdk_installation_directory" || die "Failed to set up JDK $jdk_installation_directory"
-    echo "Successfully installed JDK distribution in $jdk_installation_directory"
+    write "Successfully installed JDK distribution in $jdk_installation_directory"
   done
 }
