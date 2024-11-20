@@ -34,17 +34,20 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 
+@SuppressWarnings("for-rollout:SameNameButDifferent")
 @State(
         name = "PalantirJavaFormatSettings",
         storages = {@Storage("palantir-java-format.xml")})
 class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJavaFormatSettings.State> {
 
+    @SuppressWarnings("for-rollout:SameNameButDifferent")
     private State state = new State();
 
     static PalantirJavaFormatSettings getInstance(Project project) {
         return ServiceManager.getService(project, PalantirJavaFormatSettings.class);
     }
 
+    @SuppressWarnings("for-rollout:SameNameButDifferent")
     @Nullable
     @Override
     public State getState() {
@@ -52,7 +55,7 @@ class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJav
     }
 
     @Override
-    public void loadState(State state) {
+    public void loadState(@SuppressWarnings("for-rollout:SameNameButDifferent") State state) {
         this.state = state;
     }
 
@@ -144,6 +147,7 @@ class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJav
                     .map(strings -> strings.stream().map(URI::create).collect(Collectors.toList()));
         }
 
+        @SuppressWarnings("for-rollout:NullAway")
         public List<String> getImplementationClassPath() {
             return implementationClassPath
                     .map(paths -> paths.stream().map(URI::toString).collect(Collectors.toList()))
@@ -161,6 +165,7 @@ class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJav
             }
         }
 
+        @SuppressWarnings("for-rollout:NullAway")
         public String getEnabled() {
             switch (enabled) {
                 case ENABLED:

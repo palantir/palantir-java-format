@@ -40,10 +40,14 @@ class PalantirJavaFormatConfigurable extends BaseConfigurable implements Searcha
     private final Project project;
     private JPanel panel;
     private JCheckBox enable;
+
+    @SuppressWarnings("for-rollout:RawTypes")
     private JComboBox styleComboBox;
+
     private JLabel formatterVersion;
     private JLabel pluginVersion;
 
+    @SuppressWarnings("for-rollout:NullAway")
     public PalantirJavaFormatConfigurable(Project project) {
         this.project = project;
     }
@@ -133,6 +137,7 @@ class PalantirJavaFormatConfigurable extends BaseConfigurable implements Searcha
      *
      * @noinspection ALL
      */
+    @SuppressWarnings("for-rollout:InvalidBlockTag")
     private void $$$setupUI$$$() {
         createUIComponents();
         panel = new JPanel();
@@ -281,6 +286,7 @@ class PalantirJavaFormatConfigurable extends BaseConfigurable implements Searcha
     }
 
     /** @noinspection ALL */
+    @SuppressWarnings({"for-rollout:InvalidBlockTag", "for-rollout:MissingSummary"})
     public JComponent $$$getRootComponent$$$() {
         return panel;
     }

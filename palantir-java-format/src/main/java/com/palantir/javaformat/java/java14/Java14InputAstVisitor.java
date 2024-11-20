@@ -94,6 +94,7 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
         }
     }
 
+    @SuppressWarnings("for-rollout:NullAway")
     @Override
     public Void visitBindingPattern(BindingPatternTree node, Void unused) {
         sync(node);
@@ -326,6 +327,7 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
         return null;
     }
 
+    @SuppressWarnings("for-rollout:NullAway")
     private static Method maybeGetMethod(Class<?> c, String name) {
         try {
             return c.getMethod(name);

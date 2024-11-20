@@ -177,6 +177,7 @@ public final class JavaOutput extends Output {
      *
      * @return a list of {@link Replacement}s, sorted by start index, without overlaps
      */
+    @SuppressWarnings("for-rollout:NullAway")
     public ImmutableList<Replacement> getFormatReplacements(RangeSet<Integer> iRangeSet0) {
         ImmutableList.Builder<Replacement> result = ImmutableList.builder();
         Map<Integer, Range<Integer>> kToJ = JavaOutput.makeKToIJ(this);
@@ -212,6 +213,7 @@ public final class JavaOutput extends Output {
                 replaceFrom--;
             }
 
+            @SuppressWarnings("for-rollout:NullAway")
             int i = kToJ.get(startTok.getIndex()).lowerEndpoint();
             // Include leading blank lines from the formatted output, unless the formatted range
             // starts at the beginning of the file.
