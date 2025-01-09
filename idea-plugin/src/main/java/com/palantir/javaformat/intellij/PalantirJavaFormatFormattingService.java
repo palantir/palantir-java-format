@@ -89,10 +89,17 @@ class PalantirJavaFormatFormattingService extends AsyncDocumentFormattingService
             }
 
             try {
-                String formattedText = applyReplacements(
-                        request.getDocumentText(),
-                        formatterService.get().getFormatReplacements(request.getDocumentText(), toRanges(request)));
-                request.onTextReady(formattedText);
+                List<Replacement> replacements =
+                        formatterService.get().getFormatReplacements(request.getDocumentText(), toRanges(request));
+
+                // The Javadoc of onTextReady API says that you should set it to null when the
+                // document is unchanged. But an even better version is to simply not attempt
+                // to format a document that is already formatted
+                if (replacements.isEmpty()) {
+                    return;
+                }
+
+                request.onTextReady(applyReplacements(request.getDocumentText(), replacements));
             } catch (FormatterException e) {
                 request.onError(
                         Notifications.PARSING_ERROR_TITLE,
