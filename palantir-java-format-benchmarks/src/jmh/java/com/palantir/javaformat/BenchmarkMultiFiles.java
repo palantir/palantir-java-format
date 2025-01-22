@@ -33,12 +33,13 @@ import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 @Measurement(iterations = 2, time = 2)
-//@Warmup(iterations = 2, time = 4)
+@Warmup(iterations = 2, time = 4)
 public class BenchmarkMultiFiles {
 
     @State(Scope.Benchmark)
