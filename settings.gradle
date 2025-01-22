@@ -16,6 +16,7 @@ include ':idea-plugin'
 include ':palantir-java-format-spi'
 include ':palantir-java-format'
 include ':palantir-java-format-jdk-bootstrap'
+include ':palantir-java-format-benchmarks'
 
 boolean isCiServer = System.getenv().containsKey('CI')
 buildCache {

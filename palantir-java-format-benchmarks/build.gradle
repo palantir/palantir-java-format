@@ -1,0 +1,26 @@
+apply plugin: 'distribution'
+apply plugin: 'me.champeau.jmh'
+
+dependencies {
+    jmhAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess'
+    compileOnly 'org.openjdk.jmh:jmh-generator-annprocess'
+
+    jmhImplementation 'org.assertj:assertj-core'
+    jmhImplementation 'org.junit.jupiter:junit-jupiter'
+    jmhImplementation 'org.openjdk.jmh:jmh-core'
+    jmhImplementation 'org.openjdk.jmh:jmh-generator-annprocess'
+}
+
+tasks.withType(ProcessResources.class).configureEach {
+    from(project(':palantir-java-format').tasks.named('fatJar')) {
+        rename { 'palantir-java-format-all.jar' }
+    }
+}
+
+jmhCompileGeneratedClasses {
+    options.errorprone.enabled = false
+}
+
+tasks.named("jmh") {
+    dependsOn ":palantir-java-format:nativeCompile", ":palantir-java-format:fatJar"
+}

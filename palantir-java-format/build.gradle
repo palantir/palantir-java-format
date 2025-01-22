@@ -1,3 +1,14 @@
+buildscript {
+    repositories {
+        mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
+        gradlePluginPortal() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
+    }
+    dependencies {
+        classpath 'org.graalvm.buildtools:native-gradle-plugin:0.10.4'
+    }
+}
+
+apply plugin: 'org.graalvm.buildtools.native'
 apply plugin: 'application'
 apply plugin: 'com.palantir.external-publish-jar'
 
@@ -28,6 +39,36 @@ dependencies {
 
     compileOnly 'org.derive4j:derive4j-annotation'
     annotationProcessor 'org.derive4j:derive4j'
+}
+
+graalvmNative {
+    binaries {
+        main {
+            javaLauncher = javaToolchains.launcherFor {
+                languageVersion = JavaLanguageVersion.of(23)
+                vendor = JvmVendorSpec.GRAAL_VM
+            }
+            imageName = 'palantir-java-format'
+            mainClass = mainClassName
+            fallback = false
+            sharedLibrary = false
+            configurationFileDirectories.from(file('src/main/resources/META-INF/native-image'))
+            buildArgs.addAll("-H:ConfigurationFileDirectories=${projectDir}/src/main/resources/META-INF/native-image",
+                    '-H:+UnlockExperimentalVMOptions',
+                    '-H:IncludeResourceBundles=com.sun.tools.javac.resources.compiler',
+                    '-H:IncludeResourceBundles=com.sun.tools.javac.resources.javac',
+                    '--no-fallback',
+                    '--initialize-at-build-time=com.sun.tools.javac.file.Locations',
+                    '-H:+ReportExceptionStackTraces',
+                    '-H:-UseContainerSupport',
+                    '-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED',
+                    '-J--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED',
+                    '-J--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED',
+                    '-J--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED',
+                    '-J--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED',
+                    '-J--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED')
+        }
+    }
 }
 
 def exports = [
@@ -88,4 +129,21 @@ tasks.named("jar", Jar) {
     manifest {
         attributes('Add-Exports': exports.join(' '))
     }
+}
+
+tasks.register('fatJar', Jar) {
+    dependsOn tasks.jar, project(':palantir-java-format-spi').tasks.jar
+    manifest {
+        attributes 'Main-Class': mainClassName
+        attributes('Add-Exports': exports.join(' '))
+    }
+    archiveBaseName = 'palantir-java-format-all'
+    duplicatesStrategy = DuplicatesStrategy.WARN
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+
+tasks.named("build") {
+    dependsOn tasks.named("fatJar"), tasks.named("nativeCompile")
 }
