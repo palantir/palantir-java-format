@@ -16,7 +16,14 @@
 package com.palantir.javaformat.gradle;
 
 import com.diffplug.gradle.spotless.SpotlessExtension;
+import com.diffplug.spotless.FormatterStep;
+import com.google.common.io.Resources;
+import com.palantir.javaformat.gradle.spotless.NativePalantirJavaFormatStep;
 import com.palantir.javaformat.gradle.spotless.PalantirJavaFormatStep;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Path;
+import java.util.Optional;
 import org.gradle.api.Project;
 
 /**
@@ -28,8 +35,25 @@ final class SpotlessInterop {
 
     static void addSpotlessJavaStep(Project project, String configurationName) {
         SpotlessExtension spotlessExtension = project.getExtensions().getByType(SpotlessExtension.class);
-        spotlessExtension.java(java -> java.addStep(PalantirJavaFormatStep.create(
-                project.getRootProject().getConfigurations().getByName(configurationName),
-                project.getRootProject().getExtensions().getByType(JavaFormatExtension.class))));
+        spotlessExtension.java(java -> java.addStep(addSpotlessJavaFormatStep(project, configurationName)));
+    }
+
+    static FormatterStep addSpotlessJavaFormatStep(Project project, String configurationName) {
+        Boolean legacyFormatter = Optional.ofNullable(project.findProperty("palantir.legacy.formatter"))
+                .map(value -> Boolean.getBoolean((String) value))
+                .orElse(false);
+        if (legacyFormatter) {
+            return PalantirJavaFormatStep.create(
+                    project.getRootProject().getConfigurations().getByName(configurationName),
+                    project.getRootProject().getExtensions().getByType(JavaFormatExtension.class));
+        } else {
+            try {
+                URL resourceUrl = Resources.getResource("palantir-java-format");
+                return NativePalantirJavaFormatStep.create(
+                        Path.of(resourceUrl.toURI().getPath()).toFile());
+            } catch (URISyntaxException e) {
+                throw new RuntimeException("Palantir java format native image was not found", e);
+            }
+        }
     }
 }
