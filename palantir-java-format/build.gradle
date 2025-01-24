@@ -2,6 +2,7 @@ buildscript {
     repositories {
         mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
         gradlePluginPortal() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
+        mavenLocal()
     }
     dependencies {
         classpath 'org.graalvm.buildtools:native-gradle-plugin:0.10.4'
@@ -147,3 +148,24 @@ tasks.register('fatJar', Jar) {
 tasks.named("build") {
     dependsOn tasks.named("fatJar"), tasks.named("nativeCompile")
 }
+
+configurations {
+    nativeImage
+}
+def nativeImageFile = layout.buildDirectory.file('native/nativeCompile/palantir-java-format')
+def nativeImageArtifact = artifacts.add('nativeImage', nativeImageFile.get().asFile) {
+    type = 'nativeImage'
+    builtBy 'nativeCompile'
+}
+
+publishing {
+    publications {
+        nativeImage(MavenPublication) {
+            artifact(nativeImageArtifact) {}
+            artifactId = 'palantir-java-format-native'
+        }
+    }
+}
+
+
+

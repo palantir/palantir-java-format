@@ -89,6 +89,7 @@ tasks.named("test").configure {
     dependsOn(writeImplClasspath)
 }
 
+
 tasks.withType(ProcessResources.class).configureEach {
     from(project(':palantir-java-format').tasks.named('nativeCompile')) {}
 }

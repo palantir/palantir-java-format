@@ -25,6 +25,7 @@ import org.gradle.api.artifacts.Configuration;
 public final class PalantirJavaFormatProviderPlugin implements Plugin<Project> {
 
     static final String CONFIGURATION_NAME = "palantirJavaFormat";
+    static final String CONFIGURATION_NAME_NATIVE = "palantirJavaFormatNative";
 
     @Override
     public void apply(Project rootProject) {
@@ -32,7 +33,7 @@ public final class PalantirJavaFormatProviderPlugin implements Plugin<Project> {
                 rootProject == rootProject.getRootProject(),
                 "May only apply com.palantir.java-format-provider to the root project");
 
-        Configuration configuration = rootProject.getConfigurations().create(CONFIGURATION_NAME, conf -> {
+        Configuration _configuration = rootProject.getConfigurations().create(CONFIGURATION_NAME, conf -> {
             conf.setDescription("Internal configuration for resolving the palantir-java-format implementation");
             conf.setVisible(false);
             conf.setCanBeConsumed(false);
@@ -41,13 +42,33 @@ public final class PalantirJavaFormatProviderPlugin implements Plugin<Project> {
                 deps.add(rootProject
                         .getDependencies()
                         .create(ImmutableMap.of(
-                                "group", "com.palantir.javaformat",
-                                "name", "palantir-java-format",
+                                "group",
+                                "com.palantir.javaformat",
+                                "name",
+                                "palantir-java-format",
                                 "version",
-                                        JavaFormatExtension.class.getPackage().getImplementationVersion())));
+                                JavaFormatExtension.class.getPackage().getImplementationVersion())));
             });
         });
 
-        rootProject.getExtensions().create("palantirJavaFormat", JavaFormatExtension.class, configuration);
+        Configuration configuration2 = rootProject.getConfigurations().create(CONFIGURATION_NAME_NATIVE, conf -> {
+            conf.setDescription("Internal configuration for resolving the palantir-java-format-native implementation");
+            conf.setVisible(false);
+            conf.setCanBeConsumed(false);
+
+            conf.defaultDependencies(deps -> {
+                deps.add(rootProject
+                        .getDependencies()
+                        .create(ImmutableMap.of(
+                                "group",
+                                "com.palantir.javaformat",
+                                "name",
+                                "palantir-java-format-native",
+                                "version",
+                                JavaFormatExtension.class.getPackage().getImplementationVersion())));
+            });
+        });
+
+        rootProject.getExtensions().create("palantirJavaFormat", JavaFormatExtension.class, configuration2);
     }
 }

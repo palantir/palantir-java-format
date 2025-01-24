@@ -17,21 +17,22 @@ package com.palantir.javaformat.gradle;
 
 import com.diffplug.gradle.spotless.SpotlessExtension;
 import com.diffplug.spotless.FormatterStep;
-import com.google.common.io.Resources;
 import com.palantir.javaformat.gradle.spotless.NativePalantirJavaFormatStep;
 import com.palantir.javaformat.gradle.spotless.PalantirJavaFormatStep;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Path;
 import java.util.Optional;
 import org.gradle.api.Project;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 
 /**
  * Class that exists only to encapsulate accessing spotless classes, so that Gradle can generate a decorated class for
  * {@link com.palantir.javaformat.gradle.PalantirJavaFormatSpotlessPlugin} even if spotless is not on the classpath.
  */
 final class SpotlessInterop {
-    private SpotlessInterop() {}
+    private static Logger logger = Logging.getLogger(SpotlessInterop.class);
+
+    private SpotlessInterop() {
+    }
 
     static void addSpotlessJavaStep(Project project, String configurationName) {
         SpotlessExtension spotlessExtension = project.getExtensions().getByType(SpotlessExtension.class);
@@ -43,17 +44,13 @@ final class SpotlessInterop {
                 .map(value -> Boolean.getBoolean((String) value))
                 .orElse(false);
         if (legacyFormatter) {
+            logger.info("Using the legacy palantir-java-formatter");
             return PalantirJavaFormatStep.create(
                     project.getRootProject().getConfigurations().getByName(configurationName),
                     project.getRootProject().getExtensions().getByType(JavaFormatExtension.class));
         } else {
-            try {
-                URL resourceUrl = Resources.getResource("palantir-java-format");
-                return NativePalantirJavaFormatStep.create(
-                        Path.of(resourceUrl.toURI().getPath()).toFile());
-            } catch (URISyntaxException e) {
-                throw new RuntimeException("Palantir java format native image was not found", e);
-            }
+            logger.info("Using the native-image palantir-java-formatter");
+            return NativePalantirJavaFormatStep.create(project.getRootProject().getConfigurations().getByName("palantirJavaFormatNative"));
         }
     }
 }

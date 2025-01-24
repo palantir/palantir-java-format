@@ -20,22 +20,29 @@ import com.diffplug.spotless.FileSignature;
 import com.diffplug.spotless.FormatterFunc;
 import com.diffplug.spotless.FormatterStep;
 import com.diffplug.spotless.ProcessRunner;
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 
 public class NativePalantirJavaFormatStep {
+    private static Logger logger = Logging.getLogger(NativePalantirJavaFormatStep.class);
 
-    private NativePalantirJavaFormatStep() {}
+    private NativePalantirJavaFormatStep() {
+    }
 
     private static final String NAME = "palantir-java-format";
 
     /** Creates a step which formats everything - code, import order, and unused imports. */
-    public static FormatterStep create(File pathToExe) {
+    public static FormatterStep create(Configuration configuration) {
         return FormatterStep.createLazy(
-                NAME, () -> new State(FileSignature.signAsList(pathToExe)), State::createFormat);
+                NAME, () -> {
+                    logger.info("files {}", configuration.getFiles());
+                    return new State(FileSignature.signAsSet(configuration.getArtifacts().getFiles().getFiles()));
+                }, State::createFormat);
     }
 
     static class State implements Serializable {
