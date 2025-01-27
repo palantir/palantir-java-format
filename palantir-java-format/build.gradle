@@ -163,6 +163,7 @@ publishing {
         nativeImage(MavenPublication) {
             artifact(nativeImageArtifact) {
                 classifier="nativeImage"
+                extension="sh"
             }
             artifactId = 'palantir-java-format-native'
         }

@@ -23,8 +23,12 @@ import com.diffplug.spotless.ProcessRunner;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.attribute.PosixFilePermission;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -41,11 +45,8 @@ public class NativePalantirJavaFormatStep {
         return FormatterStep.createLazy(
                 NAME,
                 () -> {
-                    logger.info("files {}", configuration.getFiles());
-                    return new State(FileSignature.signAsSet(
-                            configuration.getResolvedConfiguration().getResolvedArtifacts().stream()
-                                    .map(artifact -> artifact.getFile())
-                                    .collect(Collectors.toList())));
+                    logger.info("files {}", configuration.getSingleFile());
+                    return new State(FileSignature.signAsSet(configuration.getSingleFile()));
                 },
                 State::createFormat);
     }
@@ -57,11 +58,26 @@ public class NativePalantirJavaFormatStep {
 
         State(FileSignature pathToExe) {
             this.pathToExe = pathToExe;
+            try {
+                Set<PosixFilePermission> existingPermissions =
+                        Files.getPosixFilePermissions(pathToExe.getOnlyFile().toPath());
+                Files.setPosixFilePermissions(
+                        pathToExe.getOnlyFile().toPath(),
+                        Stream.concat(
+                                        existingPermissions.stream(),
+                                        Stream.of(
+                                                PosixFilePermission.OWNER_EXECUTE,
+                                                PosixFilePermission.GROUP_EXECUTE,
+                                                PosixFilePermission.OTHERS_EXECUTE))
+                                .collect(Collectors.toSet()));
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to set execute permissions", e);
+            }
         }
 
         String format(ProcessRunner runner, String input) throws IOException, InterruptedException {
             List<String> argumentsWithPathToExe =
-                    List.of(pathToExe.getOnlyFile().getAbsolutePath(), "--palantir", "-i");
+                    List.of(pathToExe.getOnlyFile().getAbsolutePath(), "--palantir", "-");
             return runner.exec(input.getBytes(StandardCharsets.UTF_8), argumentsWithPathToExe)
                     .assertExitZero(StandardCharsets.UTF_8);
         }

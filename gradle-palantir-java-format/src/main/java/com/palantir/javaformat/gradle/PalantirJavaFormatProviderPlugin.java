@@ -68,7 +68,9 @@ public final class PalantirJavaFormatProviderPlugin implements Plugin<Project> {
                                 "version",
                                 JavaFormatExtension.class.getPackage().getImplementationVersion(),
                                 "classifier",
-                                "nativeImage")));
+                                "nativeImage",
+                                "ext",
+                                "sh")));
             });
         });
 
