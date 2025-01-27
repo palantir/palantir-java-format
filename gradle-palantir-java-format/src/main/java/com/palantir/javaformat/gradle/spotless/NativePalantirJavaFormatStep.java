@@ -20,10 +20,12 @@ import com.diffplug.spotless.FileSignature;
 import com.diffplug.spotless.FormatterFunc;
 import com.diffplug.spotless.FormatterStep;
 import com.diffplug.spotless.ProcessRunner;
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.List;
 import java.util.Set;
@@ -36,7 +38,8 @@ import org.gradle.api.logging.Logging;
 public class NativePalantirJavaFormatStep {
     private static Logger logger = Logging.getLogger(NativePalantirJavaFormatStep.class);
 
-    private NativePalantirJavaFormatStep() {}
+    private NativePalantirJavaFormatStep() {
+    }
 
     private static final String NAME = "palantir-java-format";
 
@@ -45,8 +48,10 @@ public class NativePalantirJavaFormatStep {
         return FormatterStep.createLazy(
                 NAME,
                 () -> {
-                    logger.info("files {}", configuration.getSingleFile());
-                    return new State(FileSignature.signAsSet(configuration.getSingleFile()));
+                    File execFile = configuration.getSingleFile();
+                    logger.info("Using native-image at {}", configuration.getSingleFile());
+                    makeFileExecutable(execFile.toPath());
+                    return new State(FileSignature.signAsSet(execFile));
                 },
                 State::createFormat);
     }
@@ -58,21 +63,6 @@ public class NativePalantirJavaFormatStep {
 
         State(FileSignature pathToExe) {
             this.pathToExe = pathToExe;
-            try {
-                Set<PosixFilePermission> existingPermissions =
-                        Files.getPosixFilePermissions(pathToExe.getOnlyFile().toPath());
-                Files.setPosixFilePermissions(
-                        pathToExe.getOnlyFile().toPath(),
-                        Stream.concat(
-                                        existingPermissions.stream(),
-                                        Stream.of(
-                                                PosixFilePermission.OWNER_EXECUTE,
-                                                PosixFilePermission.GROUP_EXECUTE,
-                                                PosixFilePermission.OTHERS_EXECUTE))
-                                .collect(Collectors.toSet()));
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to set execute permissions", e);
-            }
         }
 
         String format(ProcessRunner runner, String input) throws IOException, InterruptedException {
@@ -85,6 +75,24 @@ public class NativePalantirJavaFormatStep {
         FormatterFunc.Closeable createFormat() {
             ProcessRunner runner = new ProcessRunner();
             return FormatterFunc.Closeable.of(runner, this::format);
+        }
+    }
+
+    private static void makeFileExecutable(Path pathToExe) {
+        try {
+            Set<PosixFilePermission> existingPermissions =
+                    Files.getPosixFilePermissions(pathToExe);
+            Files.setPosixFilePermissions(
+                    pathToExe,
+                    Stream.concat(
+                                    existingPermissions.stream(),
+                                    Stream.of(
+                                            PosixFilePermission.OWNER_EXECUTE,
+                                            PosixFilePermission.GROUP_EXECUTE,
+                                            PosixFilePermission.OTHERS_EXECUTE))
+                            .collect(Collectors.toSet()));
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to set execute permissions on native-image", e);
         }
     }
 }
