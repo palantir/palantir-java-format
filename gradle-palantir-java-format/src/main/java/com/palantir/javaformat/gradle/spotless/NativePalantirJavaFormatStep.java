@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -31,18 +32,22 @@ import org.gradle.api.logging.Logging;
 public class NativePalantirJavaFormatStep {
     private static Logger logger = Logging.getLogger(NativePalantirJavaFormatStep.class);
 
-    private NativePalantirJavaFormatStep() {
-    }
+    private NativePalantirJavaFormatStep() {}
 
     private static final String NAME = "palantir-java-format";
 
     /** Creates a step which formats everything - code, import order, and unused imports. */
     public static FormatterStep create(Configuration configuration) {
         return FormatterStep.createLazy(
-                NAME, () -> {
+                NAME,
+                () -> {
                     logger.info("files {}", configuration.getFiles());
-                    return new State(FileSignature.signAsSet(configuration.getArtifacts().getFiles().getFiles()));
-                }, State::createFormat);
+                    return new State(FileSignature.signAsSet(
+                            configuration.getResolvedConfiguration().getResolvedArtifacts().stream()
+                                    .map(artifact -> artifact.getFile())
+                                    .collect(Collectors.toList())));
+                },
+                State::createFormat);
     }
 
     static class State implements Serializable {

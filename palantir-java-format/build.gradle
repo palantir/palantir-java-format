@@ -161,7 +161,9 @@ def nativeImageArtifact = artifacts.add('nativeImage', nativeImageFile.get().asF
 publishing {
     publications {
         nativeImage(MavenPublication) {
-            artifact(nativeImageArtifact) {}
+            artifact(nativeImageArtifact) {
+                classifier="nativeImage"
+            }
             artifactId = 'palantir-java-format-native'
         }
     }

@@ -55,6 +55,7 @@ public final class PalantirJavaFormatProviderPlugin implements Plugin<Project> {
             conf.setDescription("Internal configuration for resolving the palantir-java-format-native implementation");
             conf.setVisible(false);
             conf.setCanBeConsumed(false);
+            conf.setCanBeResolved(true);
 
             conf.defaultDependencies(deps -> {
                 deps.add(rootProject
@@ -65,7 +66,9 @@ public final class PalantirJavaFormatProviderPlugin implements Plugin<Project> {
                                 "name",
                                 "palantir-java-format-native",
                                 "version",
-                                JavaFormatExtension.class.getPackage().getImplementationVersion())));
+                                JavaFormatExtension.class.getPackage().getImplementationVersion(),
+                                "classifier",
+                                "nativeImage")));
             });
         });
 
