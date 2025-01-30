@@ -18,7 +18,6 @@ package com.palantir.javaformat.gradle;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
-import java.util.Optional;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
@@ -28,59 +27,61 @@ public final class PalantirJavaFormatProviderPlugin implements Plugin<Project> {
 
     static final String CONFIGURATION_NAME = "palantirJavaFormat";
 
+    static final String NATIVE_CONFIGURATION_NAME = "palantirJavaFormatNative";
+
     @Override
     public void apply(Project rootProject) {
         Preconditions.checkState(
                 rootProject == rootProject.getRootProject(),
                 "May only apply com.palantir.java-format-provider to the root project");
-        Boolean legacyFormatter = Optional.ofNullable(rootProject.findProperty("palantir.legacy.formatter"))
-                .map(value -> Boolean.getBoolean((String) value))
-                .orElse(false);
+
+        String implementationVersion = JavaFormatExtension.class.getPackage().getImplementationVersion();
 
         Configuration configuration = rootProject.getConfigurations().create(CONFIGURATION_NAME);
         configuration.setDescription("Internal configuration for resolving the palantir-java-format implementation");
         configuration.setVisible(false);
         configuration.setCanBeConsumed(false);
         configuration.setCanBeResolved(true);
+        configuration.defaultDependencies(deps -> {
+            deps.add(rootProject
+                    .getDependencies()
+                    .create(ImmutableMap.of(
+                            "group",
+                            "com.palantir.javaformat",
+                            "name",
+                            "palantir-java-format",
+                            "version",
+                            implementationVersion)));
+        });
 
-        if (legacyFormatter) {
-            configuration.defaultDependencies(deps -> {
-                deps.add(rootProject
-                        .getDependencies()
-                        .create(ImmutableMap.of(
-                                "group",
-                                "com.palantir.javaformat",
-                                "name",
-                                "palantir-java-format",
-                                "version",
-                                JavaFormatExtension.class.getPackage().getImplementationVersion())));
-            });
-        } else {
-            configuration.defaultDependencies(deps -> {
-                deps.add(rootProject
-                        .getDependencies()
-                        .create(ImmutableMap.of(
-                                "group",
-                                "com.palantir.javaformat",
-                                "name",
-                                "palantir-java-format-native",
-                                "version",
-                                JavaFormatExtension.class.getPackage().getImplementationVersion(),
-                                "classifier",
-                                "nativeImage",
-                                "ext",
-                                "sh")));
-            });
-            configuration
-                    .getAttributes()
-                    .attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "executable-nativeImage");
-            rootProject.getDependencies().registerTransform(ExecutableTransform.class, transformSpec -> {
-                transformSpec.getFrom().attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "sh");
-                transformSpec
-                        .getTo()
-                        .attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "executable-nativeImage");
-            });
-        }
+        Configuration nativeConfiguration = rootProject.getConfigurations().create(NATIVE_CONFIGURATION_NAME);
+        nativeConfiguration.setDescription(
+                "Internal configuration for resolving the palantir-java-format implementation");
+        nativeConfiguration.setVisible(false);
+        nativeConfiguration.setCanBeConsumed(false);
+        nativeConfiguration.setCanBeResolved(true);
+        nativeConfiguration.defaultDependencies(deps -> {
+            deps.add(rootProject
+                    .getDependencies()
+                    .create(ImmutableMap.of(
+                            "group",
+                            "com.palantir.javaformat",
+                            "name",
+                            "palantir-java-format-native",
+                            "version",
+                            implementationVersion,
+                            "classifier",
+                            "nativeImage",
+                            "ext",
+                            "sh")));
+        });
+        nativeConfiguration
+                .getAttributes()
+                .attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "executable-nativeImage");
+        rootProject.getDependencies().registerTransform(ExecutableTransform.class, transformSpec -> {
+            transformSpec.getFrom().attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "sh");
+            transformSpec.getTo().attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "executable-nativeImage");
+        });
 
         rootProject.getExtensions().create("palantirJavaFormat", JavaFormatExtension.class, configuration);
     }

@@ -31,8 +31,7 @@ public class PalantirJavaFormatSpotlessPlugin implements Plugin<Project> {
         project.getPluginManager().withPlugin("java", _javaPlugin -> {
             SPOTLESS_PLUGINS.forEach(
                     spotlessPluginId -> project.getPluginManager().withPlugin(spotlessPluginId, _spotlessPlugin -> {
-                        SpotlessInterop.addSpotlessJavaStep(
-                                project, PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME);
+                        SpotlessInterop.addSpotlessJavaStep(project);
                     }));
         });
     }

@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.google.common.base.Joiner;
-import com.google.common.collect.BoundType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import com.palantir.javaformat.java.FormatterException;
@@ -86,7 +85,7 @@ public final class BootstrappingFormatterService implements FormatterService {
                 .implementationClasspath(implementationClassPath)
                 .outputReplacements(true)
                 .characterRanges(ranges.stream()
-                        .map(BootstrappingFormatterService::toStringRange)
+                        .map(RangeUtils::toStringRange)
                         .collect(Collectors.toList()))
                 .build();
 
@@ -94,7 +93,8 @@ public final class BootstrappingFormatterService implements FormatterService {
         if (output.isEmpty() || output.get().isEmpty()) {
             return ImmutableList.of();
         }
-        return MAPPER.readValue(output.get(), new TypeReference<>() {});
+        return MAPPER.readValue(output.get(), new TypeReference<>() {
+        });
     }
 
     private String runFormatterCommand(String input) throws IOException {
@@ -107,31 +107,20 @@ public final class BootstrappingFormatterService implements FormatterService {
         return FormatterCommandRunner.runWithStdin(command.toArgs(), input).orElse(input);
     }
 
-    /** Returns a range representation as parsed by "com.palantir.javaformat.java.CommandLineOptionsParser". */
-    private static String toStringRange(Range<Integer> range) {
-        int lower = range.lowerBoundType() == BoundType.CLOSED ? range.lowerEndpoint() : range.lowerEndpoint() + 1;
-        int higher = range.upperBoundType() == BoundType.CLOSED ? range.upperEndpoint() : range.upperEndpoint() - 1;
-        if (lower == higher) {
-            return String.valueOf(lower);
-        }
-        return String.format("%s:%s", lower, higher);
-    }
-
     @Value.Immutable
     interface FormatterCliArgs {
+        List<String> characterRanges();
+
+        boolean outputReplacements();
+
         Path jdkPath();
 
         List<Path> implementationClasspath();
 
-        List<String> characterRanges();
-
         List<String> jvmArgs();
-
-        boolean outputReplacements();
-
+        
         default List<String> toArgs() {
-            ImmutableList.Builder<String> args = ImmutableList.<String>builder()
-                    .add(jdkPath().toAbsolutePath().toString())
+            ImmutableList.Builder<String> args = ImmutableList.<String>builder().add(jdkPath().toAbsolutePath().toString())
                     .addAll(jvmArgs())
                     .add(
                             "-cp",
