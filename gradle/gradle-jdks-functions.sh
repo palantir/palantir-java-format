@@ -141,11 +141,11 @@ install_and_setup_jdks() {
       case "$distribution_url" in
         *.zip)
           distribution_name=${distribution_url##*/}
-          curl -C - "$distribution_url" -o "$distribution_name"
+          curl -L -C - "$distribution_url" -o "$distribution_name"
           tar -xzf "$distribution_name"
           ;;
         *)
-          curl -C - "$distribution_url" | tar -xzf -
+          curl -L -C - "$distribution_url" | tar -xzf -
           ;;
       esac
     elif command -v wget > /dev/null 2>&1; then
