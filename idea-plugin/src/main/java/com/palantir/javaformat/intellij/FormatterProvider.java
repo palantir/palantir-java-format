@@ -66,14 +66,15 @@ final class FormatterProvider {
                 getSdkVersion(project),
                 settings.getImplementationClassPath(),
                 settings.getNativeImageClassPath(),
-                settings.getDefaultClassPath(),
+                settings.getUseLegacyClassPath(),
                 settings.injectedVersionIsOutdated()
         ));
     }
 
     @SuppressWarnings("for-rollout:Slf4jLogsafeArgs")
     private static Optional<FormatterService> createFormatter(FormatterCacheKey cacheKey) {
-        if (cacheKey.defaultClassPath.orElse("implementationClassPath").equals("nativeImageClassPath")) {
+        if (!cacheKey.useLegacyClassPath) {
+            Preconditions.checkState(cacheKey.nativeImageClassPath.isPresent(), "Unable to determine native image path %s", cacheKey);
             log.info("Using the native formatter with classpath: {}", cacheKey.nativeImageClassPath.get());
             return Optional.of(new NativeImageFormatterService(Path.of(cacheKey.nativeImageClassPath.get())));
         }
@@ -219,7 +220,7 @@ final class FormatterProvider {
         private final OptionalInt jdkMajorVersion;
         private final Optional<List<URI>> implementationClassPath;
         private final Optional<URI> nativeImageClassPath;
-        private final Optional<String> defaultClassPath;
+        private final Boolean useLegacyClassPath;
         private final boolean useBundledImplementation;
 
         FormatterCacheKey(
@@ -227,13 +228,13 @@ final class FormatterProvider {
                 OptionalInt jdkMajorVersion,
                 Optional<List<URI>> implementationClassPath,
                 Optional<URI> nativeImageClassPath,
-                Optional<String> defaultClassPath,
+                Boolean useLegacyClassPath,
                 boolean useBundledImplementation) {
             this.project = project;
             this.jdkMajorVersion = jdkMajorVersion;
             this.implementationClassPath = implementationClassPath;
             this.nativeImageClassPath = nativeImageClassPath;
-            this.defaultClassPath = defaultClassPath;
+            this.useLegacyClassPath = useLegacyClassPath;
             this.useBundledImplementation = useBundledImplementation;
 
         }
@@ -252,12 +253,12 @@ final class FormatterProvider {
                     && Objects.equals(project, that.project)
                     && Objects.equals(implementationClassPath, that.implementationClassPath)
                     && Objects.equals(nativeImageClassPath, that.nativeImageClassPath)
-                    && Objects.equals(defaultClassPath, that.defaultClassPath);
+                    && Objects.equals(useLegacyClassPath, that.useLegacyClassPath);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(project, jdkMajorVersion, implementationClassPath, nativeImageClassPath, defaultClassPath, useBundledImplementation);
+            return Objects.hash(project, jdkMajorVersion, implementationClassPath, nativeImageClassPath, useLegacyClassPath, useBundledImplementation);
         }
     }
 }

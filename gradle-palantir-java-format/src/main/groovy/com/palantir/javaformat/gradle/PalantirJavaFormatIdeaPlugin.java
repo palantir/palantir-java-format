@@ -49,7 +49,7 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
 
         rootProject.getPlugins().apply(PalantirJavaFormatProviderPlugin.class);
         Boolean useLegacyFormatter = Optional.ofNullable(rootProject.findProperty("palantir.legacy.formatter"))
-                .map(value -> Boolean.getBoolean((String) value))
+                .map(value -> Boolean.parseBoolean((String) value))
                 .orElse(false);
         rootProject.getPluginManager().withPlugin("idea", ideaPlugin -> {
             Configuration implConfiguration =

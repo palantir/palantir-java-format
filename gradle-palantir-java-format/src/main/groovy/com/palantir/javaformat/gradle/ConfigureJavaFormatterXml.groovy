@@ -33,8 +33,7 @@ class ConfigureJavaFormatterXml {
         matchOrCreateChild(settings, 'option', [name: 'nativeImageClassPath']).attributes().put('value', nativeImageUri)
 
         // configure default classPath to use
-        String defaultClassPath = useLegacyUris ? "implementationClassPath" : "nativeImageClassPath"
-        matchOrCreateChild(settings, 'option', [name: 'defaultClassPath']).attributes().put('value', defaultClassPath)
+        matchOrCreateChild(settings, 'option', [name: 'useLegacyClassPath']).attributes().put('value', useLegacyUris.toString())
     }
 
     static void configureExternalDependencies(Node rootNode) {
