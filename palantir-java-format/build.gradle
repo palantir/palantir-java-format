@@ -71,6 +71,12 @@ graalvmNative {
     }
 }
 
+
+// The image requires parameters to be passed to; eg. gw nativeRun -Pargs=--palantir,-i,<file>
+tasks.named("nativeRun", org.graalvm.buildtools.gradle.tasks.NativeRunTask) {
+    runtimeArgs.addAll(project.hasProperty('appArgs') ? project.appArgs.split(',') : [])
+}
+
 def exports = [
         'jdk.compiler/com.sun.tools.javac.file',
         'jdk.compiler/com.sun.tools.javac.main',
