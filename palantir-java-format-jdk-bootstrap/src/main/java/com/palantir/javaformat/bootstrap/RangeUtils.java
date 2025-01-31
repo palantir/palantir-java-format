@@ -31,6 +31,5 @@ public final class RangeUtils {
         return String.format("%s:%s", lower, higher);
     }
 
-    private RangeUtils() {
-    }
+    private RangeUtils() {}
 }

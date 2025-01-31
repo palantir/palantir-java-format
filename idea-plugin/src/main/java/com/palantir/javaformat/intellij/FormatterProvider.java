@@ -67,14 +67,14 @@ final class FormatterProvider {
                 settings.getImplementationClassPath(),
                 settings.getNativeImageClassPath(),
                 settings.getUseLegacyClassPath(),
-                settings.injectedVersionIsOutdated()
-        ));
+                settings.injectedVersionIsOutdated()));
     }
 
     @SuppressWarnings("for-rollout:Slf4jLogsafeArgs")
     private static Optional<FormatterService> createFormatter(FormatterCacheKey cacheKey) {
         if (!cacheKey.useLegacyClassPath) {
-            Preconditions.checkState(cacheKey.nativeImageClassPath.isPresent(), "Unable to determine native image path %s", cacheKey);
+            Preconditions.checkState(
+                    cacheKey.nativeImageClassPath.isPresent(), "Unable to determine native image path %s", cacheKey);
             log.info("Using the native formatter with classpath: {}", cacheKey.nativeImageClassPath.get());
             return Optional.of(new NativeImageFormatterService(Path.of(cacheKey.nativeImageClassPath.get())));
         }
@@ -236,7 +236,6 @@ final class FormatterProvider {
             this.nativeImageClassPath = nativeImageClassPath;
             this.useLegacyClassPath = useLegacyClassPath;
             this.useBundledImplementation = useBundledImplementation;
-
         }
 
         @Override
@@ -258,7 +257,13 @@ final class FormatterProvider {
 
         @Override
         public int hashCode() {
-            return Objects.hash(project, jdkMajorVersion, implementationClassPath, nativeImageClassPath, useLegacyClassPath, useBundledImplementation);
+            return Objects.hash(
+                    project,
+                    jdkMajorVersion,
+                    implementationClassPath,
+                    nativeImageClassPath,
+                    useLegacyClassPath,
+                    useBundledImplementation);
         }
     }
 }

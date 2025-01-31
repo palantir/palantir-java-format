@@ -31,8 +31,7 @@ import org.gradle.api.logging.Logging;
 final class SpotlessInterop {
     private static Logger logger = Logging.getLogger(SpotlessInterop.class);
 
-    private SpotlessInterop() {
-    }
+    private SpotlessInterop() {}
 
     static void addSpotlessJavaStep(Project project) {
         SpotlessExtension spotlessExtension = project.getExtensions().getByType(SpotlessExtension.class);
@@ -46,12 +45,15 @@ final class SpotlessInterop {
         if (legacyFormatter) {
             logger.info("Using the legacy palantir-java-formatter");
             return PalantirJavaFormatStep.create(
-                    project.getRootProject().getConfigurations().getByName(PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME),
+                    project.getRootProject()
+                            .getConfigurations()
+                            .getByName(PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME),
                     project.getRootProject().getExtensions().getByType(JavaFormatExtension.class));
         } else {
             logger.info("Using the native-image palantir-java-formatter");
-            return NativePalantirJavaFormatStep.create(
-                    project.getRootProject().getConfigurations().getByName(PalantirJavaFormatProviderPlugin.NATIVE_CONFIGURATION_NAME));
+            return NativePalantirJavaFormatStep.create(project.getRootProject()
+                    .getConfigurations()
+                    .getByName(PalantirJavaFormatProviderPlugin.NATIVE_CONFIGURATION_NAME));
         }
     }
 }

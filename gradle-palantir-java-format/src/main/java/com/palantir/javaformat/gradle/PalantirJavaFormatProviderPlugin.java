@@ -18,6 +18,8 @@ package com.palantir.javaformat.gradle;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import java.util.Locale;
+import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
@@ -71,18 +73,32 @@ public final class PalantirJavaFormatProviderPlugin implements Plugin<Project> {
                             "version",
                             implementationVersion,
                             "classifier",
-                            "nativeImage",
+                            String.format("nativeImage-%s", getCurrentOs()),
                             "ext",
-                            "sh")));
+                            "exe")));
         });
         nativeConfiguration
                 .getAttributes()
                 .attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "executable-nativeImage");
         rootProject.getDependencies().registerTransform(ExecutableTransform.class, transformSpec -> {
-            transformSpec.getFrom().attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "sh");
+            transformSpec.getFrom().attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "exe");
             transformSpec.getTo().attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "executable-nativeImage");
         });
 
         rootProject.getExtensions().create("palantirJavaFormat", JavaFormatExtension.class, configuration);
+    }
+
+    private static String getCurrentOs() {
+        String osName = System.getProperty("os.name").toLowerCase(Locale.ROOT);
+        if (osName.contains("windows")) {
+            return "windows";
+        } else if (osName.contains("mac os x") || osName.contains("darwin") || osName.contains("osx")) {
+            return "macos";
+        } else if (osName.contains("linux")) {
+            return "linux";
+        } else {
+            // Not strictly true
+            throw new GradleException(String.format("Invalid Operating System %s", osName));
+        }
     }
 }

@@ -16,6 +16,4 @@
 
 package com.palantir.javaformat.bootstrap;
 
-public interface FormatterServiceWithArgs<T> {
-
-}
+public interface FormatterServiceWithArgs<T> {}

@@ -65,7 +65,10 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
     }
 
     private static void configureLegacyIdea(
-            Project project, Configuration implConfiguration, Configuration nativeImplConfiguration, Boolean useLegacyFormatter) {
+            Project project,
+            Configuration implConfiguration,
+            Configuration nativeImplConfiguration,
+            Boolean useLegacyFormatter) {
         IdeaModel ideaModel = project.getExtensions().getByType(IdeaModel.class);
         ideaModel.getProject().getIpr().withXml(xmlProvider -> {
             // this block is lazy
@@ -82,7 +85,10 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
     }
 
     private static void configureIntelliJImport(
-            Project project, Configuration implConfiguration, Configuration nativeImplConfiguration, Boolean useLegacyFormatter) {
+            Project project,
+            Configuration implConfiguration,
+            Configuration nativeImplConfiguration,
+            Boolean useLegacyFormatter) {
         // Note: we tried using 'org.jetbrains.gradle.plugin.idea-ext' and afterSync triggers, but these are currently
         // very hard to manage as the tasks feel disconnected from the Sync operation, and you can't remove them once
         // you've added them. For that reason, we accept that we have to resolve this configuration at
@@ -98,7 +104,8 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
 
             createOrUpdateIdeaXmlFile(
                     project.file(".idea/palantir-java-format.xml"),
-                    node -> ConfigureJavaFormatterXml.configureJavaFormat(node, uris, nativeImageUri, useLegacyFormatter));
+                    node -> ConfigureJavaFormatterXml.configureJavaFormat(
+                            node, uris, nativeImageUri, useLegacyFormatter));
             createOrUpdateIdeaXmlFile(
                     project.file(".idea/externalDependencies.xml"),
                     node -> ConfigureJavaFormatterXml.configureExternalDependencies(node));
@@ -142,7 +149,7 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
         configure.accept(rootNode);
 
         try (BufferedWriter writer = Files.newWriter(configurationFile, Charset.defaultCharset());
-             PrintWriter printWriter = new PrintWriter(writer)) {
+                PrintWriter printWriter = new PrintWriter(writer)) {
             XmlNodePrinter nodePrinter = new XmlNodePrinter(printWriter);
             nodePrinter.setPreserveWhitespace(true);
             nodePrinter.print(rootNode);

@@ -29,7 +29,7 @@ import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
-public class NativePalantirJavaFormatStep {
+public final class NativePalantirJavaFormatStep {
     private static Logger logger = Logging.getLogger(NativePalantirJavaFormatStep.class);
 
     private NativePalantirJavaFormatStep() {}

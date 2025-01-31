@@ -84,17 +84,14 @@ public final class BootstrappingFormatterService implements FormatterService {
                 .withJvmArgsForVersion(jdkMajorVersion)
                 .implementationClasspath(implementationClassPath)
                 .outputReplacements(true)
-                .characterRanges(ranges.stream()
-                        .map(RangeUtils::toStringRange)
-                        .collect(Collectors.toList()))
+                .characterRanges(ranges.stream().map(RangeUtils::toStringRange).collect(Collectors.toList()))
                 .build();
 
         Optional<String> output = FormatterCommandRunner.runWithStdin(command.toArgs(), input);
         if (output.isEmpty() || output.get().isEmpty()) {
             return ImmutableList.of();
         }
-        return MAPPER.readValue(output.get(), new TypeReference<>() {
-        });
+        return MAPPER.readValue(output.get(), new TypeReference<>() {});
     }
 
     private String runFormatterCommand(String input) throws IOException {
@@ -118,9 +115,10 @@ public final class BootstrappingFormatterService implements FormatterService {
         List<Path> implementationClasspath();
 
         List<String> jvmArgs();
-        
+
         default List<String> toArgs() {
-            ImmutableList.Builder<String> args = ImmutableList.<String>builder().add(jdkPath().toAbsolutePath().toString())
+            ImmutableList.Builder<String> args = ImmutableList.<String>builder()
+                    .add(jdkPath().toAbsolutePath().toString())
                     .addAll(jvmArgs())
                     .add(
                             "-cp",

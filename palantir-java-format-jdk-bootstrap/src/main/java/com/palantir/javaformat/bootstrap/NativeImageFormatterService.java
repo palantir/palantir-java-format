@@ -48,17 +48,15 @@ public class NativeImageFormatterService implements FormatterService {
             FormatterNativeImageArgs command = FormatterNativeImageArgs.builder()
                     .nativeImagePath(nativeImagePath)
                     .outputReplacements(true)
-                    .characterRanges(ranges.stream()
-                            .map(RangeUtils::toStringRange)
-                            .collect(Collectors.toList()))
+                    .characterRanges(
+                            ranges.stream().map(RangeUtils::toStringRange).collect(Collectors.toList()))
                     .build();
 
             Optional<String> output = FormatterCommandRunner.runWithStdin(command.toArgs(), input);
             if (output.isEmpty() || output.get().isEmpty()) {
                 return ImmutableList.of();
             }
-            return MAPPER.readValue(output.get(), new TypeReference<>() {
-            });
+            return MAPPER.readValue(output.get(), new TypeReference<>() {});
         } catch (IOException e) {
             throw new RuntimeException("Error running formatter command", e);
         }
@@ -100,7 +98,8 @@ public class NativeImageFormatterService implements FormatterService {
         Path nativeImagePath();
 
         default List<String> toArgs() {
-            ImmutableList.Builder<String> args = ImmutableList.<String>builder().add(nativeImagePath().toAbsolutePath().toString());
+            ImmutableList.Builder<String> args = ImmutableList.<String>builder()
+                    .add(nativeImagePath().toAbsolutePath().toString());
 
             if (!characterRanges().isEmpty()) {
                 args.add("--character-ranges", Joiner.on(',').join(characterRanges()));
@@ -121,7 +120,6 @@ public class NativeImageFormatterService implements FormatterService {
             return new FormatterNativeImageArgs.Builder();
         }
 
-        final class Builder extends ImmutableFormatterNativeImageArgs.Builder {
-        }
+        final class Builder extends ImmutableFormatterNativeImageArgs.Builder {}
     }
 }
