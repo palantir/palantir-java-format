@@ -70,7 +70,8 @@ public class BenchmarkMultiFiles {
                         Stream.of(
                                 Path.of(".")
                                         .toAbsolutePath()
-                                        .resolve("../palantir-java-format/build/graal/palantir-java-format")
+                                        .resolve(
+                                                "../palantir-java-format/build/native/nativeCompile/palantir-java-format")
                                         .toString(),
                                 "-i",
                                 "--palantir"),
