@@ -70,7 +70,8 @@ public class BenchmarkMultiFiles {
                         Stream.of(
                                 Path.of(".")
                                         .toAbsolutePath()
-                                        .resolve("../palantir-java-format/build/native/nativeCompile/palantir-java-format")
+                                        .resolve(
+                                                "../palantir-java-format/build/native/nativeCompile/palantir-java-format")
                                         .toString(),
                                 "-i",
                                 "--palantir"),
@@ -103,8 +104,8 @@ public class BenchmarkMultiFiles {
 
     public static void main(String[] _args) throws RunnerException {
         new Runner(new OptionsBuilder()
-                .include(BenchmarkMultiFiles.class.getSimpleName())
-                .build())
+                        .include(BenchmarkMultiFiles.class.getSimpleName())
+                        .build())
                 .run();
     }
 }
