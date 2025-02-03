@@ -61,7 +61,6 @@ public abstract class ExecutableTransform implements TransformAction<TransformPa
                                             PosixFilePermission.GROUP_EXECUTE,
                                             PosixFilePermission.OTHERS_EXECUTE))
                             .collect(Collectors.toSet()));
-            logger.info("Marking is the input file as executable: {}", pathToExe);
         } catch (IOException e) {
             throw new RuntimeException("Failed to set execute permissions on native-image", e);
         }
