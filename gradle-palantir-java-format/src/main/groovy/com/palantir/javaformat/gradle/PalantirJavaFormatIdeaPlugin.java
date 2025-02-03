@@ -48,7 +48,7 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
                 "May only apply com.palantir.java-format-idea to the root project");
 
         rootProject.getPlugins().apply(PalantirJavaFormatProviderPlugin.class);
-        Boolean useLegacyFormatter = Optional.ofNullable(rootProject.findProperty("palantir.legacy.formatter"))
+        Boolean useNativeFormatter = Optional.ofNullable(rootProject.findProperty("palantir.native.formatter"))
                 .map(value -> Boolean.parseBoolean((String) value))
                 .orElse(false);
         rootProject.getPluginManager().withPlugin("idea", ideaPlugin -> {
@@ -59,8 +59,8 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
                     .getConfigurations()
                     .getByName(PalantirJavaFormatProviderPlugin.NATIVE_CONFIGURATION_NAME);
 
-            configureLegacyIdea(rootProject, implConfiguration, nativeImplConfiguration, useLegacyFormatter);
-            configureIntelliJImport(rootProject, implConfiguration, nativeImplConfiguration, useLegacyFormatter);
+            configureLegacyIdea(rootProject, implConfiguration, nativeImplConfiguration, useNativeFormatter);
+            configureIntelliJImport(rootProject, implConfiguration, nativeImplConfiguration, useNativeFormatter);
         });
     }
 
@@ -88,7 +88,7 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
             Project project,
             Configuration implConfiguration,
             Configuration nativeImplConfiguration,
-            Boolean useLegacyFormatter) {
+            Boolean useNativeFormatter) {
         // Note: we tried using 'org.jetbrains.gradle.plugin.idea-ext' and afterSync triggers, but these are currently
         // very hard to manage as the tasks feel disconnected from the Sync operation, and you can't remove them once
         // you've added them. For that reason, we accept that we have to resolve this configuration at
@@ -105,7 +105,7 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
             createOrUpdateIdeaXmlFile(
                     project.file(".idea/palantir-java-format.xml"),
                     node -> ConfigureJavaFormatterXml.configureJavaFormat(
-                            node, uris, nativeImageUri, useLegacyFormatter));
+                            node, uris, nativeImageUri, useNativeFormatter));
             createOrUpdateIdeaXmlFile(
                     project.file(".idea/externalDependencies.xml"),
                     node -> ConfigureJavaFormatterXml.configureExternalDependencies(node));
@@ -114,7 +114,7 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
 
             // Still configure legacy idea if using intellij import
             updateIdeaXmlFileIfExists(project.file(project.getName() + ".ipr"), node -> {
-                ConfigureJavaFormatterXml.configureJavaFormat(node, uris, nativeImageUri, useLegacyFormatter);
+                ConfigureJavaFormatterXml.configureJavaFormat(node, uris, nativeImageUri, useNativeFormatter);
                 ConfigureJavaFormatterXml.configureExternalDependencies(node);
             });
             updateIdeaXmlFileIfExists(project.file(project.getName() + ".iws"), node -> {

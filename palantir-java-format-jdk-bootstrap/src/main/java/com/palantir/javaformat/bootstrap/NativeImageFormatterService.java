@@ -58,7 +58,7 @@ public class NativeImageFormatterService implements FormatterService {
             }
             return MAPPER.readValue(output.get(), new TypeReference<>() {});
         } catch (IOException e) {
-            throw new RuntimeException("Error running formatter command", e);
+            throw new RuntimeException("Error running the native image command", e);
         }
     }
 
@@ -67,7 +67,7 @@ public class NativeImageFormatterService implements FormatterService {
         try {
             return runFormatterCommand(input);
         } catch (IOException e) {
-            throw new RuntimeException("Error running formatter command", e);
+            throw new RuntimeException("Error running the native image command", e);
         }
     }
 
@@ -76,7 +76,7 @@ public class NativeImageFormatterService implements FormatterService {
         try {
             return runFormatterCommand(input);
         } catch (IOException e) {
-            throw new RuntimeException("Error running formatter command", e);
+            throw new RuntimeException("Error running the native image command", e);
         }
     }
 

@@ -66,13 +66,13 @@ final class FormatterProvider {
                 getSdkVersion(project),
                 settings.getImplementationClassPath(),
                 settings.getNativeImageClassPath(),
-                settings.getUseLegacyClassPath(),
+                settings.getUseNativeImageClassPath(),
                 settings.injectedVersionIsOutdated()));
     }
 
     @SuppressWarnings("for-rollout:Slf4jLogsafeArgs")
     private static Optional<FormatterService> createFormatter(FormatterCacheKey cacheKey) {
-        if (!cacheKey.useLegacyClassPath) {
+        if (cacheKey.useNativeImageClassPath) {
             Preconditions.checkState(
                     cacheKey.nativeImageClassPath.isPresent(), "Unable to determine native image path %s", cacheKey);
             log.info("Using the native formatter with classpath: {}", cacheKey.nativeImageClassPath.get());
@@ -99,7 +99,6 @@ final class FormatterProvider {
         log.info("Using in-process formatter for jdk version {}", jdkMajorVersion);
         URL[] implementationUrls = toUrlsUnchecked(implementationClasspath);
         ClassLoader classLoader = new URLClassLoader(implementationUrls, FormatterService.class.getClassLoader());
-        // TODO(crogoz): actually load the Bootrapper
         return ServiceLoader.load(FormatterService.class, classLoader).findFirst();
     }
 
@@ -220,7 +219,7 @@ final class FormatterProvider {
         private final OptionalInt jdkMajorVersion;
         private final Optional<List<URI>> implementationClassPath;
         private final Optional<URI> nativeImageClassPath;
-        private final Boolean useLegacyClassPath;
+        private final Boolean useNativeImageClassPath;
         private final boolean useBundledImplementation;
 
         FormatterCacheKey(
@@ -228,13 +227,13 @@ final class FormatterProvider {
                 OptionalInt jdkMajorVersion,
                 Optional<List<URI>> implementationClassPath,
                 Optional<URI> nativeImageClassPath,
-                Boolean useLegacyClassPath,
+                Boolean useNativeImageClassPath,
                 boolean useBundledImplementation) {
             this.project = project;
             this.jdkMajorVersion = jdkMajorVersion;
             this.implementationClassPath = implementationClassPath;
             this.nativeImageClassPath = nativeImageClassPath;
-            this.useLegacyClassPath = useLegacyClassPath;
+            this.useNativeImageClassPath = useNativeImageClassPath;
             this.useBundledImplementation = useBundledImplementation;
         }
 
@@ -252,7 +251,7 @@ final class FormatterProvider {
                     && Objects.equals(project, that.project)
                     && Objects.equals(implementationClassPath, that.implementationClassPath)
                     && Objects.equals(nativeImageClassPath, that.nativeImageClassPath)
-                    && Objects.equals(useLegacyClassPath, that.useLegacyClassPath);
+                    && Objects.equals(useNativeImageClassPath, that.useNativeImageClassPath);
         }
 
         @Override
@@ -262,7 +261,7 @@ final class FormatterProvider {
                     jdkMajorVersion,
                     implementationClassPath,
                     nativeImageClassPath,
-                    useLegacyClassPath,
+                    useNativeImageClassPath,
                     useBundledImplementation);
         }
     }

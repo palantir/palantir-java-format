@@ -101,8 +101,8 @@ public class PalantirJavaFormatSettings implements PersistentStateComponent<Pala
     /**
      * Whether to use the legacy implementation(getImplementationClassPath) or the new implementation(getNativeImageClassPath)
      */
-    Boolean getUseLegacyClassPath() {
-        return state.useLegacyClassPath;
+    Boolean getUseNativeImageClassPath() {
+        return state.useNativeImageClassPath;
     }
 
     boolean injectedVersionIsOutdated() {
@@ -154,7 +154,7 @@ public class PalantirJavaFormatSettings implements PersistentStateComponent<Pala
         private EnabledState enabled = EnabledState.UNKNOWN;
         private Optional<List<URI>> implementationClassPath = Optional.empty();
         private Optional<URI> nativeImageClassPath = Optional.empty();
-        private Boolean useLegacyClassPath = false;
+        private Boolean useNativeImageClassPath = false;
 
         public JavaFormatterOptions.Style style = JavaFormatterOptions.Style.PALANTIR;
 
@@ -178,12 +178,12 @@ public class PalantirJavaFormatSettings implements PersistentStateComponent<Pala
             return nativeImageClassPath.map(URI::toString).orElse(null);
         }
 
-        public void setUseLegacyClassPath(@Nullable String value) {
-            useLegacyClassPath = Boolean.parseBoolean(value);
+        public void setUseNativeImageClassPath(@Nullable String value) {
+            useNativeImageClassPath = Boolean.parseBoolean(value);
         }
 
-        public String getUseLegacyClassPath() {
-            return useLegacyClassPath.toString();
+        public String getUseNativeImageClassPath() {
+            return useNativeImageClassPath.toString();
         }
 
         // enabled used to be a boolean so we use bean property methods for backwards compatibility
@@ -218,8 +218,8 @@ public class PalantirJavaFormatSettings implements PersistentStateComponent<Pala
                     + implementationClassPath
                     + ", nativeImageClassPath="
                     + nativeImageClassPath
-                    + ", useLegacyClassPath="
-                    + useLegacyClassPath
+                    + ", useNativeImageClassPath="
+                    + useNativeImageClassPath
                     + ", style="
                     + style
                     + '}';

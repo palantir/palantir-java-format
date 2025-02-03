@@ -39,21 +39,20 @@ final class SpotlessInterop {
     }
 
     static FormatterStep addSpotlessJavaFormatStep(Project project) {
-        Boolean legacyFormatter = Optional.ofNullable(project.findProperty("palantir.legacy.formatter"))
+        Boolean useNativeFormatter = Optional.ofNullable(project.findProperty("palantir.native.formatter"))
                 .map(value -> Boolean.getBoolean((String) value))
                 .orElse(false);
-        if (legacyFormatter) {
-            logger.info("Using the legacy palantir-java-formatter");
-            return PalantirJavaFormatStep.create(
-                    project.getRootProject()
-                            .getConfigurations()
-                            .getByName(PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME),
-                    project.getRootProject().getExtensions().getByType(JavaFormatExtension.class));
-        } else {
+        if (useNativeFormatter) {
             logger.info("Using the native-image palantir-java-formatter");
             return NativePalantirJavaFormatStep.create(project.getRootProject()
                     .getConfigurations()
                     .getByName(PalantirJavaFormatProviderPlugin.NATIVE_CONFIGURATION_NAME));
         }
+        logger.info("Using the legacy palantir-java-formatter");
+        return PalantirJavaFormatStep.create(
+                project.getRootProject()
+                        .getConfigurations()
+                        .getByName(PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME),
+                project.getRootProject().getExtensions().getByType(JavaFormatExtension.class));
     }
 }
