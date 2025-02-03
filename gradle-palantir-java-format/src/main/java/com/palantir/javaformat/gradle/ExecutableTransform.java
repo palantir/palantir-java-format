@@ -44,9 +44,7 @@ public abstract class ExecutableTransform implements TransformAction<TransformPa
     public void transform(TransformOutputs outputs) {
         File inputFile = getInputArtifact().get().getAsFile();
         makeFileExecutable(inputFile.toPath());
-        logger.info("Output is the input file: {}", inputFile);
         outputs.file(inputFile);
-        logger.info("Output is the input file: {}", outputs);
     }
 
     private static void makeFileExecutable(Path pathToExe) {
