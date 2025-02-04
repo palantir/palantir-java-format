@@ -124,24 +124,6 @@ jobs:
           root: /Users/distiller
           paths: [ project ]
 
-  build-windows:
-    machine:
-      image: windows-server-2022-gui:current
-    shell: bash.exe
-    resource_class: windows.medium
-    environment:
-      GRADLE_OPTS: -Dorg.gradle.workers.max=2 -Dorg.gradle.jvmargs='-Xmx2147483648 --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED'
-      _JAVA_OPTIONS: -XX:ActiveProcessorCount=4 -XX:MaxRAM=8g -XX:+CrashOnOutOfMemoryError
-    steps:
-      - checkout
-      # TODO install manually the required JDKs!
-      - run: ./gradlew --parallel --stacktrace --continue --max-workers=2 nativeCompile -Porg.gradle.java.installations.fromEnv=JAVA_11_HOME,JAVA_17_HOME,JAVA_21_HOME,JAVA_HOME
-      - *check-no-files-changed
-      - persist_to_workspace:
-          root: /home/circleci
-          paths: [ project ]
-      - store_artifacts: { path: ~/artifacts }
-
   publish:
     docker: [{ image: 'cimg/openjdk:17.0.10-node' }]
     resource_class: medium
@@ -187,17 +169,14 @@ workflows:
             parameters:
               executor:
                 - linux-amd64
-                #- linux-arm64
+                - linux-arm64
+
       - build-macos:
           requires: [ check ]
           filters: { tags: { only: /.*/ } }
 
-      - build-windows:
-          requires: [ check ]
-          filters: { tags: { only: /.*/ } }
-
       - circle-all:
-          requires: [ check, build-linux, build-macos, build-windows ]
+          requires: [ check, build-linux, build-macos ]
           filters: { tags: { only: /.*/ } }
 
       - publish:
