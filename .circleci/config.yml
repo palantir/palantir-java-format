@@ -114,10 +114,8 @@ jobs:
       xcode: 15.4.0
     resource_class: macos.m1.medium.gen1
     environment:
-      CIRCLE_TEST_REPORTS: /home/circleci/junit
-      CIRCLE_ARTIFACTS: /home/circleci/artifacts
       GRADLE_OPTS: -Dorg.gradle.workers.max=2 -Dorg.gradle.jvmargs='-Xmx2147483648 --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED'
-      _JAVA_OPTIONS: -XX:ActiveProcessorCount=4 -XX:MaxRAM=8g -XX:+CrashOnOutOfMemoryError -XX:ErrorFile=/home/circleci/artifacts/hs_err_pid%p.log -XX:HeapDumpPath=/home/circleci/artifacts
+      _JAVA_OPTIONS: -XX:ActiveProcessorCount=4 -XX:MaxRAM=8g -XX:+CrashOnOutOfMemoryError
     steps:
       - checkout
       - run: ./gradlew --parallel --stacktrace --continue --max-workers=2 nativeCompile -Porg.gradle.java.installations.fromEnv=JAVA_11_HOME,JAVA_17_HOME,JAVA_21_HOME,JAVA_HOME
@@ -125,7 +123,6 @@ jobs:
       - persist_to_workspace:
           root: /home/circleci
           paths: [ project ]
-      - store_artifacts: { path: ~/artifacts }
 
   build-windows:
     machine:
@@ -133,10 +130,8 @@ jobs:
     shell: powershell.exe
     resource_class: windows.medium
     environment:
-      CIRCLE_TEST_REPORTS: /home/circleci/junit
-      CIRCLE_ARTIFACTS: /home/circleci/artifacts
       GRADLE_OPTS: -Dorg.gradle.workers.max=2 -Dorg.gradle.jvmargs='-Xmx2147483648 --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED'
-      _JAVA_OPTIONS: -XX:ActiveProcessorCount=4 -XX:MaxRAM=8g -XX:+CrashOnOutOfMemoryError -XX:ErrorFile=/home/circleci/artifacts/hs_err_pid%p.log -XX:HeapDumpPath=/home/circleci/artifacts
+      _JAVA_OPTIONS: -XX:ActiveProcessorCount=4 -XX:MaxRAM=8g -XX:+CrashOnOutOfMemoryError
     steps:
       - checkout
       - run: ./gradlew --parallel --stacktrace --continue --max-workers=2 nativeCompile -Porg.gradle.java.installations.fromEnv=JAVA_11_HOME,JAVA_17_HOME,JAVA_21_HOME,JAVA_HOME
