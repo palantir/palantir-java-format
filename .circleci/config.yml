@@ -20,21 +20,19 @@ aliases:
 executors:
   amd64:
     machine:
-      image: cimg/openjdk:17.0.10-node
+      image: ubuntu-2004:current
     resource_class: medium
   arm64:
     machine:
-      image: cimg/openjdk:17.0.10-node
+      image: ubuntu-2004:current
     resource_class: arm.medium
 
 
 jobs:
 
   check:
-    parameters:
-      executor:
-        type: executor
-    executor: << parameters.executor >>
+    docker: [{ image: 'cimg/openjdk:17.0.1-node' }]
+    resource_class: large
     environment:
       CIRCLE_TEST_REPORTS: /home/circleci/junit
       CIRCLE_ARTIFACTS: /home/circleci/artifacts
@@ -153,10 +151,6 @@ workflows:
     jobs:
       - check:
           filters: { tags: { only: /.*/ } }
-          matrix:
-            parameters:
-              executor:
-                - amd64
 
       - build-linux:
           requires: [ check ]
