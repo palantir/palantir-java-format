@@ -57,6 +57,9 @@ def exports = [
 def jvmArgList = exports.collect { value -> "--add-exports=${value}=ALL-UNNAMED".toString() }
 
 
+def osName = getCurrentOs()
+def archName = getCurrentArch()
+
 graalvmNative {
     binaries {
         main {
@@ -64,7 +67,7 @@ graalvmNative {
                 languageVersion = JavaLanguageVersion.of(23)
                 vendor = JvmVendorSpec.GRAAL_VM
             }
-            imageName = 'palantir-java-format'
+            imageName = String.format('palantir-java-format-%s-%s', osName, archName)
             mainClass = mainClassName
             fallback = false
             sharedLibrary = false
@@ -162,14 +165,11 @@ def nativeImageArtifact = artifacts.add('nativeImage', tasks.named("nativeCompil
     builtBy 'nativeCompile'
 }
 
-def osName = getCurrentOs()
-def archName = getCurrentArch()
-
 publishing {
     publications {
         nativeImage(MavenPublication) {
             artifact(nativeImageArtifact) {
-                classifier="nativeImage-" + osName + "-" + archName
+                classifier=String.format('nativeImage-%s-%s', osName, archName)
                 extension="exe"
             }
             artifactId = 'palantir-java-format-native'
