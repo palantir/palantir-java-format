@@ -190,6 +190,9 @@ workflows:
               executor:
                 - linux-amd64
                 #- linux-arm64
+      - build-macos:
+          requires: [ check ]
+          filters: { tags: { only: /.*/ } }
 
       - circle-all:
           requires: [ check, build-linux, build-macos ]
