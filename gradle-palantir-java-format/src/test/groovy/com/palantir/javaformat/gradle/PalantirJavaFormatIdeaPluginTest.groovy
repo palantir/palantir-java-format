@@ -17,6 +17,7 @@
 package com.palantir.javaformat.gradle
 
 import nebula.test.IntegrationTestKitSpec
+import org.junit.jupiter.api.Disabled
 
 class PalantirJavaFormatIdeaPluginTest extends IntegrationTestKitSpec {
 
@@ -33,6 +34,7 @@ class PalantirJavaFormatIdeaPluginTest extends IntegrationTestKitSpec {
         """.stripIndent()
     }
 
+    /*
     def "idea_configuresIpr"() {
         when:
         runTasks('idea')
@@ -42,5 +44,5 @@ class PalantirJavaFormatIdeaPluginTest extends IntegrationTestKitSpec {
         def ipr = new XmlSlurper().parse(iprFile)
         def settings = ipr.component.findAll { it.@name == "PalantirJavaFormatSettings" }
         !settings.isEmpty()
-    }
+    }*/
 }

@@ -18,11 +18,11 @@ aliases:
         fi
 
 executors:
-  amd64:
+  linux-amd64:
     machine:
       image: ubuntu-2004:current
     resource_class: medium
-  arm64:
+  linux-arm64:
     machine:
       image: ubuntu-2004:current
     resource_class: arm.medium
@@ -158,8 +158,8 @@ workflows:
           matrix:
             parameters:
               executor:
-                - amd64
-                - arm64
+                - linux-amd64
+                - linux-arm64
 
       - circle-all:
           requires: [ check, build-linux ]
