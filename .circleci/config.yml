@@ -101,6 +101,7 @@ jobs:
       _JAVA_OPTIONS: -XX:ActiveProcessorCount=4 -XX:MaxRAM=8g -XX:+CrashOnOutOfMemoryError -XX:ErrorFile=/home/circleci/artifacts/hs_err_pid%p.log -XX:HeapDumpPath=/home/circleci/artifacts
     steps:
       - checkout
+      - attach_workspace: { at: /home/circleci }
       - restore_cache: { key: 'gradle-wrapper-v1-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
       - restore_cache: { key: 'check-gradle-cache-v1-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
       - run: ./gradlew --parallel --stacktrace --continue --max-workers=2 nativeCompile -Porg.gradle.java.installations.fromEnv=JAVA_11_HOME,JAVA_17_HOME,JAVA_21_HOME,JAVA_HOME
@@ -112,7 +113,7 @@ jobs:
           key: 'gradle-wrapper-v1-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}'
           paths: [ ~/.gradle/wrapper ]
       - save_cache:
-          key: 'check-gradle-cache-v1-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}'
+          key: 'build-linux-{{ parameters.executor }}-gradle-cache-v1-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}'
           paths: [ ~/.gradle/caches ]
       - store_artifacts: { path: ~/artifacts }
 
@@ -143,6 +144,7 @@ jobs:
     docker: [{ image: 'busybox:1.36.1@sha256:6d9ac9237a84afe1516540f40a0fafdc86859b2141954b4d643af7066d598b74' }]
     resource_class: small
     steps:
+      - attach_workspace: { at: /home/circleci }
       - run: { command: ls -l /home/circleci/project/palantir-java-format/build/native/nativeCompile }
       - run: {command: echo "All required jobs finished successfully"}
 
@@ -160,7 +162,7 @@ workflows:
             parameters:
               executor:
                 - linux-amd64
-                - linux-arm64
+                #- linux-arm64
 
       - circle-all:
           requires: [ check, build-linux ]

@@ -160,6 +160,7 @@ tasks.named("build") {
 configurations {
     nativeImage
 }
+
 def nativeImageArtifact = artifacts.add('nativeImage', tasks.named("nativeCompile", BuildNativeImageTask.class).map { it.outputFile }) {
     type = 'nativeImage'
     builtBy 'nativeCompile'
