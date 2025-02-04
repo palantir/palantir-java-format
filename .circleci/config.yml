@@ -121,7 +121,7 @@ jobs:
       - run: ./gradlew --parallel --stacktrace --continue --max-workers=2 nativeCompile -Porg.gradle.java.installations.fromEnv=JAVA_11_HOME,JAVA_17_HOME,JAVA_21_HOME,JAVA_HOME
       - *check-no-files-changed
       - persist_to_workspace:
-          root: /home/circleci
+          root: /Users/distiller
           paths: [ project ]
 
   build-windows:
@@ -134,6 +134,7 @@ jobs:
       _JAVA_OPTIONS: -XX:ActiveProcessorCount=4 -XX:MaxRAM=8g -XX:+CrashOnOutOfMemoryError
     steps:
       - checkout
+      - # TODO install manually the required JDKs!
       - run: ./gradlew --parallel --stacktrace --continue --max-workers=2 nativeCompile -Porg.gradle.java.installations.fromEnv=JAVA_11_HOME,JAVA_17_HOME,JAVA_21_HOME,JAVA_HOME
       - *check-no-files-changed
       - persist_to_workspace:
