@@ -102,19 +102,11 @@ jobs:
     steps:
       - checkout
       - attach_workspace: { at: /home/circleci }
-      - restore_cache: { key: 'gradle-wrapper-v1-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
-      - restore_cache: { key: 'check-gradle-cache-v1-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
       - run: ./gradlew --parallel --stacktrace --continue --max-workers=2 nativeCompile -Porg.gradle.java.installations.fromEnv=JAVA_11_HOME,JAVA_17_HOME,JAVA_21_HOME,JAVA_HOME
       - *check-no-files-changed
       - persist_to_workspace:
           root: /home/circleci
           paths: [ project ]
-      - save_cache:
-          key: 'gradle-wrapper-v1-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}'
-          paths: [ ~/.gradle/wrapper ]
-      - save_cache:
-          key: 'build-linux-{{ parameters.executor }}-gradle-cache-v1-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}'
-          paths: [ ~/.gradle/caches ]
       - store_artifacts: { path: ~/artifacts }
 
   build-macos:
@@ -128,19 +120,30 @@ jobs:
       _JAVA_OPTIONS: -XX:ActiveProcessorCount=4 -XX:MaxRAM=8g -XX:+CrashOnOutOfMemoryError -XX:ErrorFile=/home/circleci/artifacts/hs_err_pid%p.log -XX:HeapDumpPath=/home/circleci/artifacts
     steps:
       - checkout
-      - restore_cache: { key: 'gradle-wrapper-v1-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
-      - restore_cache: { key: 'check-gradle-cache-v1-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
       - run: ./gradlew --parallel --stacktrace --continue --max-workers=2 nativeCompile -Porg.gradle.java.installations.fromEnv=JAVA_11_HOME,JAVA_17_HOME,JAVA_21_HOME,JAVA_HOME
       - *check-no-files-changed
       - persist_to_workspace:
           root: /home/circleci
           paths: [ project ]
-      - save_cache:
-          key: 'gradle-wrapper-v1-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}'
-          paths: [ ~/.gradle/wrapper ]
-      - save_cache:
-          key: 'build-macos-gradle-cache-v1-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}'
-          paths: [ ~/.gradle/caches ]
+      - store_artifacts: { path: ~/artifacts }
+
+  build-windows:
+    machine:
+      image: windows-server-2022-gui:current
+    shell: powershell.exe
+    resource_class: windows.medium
+    environment:
+      CIRCLE_TEST_REPORTS: /home/circleci/junit
+      CIRCLE_ARTIFACTS: /home/circleci/artifacts
+      GRADLE_OPTS: -Dorg.gradle.workers.max=2 -Dorg.gradle.jvmargs='-Xmx2147483648 --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED'
+      _JAVA_OPTIONS: -XX:ActiveProcessorCount=4 -XX:MaxRAM=8g -XX:+CrashOnOutOfMemoryError -XX:ErrorFile=/home/circleci/artifacts/hs_err_pid%p.log -XX:HeapDumpPath=/home/circleci/artifacts
+    steps:
+      - checkout
+      - run: ./gradlew --parallel --stacktrace --continue --max-workers=2 nativeCompile -Porg.gradle.java.installations.fromEnv=JAVA_11_HOME,JAVA_17_HOME,JAVA_21_HOME,JAVA_HOME
+      - *check-no-files-changed
+      - persist_to_workspace:
+          root: /home/circleci
+          paths: [ project ]
       - store_artifacts: { path: ~/artifacts }
 
   publish:
@@ -193,8 +196,12 @@ workflows:
           requires: [ check ]
           filters: { tags: { only: /.*/ } }
 
+      - build-windows:
+          requires: [ check ]
+          filters: { tags: { only: /.*/ } }
+
       - circle-all:
-          requires: [ check, build-linux, build-macos ]
+          requires: [ check, build-linux, build-macos, build-windows ]
           filters: { tags: { only: /.*/ } }
 
       - publish:
