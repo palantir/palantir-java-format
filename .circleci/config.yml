@@ -72,7 +72,7 @@ jobs:
             if [ -x .circleci/check-setup.sh ]; then
                 echo "Running check-setup" && .circleci/check-setup.sh && echo "check-setup complete"
             fi
-      - run: ./gradlew --parallel --stacktrace --continue --max-workers=2 build -Porg.gradle.java.installations.fromEnv=JAVA_11_HOME,JAVA_17_HOME,JAVA_21_HOME,JAVA_HOME
+      - run: ./gradlew --parallel --stacktrace --continue --max-workers=2 build --dry-run -Porg.gradle.java.installations.fromEnv=JAVA_11_HOME,JAVA_17_HOME,JAVA_21_HOME,JAVA_HOME
       - *check-no-files-changed
       - persist_to_workspace:
           root: /home/circleci
@@ -128,7 +128,6 @@ jobs:
       _JAVA_OPTIONS: -XX:ActiveProcessorCount=4 -XX:MaxRAM=8g -XX:+CrashOnOutOfMemoryError -XX:ErrorFile=/home/circleci/artifacts/hs_err_pid%p.log -XX:HeapDumpPath=/home/circleci/artifacts
     steps:
       - checkout
-      - attach_workspace: { at: /home/circleci }
       - restore_cache: { key: 'gradle-wrapper-v1-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
       - restore_cache: { key: 'check-gradle-cache-v1-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
       - run: ./gradlew --parallel --stacktrace --continue --max-workers=2 nativeCompile -Porg.gradle.java.installations.fromEnv=JAVA_11_HOME,JAVA_17_HOME,JAVA_21_HOME,JAVA_HOME
