@@ -40,7 +40,7 @@ final class SpotlessInterop {
 
     static FormatterStep addSpotlessJavaFormatStep(Project project) {
         Boolean useNativeFormatter = Optional.ofNullable(project.findProperty("palantir.native.formatter"))
-                .map(value -> Boolean.getBoolean((String) value))
+                .map(value -> Boolean.parseBoolean((String) value))
                 .orElse(false);
         if (useNativeFormatter) {
             logger.info("Using the native-image palantir-java-formatter");

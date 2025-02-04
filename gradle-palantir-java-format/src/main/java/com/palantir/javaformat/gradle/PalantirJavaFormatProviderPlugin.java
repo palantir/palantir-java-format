@@ -19,6 +19,7 @@ package com.palantir.javaformat.gradle;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import java.util.Locale;
+import java.util.Set;
 import org.gradle.api.GradleException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
@@ -73,7 +74,7 @@ public final class PalantirJavaFormatProviderPlugin implements Plugin<Project> {
                             "version",
                             implementationVersion,
                             "classifier",
-                            String.format("nativeImage-%s", getCurrentOs()),
+                            String.format("nativeImage-%s-%s", getCurrentOs(), getCurrentArch()),
                             "ext",
                             "exe")));
         });
@@ -100,5 +101,19 @@ public final class PalantirJavaFormatProviderPlugin implements Plugin<Project> {
             // Not strictly true
             throw new GradleException(String.format("Invalid Operating System %s", osName));
         }
+    }
+
+    private static String getCurrentArch() {
+        String osArch = System.getProperty("os.arch").toLowerCase(Locale.ROOT);
+        if (Set.of("x86_64", "x64", "amd64").contains(osArch)) {
+            return "x86_64";
+        }
+        if (Set.of("arm", "arm64", "aarch64").contains(osArch)) {
+            return "aarch64";
+        }
+        if (Set.of("x86", "i686").contains(osArch)) {
+            return "x86";
+        }
+        throw new GradleException(String.format("Invalid Operating System %s", osArch));
     }
 }

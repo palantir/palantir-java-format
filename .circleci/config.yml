@@ -17,11 +17,24 @@ aliases:
           exit 1
         fi
 
+executors:
+  amd64:
+    machine:
+      image: cimg/openjdk:17.0.10-node
+    resource_class: medium
+  arm64:
+    machine:
+      image: cimg/openjdk:17.0.10-node
+    resource_class: arm.medium
+
+
 jobs:
 
   check:
-    docker: [{ image: 'cimg/openjdk:17.0.10-node' }]
-    resource_class: large
+    parameters:
+      executor:
+        type: executor
+    executor: << parameters.executor >>
     environment:
       CIRCLE_TEST_REPORTS: /home/circleci/junit
       CIRCLE_ARTIFACTS: /home/circleci/artifacts
@@ -78,6 +91,33 @@ jobs:
       - store_test_results: { path: ~/junit }
       - store_artifacts: { path: ~/artifacts }
 
+  build-linux:
+    parameters:
+      executor:
+        type: executor
+    executor: << parameters.executor >>
+    environment:
+      CIRCLE_TEST_REPORTS: /home/circleci/junit
+      CIRCLE_ARTIFACTS: /home/circleci/artifacts
+      GRADLE_OPTS: -Dorg.gradle.workers.max=2 -Dorg.gradle.jvmargs='-Xmx2147483648 --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED'
+      _JAVA_OPTIONS: -XX:ActiveProcessorCount=4 -XX:MaxRAM=8g -XX:+CrashOnOutOfMemoryError -XX:ErrorFile=/home/circleci/artifacts/hs_err_pid%p.log -XX:HeapDumpPath=/home/circleci/artifacts
+    steps:
+      - checkout
+      - restore_cache: { key: 'gradle-wrapper-v1-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
+      - restore_cache: { key: 'check-gradle-cache-v1-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
+      - run: ./gradlew --parallel --stacktrace --continue --max-workers=2 nativeCompile -Porg.gradle.java.installations.fromEnv=JAVA_11_HOME,JAVA_17_HOME,JAVA_21_HOME,JAVA_HOME
+      - *check-no-files-changed
+      - persist_to_workspace:
+          root: /home/circleci
+          paths: [ project ]
+      - save_cache:
+          key: 'gradle-wrapper-v1-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}'
+          paths: [ ~/.gradle/wrapper ]
+      - save_cache:
+          key: 'check-gradle-cache-v1-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}'
+          paths: [ ~/.gradle/caches ]
+      - store_artifacts: { path: ~/artifacts }
+
   publish:
     docker: [{ image: 'cimg/openjdk:17.0.10-node' }]
     resource_class: medium
@@ -113,9 +153,22 @@ workflows:
     jobs:
       - check:
           filters: { tags: { only: /.*/ } }
+          matrix:
+            parameters:
+              executor:
+                - amd64
+
+      - build-linux:
+          requires: [ check ]
+          filters: { tags: { only: /.*/ } }
+          matrix:
+            parameters:
+              executor:
+                - amd64
+                - arm64
 
       - circle-all:
-          requires: [ check ]
+          requires: [ check, build-linux ]
           filters: { tags: { only: /.*/ } }
 
       - publish:
