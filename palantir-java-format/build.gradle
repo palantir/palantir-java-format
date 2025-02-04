@@ -6,6 +6,7 @@ buildscript {
     }
     dependencies {
         classpath 'org.graalvm.buildtools:native-gradle-plugin:0.10.4'
+        classpath 'com.palantir.gradle.utils:platform:0.9.0-107-ge1840ce.dirty'
     }
 }
 
@@ -25,6 +26,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8'
     implementation 'com.fasterxml.jackson.module:jackson-module-parameter-names'
+    implementation 'com.palantir.gradle.utils:platform'
 
     testImplementation 'com.google.guava:guava-testlib'
     testImplementation 'com.google.truth:truth'
@@ -160,31 +162,18 @@ def nativeImageArtifact = artifacts.add('nativeImage', nativeImageFile.get().asF
     builtBy 'nativeCompile'
 }
 
-def osName = getCurrentOs()
+import com.palantir.platform.CurrentOs
+import com.palantir.platform.CurrentArch
 
 publishing {
     publications {
         nativeImage(MavenPublication) {
             artifact(nativeImageArtifact) {
-                classifier="nativeImage-" + osName
+                classifier="nativeImage-" + CurrentOs.get().uiName() + "-" + CurrentArch.get().uiName()
                 extension="exe"
             }
             artifactId = 'palantir-java-format-native'
             
         }
-    }
-}
-
-private static String getCurrentOs() {
-    String osName = System.getProperty("os.name").toLowerCase(Locale.ROOT)
-    if (osName.contains("windows")) {
-        return "windows"
-    } else if (osName.contains("mac os x") || osName.contains("darwin") || osName.contains("osx")) {
-        return "macos"
-    } else if (osName.contains("linux")) {
-        return "linux"
-    } else {
-        // Not strictly true
-        throw new GradleException(String.format("Invalid Operating System %s", osName))
     }
 }

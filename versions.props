@@ -21,3 +21,4 @@ org.slf4j:* = 1.7.36
 com.fasterxml.jackson.*:* = 2.18.2
 com.fasterxml.jackson.core:jackson-databind = 2.18.2
 org.openjdk.jmh:* = 1.37
+com.palantir.gradle.utils:platform=0.9.0-107-ge1840ce.dirty
