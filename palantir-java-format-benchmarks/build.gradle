@@ -11,7 +11,7 @@ dependencies {
     jmhImplementation 'org.openjdk.jmh:jmh-generator-annprocess'
 }
 
-tasks.withType(ProcessResources.class).configureEach {
+tasks.named('processJmhResources', ProcessResources.class) {
     from(project(':palantir-java-format').tasks.named('fatJar')) {
         rename { 'palantir-java-format-all.jar' }
     }

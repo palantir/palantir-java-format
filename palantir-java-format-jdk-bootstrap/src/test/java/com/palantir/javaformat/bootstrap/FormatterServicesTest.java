@@ -110,6 +110,6 @@ final class FormatterServicesTest {
         return Stream.of(
                 new BootstrappingFormatterService(
                         javaBinPath(), Runtime.version().feature(), getClasspath()),
-                new NativeImageFormatterService(Path.of("build/resources/main/palantir-java-format")));
+                new NativeImageFormatterService(Path.of("build/resources/test/palantir-java-format")));
     }
 }
