@@ -89,7 +89,7 @@ jobs:
       - store_test_results: { path: ~/junit }
       - store_artifacts: { path: ~/artifacts }
 
-  build-linux:
+  build:
     parameters:
       executor:
         type: executor
@@ -106,7 +106,7 @@ jobs:
       - *check-no-files-changed
       - persist_to_workspace:
           root: /home/circleci
-          paths: [ project ]
+          paths: [ project/palantir-java-format/build/native/nativeCompile ]
       - store_artifacts: { path: ~/artifacts }
 
   build-macos:
@@ -122,7 +122,7 @@ jobs:
       - *check-no-files-changed
       - persist_to_workspace:
           root: /Users/distiller
-          paths: [ project ]
+          paths: [ project/palantir-java-format/build/native/nativeCompile ]
 
   publish:
     docker: [{ image: 'cimg/openjdk:17.0.10-node' }]
@@ -162,7 +162,7 @@ workflows:
       - check:
           filters: { tags: { only: /.*/ } }
 
-      - build-linux:
+      - build:
           requires: [ check ]
           filters: { tags: { only: /.*/ } }
           matrix:
@@ -176,7 +176,7 @@ workflows:
           filters: { tags: { only: /.*/ } }
 
       - circle-all:
-          requires: [ check, build-linux, build-macos ]
+          requires: [ check, build, build-macos ]
           filters: { tags: { only: /.*/ } }
 
       - publish:
