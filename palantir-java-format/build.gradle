@@ -152,11 +152,6 @@ tasks.register('fatJar', Jar) {
     with jar
 }
 
-
-tasks.named("build") {
-    dependsOn tasks.named("fatJar"), tasks.named("nativeCompile")
-}
-
 configurations {
     nativeImage
 }

@@ -68,10 +68,7 @@ public class BenchmarkMultiFiles {
         ProcessBuilder p = new ProcessBuilder();
         p.command(Stream.concat(
                         Stream.of(
-                                Path.of(".")
-                                        .toAbsolutePath()
-                                        .resolve(
-                                                "../palantir-java-format/build/native/nativeCompile/palantir-java-format")
+                                Path.of("build/resources/jmh/palantir-java-format")
                                         .toString(),
                                 "-i",
                                 "--palantir"),
@@ -90,9 +87,7 @@ public class BenchmarkMultiFiles {
                         Stream.of(
                                 "java",
                                 "-jar",
-                                Paths.get(".")
-                                        .toAbsolutePath()
-                                        .resolve("build/resources/jmh/palantir-java-format-all.jar")
+                                Path.of("build/resources/jmh/palantir-java-format-all.jar")
                                         .toString(),
                                 "-i",
                                 "--palantir"),
