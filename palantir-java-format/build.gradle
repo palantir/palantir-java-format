@@ -1,5 +1,8 @@
 import org.graalvm.buildtools.gradle.tasks.BuildNativeImageTask
 
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
 buildscript {
     repositories {
         mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
@@ -152,26 +155,27 @@ tasks.register('fatJar', Jar) {
     with jar
 }
 
-configurations {
-    nativeImage
-}
-
-def nativeImageArtifact = artifacts.add('nativeImage', tasks.named("nativeCompile", BuildNativeImageTask.class).map { it.outputFile }) {
-    type = 'nativeImage'
-    builtBy 'nativeCompile'
-}
-
 publishing {
     publications {
         nativeImage(MavenPublication) {
-            artifact(nativeImageArtifact) {
-                classifier=String.format('nativeImage-%s-%s', osName, archName)
-                extension="exe"
+            fileTree("build/native/nativeCompile", { it.include("**/*") }).forEach { file ->
+                artifact(file) {
+                    classifier = String.format("nativeImage-%s", getOsArchName(file))
+                    extension = 'exe'
+                }
+                artifactId = 'palantir-java-format-native'
             }
-            artifactId = 'palantir-java-format-native'
-            
         }
     }
+}
+
+private static String getOsArchName(File file) {
+    Pattern pattern = Pattern.compile("palantir-java-format-(.*)-(.*)\$");
+    Matcher matcher = pattern.matcher(file.name)
+    if (matcher.find()) {
+        return matcher.group(1) + "-" + matcher.group(2)
+    }
+    throw new GradleException("Could not determine OS name from file name: ${file.name}")
 }
 
 private static String getCurrentOs() {
