@@ -36,9 +36,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class PalantirJavaFormatFormattingService extends AsyncDocumentFormattingService {
     private final FormatterProvider formatterProvider = new FormatterProvider();
+    private static final Logger log = LoggerFactory.getLogger(PalantirJavaFormatFormattingService.class);
 
     @Override
     protected FormattingTask createFormattingTask(@NotNull AsyncFormattingRequest request) {
@@ -81,6 +84,7 @@ class PalantirJavaFormatFormattingService extends AsyncDocumentFormattingService
 
         @Override
         public void run() {
+            log.info("Running the formatter task using the formatterService {}", formatterService.getClass());
             if (formatterService.isEmpty()) {
                 request.onError(
                         Notifications.GENERIC_ERROR_NOTIFICATION_GROUP,

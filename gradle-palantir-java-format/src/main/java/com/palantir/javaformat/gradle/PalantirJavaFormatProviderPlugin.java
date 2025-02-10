@@ -29,7 +29,6 @@ import org.gradle.api.artifacts.type.ArtifactTypeDefinition;
 public final class PalantirJavaFormatProviderPlugin implements Plugin<Project> {
 
     static final String CONFIGURATION_NAME = "palantirJavaFormat";
-
     static final String NATIVE_CONFIGURATION_NAME = "palantirJavaFormatNative";
 
     @Override
@@ -40,53 +39,47 @@ public final class PalantirJavaFormatProviderPlugin implements Plugin<Project> {
 
         String implementationVersion = JavaFormatExtension.class.getPackage().getImplementationVersion();
 
-        Configuration configuration = rootProject.getConfigurations().create(CONFIGURATION_NAME);
-        configuration.setDescription("Internal configuration for resolving the palantir-java-format implementation");
-        configuration.setVisible(false);
-        configuration.setCanBeConsumed(false);
-        configuration.setCanBeResolved(true);
-        configuration.defaultDependencies(deps -> {
-            deps.add(rootProject
-                    .getDependencies()
-                    .create(ImmutableMap.of(
-                            "group",
-                            "com.palantir.javaformat",
-                            "name",
-                            "palantir-java-format",
-                            "version",
-                            implementationVersion)));
-        });
+        Configuration configuration = rootProject.getConfigurations().create(CONFIGURATION_NAME, conf -> {
+            conf.setVisible(false);
+            conf.setCanBeConsumed(true);
+            conf.setDescription("Internal configuration for resolving the palantir-java-format implementation");
 
-        Configuration nativeConfiguration = rootProject.getConfigurations().create(NATIVE_CONFIGURATION_NAME);
-        nativeConfiguration.setDescription(
-                "Internal configuration for resolving the palantir-java-format implementation");
-        nativeConfiguration.setVisible(false);
-        nativeConfiguration.setCanBeConsumed(false);
-        nativeConfiguration.setCanBeResolved(true);
-        nativeConfiguration.defaultDependencies(deps -> {
-            deps.add(rootProject
-                    .getDependencies()
-                    .create(ImmutableMap.of(
-                            "group",
-                            "com.palantir.javaformat",
-                            "name",
-                            "palantir-java-format-native",
-                            "version",
-                            implementationVersion,
-                            "classifier",
-                            String.format("nativeImage-%s-%s", getCurrentOs(), getCurrentArch()),
-                            "ext",
-                            "exe")));
-        });
-        nativeConfiguration
-                .getAttributes()
-                .attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "executable-nativeImage");
-        rootProject.getDependencies().registerTransform(ExecutableTransform.class, transformSpec -> {
-            transformSpec.getFrom().attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "exe");
-            transformSpec.getTo().attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "executable-nativeImage");
+            conf.defaultDependencies(deps -> {
+                deps.add(rootProject
+                        .getDependencies()
+                        .create(ImmutableMap.of(
+                                "group",
+                                "com.palantir.javaformat",
+                                "name",
+                                "palantir-java-format",
+                                "version",
+                                implementationVersion)));
+            });
         });
 
         rootProject.getExtensions().create("palantirJavaFormat", JavaFormatExtension.class, configuration);
+
+        String extension = getCurrentOs().equals("macos") ? "bin" : "exe";
+
+        rootProject.getConfigurations().register(NATIVE_CONFIGURATION_NAME, conf -> {
+            conf.setDescription("Internal configuration for resolving the native palantir-java-format implementation");
+            conf.setVisible(false);
+            conf.setCanBeConsumed(false);
+            conf.setCanBeResolved(true);
+            conf.defaultDependencies(deps -> {
+                deps.add(rootProject
+                        .getDependencies()
+                        .create(String.format(
+                                "com.palantir.javaformat:palantir-java-format-native:%s:nativeImage-%s-%s@%s",
+                                implementationVersion, getCurrentOs(), getCurrentArch(), extension)));
+            });
+            conf.getAttributes().attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "executable-nativeImage");
+        });
+
+        rootProject.getDependencies().registerTransform(ExecutableTransform.class, transformSpec -> {
+            transformSpec.getFrom().attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, extension);
+            transformSpec.getTo().attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "executable-nativeImage");
+        });
     }
 
     private static String getCurrentOs() {

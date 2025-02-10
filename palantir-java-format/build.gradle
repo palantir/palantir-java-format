@@ -155,13 +155,15 @@ tasks.register('fatJar', Jar) {
     with jar
 }
 
+def osExtension = getCurrentOs() == 'macos' ? 'bin' : 'exe'
+
 publishing {
     publications {
         nativeImage(MavenPublication) {
             fileTree("build/native/nativeCompile", { it.include("**/*") }).forEach { file ->
                 artifact(file) {
                     classifier = String.format("nativeImage-%s", getOsArchName(file))
-                    extension = 'exe'
+                    extension = osExtension
                 }
                 artifactId = 'palantir-java-format-native'
             }
