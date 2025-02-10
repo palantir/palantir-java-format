@@ -1,3 +1,6 @@
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
 buildscript {
     repositories {
         mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
@@ -53,6 +56,10 @@ def exports = [
 
 def jvmArgList = exports.collect { value -> "--add-exports=${value}=ALL-UNNAMED".toString() }
 
+
+def osName = getCurrentOs()
+def archName = getCurrentArch()
+
 graalvmNative {
     binaries {
         main {
@@ -60,7 +67,7 @@ graalvmNative {
                 languageVersion = JavaLanguageVersion.of(23)
                 vendor = JvmVendorSpec.GRAAL_VM
             }
-            imageName = 'palantir-java-format'
+            imageName = String.format('palantir-java-format-%s-%s', osName, archName)
             mainClass = mainClassName
             fallback = false
             sharedLibrary = false
@@ -145,7 +152,59 @@ tasks.register('fatJar', Jar) {
     with jar
 }
 
+def osExtension = getCurrentOs() == 'macos' ? 'bin' : 'exe'
 
-tasks.named("build") {
-    dependsOn tasks.named("fatJar"), tasks.named("nativeCompile")
+publishing {
+    publications {
+        nativeImage(MavenPublication) {
+            fileTree("build/native/nativeCompile", { it.include("**/*") }).forEach { file ->
+                artifact(file) {
+                    classifier = String.format("nativeImage-%s", getOsArchName(file))
+                    extension = osExtension
+                }
+                artifactId = 'palantir-java-format-native'
+            }
+        }
+    }
 }
+
+// Making sure we will always run the nativeCompile task before publishing (for local builds)
+tasks.withType(AbstractPublishToMaven.class).configureEach {
+    dependsOn tasks.named('nativeCompile')
+}
+
+private static String getOsArchName(File file) {
+    Pattern pattern = Pattern.compile("palantir-java-format-(.*)-(.*)\$");
+    Matcher matcher = pattern.matcher(file.name)
+    if (matcher.find()) {
+        return matcher.group(1) + "-" + matcher.group(2)
+    }
+    throw new GradleException("Could not determine OS name from file name: ${file.name}")
+}
+
+private static String getCurrentOs() {
+    String osName = System.getProperty("os.name").toLowerCase(Locale.ROOT)
+    if (osName.contains("windows")) {
+        return "windows"
+    } else if (osName.contains("mac os x") || osName.contains("darwin") || osName.contains("osx")) {
+        return "macos"
+    } else if (osName.contains("linux")) {
+        return "linux"
+    }
+    throw new GradleException(String.format("Invalid Operating System %s", osName))
+}
+
+private static String getCurrentArch() {
+    String osArch = System.getProperty("os.arch").toLowerCase(Locale.ROOT);
+    if (Set.of("x86_64", "x64", "amd64").contains(osArch)) {
+        return "x86_64";
+    }
+    if (Set.of("arm", "arm64", "aarch64").contains(osArch)) {
+        return "aarch64"
+    }
+    if (Set.of("x86", "i686").contains(osArch)) {
+        return "x86"
+    }
+    throw new GradleException(String.format("Invalid Operating System %s", osArch))
+}
+

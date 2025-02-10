@@ -15,3 +15,9 @@ dependencies {
     testImplementation 'org.assertj:assertj-core'
     testImplementation 'com.fasterxml.jackson.core:jackson-databind'
 }
+
+tasks.named('processTestResources', ProcessResources.class) {
+    from(project(':palantir-java-format').tasks.named('nativeCompile')) {
+        rename { 'palantir-java-format'}
+    }
+}
