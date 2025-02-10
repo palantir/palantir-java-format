@@ -171,6 +171,11 @@ publishing {
     }
 }
 
+// Making sure we will always run the nativeCompile task before publishing (for local builds)
+tasks.withType(AbstractPublishToMaven.class) {
+    dependsOn tasks.named('nativeCompile')
+}
+
 private static String getOsArchName(File file) {
     Pattern pattern = Pattern.compile("palantir-java-format-(.*)-(.*)\$");
     Matcher matcher = pattern.matcher(file.name)
