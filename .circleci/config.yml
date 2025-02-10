@@ -17,20 +17,9 @@ aliases:
           exit 1
         fi
 
-executors:
-  linux-amd64:
-    machine:
-      image: ubuntu-2004:current
-    resource_class: medium
-  linux-arm64:
-    machine:
-      image: ubuntu-2004:current
-    resource_class: arm.medium
-
-
 jobs:
 
-  check:
+  check-build-linux-amd64:
     docker: [{ image: 'cimg/openjdk:17.0.1-node' }]
     resource_class: large
     environment:
@@ -89,11 +78,10 @@ jobs:
       - store_test_results: { path: ~/junit }
       - store_artifacts: { path: ~/artifacts }
 
-  build:
-    parameters:
-      executor:
-        type: executor
-    executor: << parameters.executor >>
+  build-linux-arm64:
+    machine:
+      image: ubuntu-2004:current
+    resource_class: arm.medium
     environment:
       CIRCLE_TEST_REPORTS: /home/circleci/junit
       CIRCLE_ARTIFACTS: /home/circleci/artifacts
@@ -159,24 +147,19 @@ workflows:
   version: 2
   build:
     jobs:
-      - check:
+      - check-build-linux-amd64:
           filters: { tags: { only: /.*/ } }
 
-      - build:
-          requires: [ check ]
+      - build-linux-arm64:
+          requires: [ check-build-linux-amd64 ]
           filters: { tags: { only: /.*/ } }
-          matrix:
-            parameters:
-              executor:
-                - linux-amd64
-                - linux-arm64
 
       - build-macos:
-          requires: [ check ]
+          requires: [ check-build-linux-amd64 ]
           filters: { tags: { only: /.*/ } }
 
       - circle-all:
-          requires: [ check, build, build-macos ]
+          requires: [ check-build-linux-amd64, build-linux-arm64, build-macos ]
           filters: { tags: { only: /.*/ } }
 
       - publish:
