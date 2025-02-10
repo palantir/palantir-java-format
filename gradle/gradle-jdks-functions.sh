@@ -53,6 +53,7 @@ get_os() {
   case "$( uname )" in                          #(
     Linux* )          os_name="linux"  ;;       #(
     Darwin* )         os_name="macos"  ;;       #(
+    MSYS_NT* )        os_name="windows"  ;;       #(
     * )               die "ERROR Unsupported OS: $( uname )" ;;
   esac
 

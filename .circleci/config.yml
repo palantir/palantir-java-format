@@ -112,6 +112,22 @@ jobs:
           root: /Users/distiller
           paths: [ project/palantir-java-format/build/native/nativeCompile ]
 
+  build-windows:
+    machine:
+      image: windows-server-2022-gui:current
+    shell: bash.exe
+    resource_class: windows.medium
+    environment:
+      GRADLE_OPTS: -Dorg.gradle.workers.max=2 -Dorg.gradle.jvmargs='-Xmx2147483648 --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED'
+      _JAVA_OPTIONS: -XX:ActiveProcessorCount=4 -XX:MaxRAM=8g -XX:+CrashOnOutOfMemoryError
+    steps:
+      - checkout
+      - run: ./gradlew --parallel --stacktrace --continue --max-workers=2 nativeCompile
+      - *check-no-files-changed
+      - persist_to_workspace:
+          root: /c/Users/circleci
+          paths: [ project/palantir-java-format/build/native/nativeCompile ]
+
   publish:
     docker: [{ image: 'cimg/openjdk:17.0.10-node' }]
     resource_class: medium
@@ -163,8 +179,12 @@ workflows:
           requires: [ check-build-linux-amd64 ]
           filters: { tags: { only: /.*/ } }
 
+      - build-windows:
+          requires: [ check-build-linux-amd64 ]
+          filters: { tags: { only: /.*/ } }
+
       - circle-all:
-          requires: [ check-build-linux-amd64, build-linux-arm64, build-macos ]
+          requires: [ build-windows ]
           filters: { tags: { only: /.*/ } }
 
       - publish:
