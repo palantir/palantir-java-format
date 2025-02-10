@@ -172,7 +172,7 @@ publishing {
 }
 
 // Making sure we will always run the nativeCompile task before publishing (for local builds)
-tasks.withType(AbstractPublishToMaven.class) {
+tasks.withType(AbstractPublishToMaven.class).configureEach {
     dependsOn tasks.named('nativeCompile')
 }
 
