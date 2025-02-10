@@ -154,7 +154,7 @@ install_and_setup_jdks() {
           curl -L -C - "$distribution_url" -o "$distribution_name"
           if [ "$OS" = "windows" ]; then
             unzip "$distribution_name"
-          else:
+          else
             tar -xzf "$distribution_name"
           fi
           ;;
