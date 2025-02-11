@@ -5,11 +5,9 @@ buildscript {
     repositories {
         mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
         gradlePluginPortal() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
-        mavenLocal()
     }
     dependencies {
         classpath 'org.graalvm.buildtools:native-gradle-plugin:0.10.4'
-        classpath 'com.palantir.gradle.utils:platform:0.9.0-107-ge1840ce.dirty'
     }
 }
 
@@ -29,7 +27,6 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8'
     implementation 'com.fasterxml.jackson.module:jackson-module-parameter-names'
-    implementation 'com.palantir.gradle.utils:platform'
 
     testImplementation 'com.google.guava:guava-testlib'
     testImplementation 'com.google.truth:truth'
@@ -206,31 +203,6 @@ configurations {
         outgoing.artifact(tasks.named('nativeCompile').map(task -> task.getOutputFile()))
         attributes {
             attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements, 'consumableNativeImage'))
-        }
-    }
-}
-
-configurations {
-    nativeImage
-}
-def nativeImageFile = layout.buildDirectory.file('native/nativeCompile/palantir-java-format')
-def nativeImageArtifact = artifacts.add('nativeImage', nativeImageFile.get().asFile) {
-    type = 'nativeImage'
-    builtBy 'nativeCompile'
-}
-
-import com.palantir.platform.CurrentOs
-import com.palantir.platform.CurrentArch
-
-publishing {
-    publications {
-        nativeImage(MavenPublication) {
-            artifact(nativeImageArtifact) {
-                classifier="nativeImage-" + CurrentOs.get().uiName() + "-" + CurrentArch.get().uiName()
-                extension="exe"
-            }
-            artifactId = 'palantir-java-format-native'
-            
         }
     }
 }
