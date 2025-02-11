@@ -87,6 +87,7 @@ public class PalantirJavaFormatFormattingServiceTest {
         WriteCommandAction.runWriteCommandAction(file.getProject(), () -> {
             ProjectRootManager.getInstance(getProject())
                     .setProjectSdk(getProjectDescriptor().getSdk());
+
             processor.run();
             PsiDocumentManager.getInstance(file.getProject()).commitAllDocuments();
         });
