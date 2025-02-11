@@ -61,7 +61,6 @@ public class BenchmarkMultiFiles {
         }
     }
 
-    /*
     @Benchmark
     @BenchmarkMode(Mode.All)
     @OutputTimeUnit(TimeUnit.SECONDS)
@@ -69,14 +68,12 @@ public class BenchmarkMultiFiles {
         ProcessBuilder p = new ProcessBuilder();
         p.command(Stream.concat(
                         Stream.of(
-                                Path.of(System.getenv("NATIVE_IMAGE_CLASSPATH")).toString(),
-                                "-i",
-                                "--palantir"),
+                                Path.of(System.getenv("NATIVE_IMAGE_CLASSPATH")).toString(), "-i", "--palantir"),
                         state.filesToFormat.stream())
                 .collect(Collectors.toList()));
         Process process = p.inheritIO().start();
         assertThat(process.waitFor()).isEqualTo(0);
-    }*/
+    }
 
     @Benchmark
     @BenchmarkMode(Mode.All)
