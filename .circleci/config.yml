@@ -19,8 +19,8 @@ aliases:
 
 jobs:
 
-  check:
-    docker: [{ image: 'cimg/openjdk:17.0.10-node' }]
+  check-build-linux-amd64:
+    docker: [{ image: 'cimg/openjdk:17.0.1-node' }]
     resource_class: large
     environment:
       CIRCLE_TEST_REPORTS: /home/circleci/junit
@@ -61,7 +61,7 @@ jobs:
             if [ -x .circleci/check-setup.sh ]; then
                 echo "Running check-setup" && .circleci/check-setup.sh && echo "check-setup complete"
             fi
-      - run: ./gradlew --parallel --stacktrace --continue --max-workers=2 build -Porg.gradle.java.installations.fromEnv=JAVA_11_HOME,JAVA_17_HOME,JAVA_21_HOME,JAVA_HOME
+      - run: ./gradlew --parallel --stacktrace --continue --max-workers=2 build
       - *check-no-files-changed
       - persist_to_workspace:
           root: /home/circleci
@@ -78,6 +78,40 @@ jobs:
       - store_test_results: { path: ~/junit }
       - store_artifacts: { path: ~/artifacts }
 
+  build-linux-arm64:
+    machine:
+      image: ubuntu-2004:current
+    resource_class: arm.medium
+    environment:
+      CIRCLE_TEST_REPORTS: /home/circleci/junit
+      CIRCLE_ARTIFACTS: /home/circleci/artifacts
+      GRADLE_OPTS: -Dorg.gradle.workers.max=2 -Dorg.gradle.jvmargs='-Xmx2147483648 --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED'
+      _JAVA_OPTIONS: -XX:ActiveProcessorCount=4 -XX:MaxRAM=8g -XX:+CrashOnOutOfMemoryError -XX:ErrorFile=/home/circleci/artifacts/hs_err_pid%p.log -XX:HeapDumpPath=/home/circleci/artifacts
+    steps:
+      - checkout
+      - attach_workspace: { at: /home/circleci }
+      - run: ./gradlew --parallel --stacktrace --continue --max-workers=2 nativeCompile
+      - *check-no-files-changed
+      - persist_to_workspace:
+          root: /home/circleci
+          paths: [ project/palantir-java-format/build/native/nativeCompile ]
+      - store_artifacts: { path: ~/artifacts }
+
+  build-macos:
+    macos:
+      xcode: 15.4.0
+    resource_class: macos.m1.medium.gen1
+    environment:
+      GRADLE_OPTS: -Dorg.gradle.workers.max=2 -Dorg.gradle.jvmargs='-Xmx2147483648 --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED'
+      _JAVA_OPTIONS: -XX:ActiveProcessorCount=4 -XX:MaxRAM=8g -XX:+CrashOnOutOfMemoryError
+    steps:
+      - checkout
+      - run: ./gradlew --parallel --stacktrace --continue --max-workers=2 nativeCompile
+      - *check-no-files-changed
+      - persist_to_workspace:
+          root: /Users/distiller
+          paths: [ project/palantir-java-format/build/native/nativeCompile ]
+
   publish:
     docker: [{ image: 'cimg/openjdk:17.0.10-node' }]
     resource_class: medium
@@ -91,7 +125,7 @@ jobs:
       - restore_cache: { key: 'gradle-wrapper-v1-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
       - restore_cache: { key: 'publish-gradle-cache-v1-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
       - deploy:
-          command: ./gradlew --parallel --stacktrace --continue publish -Porg.gradle.java.installations.fromEnv=JAVA_11_HOME,JAVA_17_HOME,JAVA_21_HOME,JAVA_HOME
+          command: ./gradlew --parallel --stacktrace --continue publish
       - run:
           command: git status --porcelain
           when: always
@@ -111,11 +145,19 @@ workflows:
   version: 2
   build:
     jobs:
-      - check:
+      - check-build-linux-amd64:
+          filters: { tags: { only: /.*/ } }
+
+      - build-linux-arm64:
+          requires: [ check-build-linux-amd64 ]
+          filters: { tags: { only: /.*/ } }
+
+      - build-macos:
+          requires: [ check-build-linux-amd64 ]
           filters: { tags: { only: /.*/ } }
 
       - circle-all:
-          requires: [ check ]
+          requires: [ check-build-linux-amd64, build-linux-arm64, build-macos ]
           filters: { tags: { only: /.*/ } }
 
       - publish:

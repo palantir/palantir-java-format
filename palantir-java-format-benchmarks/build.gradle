@@ -1,6 +1,11 @@
 apply plugin: 'distribution'
 apply plugin: 'me.champeau.jmh'
 
+configurations {
+    consumingNativeImage
+    consumingPalantirJars
+}
+
 dependencies {
     jmhAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess'
     compileOnly 'org.openjdk.jmh:jmh-generator-annprocess'
@@ -9,18 +14,23 @@ dependencies {
     jmhImplementation 'org.junit.jupiter:junit-jupiter'
     jmhImplementation 'org.openjdk.jmh:jmh-core'
     jmhImplementation 'org.openjdk.jmh:jmh-generator-annprocess'
+    consumingPalantirJars (project(':palantir-java-format'))
+    consumingNativeImage(project(':palantir-java-format')) {
+        attributes {
+            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements, 'consumableNativeImage'))
+        }
+    }
 }
 
-tasks.withType(ProcessResources.class).configureEach {
-    from(project(':palantir-java-format').tasks.named('fatJar')) {
-        rename { 'palantir-java-format-all.jar' }
-    }
+import me.champeau.jmh.JMHTask
+
+tasks.named('jmh', JMHTask.class) {
+    inputs.files(configurations.consumingNativeImage)
+    inputs.files(configurations.consumingPalantirJars)
+    environment.put('NATIVE_IMAGE_CLASSPATH', configurations.consumingNativeImage.asPath)
+    environment.put('JARS_CLASSPATH', configurations.consumingPalantirJars.collect { it.absolutePath }.join(":"))
 }
 
 jmhCompileGeneratedClasses {
     options.errorprone.enabled = false
-}
-
-tasks.named("jmh") {
-    dependsOn ":palantir-java-format:nativeCompile", ":palantir-java-format:fatJar"
 }

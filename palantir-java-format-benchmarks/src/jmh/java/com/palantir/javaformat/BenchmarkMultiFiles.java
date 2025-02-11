@@ -68,13 +68,7 @@ public class BenchmarkMultiFiles {
         ProcessBuilder p = new ProcessBuilder();
         p.command(Stream.concat(
                         Stream.of(
-                                Path.of(".")
-                                        .toAbsolutePath()
-                                        .resolve(
-                                                "../palantir-java-format/build/native/nativeCompile/palantir-java-format")
-                                        .toString(),
-                                "-i",
-                                "--palantir"),
+                                Path.of(System.getenv("NATIVE_IMAGE_CLASSPATH")).toString(), "-i", "--palantir"),
                         state.filesToFormat.stream())
                 .collect(Collectors.toList()));
         Process process = p.inheritIO().start();
@@ -89,11 +83,14 @@ public class BenchmarkMultiFiles {
         p.command(Stream.concat(
                         Stream.of(
                                 "java",
-                                "-jar",
-                                Paths.get(".")
-                                        .toAbsolutePath()
-                                        .resolve("build/resources/jmh/palantir-java-format-all.jar")
-                                        .toString(),
+                                "-cp",
+                                System.getenv("JARS_CLASSPATH"),
+                                "--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
+                                "--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED",
+                                "--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED",
+                                "--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
+                                "--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
+                                "com.palantir.javaformat.java.Main",
                                 "-i",
                                 "--palantir"),
                         state.filesToFormat.stream())
