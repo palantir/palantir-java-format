@@ -73,15 +73,29 @@ configurations {
         canBeConsumed = false
         canBeResolved = true
     }
+
+    consumingNativeImage {
+        canBeConsumed = false
+        canBeResolved = true
+    }
+
+
 }
 
 dependencies {
     impl project(':palantir-java-format')
+    consumingNativeImage(project(':palantir-java-format')) {
+        attributes {
+            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements, 'consumableNativeImage'))
+        }
+    }
+
 }
 
 def writeImplClasspath = tasks.register("writeImplClasspath") {
     doLast {
         file("$buildDir/impl.classpath").text = configurations.impl.asPath
+        file("$buildDir/nativeImage.path").text = configurations.consumingNativeImage.asPath
     }
 }
 

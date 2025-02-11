@@ -28,7 +28,6 @@ import org.gradle.api.artifacts.type.ArtifactTypeDefinition;
 public final class PalantirJavaFormatProviderPlugin implements Plugin<Project> {
 
     static final String CONFIGURATION_NAME = "palantirJavaFormat";
-
     static final String NATIVE_CONFIGURATION_NAME = "palantirJavaFormatNative";
 
     @Override
@@ -39,15 +38,17 @@ public final class PalantirJavaFormatProviderPlugin implements Plugin<Project> {
 
         String implementationVersion = JavaFormatExtension.class.getPackage().getImplementationVersion();
 
-        Configuration configuration = rootProject.getConfigurations().create(CONFIGURATION_NAME);
-        configuration.setDescription("Internal configuration for resolving the palantir-java-format implementation");
-        configuration.setVisible(false);
-        configuration.setCanBeConsumed(false);
-        configuration.setCanBeResolved(true);
-        configuration.defaultDependencies(deps -> {
-            deps.add(rootProject
-                    .getDependencies()
-                    .create(String.format("com.palantir.javaformat:palantir-java-format:%s", implementationVersion)));
+        Configuration configuration = rootProject.getConfigurations().create(CONFIGURATION_NAME, conf -> {
+            conf.setDescription("Internal configuration for resolving the palantir-java-format implementation");
+            conf.setVisible(false);
+            conf.setCanBeConsumed(false);
+            conf.setCanBeResolved(true);
+            conf.defaultDependencies(deps -> {
+                deps.add(rootProject
+                        .getDependencies()
+                        .create(String.format(
+                                "com.palantir.javaformat:palantir-java-format:%s", implementationVersion)));
+            });
         });
 
         rootProject.getConfigurations().register(NATIVE_CONFIGURATION_NAME, conf -> {
@@ -60,19 +61,19 @@ public final class PalantirJavaFormatProviderPlugin implements Plugin<Project> {
                         .getDependencies()
                         .create(String.format(
                                 "com.palantir.javaformat:palantir-java-format-native:%s:nativeImage-%s-%s@%s",
-                                implementationVersion, getCurrentArch(), getCurrentOs(), getExtenstion())));
+                                implementationVersion, getCurrentArch(), getCurrentOs(), getExtension())));
             });
             conf.getAttributes().attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "executable-nativeImage");
         });
         rootProject.getDependencies().registerTransform(ExecutableTransform.class, transformSpec -> {
-            transformSpec.getFrom().attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "exe");
+            transformSpec.getFrom().attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, getExtension());
             transformSpec.getTo().attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "executable-nativeImage");
         });
 
         rootProject.getExtensions().create("palantirJavaFormat", JavaFormatExtension.class, configuration);
     }
 
-    private static String getExtenstion() {
+    private static String getExtension() {
         String osName = System.getProperty("os.name").toLowerCase(Locale.ROOT);
         if (osName.contains("windows")) {
             return "exe";

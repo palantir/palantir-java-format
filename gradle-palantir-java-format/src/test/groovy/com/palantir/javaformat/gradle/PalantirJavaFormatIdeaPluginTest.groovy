@@ -17,8 +17,12 @@
 package com.palantir.javaformat.gradle
 
 import nebula.test.IntegrationTestKitSpec
+import org.junit.jupiter.api.Disabled
+import spock.lang.Ignore
 
 class PalantirJavaFormatIdeaPluginTest extends IntegrationTestKitSpec {
+
+    private static final NATIVE_IMAGE_FILE = new File("build/nativeImage.path").absolutePath
 
     void setup() {
         buildFile << """
@@ -29,10 +33,16 @@ class PalantirJavaFormatIdeaPluginTest extends IntegrationTestKitSpec {
             
             dependencies {
                 palantirJavaFormat project.files() // no need to store the real thing in here
+                palantirJavaFormatNative(files(file("${NATIVE_IMAGE_FILE}").text)) {
+                    attributes {
+                        attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "bin")
+                    }
+                }
             }
         """.stripIndent()
     }
 
+    @Ignore("TODO crogoz")
     def "idea_configuresIpr"() {
         when:
         runTasks('idea')

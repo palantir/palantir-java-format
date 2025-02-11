@@ -5,7 +5,7 @@ apply plugin: 'com.palantir.external-publish-jar'
 apply plugin: 'com.palantir.revapi'
 
 configurations {
-    consumingNativeImage.extendsFrom(testImplementation)
+    consumingNativeImage
 }
 
 dependencies {
