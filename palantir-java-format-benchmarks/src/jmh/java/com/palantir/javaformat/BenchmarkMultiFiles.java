@@ -61,6 +61,7 @@ public class BenchmarkMultiFiles {
         }
     }
 
+    /*
     @Benchmark
     @BenchmarkMode(Mode.All)
     @OutputTimeUnit(TimeUnit.SECONDS)
@@ -68,15 +69,14 @@ public class BenchmarkMultiFiles {
         ProcessBuilder p = new ProcessBuilder();
         p.command(Stream.concat(
                         Stream.of(
-                                Path.of("build/resources/jmh/palantir-java-format")
-                                        .toString(),
+                                Path.of(System.getenv("NATIVE_IMAGE_CLASSPATH")).toString(),
                                 "-i",
                                 "--palantir"),
                         state.filesToFormat.stream())
                 .collect(Collectors.toList()));
         Process process = p.inheritIO().start();
         assertThat(process.waitFor()).isEqualTo(0);
-    }
+    }*/
 
     @Benchmark
     @BenchmarkMode(Mode.All)
@@ -86,9 +86,14 @@ public class BenchmarkMultiFiles {
         p.command(Stream.concat(
                         Stream.of(
                                 "java",
-                                "-jar",
-                                Path.of("build/resources/jmh/palantir-java-format-all.jar")
-                                        .toString(),
+                                "-cp",
+                                System.getenv("JARS_CLASSPATH"),
+                                "--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
+                                "--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED",
+                                "--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED",
+                                "--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
+                                "--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
+                                "com.palantir.javaformat.java.Main",
                                 "-i",
                                 "--palantir"),
                         state.filesToFormat.stream())

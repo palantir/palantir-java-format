@@ -140,18 +140,6 @@ tasks.named("jar", Jar) {
     }
 }
 
-tasks.register('fatJar', Jar) {
-    dependsOn tasks.jar, project(':palantir-java-format-spi').tasks.jar
-    manifest {
-        attributes 'Main-Class': mainClassName
-        attributes('Add-Exports': exports.join(' '))
-    }
-    archiveBaseName = 'palantir-java-format-all'
-    duplicatesStrategy = DuplicatesStrategy.WARN
-    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
-}
-
 def osExtension = getCurrentOs() == 'macos' ? 'bin' : 'exe'
 
 publishing {
@@ -208,3 +196,13 @@ private static String getCurrentArch() {
     throw new GradleException(String.format("Invalid Operating System %s", osArch))
 }
 
+configurations {
+    consumableNativeImage {
+        canBeConsumed = true
+        canBeResolved = false
+        outgoing.artifact(tasks.named('nativeCompile').map(task -> task.getOutputFile()))
+        attributes {
+            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements, 'consumableNativeImage'))
+        }
+    }
+}
