@@ -53,7 +53,6 @@ get_os() {
   case "$( uname )" in                          #(
     Linux* )          os_name="linux"  ;;       #(
     Darwin* )         os_name="macos"  ;;       #(
-    MSYS_NT* )        os_name="windows"  ;;     #(
     * )               die "ERROR Unsupported OS: $( uname )" ;;
   esac
 
@@ -96,6 +95,11 @@ get_gradle_jdks_home() {
   echo "$gradle_jdks_home"
 }
 
+get_java_home() {
+  java_bin=$(find "$1" -type f -name "java" -path "*/bin/java" ! -type l -print -quit)
+  echo "${java_bin%/*/*}"
+}
+
 GRADLE_JDKS_HOME=$(get_gradle_jdks_home)
 mkdir -p "$GRADLE_JDKS_HOME"
 export GRADLE_JDKS_HOME
@@ -105,20 +109,6 @@ export OS
 
 ARCH=$(get_arch)
 export ARCH
-
-get_java_exec() {
-    if [ "$OS" = "windows" ]; then
-      echo "java.exe"
-    else
-      echo "java"
-    fi
-}
-
-get_java_home() {
-  javaExec=$(get_java_exec)
-  java_bin=$(find "$1" -type f -name "$javaExec" -path "*/bin/$javaExec" ! -type l -print -quit)
-  echo "${java_bin%/*/*}"
-}
 
 install_and_setup_jdks() {
   gradle_dir=$1
@@ -152,11 +142,7 @@ install_and_setup_jdks() {
         *.zip)
           distribution_name=${distribution_url##*/}
           curl -L -C - "$distribution_url" -o "$distribution_name"
-          if [ "$OS" = "windows" ]; then
-            unzip "$distribution_name"
-          else
-            tar -xzf "$distribution_name"
-          fi
+          tar -xzf "$distribution_name"
           ;;
         *)
           curl -L -C - "$distribution_url" | tar -xzf -
@@ -180,9 +166,8 @@ install_and_setup_jdks() {
     cd - > /dev/null || die "failed to change dir to old pwd: $OLDPWD"
 
     # Finding the java_home
-    java_exec=$(get_java_exec)
     java_home=$(get_java_home "$in_progress_dir")
-    "$java_home"/bin/"$java_exec" -cp "$scripts_dir"/gradle-jdks-setup.jar com.palantir.gradle.jdks.setup.GradleJdkInstallationSetup jdkSetup "$jdk_installation_directory" || die "Failed to set up JDK $jdk_installation_directory"
+    "$java_home"/bin/java -cp "$scripts_dir"/gradle-jdks-setup.jar com.palantir.gradle.jdks.setup.GradleJdkInstallationSetup jdkSetup "$jdk_installation_directory" || die "Failed to set up JDK $jdk_installation_directory"
     write "Successfully installed JDK distribution in $jdk_installation_directory"
   done
 }
