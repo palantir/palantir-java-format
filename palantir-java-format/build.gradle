@@ -1,20 +1,16 @@
-import java.util.regex.Matcher
-import java.util.regex.Pattern
-
 buildscript {
     repositories {
         mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
         gradlePluginPortal() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
     }
     dependencies {
-        classpath 'org.graalvm.buildtools:native-gradle-plugin:0.10.4'
         classpath 'com.palantir.gradle.utils:platform:0.10.0'
     }
 }
 
-apply plugin: 'org.graalvm.buildtools.native'
 apply plugin: 'application'
 apply plugin: 'com.palantir.external-publish-jar'
+apply plugin: 'com.palantir.external-publish-custom'
 
 mainClassName = 'com.palantir.javaformat.java.Main'
 
@@ -56,44 +52,6 @@ def exports = [
 ]
 
 def jvmArgList = exports.collect { value -> "--add-exports=${value}=ALL-UNNAMED".toString() }
-
-import com.palantir.platform.OperatingSystem
-import com.palantir.platform.Architecture
-
-def operatingSystem = OperatingSystem.get()
-def architecture = Architecture.get()
-
-graalvmNative {
-    binaries {
-        main {
-            javaLauncher = javaToolchains.launcherFor {
-                languageVersion = JavaLanguageVersion.of(23)
-                vendor = JvmVendorSpec.GRAAL_VM
-            }
-            imageName = String.format('palantir-java-format-%s-%s', operatingSystem.uiName(), architecture.uiName())
-            mainClass = mainClassName
-            fallback = false
-            sharedLibrary = false
-            configurationFileDirectories.from(file('src/main/resources/META-INF/native-image'))
-            buildArgs.addAll("-H:ConfigurationFileDirectories=${projectDir}/src/main/resources/META-INF/native-image",
-                    '-H:+UnlockExperimentalVMOptions',
-                    '-H:IncludeResourceBundles=com.sun.tools.javac.resources.compiler',
-                    '-H:IncludeResourceBundles=com.sun.tools.javac.resources.javac',
-                    '--no-fallback',
-                    '--initialize-at-build-time=com.sun.tools.javac.file.Locations',
-                    '-H:+ReportExceptionStackTraces',
-                    '-H:-UseContainerSupport',
-                    "-march=compatibility")
-            jvmArgs.addAll(jvmArgList)
-        }
-    }
-}
-
-
-// The image requires parameters to be passed to; eg. gw nativeRun -Pargs=--palantir,-i,<file>
-tasks.named("nativeRun", org.graalvm.buildtools.gradle.tasks.NativeRunTask) {
-    runtimeArgs.addAll(project.hasProperty('appArgs') ? project.appArgs.split(',') : [])
-}
 
 tasks.withType(JavaCompile).configureEach {
     options.errorprone.disable 'StrictUnusedVariable'
@@ -143,43 +101,3 @@ tasks.named("jar", Jar) {
     }
 }
 
-def osExtension = operatingSystem == OperatingSystem.MACOS ? 'bin' : 'exe'
-
-publishing {
-    publications {
-        nativeImage(MavenPublication) {
-            fileTree("build/native/nativeCompile", { it.include("**/*") }).forEach { file ->
-                artifact(file) {
-                    classifier = String.format("nativeImage-%s", getOsArchName(file))
-                    extension = osExtension
-                }
-                artifactId = 'palantir-java-format-native'
-            }
-        }
-    }
-}
-
-// Making sure we will always run the nativeCompile task before publishing (for local builds)
-tasks.withType(AbstractPublishToMaven.class).configureEach {
-    dependsOn tasks.named('nativeCompile')
-}
-
-private static String getOsArchName(File file) {
-    Pattern pattern = Pattern.compile("palantir-java-format-(.*)-(.*)\$");
-    Matcher matcher = pattern.matcher(file.name)
-    if (matcher.find()) {
-        return matcher.group(1) + "-" + matcher.group(2)
-    }
-    throw new GradleException("Could not determine OS name from file name: ${file.name}")
-}
-
-configurations {
-    nativeImage {
-        canBeConsumed = true
-        canBeResolved = false
-        outgoing.artifact(tasks.named('nativeCompile').map(task -> task.getOutputFile()))
-        attributes {
-            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements, 'nativeImage'))
-        }
-    }
-}
