@@ -1,16 +1,5 @@
-buildscript {
-    repositories {
-        mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
-        gradlePluginPortal() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
-    }
-    dependencies {
-        classpath 'com.palantir.gradle.utils:platform:0.10.0'
-    }
-}
-
 apply plugin: 'application'
 apply plugin: 'com.palantir.external-publish-jar'
-apply plugin: 'com.palantir.external-publish-custom'
 
 mainClassName = 'com.palantir.javaformat.java.Main'
 
@@ -100,4 +89,3 @@ tasks.named("jar", Jar) {
         attributes('Add-Exports': exports.join(' '))
     }
 }
-
