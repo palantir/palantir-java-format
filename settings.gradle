@@ -17,6 +17,7 @@ include ':palantir-java-format-spi'
 include ':palantir-java-format'
 include ':palantir-java-format-jdk-bootstrap'
 include ':palantir-java-format-benchmarks'
+include 'palantir-java-format-native'
 
 boolean isCiServer = System.getenv().containsKey('CI')
 buildCache {
@@ -24,5 +25,3 @@ buildCache {
         enabled = !isCiServer
     }
 }
-include 'palantir-java-format-nativeImage'
-
