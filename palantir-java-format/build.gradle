@@ -8,6 +8,7 @@ buildscript {
     }
     dependencies {
         classpath 'org.graalvm.buildtools:native-gradle-plugin:0.10.4'
+        classpath 'com.palantir.gradle.utils:platform:0.10.0'
     }
 }
 
@@ -56,9 +57,11 @@ def exports = [
 
 def jvmArgList = exports.collect { value -> "--add-exports=${value}=ALL-UNNAMED".toString() }
 
+import com.palantir.platform.OperatingSystem
+import com.palantir.platform.Architecture
 
-def osName = getCurrentOs()
-def archName = getCurrentArch()
+def operatingSystem = OperatingSystem.get()
+def architecture = Architecture.get()
 
 graalvmNative {
     binaries {
@@ -67,7 +70,7 @@ graalvmNative {
                 languageVersion = JavaLanguageVersion.of(23)
                 vendor = JvmVendorSpec.GRAAL_VM
             }
-            imageName = String.format('palantir-java-format-%s-%s', osName, archName)
+            imageName = String.format('palantir-java-format-%s-%s', operatingSystem.uiName(), architecture.uiName())
             mainClass = mainClassName
             fallback = false
             sharedLibrary = false
@@ -140,7 +143,7 @@ tasks.named("jar", Jar) {
     }
 }
 
-def osExtension = getCurrentOs() == 'macos' ? 'bin' : 'exe'
+def osExtension = operatingSystem == OperatingSystem.MACOS ? 'bin' : 'exe'
 
 publishing {
     publications {
@@ -168,32 +171,6 @@ private static String getOsArchName(File file) {
         return matcher.group(1) + "-" + matcher.group(2)
     }
     throw new GradleException("Could not determine OS name from file name: ${file.name}")
-}
-
-private static String getCurrentOs() {
-    String osName = System.getProperty("os.name").toLowerCase(Locale.ROOT)
-    if (osName.contains("windows")) {
-        return "windows"
-    } else if (osName.contains("mac os x") || osName.contains("darwin") || osName.contains("osx")) {
-        return "macos"
-    } else if (osName.contains("linux")) {
-        return "linux"
-    }
-    throw new GradleException(String.format("Invalid Operating System %s", osName))
-}
-
-private static String getCurrentArch() {
-    String osArch = System.getProperty("os.arch").toLowerCase(Locale.ROOT);
-    if (Set.of("x86_64", "x64", "amd64").contains(osArch)) {
-        return "x86_64";
-    }
-    if (Set.of("arm", "arm64", "aarch64").contains(osArch)) {
-        return "aarch64"
-    }
-    if (Set.of("x86", "i686").contains(osArch)) {
-        return "x86"
-    }
-    throw new GradleException(String.format("Invalid Operating System %s", osArch))
 }
 
 configurations {

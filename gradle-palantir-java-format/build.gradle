@@ -19,6 +19,7 @@ dependencies {
     implementation 'com.google.guava:guava'
     implementation project(':palantir-java-format-spi')
     implementation project(':palantir-java-format-jdk-bootstrap')
+    implementation 'com.palantir.gradle.utils:platform'
 
     testImplementation 'com.netflix.nebula:nebula-test'
     testImplementation 'org.junit.jupiter:junit-jupiter'
