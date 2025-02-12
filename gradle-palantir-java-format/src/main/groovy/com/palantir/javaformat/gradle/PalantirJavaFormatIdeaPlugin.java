@@ -63,9 +63,11 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
     }
 
     private static Optional<Configuration> maybeGetNativeImplConfiguration(Project rootProject) {
-        return NativeImageFormatProviderPlugin.isNativeImageSupported() ? Optional.of(rootProject
-                .getConfigurations()
-                .getByName(NativeImageFormatProviderPlugin.NATIVE_CONFIGURATION_NAME)) : Optional.empty();
+        return NativeImageFormatProviderPlugin.isNativeImageSupported()
+                ? Optional.of(rootProject
+                        .getConfigurations()
+                        .getByName(NativeImageFormatProviderPlugin.NATIVE_CONFIGURATION_NAME))
+                : Optional.empty();
     }
 
     private static void configureLegacyIdea(
@@ -78,7 +80,8 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
             // this block is lazy
             List<URI> uris =
                     implConfiguration.getFiles().stream().map(File::toURI).collect(Collectors.toList());
-            Optional<URI> nativeUri = nativeImplConfiguration.map(conf -> conf.getSingleFile().toURI());
+            Optional<URI> nativeUri =
+                    nativeImplConfiguration.map(conf -> conf.getSingleFile().toURI());
             ConfigureJavaFormatterXml.configureJavaFormat(xmlProvider.asNode(), uris, nativeUri, useLegacyFormatter);
             ConfigureJavaFormatterXml.configureExternalDependencies(xmlProvider.asNode());
         });
@@ -104,7 +107,8 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
             List<URI> uris =
                     implConfiguration.getFiles().stream().map(File::toURI).collect(Collectors.toList());
 
-            Optional<URI> nativeImageUri = nativeImplConfiguration.map(conf -> conf.getSingleFile().toURI());
+            Optional<URI> nativeImageUri =
+                    nativeImplConfiguration.map(conf -> conf.getSingleFile().toURI());
 
             createOrUpdateIdeaXmlFile(
                     project.file(".idea/palantir-java-format.xml"),
@@ -153,7 +157,7 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
         configure.accept(rootNode);
 
         try (BufferedWriter writer = Files.newWriter(configurationFile, Charset.defaultCharset());
-             PrintWriter printWriter = new PrintWriter(writer)) {
+                PrintWriter printWriter = new PrintWriter(writer)) {
             XmlNodePrinter nodePrinter = new XmlNodePrinter(printWriter);
             nodePrinter.setPreserveWhitespace(true);
             nodePrinter.print(rootNode);
