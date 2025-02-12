@@ -29,6 +29,6 @@ dependencies {
 
 tasks.named('test', Test.class) {
     inputs.files(configurations.named('formatterNativeImage'))
-    environment.put('NATIVE_IMAGE_CLASSPATH', configurations.named('formatterNativeImage').map { it.asPath })
+    environment.put('NATIVE_IMAGE_CLASSPATH', configurations.formatterNativeImage.asPath)
 }
 
