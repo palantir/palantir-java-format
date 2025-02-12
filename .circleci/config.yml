@@ -19,11 +19,88 @@ aliases:
 
 jobs:
 
-  build-windows:
+  check-build-linux-amd64:
+    docker: [{ image: 'cimg/openjdk:17.0.1-node' }]
+    resource_class: large
+    environment:
+      CIRCLE_TEST_REPORTS: /home/circleci/junit
+      CIRCLE_ARTIFACTS: /home/circleci/artifacts
+      GRADLE_OPTS: -Dorg.gradle.workers.max=2 -Dorg.gradle.jvmargs='-Xmx2147483648 --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED'
+      _JAVA_OPTIONS: -XX:ActiveProcessorCount=4 -XX:MaxRAM=8g -XX:+CrashOnOutOfMemoryError -XX:ErrorFile=/home/circleci/artifacts/hs_err_pid%p.log -XX:HeapDumpPath=/home/circleci/artifacts
+    steps:
+      - checkout
+      - run:
+          name: delete_unrelated_tags
+          command: |
+            ALL_TAGS=$(git tag --points-at HEAD)
+
+            if [ -z "$ALL_TAGS" ]; then
+                echo "No-op as there are no tags on the current commit ($(git rev-parse HEAD))"
+                exit 0
+            fi
+
+            if [ -z "${CIRCLE_TAG:+x}" ]; then
+                echo "Non-tag build, deleting all tags which point to HEAD: [${ALL_TAGS/$'\n'/,}]"
+                echo "$ALL_TAGS" | while read -r TAG; do git tag -d "$TAG" 1>/dev/null; done
+                exit 0
+            fi
+
+            TAGS_TO_DELETE=$(echo "$ALL_TAGS" | grep -v "^$CIRCLE_TAG$" || :)
+            if [ -z "$TAGS_TO_DELETE" ]; then
+                echo "No-op as exactly one tag ($CIRCLE_TAG) points to HEAD"
+                exit 0
+            fi
+
+            echo "Detected tag build, deleting all tags except '$CIRCLE_TAG' which point to HEAD: [${TAGS_TO_DELETE/$'\n'/,}]"
+            echo "$TAGS_TO_DELETE" | while read -r TAG; do git tag -d "$TAG" 1>/dev/null; done
+      - restore_cache: { key: 'gradle-wrapper-v1-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
+      - restore_cache: { key: 'check-gradle-cache-v1-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
+      - run:
+          name: check-setup
+          command: |
+            if [ -x .circleci/check-setup.sh ]; then
+                echo "Running check-setup" && .circleci/check-setup.sh && echo "check-setup complete"
+            fi
+      - run: ./gradlew --parallel --stacktrace --continue --max-workers=2 build
+      - *check-no-files-changed
+      - persist_to_workspace:
+          root: /home/circleci
+          paths: [ project ]
+      - save_cache:
+          key: 'gradle-wrapper-v1-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}'
+          paths: [ ~/.gradle/wrapper ]
+      - save_cache:
+          key: 'check-gradle-cache-v1-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}'
+          paths: [ ~/.gradle/caches ]
+      - run:
+          command: mkdir -p ~/junit && find . -type f -regex ".*/build/.*TEST.*xml" -exec cp --parents {} ~/junit/ \;
+          when: always
+      - store_test_results: { path: ~/junit }
+      - store_artifacts: { path: ~/artifacts }
+
+  build-linux-arm64:
     machine:
-      image: windows-server-2022-gui:current
-    shell: bash.exe
-    resource_class: windows.medium
+      image: ubuntu-2004:current
+    resource_class: arm.medium
+    environment:
+      CIRCLE_TEST_REPORTS: /home/circleci/junit
+      CIRCLE_ARTIFACTS: /home/circleci/artifacts
+      GRADLE_OPTS: -Dorg.gradle.workers.max=2 -Dorg.gradle.jvmargs='-Xmx2147483648 --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED'
+      _JAVA_OPTIONS: -XX:ActiveProcessorCount=4 -XX:MaxRAM=8g -XX:+CrashOnOutOfMemoryError -XX:ErrorFile=/home/circleci/artifacts/hs_err_pid%p.log -XX:HeapDumpPath=/home/circleci/artifacts
+    steps:
+      - checkout
+      - attach_workspace: { at: /home/circleci }
+      - run: ./gradlew --parallel --stacktrace --continue --max-workers=2 nativeCompile
+      - *check-no-files-changed
+      - persist_to_workspace:
+          root: /home/circleci
+          paths: [ project/palantir-java-format/build/native/nativeCompile ]
+      - store_artifacts: { path: ~/artifacts }
+
+  build-macos:
+    macos:
+      xcode: 15.4.0
+    resource_class: macos.m1.medium.gen1
     environment:
       GRADLE_OPTS: -Dorg.gradle.workers.max=2 -Dorg.gradle.jvmargs='-Xmx2147483648 --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED'
       _JAVA_OPTIONS: -XX:ActiveProcessorCount=4 -XX:MaxRAM=8g -XX:+CrashOnOutOfMemoryError
@@ -32,7 +109,7 @@ jobs:
       - run: ./gradlew --parallel --stacktrace --continue --max-workers=2 nativeCompile
       - *check-no-files-changed
       - persist_to_workspace:
-          root: /c/Users/circleci
+          root: /Users/distiller
           paths: [ project/palantir-java-format/build/native/nativeCompile ]
 
   publish:
@@ -48,7 +125,7 @@ jobs:
       - restore_cache: { key: 'gradle-wrapper-v1-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}' }
       - restore_cache: { key: 'publish-gradle-cache-v1-{{ checksum "versions.props" }}-{{ checksum "build.gradle" }}' }
       - deploy:
-          command: ./gradlew --parallel --stacktrace --continue publish=-Porg.gradle.java.installations.fromEnv=JAVA_11_HOME,JAVA_17_HOME,JAVA_21_HOME,JAVA_HOME
+          command: ./gradlew --parallel --stacktrace --continue publish
       - run:
           command: git status --porcelain
           when: always
@@ -69,18 +146,27 @@ jobs:
     steps:
       - attach_workspace: { at: /home/circleci }
       - run: { command: ls -l /home/circleci/project/palantir-java-format/build/native/nativeCompile }
+      - run: { command: ./gradlew publishToMavenLocal --info }
+      - run: { command: ls -l ~/.m2/repository/com/palantir/javaformat/palantir-java-format-native/ }
       - run: { command: echo "All required jobs finished successfully" }
 
 workflows:
   version: 2
   build:
     jobs:
+      - check-build-linux-amd64:
+          filters: { tags: { only: /.*/ } }
 
-      - build-windows:
+      - build-linux-arm64:
+          requires: [ check-build-linux-amd64 ]
+          filters: { tags: { only: /.*/ } }
+
+      - build-macos:
+          requires: [ check-build-linux-amd64 ]
           filters: { tags: { only: /.*/ } }
 
       - circle-all:
-          requires: [ build-windows ]
+          requires: [ check-build-linux-amd64, build-linux-arm64, build-macos ]
           filters: { tags: { only: /.*/ } }
 
       - publish:
