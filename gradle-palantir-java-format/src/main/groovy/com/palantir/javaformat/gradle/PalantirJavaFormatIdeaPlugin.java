@@ -55,26 +55,30 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
             Configuration implConfiguration =
                     rootProject.getConfigurations().getByName(PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME);
 
-            Configuration nativeImplConfiguration = rootProject
-                    .getConfigurations()
-                    .getByName(PalantirJavaFormatProviderPlugin.NATIVE_CONFIGURATION_NAME);
+            Optional<Configuration> nativeImplConfiguration = maybeGetNativeImplConfiguration(rootProject);
 
             configureLegacyIdea(rootProject, implConfiguration, nativeImplConfiguration, useNativeFormatter);
             configureIntelliJImport(rootProject, implConfiguration, nativeImplConfiguration, useNativeFormatter);
         });
     }
 
+    private static Optional<Configuration> maybeGetNativeImplConfiguration(Project rootProject) {
+        return Optional.of(rootProject
+                .getConfigurations()
+                .getByName(PalantirJavaFormatProviderPlugin.NATIVE_CONFIGURATION_NAME));
+    }
+
     private static void configureLegacyIdea(
             Project project,
             Configuration implConfiguration,
-            Configuration nativeImplConfiguration,
+            Optional<Configuration> nativeImplConfiguration,
             Boolean useLegacyFormatter) {
         IdeaModel ideaModel = project.getExtensions().getByType(IdeaModel.class);
         ideaModel.getProject().getIpr().withXml(xmlProvider -> {
             // this block is lazy
             List<URI> uris =
                     implConfiguration.getFiles().stream().map(File::toURI).collect(Collectors.toList());
-            URI nativeUri = nativeImplConfiguration.getSingleFile().toURI();
+            Optional<URI> nativeUri = nativeImplConfiguration.map(conf -> conf.getSingleFile().toURI());
             ConfigureJavaFormatterXml.configureJavaFormat(xmlProvider.asNode(), uris, nativeUri, useLegacyFormatter);
             ConfigureJavaFormatterXml.configureExternalDependencies(xmlProvider.asNode());
         });
@@ -87,7 +91,7 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
     private static void configureIntelliJImport(
             Project project,
             Configuration implConfiguration,
-            Configuration nativeImplConfiguration,
+            Optional<Configuration> nativeImplConfiguration,
             Boolean useNativeFormatter) {
         // Note: we tried using 'org.jetbrains.gradle.plugin.idea-ext' and afterSync triggers, but these are currently
         // very hard to manage as the tasks feel disconnected from the Sync operation, and you can't remove them once
@@ -100,7 +104,7 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
             List<URI> uris =
                     implConfiguration.getFiles().stream().map(File::toURI).collect(Collectors.toList());
 
-            URI nativeImageUri = nativeImplConfiguration.getSingleFile().toURI();
+            Optional<URI> nativeImageUri = nativeImplConfiguration.map(conf -> conf.getSingleFile().toURI());
 
             createOrUpdateIdeaXmlFile(
                     project.file(".idea/palantir-java-format.xml"),
@@ -149,7 +153,7 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
         configure.accept(rootNode);
 
         try (BufferedWriter writer = Files.newWriter(configurationFile, Charset.defaultCharset());
-                PrintWriter printWriter = new PrintWriter(writer)) {
+             PrintWriter printWriter = new PrintWriter(writer)) {
             XmlNodePrinter nodePrinter = new XmlNodePrinter(printWriter);
             nodePrinter.setPreserveWhitespace(true);
             nodePrinter.print(rootNode);

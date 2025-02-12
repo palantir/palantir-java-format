@@ -17,7 +17,6 @@
 package com.palantir.javaformat.gradle
 
 import nebula.test.IntegrationTestKitSpec
-import org.junit.jupiter.api.Disabled
 import spock.lang.Ignore
 
 class PalantirJavaFormatIdeaPluginTest extends IntegrationTestKitSpec {

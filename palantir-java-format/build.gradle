@@ -197,12 +197,12 @@ private static String getCurrentArch() {
 }
 
 configurations {
-    consumableNativeImage {
+    nativeImage {
         canBeConsumed = true
         canBeResolved = false
         outgoing.artifact(tasks.named('nativeCompile').map(task -> task.getOutputFile()))
         attributes {
-            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements, 'consumableNativeImage'))
+            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements, 'nativeImage'))
         }
     }
 }

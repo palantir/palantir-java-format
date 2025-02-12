@@ -2,8 +2,8 @@ apply plugin: 'distribution'
 apply plugin: 'me.champeau.jmh'
 
 configurations {
-    consumingNativeImage
-    consumingPalantirJars
+    formatterNativeImage
+    formatterNativeJars
 }
 
 dependencies {
@@ -14,10 +14,10 @@ dependencies {
     jmhImplementation 'org.junit.jupiter:junit-jupiter'
     jmhImplementation 'org.openjdk.jmh:jmh-core'
     jmhImplementation 'org.openjdk.jmh:jmh-generator-annprocess'
-    consumingPalantirJars (project(':palantir-java-format'))
-    consumingNativeImage(project(':palantir-java-format')) {
+    formatterNativeJars (project(':palantir-java-format'))
+    formatterNativeImage(project(':palantir-java-format')) {
         attributes {
-            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements, 'consumableNativeImage'))
+            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements, 'nativeImage'))
         }
     }
 }
@@ -25,10 +25,10 @@ dependencies {
 import me.champeau.jmh.JMHTask
 
 tasks.named('jmh', JMHTask.class) {
-    inputs.files(configurations.consumingNativeImage)
-    inputs.files(configurations.consumingPalantirJars)
-    environment.put('NATIVE_IMAGE_CLASSPATH', configurations.consumingNativeImage.asPath)
-    environment.put('JARS_CLASSPATH', configurations.consumingPalantirJars.collect { it.absolutePath }.join(":"))
+    inputs.files(configurations.named('formatterNativeImage'))
+    inputs.files(configurations.named('formatterNativeJars'))
+    environment.put('NATIVE_IMAGE_CLASSPATH', configurations.named('formatterNativeImage').map { it.asPath })
+    environment.put('JARS_CLASSPATH', configurations.named('formatterNativeJars').map { conf -> conf.collect { it.absolutePath }.join(":") })
 }
 
 jmhCompileGeneratedClasses {

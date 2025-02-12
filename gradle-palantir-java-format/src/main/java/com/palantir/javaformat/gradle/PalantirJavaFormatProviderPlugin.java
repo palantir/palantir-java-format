@@ -24,11 +24,14 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.type.ArtifactTypeDefinition;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 
 public final class PalantirJavaFormatProviderPlugin implements Plugin<Project> {
 
     static final String CONFIGURATION_NAME = "palantirJavaFormat";
     static final String NATIVE_CONFIGURATION_NAME = "palantirJavaFormatNative";
+    static final Logger log = Logging.getLogger(PalantirJavaFormatProviderPlugin.class);
 
     @Override
     public void apply(Project rootProject) {
@@ -50,27 +53,28 @@ public final class PalantirJavaFormatProviderPlugin implements Plugin<Project> {
                                 "com.palantir.javaformat:palantir-java-format:%s", implementationVersion)));
             });
         });
-
-        rootProject.getConfigurations().register(NATIVE_CONFIGURATION_NAME, conf -> {
-            conf.setDescription("Internal configuration for resolving the palantir-java-format native image");
-            conf.setVisible(false);
-            conf.setCanBeConsumed(false);
-            conf.setCanBeResolved(true);
-            conf.defaultDependencies(deps -> {
-                deps.add(rootProject
-                        .getDependencies()
-                        .create(String.format(
-                                "com.palantir.javaformat:palantir-java-format-native:%s:nativeImage-%s-%s@%s",
-                                implementationVersion, getCurrentArch(), getCurrentOs(), getExtension())));
-            });
-            conf.getAttributes().attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "executable-nativeImage");
-        });
-        rootProject.getDependencies().registerTransform(ExecutableTransform.class, transformSpec -> {
-            transformSpec.getFrom().attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, getExtension());
-            transformSpec.getTo().attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "executable-nativeImage");
-        });
-
         rootProject.getExtensions().create("palantirJavaFormat", JavaFormatExtension.class, configuration);
+
+        if (isNativeImageSupported()) {
+            rootProject.getConfigurations().register(NATIVE_CONFIGURATION_NAME, conf -> {
+                conf.setDescription("Internal configuration for resolving the palantir-java-format native image");
+                conf.setVisible(false);
+                conf.setCanBeConsumed(false);
+                conf.setCanBeResolved(true);
+                conf.defaultDependencies(deps -> {
+                    deps.add(rootProject
+                            .getDependencies()
+                            .create(String.format(
+                                    "com.palantir.javaformat:palantir-java-format-native:%s:nativeImage-%s-%s@%s",
+                                    implementationVersion, getCurrentArch(), getCurrentOs(), getExtension())));
+                });
+                conf.getAttributes().attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "executable-nativeImage");
+            });
+            rootProject.getDependencies().registerTransform(ExecutableTransform.class, transformSpec -> {
+                transformSpec.getFrom().attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, getExtension());
+                transformSpec.getTo().attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "executable-nativeImage");
+            });
+        }
     }
 
     private static String getExtension() {
@@ -105,5 +109,18 @@ public final class PalantirJavaFormatProviderPlugin implements Plugin<Project> {
             return "x86";
         }
         throw new GradleException(String.format("Invalid Operating System %s", osArch));
+    }
+
+
+    private static boolean isNativeImageSupported() {
+        //TODO(crogoz): check if musl or glibc
+        if (getCurrentOs().equals("linux")) {
+            return true;
+        }
+        if (getCurrentOs().equals("macos") && getCurrentArch().equals("aarh64")) {
+            return true;
+        }
+        log.info("Not using the native image for the current OS and Arch");
+        return false;
     }
 }

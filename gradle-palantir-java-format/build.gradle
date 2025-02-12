@@ -86,7 +86,7 @@ dependencies {
     impl project(':palantir-java-format')
     consumingNativeImage(project(':palantir-java-format')) {
         attributes {
-            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements, 'consumableNativeImage'))
+            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements, 'nativeImage'))
         }
     }
 
