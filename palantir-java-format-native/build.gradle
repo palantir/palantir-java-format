@@ -76,17 +76,15 @@ tasks.named("nativeRun", org.graalvm.buildtools.gradle.tasks.NativeRunTask) {
 def osExtension = operatingSystem == OperatingSystem.MACOS ? 'bin' : 'exe'
 
 externalPublishing {
-    publishing {
-        publications {
-            nativeImage(MavenPublication) {
-                fileTree("build/native/nativeCompile", { it.include("**/*") }).forEach { file ->
-                    artifact(file) {
-                        classifier = String.format("nativeImage-%s", getOsArchName(file))
-                        extension = osExtension
-                    }
-                }
+    publication('nativeImage') {
+        fileTree("build/native/nativeCompile", { it.include("**/*") }).forEach { file ->
+            artifact(file) {
+                classifier = String.format("nativeImage-%s", getOsArchName(file))
+                extension = osExtension
+                builtBy(tasks.named('nativeCompile'))
             }
         }
+
     }
 }
 
