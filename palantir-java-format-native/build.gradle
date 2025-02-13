@@ -39,7 +39,6 @@ def exports = [
 
 def jvmArgList = exports.collect { value -> "--add-exports=${value}=ALL-UNNAMED".toString() }
 
-
 graalvmNative {
     binaries {
         main {
@@ -73,19 +72,27 @@ tasks.named("nativeRun", org.graalvm.buildtools.gradle.tasks.NativeRunTask) {
     runtimeArgs.addAll(project.hasProperty('appArgs') ? project.appArgs.split(',') : [])
 }
 
-def osExtension = operatingSystem == OperatingSystem.MACOS ? 'bin' : 'exe'
-
 externalPublishing {
     publication('nativeImage') {
         fileTree("build/native/nativeCompile", { it.include("**/*") }).forEach { file ->
             artifact(file) {
                 classifier = String.format("nativeImage-%s", getOsArchName(file))
-                extension = osExtension
-                builtBy(tasks.named('nativeCompile'))
+                extension = getExtension(file)
             }
         }
-
     }
+}
+
+private static String getExtension(File file) {
+    Pattern pattern = Pattern.compile("palantir-java-format-(.*)-(.*)\$");
+    Matcher matcher = pattern.matcher(file.name)
+    if (matcher.find()) {
+        return OperatingSystem.fromString(matcher.group(1))
+                .orElseThrow(() -> new GradleException(
+                        String.format("Unexpected Operating System", matcher.group(1))))
+                == OperatingSystem.WINDOWS ? "exe" : "bin"
+    }
+    throw new GradleException("Could not determine OS name from file name: ${file.name}")
 }
 
 private static String getOsArchName(File file) {
