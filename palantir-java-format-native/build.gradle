@@ -72,13 +72,19 @@ tasks.named("nativeRun", org.graalvm.buildtools.gradle.tasks.NativeRunTask) {
     runtimeArgs.addAll(project.hasProperty('appArgs') ? project.appArgs.split(',') : [])
 }
 
+import org.graalvm.buildtools.gradle.tasks.BuildNativeImageTask
+
 externalPublishing {
     publication('nativeImage') {
-        fileTree("build/native/nativeCompile", { it.include("**/*") }).forEach { file ->
+        fileTree("build/native/nativeCompile", { it.include("**/*"); it.exclude(String.format("**/palantir-java-format-%s-%s", operatingSystem.uiName(), architecture.uiName())) }).forEach { file ->
             artifact(file) {
                 classifier = String.format("nativeImage-%s", getOsArchName(file))
                 extension = getExtension(file)
             }
+        }
+        artifact(tasks.named('nativeCompile', BuildNativeImageTask.class).map { it.getOutputFile() }) {
+            classifier = String.format("nativeImage-%s", getOsArchName(it.getFile()))
+            extension = getExtension(it.getFile())
         }
     }
 }
@@ -87,9 +93,7 @@ private static String getExtension(File file) {
     Pattern pattern = Pattern.compile("palantir-java-format-(.*)-(.*)\$");
     Matcher matcher = pattern.matcher(file.name)
     if (matcher.find()) {
-        return OperatingSystem.fromString(matcher.group(1))
-                .orElseThrow(() -> new GradleException(
-                        String.format("Unexpected Operating System", matcher.group(1))))
+        return OperatingSystem.fromStringThrowing(matcher.group(1))
                 == OperatingSystem.WINDOWS ? "exe" : "bin"
     }
     throw new GradleException("Could not determine OS name from file name: ${file.name}")
