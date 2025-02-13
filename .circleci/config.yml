@@ -136,10 +136,19 @@ jobs:
       - store_artifacts: { path: ~/artifacts }
 
   circle-all:
-    docker: [{ image: 'busybox:1.36.1@sha256:6d9ac9237a84afe1516540f40a0fafdc86859b2141954b4d643af7066d598b74' }]
-    resource_class: small
+    docker: [{ image: 'cimg/openjdk:17.0.10-node' }]
+    resource_class: medium
+    environment:
+      CIRCLE_TEST_REPORTS: /home/circleci/junit
+      CIRCLE_ARTIFACTS: /home/circleci/artifacts
+      GRADLE_OPTS: -Dorg.gradle.workers.max=1 -Dorg.gradle.jvmargs='-Xmx2147483648 --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED'
+      _JAVA_OPTIONS: -XX:ActiveProcessorCount=2 -XX:MaxRAM=4g -XX:+CrashOnOutOfMemoryError -XX:ErrorFile=/home/circleci/artifacts/hs_err_pid%p.log -XX:HeapDumpPath=/home/circleci/artifacts
     steps:
-      - run: {command: echo "All required jobs finished successfully"}
+      - attach_workspace: { at: /home/circleci }
+      - run: { command: ls -l /home/circleci/project/palantir-java-format-native/build/native/nativeCompile }
+      - run: { command: ./gradlew publishToMavenLocal --info }
+      - run: { command: ls -l ~/.m2/repository/com/palantir/javaformat/palantir-java-format-native/ }
+      - run: { command: echo "All required jobs finished successfully" }
 
 workflows:
   version: 2
