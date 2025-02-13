@@ -94,7 +94,7 @@ jobs:
       - *check-no-files-changed
       - persist_to_workspace:
           root: /home/circleci
-          paths: [ project/palantir-java-format/build/native/nativeCompile ]
+          paths: [ project/palantir-java-format-native/build/native/nativeCompile ]
       - store_artifacts: { path: ~/artifacts }
 
   build-macos:
@@ -110,7 +110,7 @@ jobs:
       - *check-no-files-changed
       - persist_to_workspace:
           root: /Users/distiller
-          paths: [ project/palantir-java-format/build/native/nativeCompile ]
+          paths: [ project/palantir-java-format-native/build/native/nativeCompile ]
 
   publish:
     docker: [{ image: 'cimg/openjdk:17.0.10-node' }]
