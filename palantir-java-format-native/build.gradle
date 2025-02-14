@@ -1,0 +1,130 @@
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+import java.util.Optional
+import org.graalvm.buildtools.gradle.tasks.BuildNativeImageTask
+
+buildscript {
+    repositories {
+        mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
+        gradlePluginPortal() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
+    }
+    dependencies {
+        classpath 'org.graalvm.buildtools:native-gradle-plugin:0.10.4'
+        classpath 'com.palantir.gradle.utils:platform:0.10.0'
+    }
+}
+
+
+apply plugin: 'java-library'
+apply plugin: 'org.graalvm.buildtools.native'
+apply plugin: 'com.palantir.external-publish-custom'
+
+dependencies {
+    implementation project(':palantir-java-format')
+}
+
+import com.palantir.platform.OperatingSystem
+import com.palantir.platform.Architecture
+
+def operatingSystem = OperatingSystem.get()
+def architecture = Architecture.get()
+
+def exports = [
+        'jdk.compiler/com.sun.tools.javac.file',
+        'jdk.compiler/com.sun.tools.javac.main',
+        'jdk.compiler/com.sun.tools.javac.parser',
+        'jdk.compiler/com.sun.tools.javac.tree',
+        'jdk.compiler/com.sun.tools.javac.util',
+        'jdk.compiler/com.sun.tools.javac.code',
+        'jdk.compiler/com.sun.tools.javac.api'
+]
+
+def jvmArgList = exports.collect { value -> "--add-exports=${value}=ALL-UNNAMED".toString() }
+
+graalvmNative {
+    binaries {
+        main {
+            javaLauncher = javaToolchains.launcherFor {
+                languageVersion = JavaLanguageVersion.of(23)
+                vendor = JvmVendorSpec.GRAAL_VM
+            }
+            imageName = String.format('palantir-java-format-%s_%s', operatingSystem.uiName(), architecture.uiName())
+            mainClass = 'com.palantir.javaformat.java.Main'
+            fallback = false
+            sharedLibrary = false
+            classpath.setFrom(configurations.named('runtimeClasspath'))
+            configurationFileDirectories.from(file('src/main/resources/META-INF/native-image'))
+            buildArgs.addAll("-H:ConfigurationFileDirectories=${projectDir}/src/main/resources/META-INF/native-image",
+                    '-H:+UnlockExperimentalVMOptions',
+                    '-H:IncludeResourceBundles=com.sun.tools.javac.resources.compiler',
+                    '-H:IncludeResourceBundles=com.sun.tools.javac.resources.javac',
+                    '--no-fallback',
+                    '--initialize-at-build-time=com.sun.tools.javac.file.Locations',
+                    '-H:+ReportExceptionStackTraces',
+                    '-H:-UseContainerSupport',
+                    "-march=compatibility")
+            jvmArgs.addAll(jvmArgList)
+        }
+    }
+}
+
+
+// The image requires parameters to be passed to; eg. gw nativeRun -Pargs=--palantir,-i,<file>
+tasks.named("nativeRun", org.graalvm.buildtools.gradle.tasks.NativeRunTask) {
+    runtimeArgs.addAll(project.hasProperty('appArgs') ? project.appArgs.split(',') : [])
+}
+
+if (Optional.ofNullable(System.getenv("CI")).isPresent()) {
+    externalPublishing {
+        publication('nativeImage') {
+            fileTree("build/native/nativeCompile", { it.include("**/*") }).forEach { file ->
+                artifact(file) {
+                    classifier = String.format("nativeImage-%s", getOsArchName(file))
+                    extension = getExtension(file)
+                }
+            }
+        }
+    }
+} else {
+    logger.info("Configuring local publishing, skipping the external publishing setup because CI was not detected")
+    publishing {
+        publications {
+            nativeImage(MavenPublication) {
+                artifact(tasks.named('nativeCompile', BuildNativeImageTask.class).map { it.getOutputFile() }) {
+                    classifier = String.format("nativeImage-%s", getOsArchName(it.getFile()))
+                    extension = getExtension(it.getFile())
+                }
+            }
+        }
+    }
+}
+
+private static String getExtension(File file) {
+    Pattern pattern = Pattern.compile("palantir-java-format-(.*)_(.*)\$");
+    Matcher matcher = pattern.matcher(file.name)
+    if (matcher.find()) {
+        return OperatingSystem.fromStringThrowing(matcher.group(1))
+                == OperatingSystem.WINDOWS ? "exe" : "bin"
+    }
+    throw new GradleException("Could not determine OS name from file name: ${file.name}")
+}
+
+private static String getOsArchName(File file) {
+    Pattern pattern = Pattern.compile("palantir-java-format-(.*)_(.*)\$");
+    Matcher matcher = pattern.matcher(file.name)
+    if (matcher.find()) {
+        return matcher.group(1) + "_" + matcher.group(2)
+    }
+    throw new GradleException("Could not determine OS name from file name: ${file.name}")
+}
+
+configurations {
+    nativeImage {
+        canBeConsumed = true
+        canBeResolved = false
+        outgoing.artifact(tasks.named('nativeCompile').map(task -> task.getOutputFile()))
+        attributes {
+            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements, 'nativeImage'))
+        }
+    }
+}
