@@ -147,7 +147,7 @@ jobs:
       - attach_workspace: { at: /home/circleci }
       - run: { command: ls -l /home/circleci/project/palantir-java-format-native/build/native/nativeCompile }
       - run: { command: ./gradlew publishToMavenLocal --info }
-      - run: { command: ls -l ~/.m2/repository/com/palantir/javaformat/palantir-java-format-native/ }
+      - run: { command: ls -l ~/.m2/repository/com/palantir/javaformat/palantir-java-format-native/*/ }
       - run: { command: echo "All required jobs finished successfully" }
 
 workflows:

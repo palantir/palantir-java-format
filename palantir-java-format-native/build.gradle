@@ -1,5 +1,7 @@
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+import java.util.Optional
+import org.graalvm.buildtools.gradle.tasks.BuildNativeImageTask
 
 buildscript {
     repositories {
@@ -72,25 +74,25 @@ tasks.named("nativeRun", org.graalvm.buildtools.gradle.tasks.NativeRunTask) {
     runtimeArgs.addAll(project.hasProperty('appArgs') ? project.appArgs.split(',') : [])
 }
 
-import org.graalvm.buildtools.gradle.tasks.BuildNativeImageTask
-
-externalPublishing {
-    publication('nativeImage') {
-        fileTree("build/native/nativeCompile", { it.include("**/*")}).forEach { file ->
-            artifact(file) {
-                classifier = String.format("nativeImage-%s", getOsArchName(file))
-                extension = getExtension(file)
+if (Optional.ofNullable(System.getenv("CI")).isEmpty()) {
+    externalPublishing {
+        publication('nativeImage') {
+            fileTree("build/native/nativeCompile", { it.include("**/*") }).forEach { file ->
+                artifact(file) {
+                    classifier = String.format("nativeImage-%s", getOsArchName(file))
+                    extension = getExtension(file)
+                }
             }
         }
     }
-}
-
-publishing {
-    publications {
-        nativeImage(MavenPublication) {
-            artifact(tasks.named('nativeCompile', BuildNativeImageTask.class).map { it.getOutputFile() }) {
-                classifier = String.format("nativeImage-%s", getOsArchName(it.getFile()))
-                extension = getExtension(it.getFile())
+} else {
+    publishing {
+        publications {
+            nativeImage(MavenPublication) {
+                artifact(tasks.named('nativeCompile', BuildNativeImageTask.class).map { it.getOutputFile() }) {
+                    classifier = String.format("nativeImage-%s", getOsArchName(it.getFile()))
+                    extension = getExtension(it.getFile())
+                }
             }
         }
     }
