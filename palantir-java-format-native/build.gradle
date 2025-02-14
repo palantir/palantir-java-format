@@ -86,6 +86,7 @@ if (Optional.ofNullable(System.getenv("CI")).isPresent()) {
         }
     }
 } else {
+    logger.info("Configuring local publishing, skipping the external publishing setup because CI env varis not detected")
     publishing {
         publications {
             nativeImage(MavenPublication) {
