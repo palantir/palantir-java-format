@@ -74,7 +74,7 @@ tasks.named("nativeRun", org.graalvm.buildtools.gradle.tasks.NativeRunTask) {
     runtimeArgs.addAll(project.hasProperty('appArgs') ? project.appArgs.split(',') : [])
 }
 
-if (Optional.ofNullable(System.getenv("CI")).isEmpty()) {
+if (Optional.ofNullable(System.getenv("CI")).isPresent()) {
     externalPublishing {
         publication('nativeImage') {
             fileTree("build/native/nativeCompile", { it.include("**/*") }).forEach { file ->
