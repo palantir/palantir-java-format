@@ -76,15 +76,22 @@ import org.graalvm.buildtools.gradle.tasks.BuildNativeImageTask
 
 externalPublishing {
     publication('nativeImage') {
-        fileTree("build/native/nativeCompile", { it.include("**/*.bin", "**/*.exe"); it.exclude(String.format("**/palantir-java-format-%s_%s", operatingSystem.uiName(), architecture.uiName())) }).forEach { file ->
+        fileTree("build/native/nativeCompile", { it.include("**/*")}).forEach { file ->
             artifact(file) {
                 classifier = String.format("nativeImage-%s", getOsArchName(file))
                 extension = getExtension(file)
             }
         }
-        artifact(tasks.named('nativeCompile', BuildNativeImageTask.class).map { it.getOutputFile() }) {
-            classifier = String.format("nativeImage-%s", getOsArchName(it.getFile()))
-            extension = getExtension(it.getFile())
+    }
+}
+
+publishing {
+    publications {
+        nativeImage(MavenPublication) {
+            artifact(tasks.named('nativeCompile', BuildNativeImageTask.class).map { it.getOutputFile() }) {
+                classifier = String.format("nativeImage-%s", getOsArchName(it.getFile()))
+                extension = getExtension(it.getFile())
+            }
         }
     }
 }
