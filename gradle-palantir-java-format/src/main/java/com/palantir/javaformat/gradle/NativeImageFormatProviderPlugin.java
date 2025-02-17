@@ -52,7 +52,7 @@ public final class NativeImageFormatProviderPlugin implements Plugin<Project> {
                 deps.add(rootProject
                         .getDependencies()
                         .create(String.format(
-                                "com.palantir.javaformat:palantir-java-format-native:%s:nativeImage-%s-%s@%s",
+                                "com.palantir.javaformat:palantir-java-format-native:%s:nativeImage-%s_%s@%s",
                                 implementationVersion, getCurrentArch(), getCurrentOs(), getExtension())));
             });
             conf.getAttributes().attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "executable-nativeImage");
