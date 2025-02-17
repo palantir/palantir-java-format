@@ -33,6 +33,8 @@ import com.intellij.openapi.util.SystemInfo;
 import com.palantir.javaformat.bootstrap.BootstrappingFormatterService;
 import com.palantir.javaformat.bootstrap.NativeImageFormatterService;
 import com.palantir.javaformat.java.FormatterService;
+import com.palantir.platform.Architecture;
+import com.palantir.platform.OperatingSystem;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -66,8 +68,14 @@ final class FormatterProvider {
                 getSdkVersion(project),
                 settings.getImplementationClassPath(),
                 settings.getNativeImageClassPath(),
-                settings.getUseNativeImageClassPath(),
+                isNativeImageSupported() && settings.getUseNativeImageClassPath(),
                 settings.injectedVersionIsOutdated()));
+    }
+
+    public static boolean isNativeImageSupported() {
+        OperatingSystem os = OperatingSystem.get();
+        return os.equals(OperatingSystem.LINUX_GLIBC)
+                || (os.equals(OperatingSystem.MACOS) && Architecture.get().equals(Architecture.AARCH64));
     }
 
     @SuppressWarnings("for-rollout:Slf4jLogsafeArgs")

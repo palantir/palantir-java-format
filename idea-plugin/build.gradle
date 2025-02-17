@@ -60,6 +60,7 @@ dependencies {
         // Has class version conflicts with slf4j brought in by Intellij
         exclude group: 'org.slf4j', module: 'slf4j-api'
     }
+    implementation 'com.palantir.gradle.utils:platform'
 
     formatter project(':palantir-java-format')
 
