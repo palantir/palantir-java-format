@@ -22,6 +22,7 @@ class PalantirJavaFormatPluginTest extends IntegrationTestKitSpec {
 
     /** ./gradlew writeImplClasspath generates this file. */
     private static final CLASSPATH_FILE = new File("build/impl.classpath").absolutePath
+    private static final NATIVE_IMAGE_FILE = new File("build/nativeImage.path").absolutePath
 
     void setup() {
         buildFile << """
@@ -32,6 +33,7 @@ class PalantirJavaFormatPluginTest extends IntegrationTestKitSpec {
             
             dependencies {
                 palantirJavaFormat files(file("${CLASSPATH_FILE}").text.split(':'))
+                palantirJavaFormatNative(files(file("${NATIVE_IMAGE_FILE}").text))
             }
             apply plugin: 'idea'
         """.stripIndent()
