@@ -16,11 +16,18 @@
 
 package com.palantir.javaformat.gradle;
 
+import com.palantir.javaformat.bootstrap.NativeImageFormatterService;
 import com.palantir.javaformat.java.FormatterService;
 import java.io.IOException;
+import java.nio.file.Path;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
+import org.gradle.api.provider.Property;
+import org.gradle.api.provider.Provider;
+import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
 
 public final class PalantirJavaFormatPlugin implements Plugin<Project> {
@@ -28,19 +35,39 @@ public final class PalantirJavaFormatPlugin implements Plugin<Project> {
     @Override
     public void apply(Project project) {
         project.getRootProject().getPlugins().apply(PalantirJavaFormatProviderPlugin.class);
+        project.getRootProject().getPlugins().apply(NativeImageFormatProviderPlugin.class);
         project.getRootProject().getPlugins().apply(PalantirJavaFormatIdeaPlugin.class);
 
         project.getPlugins().apply(PalantirJavaFormatSpotlessPlugin.class);
 
         project.getPlugins().withId("java", p -> {
-            project.getTasks().register("formatDiff", FormatDiffTask.class);
-
-            // TODO(dfox): in the future we may want to offer a simple 'format' task so people don't need to use
-            // spotless to try out our formatter
+            project.getTasks().register("formatDiff", FormatDiffTask.class, task -> {
+                if (NativeImageFormatProviderPlugin.isNativeImageSupported()
+                        && NativeImageFormatProviderPlugin.shouldUseNativeImage(project)) {
+                    task.getNativeImage().set(getNativeImplConfiguration(project));
+                }
+            });
         });
+
+        // TODO(dfox): in the future we may want to offer a simple 'format' task so people don't need to use
+        // spotless to try out our formatter
     }
 
-    public static class FormatDiffTask extends DefaultTask {
+    private static Provider<Path> getNativeImplConfiguration(Project project) {
+        return (project.getRootProject()
+                .getConfigurations()
+                .named(NativeImageFormatProviderPlugin.NATIVE_CONFIGURATION_NAME)
+                .map(conf -> conf.getSingleFile().toPath()));
+    }
+
+    public abstract static class FormatDiffTask extends DefaultTask {
+
+        private static Logger log = Logging.getLogger(FormatDiffTask.class);
+
+        @org.gradle.api.tasks.Optional
+        @Input
+        abstract Property<Path> getNativeImage();
+
         public FormatDiffTask() {
             setDescription("Format only chunks of files that appear in git diff");
             setGroup("Formatting");
@@ -48,10 +75,18 @@ public final class PalantirJavaFormatPlugin implements Plugin<Project> {
 
         @TaskAction
         public final void formatDiff() throws IOException, InterruptedException {
-            JavaFormatExtension extension =
-                    getProject().getRootProject().getExtensions().getByType(JavaFormatExtension.class);
-            FormatterService formatterService = extension.serviceLoad();
-            FormatDiff.formatDiff(getProject().getProjectDir().toPath(), formatterService);
+            if (getNativeImage().isPresent()) {
+                log.info("Using the native-image to format");
+                FormatDiff.formatDiff(
+                        getProject().getProjectDir().toPath(),
+                        new NativeImageFormatterService(getNativeImage().get()));
+            } else {
+                log.info("Using legacy java formatter");
+                JavaFormatExtension extension =
+                        getProject().getRootProject().getExtensions().getByType(JavaFormatExtension.class);
+                FormatterService formatterService = extension.serviceLoad();
+                FormatDiff.formatDiff(getProject().getProjectDir().toPath(), formatterService);
+            }
         }
     }
 }

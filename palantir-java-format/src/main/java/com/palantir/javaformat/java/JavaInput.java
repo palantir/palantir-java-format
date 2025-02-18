@@ -266,6 +266,7 @@ public final class JavaInput extends Input {
      * @param text the input text
      * @throws FormatterException if the input cannot be parsed
      */
+    @SuppressWarnings("for-rollout:NullAway")
     public JavaInput(String text) throws FormatterException {
         this.text = checkNotNull(text);
         setLines(ImmutableList.copyOf(Newlines.lineIterator(text)));
@@ -344,6 +345,7 @@ public final class JavaInput extends Input {
      * @param stopTokens a set of tokens which should cause lexing to stop. If one of these is found, the returned list
      *     will include tokens up to but not including that token.
      */
+    @SuppressWarnings("for-rollout:NullAway")
     static ImmutableList<Tok> buildToks(String text, ImmutableSet<TokenKind> stopTokens) throws FormatterException {
         stopTokens = ImmutableSet.<TokenKind>builder()
                 .addAll(stopTokens)

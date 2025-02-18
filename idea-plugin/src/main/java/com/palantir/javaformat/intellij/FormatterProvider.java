@@ -31,7 +31,10 @@ import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.BuildNumber;
 import com.intellij.openapi.util.SystemInfo;
 import com.palantir.javaformat.bootstrap.BootstrappingFormatterService;
+import com.palantir.javaformat.bootstrap.NativeImageFormatterService;
 import com.palantir.javaformat.java.FormatterService;
+import com.palantir.platform.Architecture;
+import com.palantir.platform.OperatingSystem;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -64,10 +67,25 @@ final class FormatterProvider {
                 project,
                 getSdkVersion(project),
                 settings.getImplementationClassPath(),
+                settings.getNativeImageClassPath(),
+                isNativeImageSupported() && settings.getUseNativeImageClassPath(),
                 settings.injectedVersionIsOutdated()));
     }
 
+    public static boolean isNativeImageSupported() {
+        OperatingSystem os = OperatingSystem.get();
+        return os.equals(OperatingSystem.LINUX_GLIBC)
+                || (os.equals(OperatingSystem.MACOS) && Architecture.get().equals(Architecture.AARCH64));
+    }
+
+    @SuppressWarnings("for-rollout:Slf4jLogsafeArgs")
     private static Optional<FormatterService> createFormatter(FormatterCacheKey cacheKey) {
+        if (cacheKey.useNativeImageClassPath) {
+            Preconditions.checkState(
+                    cacheKey.nativeImageClassPath.isPresent(), "Unable to determine native image path %s", cacheKey);
+            log.info("Using the native formatter with classpath: {}", cacheKey.nativeImageClassPath.get());
+            return Optional.of(new NativeImageFormatterService(Path.of(cacheKey.nativeImageClassPath.get())));
+        }
         if (cacheKey.jdkMajorVersion.isEmpty()) {
             return Optional.empty();
         }
@@ -107,6 +125,7 @@ final class FormatterProvider {
         return implementationClasspath.stream().map(Path::of).collect(Collectors.toList());
     }
 
+    @SuppressWarnings("for-rollout:Slf4jLogsafeArgs")
     private static List<Path> getBundledImplementationUrls() {
         // Load from the jars bundled with the plugin.
         IdeaPluginDescriptor ourPlugin = Preconditions.checkNotNull(
@@ -116,6 +135,7 @@ final class FormatterProvider {
         return listDirAsUrlsUnchecked(implDir);
     }
 
+    @SuppressWarnings("for-rollout:Slf4jLogsafeArgs")
     private static List<Path> getImplementationUrls(
             Optional<List<URI>> implementationClassPath, boolean useBundledImplementation) {
         if (useBundledImplementation) {
@@ -163,6 +183,7 @@ final class FormatterProvider {
         return parseSdkJavaVersion(version);
     }
 
+    @SuppressWarnings("for-rollout:Slf4jLogsafeArgs")
     @VisibleForTesting
     static OptionalInt parseSdkJavaVersion(String version) {
         int indexOfVersionDelimiter = version.indexOf('.');
@@ -205,16 +226,22 @@ final class FormatterProvider {
         private final Project project;
         private final OptionalInt jdkMajorVersion;
         private final Optional<List<URI>> implementationClassPath;
+        private final Optional<URI> nativeImageClassPath;
+        private final Boolean useNativeImageClassPath;
         private final boolean useBundledImplementation;
 
         FormatterCacheKey(
                 Project project,
                 OptionalInt jdkMajorVersion,
                 Optional<List<URI>> implementationClassPath,
+                Optional<URI> nativeImageClassPath,
+                Boolean useNativeImageClassPath,
                 boolean useBundledImplementation) {
             this.project = project;
             this.jdkMajorVersion = jdkMajorVersion;
             this.implementationClassPath = implementationClassPath;
+            this.nativeImageClassPath = nativeImageClassPath;
+            this.useNativeImageClassPath = useNativeImageClassPath;
             this.useBundledImplementation = useBundledImplementation;
         }
 
@@ -230,12 +257,20 @@ final class FormatterProvider {
             return Objects.equals(jdkMajorVersion, that.jdkMajorVersion)
                     && useBundledImplementation == that.useBundledImplementation
                     && Objects.equals(project, that.project)
-                    && Objects.equals(implementationClassPath, that.implementationClassPath);
+                    && Objects.equals(implementationClassPath, that.implementationClassPath)
+                    && Objects.equals(nativeImageClassPath, that.nativeImageClassPath)
+                    && Objects.equals(useNativeImageClassPath, that.useNativeImageClassPath);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(project, jdkMajorVersion, implementationClassPath, useBundledImplementation);
+            return Objects.hash(
+                    project,
+                    jdkMajorVersion,
+                    implementationClassPath,
+                    nativeImageClassPath,
+                    useNativeImageClassPath,
+                    useBundledImplementation);
         }
     }
 }

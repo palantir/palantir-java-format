@@ -117,6 +117,7 @@ public class RemoveUnusedImports {
 
         private static final Method CASE_TREE_GET_LABELS = caseTreeGetLabels();
 
+        @SuppressWarnings("for-rollout:NullAway")
         private static Method caseTreeGetLabels() {
             try {
                 return CaseTree.class.getMethod("getLabels");
@@ -125,6 +126,7 @@ public class RemoveUnusedImports {
             }
         }
 
+        @SuppressWarnings("for-rollout:VoidUsed")
         @Override
         public Void scan(Tree tree, Void unused) {
             if (tree == null) {
@@ -182,6 +184,7 @@ public class RemoveUnusedImports {
                     this.basePos = basePos;
                 }
 
+                @SuppressWarnings("for-rollout:VoidUsed")
                 @Override
                 public Void visitIdentifier(IdentifierTree node, Void aVoid) {
                     usedInJavadoc.put(

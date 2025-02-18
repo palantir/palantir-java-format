@@ -22,6 +22,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
+import com.palantir.javaformat.java.FormatterException;
+import com.palantir.javaformat.java.FormatterService;
 import com.palantir.javaformat.java.Replacement;
 import java.net.URI;
 import java.nio.file.Files;
@@ -29,34 +31,39 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
-import org.junit.jupiter.api.Test;
+import java.util.stream.Stream;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-final class BootstrappingFormatterServiceTest {
+final class FormatterServicesTest {
 
-    @Test
-    void can_format_file_with_replacement() {
+    @ParameterizedTest
+    @MethodSource("getFormatters")
+    void can_format_file_with_replacement(FormatterService formatterService) throws FormatterException {
         String input = getTestResourceContent("format.input");
         String expectedOutput = getTestResourceContent("format.output");
 
         ImmutableList<Replacement> replacements =
-                getFormatter().getFormatReplacements(input, List.of(Range.open(0, input.length())));
+                formatterService.getFormatReplacements(input, List.of(Range.open(0, input.length())));
 
         assertThat(replacements).hasSize(1);
         assertThat(replacements.get(0).getReplacementString()).isEqualTo(expectedOutput);
     }
 
-    @Test
-    void can_format_full_file() {
+    @ParameterizedTest
+    @MethodSource("getFormatters")
+    void can_format_full_file(FormatterService formatterService) throws FormatterException {
         String input = getTestResourceContent("format.input");
         String expectedOutput = getTestResourceContent("format.output");
 
-        String formatted = getFormatter().formatSourceReflowStringsAndFixImports(input);
+        String formatted = formatterService.formatSourceReflowStringsAndFixImports(input);
 
         assertThat(formatted).isEqualTo(expectedOutput);
     }
 
-    @Test
-    void can_format_large_input_file() {
+    @ParameterizedTest
+    @MethodSource("getFormatters")
+    void can_format_large_input_file(FormatterService formatterService) throws FormatterException {
         String input = "class A {\n"
                 + "  void f(){\n"
                 + "    System.out.println(\"Test output\");\n".repeat(2000)
@@ -64,16 +71,19 @@ final class BootstrappingFormatterServiceTest {
                 + "}\n";
 
         ImmutableList<Replacement> replacements =
-                getFormatter().getFormatReplacements(input, List.of(Range.open(0, input.length())));
+                formatterService.getFormatReplacements(input, List.of(Range.open(0, input.length())));
 
         assertThat(replacements).singleElement().satisfies(replacement -> {
             assertThat(replacement.getReplacementString()).startsWith("class A {\n    void f() {");
         });
     }
 
-    private BootstrappingFormatterService getFormatter() {
-        return new BootstrappingFormatterService(
-                javaBinPath(), Runtime.version().feature(), getClasspath());
+    private static Stream<FormatterService> getFormatters() {
+        return Stream.of(
+                new BootstrappingFormatterService(
+                        javaBinPath(), Runtime.version().feature(), getClasspath()),
+                new NativeImageFormatterService(
+                        Path.of(System.getenv("NATIVE_IMAGE_CLASSPATH").toString())));
     }
 
     private String getTestResourceContent(String resourceName) {

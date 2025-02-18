@@ -17,7 +17,6 @@
 package com.palantir.javaformat.gradle;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
@@ -32,19 +31,19 @@ public final class PalantirJavaFormatProviderPlugin implements Plugin<Project> {
                 rootProject == rootProject.getRootProject(),
                 "May only apply com.palantir.java-format-provider to the root project");
 
+        rootProject.getPluginManager().apply(NativeImageFormatProviderPlugin.class);
+
+        String implementationVersion = JavaFormatExtension.class.getPackage().getImplementationVersion();
+
         Configuration configuration = rootProject.getConfigurations().create(CONFIGURATION_NAME, conf -> {
             conf.setDescription("Internal configuration for resolving the palantir-java-format implementation");
             conf.setVisible(false);
             conf.setCanBeConsumed(false);
-
             conf.defaultDependencies(deps -> {
                 deps.add(rootProject
                         .getDependencies()
-                        .create(ImmutableMap.of(
-                                "group", "com.palantir.javaformat",
-                                "name", "palantir-java-format",
-                                "version",
-                                        JavaFormatExtension.class.getPackage().getImplementationVersion())));
+                        .create(String.format(
+                                "com.palantir.javaformat:palantir-java-format:%s", implementationVersion)));
             });
         });
 

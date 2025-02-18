@@ -34,17 +34,20 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 
+@SuppressWarnings("for-rollout:SameNameButDifferent")
 @State(
         name = "PalantirJavaFormatSettings",
         storages = {@Storage("palantir-java-format.xml")})
-class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJavaFormatSettings.State> {
+public class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJavaFormatSettings.State> {
 
+    @SuppressWarnings("for-rollout:SameNameButDifferent")
     private State state = new State();
 
     static PalantirJavaFormatSettings getInstance(Project project) {
         return ServiceManager.getService(project, PalantirJavaFormatSettings.class);
     }
 
+    @SuppressWarnings("for-rollout:SameNameButDifferent")
     @Nullable
     @Override
     public State getState() {
@@ -52,7 +55,7 @@ class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJav
     }
 
     @Override
-    public void loadState(State state) {
+    public void loadState(@SuppressWarnings("for-rollout:SameNameButDifferent") State state) {
         this.state = state;
     }
 
@@ -86,6 +89,20 @@ class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJav
      */
     Optional<List<URI>> getImplementationClassPath() {
         return state.implementationClassPath;
+    }
+
+    /**
+     * The path to the formatter nativeImage.
+     */
+    Optional<URI> getNativeImageClassPath() {
+        return state.nativeImageClassPath;
+    }
+
+    /**
+     * Whether to use the legacy implementation(getImplementationClassPath) or the new implementation(getNativeImageClassPath)
+     */
+    Boolean getUseNativeImageClassPath() {
+        return state.useNativeImageClassPath;
     }
 
     boolean injectedVersionIsOutdated() {
@@ -136,6 +153,8 @@ class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJav
 
         private EnabledState enabled = EnabledState.UNKNOWN;
         private Optional<List<URI>> implementationClassPath = Optional.empty();
+        private Optional<URI> nativeImageClassPath = Optional.empty();
+        private Boolean useNativeImageClassPath = false;
 
         public JavaFormatterOptions.Style style = JavaFormatterOptions.Style.PALANTIR;
 
@@ -144,10 +163,27 @@ class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJav
                     .map(strings -> strings.stream().map(URI::create).collect(Collectors.toList()));
         }
 
+        @SuppressWarnings("for-rollout:NullAway")
         public List<String> getImplementationClassPath() {
             return implementationClassPath
                     .map(paths -> paths.stream().map(URI::toString).collect(Collectors.toList()))
                     .orElse(null);
+        }
+
+        public void setNativeImageClassPath(@Nullable String value) {
+            nativeImageClassPath = Optional.ofNullable(value).map(URI::create);
+        }
+
+        public String getNativeImageClassPath() {
+            return nativeImageClassPath.map(URI::toString).orElse(null);
+        }
+
+        public void setUseNativeImageClassPath(@Nullable String value) {
+            useNativeImageClassPath = Boolean.parseBoolean(value);
+        }
+
+        public String getUseNativeImageClassPath() {
+            return useNativeImageClassPath.toString();
         }
 
         // enabled used to be a boolean so we use bean property methods for backwards compatibility
@@ -161,6 +197,7 @@ class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJav
             }
         }
 
+        @SuppressWarnings("for-rollout:NullAway")
         public String getEnabled() {
             switch (enabled) {
                 case ENABLED:
@@ -177,8 +214,12 @@ class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJav
             return "PalantirJavaFormatSettings{"
                     + "enabled="
                     + enabled
-                    + ", formatterPath="
+                    + ", implementationClassPath="
                     + implementationClassPath
+                    + ", nativeImageClassPath="
+                    + nativeImageClassPath
+                    + ", useNativeImageClassPath="
+                    + useNativeImageClassPath
                     + ", style="
                     + style
                     + '}';

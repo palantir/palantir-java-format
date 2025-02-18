@@ -1,6 +1,7 @@
 apply plugin: 'java-gradle-plugin'
 apply plugin: 'groovy'
 apply plugin: 'com.palantir.external-publish-jar'
+apply plugin: 'com.palantir.gradle-plugin-testing'
 apply plugin: 'com.palantir.external-publish-gradle-plugin'
 apply plugin: 'com.palantir.revapi'
 
@@ -18,6 +19,7 @@ dependencies {
     implementation 'com.google.guava:guava'
     implementation project(':palantir-java-format-spi')
     implementation project(':palantir-java-format-jdk-bootstrap')
+    implementation 'com.palantir.gradle.utils:platform'
 
     testImplementation 'com.netflix.nebula:nebula-test'
     testImplementation 'org.junit.jupiter:junit-jupiter'
@@ -72,15 +74,38 @@ configurations {
         canBeConsumed = false
         canBeResolved = true
     }
+
+    formatterNativeImage {
+        canBeConsumed = false
+        canBeResolved = true
+    }
+
+
 }
 
 dependencies {
     impl project(':palantir-java-format')
+    formatterNativeImage(project(':palantir-java-format-native')) {
+        attributes {
+            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements, 'nativeImage'))
+        }
+    }
+
+}
+
+tasks.register("copyNativeImage", Copy.class) {
+    from(configurations.formatterNativeImage)
+    rename { fileName ->
+        String.format("%s.bin", fileName)
+    }
+    into("$buildDir/nativeImage")
 }
 
 def writeImplClasspath = tasks.register("writeImplClasspath") {
+    inputs.files(tasks.named("copyNativeImage"))
     doLast {
         file("$buildDir/impl.classpath").text = configurations.impl.asPath
+        file("$buildDir/nativeImage.path").text = tasks.named("copyNativeImage").get().getOutputs().getFiles().getSingleFile().listFiles()[0].getAbsolutePath()
     }
 }
 

@@ -1,0 +1,36 @@
+apply plugin: 'distribution'
+apply plugin: 'me.champeau.jmh'
+
+configurations {
+    formatterNativeImage
+    formatterNativeJars
+}
+
+dependencies {
+    jmhAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess'
+    compileOnly 'org.openjdk.jmh:jmh-generator-annprocess'
+
+    jmhImplementation 'org.assertj:assertj-core'
+    jmhImplementation 'org.junit.jupiter:junit-jupiter'
+    jmhImplementation 'org.openjdk.jmh:jmh-core'
+    jmhImplementation 'org.openjdk.jmh:jmh-generator-annprocess'
+    formatterNativeJars project(':palantir-java-format')
+    formatterNativeImage(project(':palantir-java-format')) {
+        attributes {
+            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements, 'nativeImage'))
+        }
+    }
+}
+
+import me.champeau.jmh.JMHTask
+
+tasks.named('jmh', JMHTask.class) {
+    inputs.files(configurations.named('formatterNativeImage'))
+    inputs.files(configurations.named('formatterNativeJars'))
+    environment.put('NATIVE_IMAGE_CLASSPATH', configurations.named('formatterNativeImage').map { it.asPath })
+    environment.put('JARS_CLASSPATH', configurations.named('formatterNativeJars').map { conf -> conf.collect { it.absolutePath }.join(":") })
+}
+
+jmhCompileGeneratedClasses {
+    options.errorprone.enabled = false
+}

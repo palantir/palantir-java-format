@@ -20,6 +20,8 @@ import nebula.test.IntegrationTestKitSpec
 
 class PalantirJavaFormatIdeaPluginTest extends IntegrationTestKitSpec {
 
+    private static final NATIVE_IMAGE_FILE = new File("build/nativeImage.path").absolutePath
+
     void setup() {
         buildFile << """
             plugins {
@@ -29,6 +31,7 @@ class PalantirJavaFormatIdeaPluginTest extends IntegrationTestKitSpec {
             
             dependencies {
                 palantirJavaFormat project.files() // no need to store the real thing in here
+                palantirJavaFormatNative files(file("${NATIVE_IMAGE_FILE}").text)
             }
         """.stripIndent()
     }

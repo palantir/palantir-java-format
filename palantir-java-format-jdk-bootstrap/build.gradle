@@ -1,6 +1,12 @@
+import me.champeau.jmh.JMHTask
+
 apply plugin: 'java-library'
 apply plugin: 'com.palantir.external-publish-jar'
 apply plugin: 'com.palantir.revapi'
+
+configurations {
+    formatterNativeImage
+}
 
 dependencies {
     annotationProcessor "org.immutables:value"
@@ -14,4 +20,15 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'org.assertj:assertj-core'
     testImplementation 'com.fasterxml.jackson.core:jackson-databind'
+    formatterNativeImage(project(':palantir-java-format-native')) {
+        attributes {
+            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements, 'nativeImage'))
+        }
+    }
 }
+
+tasks.named('test', Test.class) {
+    inputs.files(configurations.named('formatterNativeImage'))
+    environment.put('NATIVE_IMAGE_CLASSPATH', configurations.formatterNativeImage.asPath)
+}
+

@@ -436,6 +436,7 @@ final class JavadocLexer {
         return output.build();
     }
 
+    @SuppressWarnings("for-rollout:NullAway")
     private static void deindentPreCodeBlock(ImmutableList.Builder<Token> output, PeekingIterator<Token> tokens) {
         Deque<Token> saved = new ArrayDeque<>();
         output.add(new Token(LITERAL, tokens.next().getValue().trim()));

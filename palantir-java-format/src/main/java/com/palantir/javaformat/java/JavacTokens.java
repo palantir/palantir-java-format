@@ -72,6 +72,7 @@ class JavacTokens {
     }
 
     /** Lex the input and return a list of {@link RawTok}s. */
+    @SuppressWarnings("for-rollout:NullAway")
     public static ImmutableList<RawTok> getTokens(String source, Context context, Set<TokenKind> stopTokens) {
         if (source == null) {
             return ImmutableList.of();
@@ -154,6 +155,7 @@ class JavacTokens {
         private final AccessibleReader reader;
         private final CommentStyle style;
 
+        @SuppressWarnings("for-rollout:NullAway")
         private String text = null;
 
         public CommentWithTextAndPosition(int pos, int endPos, AccessibleReader reader, CommentStyle style) {
