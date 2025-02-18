@@ -69,6 +69,5 @@ public abstract class ExecutableTransform implements TransformAction<TransformPa
         }
     }
 
-    interface Parameters extends TransformParameters {
-    }
+    interface Parameters extends TransformParameters {}
 }

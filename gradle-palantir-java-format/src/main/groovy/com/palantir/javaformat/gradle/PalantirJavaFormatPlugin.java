@@ -40,9 +40,10 @@ public final class PalantirJavaFormatPlugin implements Plugin<Project> {
 
         project.getPlugins().apply(PalantirJavaFormatSpotlessPlugin.class);
 
-        // TODO(dfox): in the future we may want to offer a simple 'format' task so people don't need to use
-        // spotless to try out our formatter
         project.getPlugins().withId("java", p -> {
+
+            // TODO(dfox): in the future we may want to offer a simple 'format' task so people don't need to use
+            // spotless to try out our formatter
             project.getTasks().register("formatDiff", FormatDiffTask.class, task -> {
                 if (NativeImageFormatProviderPlugin.isNativeImageSupported()
                         && NativeImageFormatProviderPlugin.shouldUseNativeImage(project)) {
