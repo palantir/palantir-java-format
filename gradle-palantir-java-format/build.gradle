@@ -110,6 +110,5 @@ def writeImplClasspath = tasks.register("writeImplClasspath") {
 }
 
 tasks.named("test").configure {
-    inputs.files(configurations.named('formatterNativeImage'))
     dependsOn(writeImplClasspath)
 }

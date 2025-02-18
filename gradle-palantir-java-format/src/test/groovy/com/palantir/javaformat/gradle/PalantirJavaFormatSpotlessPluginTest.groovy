@@ -47,7 +47,6 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
         """.stripIndent()
     }
 
-
     def "formats with spotless when spotless is applied"() {
         file('gradle.properties') << extraGradleProperties
 

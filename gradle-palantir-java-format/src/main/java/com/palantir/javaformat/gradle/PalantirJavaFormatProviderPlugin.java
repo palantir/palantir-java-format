@@ -39,7 +39,6 @@ public final class PalantirJavaFormatProviderPlugin implements Plugin<Project> {
             conf.setDescription("Internal configuration for resolving the palantir-java-format implementation");
             conf.setVisible(false);
             conf.setCanBeConsumed(false);
-            conf.setCanBeResolved(true);
             conf.defaultDependencies(deps -> {
                 deps.add(rootProject
                         .getDependencies()
@@ -47,6 +46,7 @@ public final class PalantirJavaFormatProviderPlugin implements Plugin<Project> {
                                 "com.palantir.javaformat:palantir-java-format:%s", implementationVersion)));
             });
         });
+
         rootProject.getExtensions().create("palantirJavaFormat", JavaFormatExtension.class, configuration);
     }
 }
