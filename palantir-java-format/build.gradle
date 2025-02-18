@@ -51,9 +51,6 @@ tasks.withType(JavaCompile).configureEach {
     if (JavaVersion.current() < JavaVersion.VERSION_14) {
         excludes = ['**/Java14InputAstVisitor.java']
     }
-    if (JavaVersion.current() < JavaVersion.VERSION_21) {
-        excludes = ['**/Java21InputAstVisitor.java']
-    }
 }
 
 tasks.withType(Test).configureEach {
@@ -66,9 +63,6 @@ tasks.withType(Javadoc).configureEach {
 
     if (JavaVersion.current() < JavaVersion.VERSION_14) {
         exclude '**/Java14InputAstVisitor.java'
-    }
-    if (JavaVersion.current() < JavaVersion.VERSION_21) {
-        exclude '**/Java21InputAstVisitor.java'
     }
 }
 
