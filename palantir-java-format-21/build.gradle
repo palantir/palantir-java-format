@@ -1,0 +1,56 @@
+apply plugin: 'application'
+apply plugin: 'com.palantir.external-publish-jar'
+
+mainClassName = 'com.palantir.javaformat.java.Main'
+
+description = 'Palantir Java Format 21'
+
+dependencies {
+    implementation project(':palantir-java-format')
+}
+
+def exports = [
+        'jdk.compiler/com.sun.tools.javac.file',
+        'jdk.compiler/com.sun.tools.javac.main',
+        'jdk.compiler/com.sun.tools.javac.parser',
+        'jdk.compiler/com.sun.tools.javac.tree',
+        'jdk.compiler/com.sun.tools.javac.util',
+        'jdk.compiler/com.sun.tools.javac.code',
+        'jdk.compiler/com.sun.tools.javac.api'
+]
+
+def jvmArgList = exports.collect { value -> "--add-exports=${value}=ALL-UNNAMED".toString() }
+
+tasks.withType(JavaCompile).configureEach {
+    options.errorprone.disable 'StrictUnusedVariable'
+
+    // Allow access to internal javac apis
+    options.compilerArgs += jvmArgList
+}
+
+tasks.withType(Test).configureEach {
+    jvmArgs = jvmArgList
+}
+
+tasks.withType(Javadoc).configureEach {
+    // Allow access to internal javac apis
+    options.optionFiles << file('../gradle/javadoc.options')
+}
+
+// necessary to compile Java14InputAstVisitor
+idea {
+    module.languageLevel = new org.gradle.plugins.ide.idea.model.IdeaLanguageLevel(21)
+}
+
+// This block may be replaced by BaselineExportsExtension exports
+// once https://github.com/gradle/gradle/issues/18824 is resolved.
+tasks.named("jar", Jar) {
+    manifest {
+        attributes('Add-Exports': exports.join(' '))
+    }
+}
+
+javaVersion {
+    target = 21
+    runtime = 21
+}

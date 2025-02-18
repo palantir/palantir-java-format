@@ -20,6 +20,10 @@
   "methods":[{"name":"<init>","parameterTypes":["com.palantir.javaformat.OpsBuilder","int"] }]
 },
 {
+  "name":"com.palantir.javaformat.java.java21.Java21InputAstVisitor",
+  "methods":[{"name":"<init>","parameterTypes":["com.palantir.javaformat.OpsBuilder","int"] }]
+},
+{
   "name":"com.sun.source.tree.BindingPatternTree",
   "methods":[{"name":"getBinding","parameterTypes":[] }, {"name":"getType","parameterTypes":[] }, {"name":"getVariable","parameterTypes":[] }]
 },

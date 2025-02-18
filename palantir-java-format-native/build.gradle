@@ -20,7 +20,7 @@ apply plugin: 'org.graalvm.buildtools.native'
 apply plugin: 'com.palantir.external-publish-custom'
 
 dependencies {
-    implementation project(':palantir-java-format')
+    implementation project(':palantir-java-format-21')
 }
 
 import com.palantir.platform.OperatingSystem
@@ -52,9 +52,7 @@ graalvmNative {
             mainClass = 'com.palantir.javaformat.java.Main'
             fallback = false
             sharedLibrary = false
-            classpath.setFrom(
-                    configurations.named('runtimeClasspath'),
-                    fileTree(dir: "../palantir-java-format/src/main/java", includes: ["**/Java21InputAstVisitor.java"]))
+            classpath.setFrom(configurations.named('runtimeClasspath'))
             configurationFileDirectories.from(file('src/main/resources/META-INF/native-image'))
             buildArgs.addAll("-H:ConfigurationFileDirectories=${projectDir}/src/main/resources/META-INF/native-image",
                     '-H:+UnlockExperimentalVMOptions',
@@ -129,4 +127,9 @@ configurations {
             attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements, 'nativeImage'))
         }
     }
+}
+
+javaVersion {
+    target = 21
+    runtime = 21
 }

@@ -85,7 +85,7 @@ tasks.named("test") {
 
 // necessary to compile Java14InputAstVisitor
 idea {
-    module.languageLevel = new org.gradle.plugins.ide.idea.model.IdeaLanguageLevel(21)
+    module.languageLevel = new org.gradle.plugins.ide.idea.model.IdeaLanguageLevel(14)
 }
 
 // This block may be replaced by BaselineExportsExtension exports

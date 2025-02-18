@@ -209,7 +209,7 @@ public final class Formatter {
                     .getConstructor(OpsBuilder.class, int.class)
                     .newInstance(builder, options.indentationMultiplier());
         } catch (ReflectiveOperationException e) {
-            throw new LinkageError(e.getMessage(), e);
+            throw new LinkageError(e.getMessage());
         }
     }
 
@@ -261,7 +261,7 @@ public final class Formatter {
      * @return the output string
      * @throws FormatterException if the input string cannot be parsed
      * @see <a href="https://google.github.io/styleguide/javaguide.html#s3.3.3-import-ordering-and-spacing">Google Java
-     *     Style Guide - 3.3.3 Import ordering and spacing</a>
+     * Style Guide - 3.3.3 Import ordering and spacing</a>
      */
     public String formatSourceAndFixImports(String input) throws FormatterException {
         input = ImportOrderer.reorderImports(input, options.style());
@@ -278,7 +278,7 @@ public final class Formatter {
      * @return the output string
      * @throws FormatterException if the input string cannot be parsed
      * @see <a href="https://google.github.io/styleguide/javaguide.html#s3.3.3-import-ordering-and-spacing">Google Java
-     *     Style Guide - 3.3.3 Import ordering and spacing</a>
+     * Style Guide - 3.3.3 Import ordering and spacing</a>
      */
     public String fixImports(String input) throws FormatterException {
         return ImportOrderer.reorderImports(RemoveUnusedImports.removeUnusedImports(input), options.style());

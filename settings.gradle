@@ -25,3 +25,5 @@ buildCache {
         enabled = !isCiServer
     }
 }
+include 'palantir-java-format-21'
+
