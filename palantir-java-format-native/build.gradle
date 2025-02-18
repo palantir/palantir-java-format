@@ -52,7 +52,9 @@ graalvmNative {
             mainClass = 'com.palantir.javaformat.java.Main'
             fallback = false
             sharedLibrary = false
-            classpath.setFrom(configurations.named('runtimeClasspath'))
+            classpath.setFrom(
+                    configurations.named('runtimeClasspath'),
+                    fileTree(dir: "../palantir-java-format/src/main/java", includes: ["**/Java21InputAstVisitor.java"]))
             configurationFileDirectories.from(file('src/main/resources/META-INF/native-image'))
             buildArgs.addAll("-H:ConfigurationFileDirectories=${projectDir}/src/main/resources/META-INF/native-image",
                     '-H:+UnlockExperimentalVMOptions',

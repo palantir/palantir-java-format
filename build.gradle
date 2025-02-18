@@ -29,7 +29,6 @@ apply plugin: 'com.palantir.git-version'
 apply plugin: 'com.palantir.jdks'
 apply plugin: 'com.palantir.jdks.latest'
 apply plugin: 'com.palantir.baseline'
-apply plugin: 'com.palantir.baseline-java-versions'
 apply plugin: 'com.palantir.consistent-versions'
 
 version System.env.CIRCLE_TAG ?: gitVersion()
@@ -49,6 +48,10 @@ allprojects {
 subprojects {
     apply plugin: 'java-library'
     apply plugin: 'org.inferred.processors'
+
+    sourceCompatibility = 11
+    targetCompatibility = 11
+
 
     tasks.withType(Checkstyle).configureEach {
         enabled = false
@@ -95,16 +98,11 @@ idea.project.ipr.withXml { xml ->
 }
 
 jdks {
-    daemonTarget = 21
+    daemonTarget = 17
 
     jdk(23) {
         distribution = 'graalvm-ce'
         jdkVersion = '23.0.1'
     }
 
-}
-
-javaVersions {
-    libraryTarget = 21
-    runtime = 21
 }
