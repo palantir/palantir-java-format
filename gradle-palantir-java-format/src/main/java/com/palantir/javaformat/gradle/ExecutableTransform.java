@@ -33,6 +33,11 @@ import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.gradle.api.provider.Provider;
 
+/**
+ * A transform that makes the input artifact executable.
+ *
+ * <p>This is useful for native-image executables, which need to be executable in order to run.
+ */
 public abstract class ExecutableTransform implements TransformAction<TransformParameters.None> {
 
     private static Logger logger = Logging.getLogger(ExecutableTransform.class);

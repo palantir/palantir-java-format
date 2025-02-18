@@ -16,10 +16,12 @@
 package com.palantir.javaformat.gradle
 
 import nebula.test.IntegrationTestKitSpec
+import spock.lang.Unroll
 
 class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
     /** ./gradlew writeImplClasspath generates this file. */
     private static final CLASSPATH_FILE = new File("build/impl.classpath").absolutePath
+    private static final NATIVE_IMAGE_FILE = new File("build/nativeImage.path").absolutePath
 
     void setup() {
         buildFile << """
@@ -31,6 +33,7 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
             
             dependencies {
                 palantirJavaFormat files(file("${CLASSPATH_FILE}").text.split(':'))
+                palantirJavaFormatNative files(file("${NATIVE_IMAGE_FILE}").text)
             }
         """.stripIndent()
 
@@ -44,7 +47,10 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
         """.stripIndent()
     }
 
+
     def "formats with spotless when spotless is applied"() {
+        file('gradle.properties') << extraGradleProperties
+
         buildFile << """
             apply plugin: 'com.diffplug.spotless'
         """.stripIndent()
@@ -52,10 +58,17 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
         file('src/main/java/Main.java').text = invalidJavaFile
 
         when:
-        runTasks('spotlessApply')
+        def result = runTasks('spotlessApply', '--info')
 
         then:
+        result.output.contains(expectedOutput)
         file('src/main/java/Main.java').text == validJavaFile
+
+        where:
+        extraGradleProperties  | expectedOutput
+        "" | "Using the legacy palantir-java-formatter"
+        "palantir.native.formatter=true" | "Using the native-image palantir-java-formatter"
+
     }
 
     def validJavaFile = '''\

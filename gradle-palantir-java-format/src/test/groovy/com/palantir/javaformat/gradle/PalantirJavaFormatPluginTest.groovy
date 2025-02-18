@@ -33,7 +33,7 @@ class PalantirJavaFormatPluginTest extends IntegrationTestKitSpec {
             
             dependencies {
                 palantirJavaFormat files(file("${CLASSPATH_FILE}").text.split(':'))
-                palantirJavaFormatNative(files(file("${NATIVE_IMAGE_FILE}").text))
+                palantirJavaFormatNative files(file("${NATIVE_IMAGE_FILE}").text)
             }
             apply plugin: 'idea'
         """.stripIndent()
@@ -49,7 +49,7 @@ class PalantirJavaFormatPluginTest extends IntegrationTestKitSpec {
     }
 
     def 'formatDiff updates only lines changed in git diff'() {
-        when:
+        file('gradle.properties') << extraGradleProperties
         "git init".execute(Collections.emptyList(), projectDir).waitFor()
         "git config user.name Foo".execute(Collections.emptyList(), projectDir).waitFor()
         "git config user.email foo@bar.com".execute(Collections.emptyList(), projectDir).waitFor()
@@ -73,8 +73,11 @@ class PalantirJavaFormatPluginTest extends IntegrationTestKitSpec {
         }
         '''.stripIndent()
 
+        when:
+        def result = runTasks('formatDiff', '--info')
+
         then:
-        runTasks('formatDiff')
+        result.output.contains(expectedOutput)
         file('src/main/java/Main.java').text == '''
         class Main {
             public static void crazyExistingFormatting  (  String... args) {
@@ -82,5 +85,10 @@ class PalantirJavaFormatPluginTest extends IntegrationTestKitSpec {
             }
         }
         '''.stripIndent()
+
+        where:
+        extraGradleProperties  | expectedOutput
+        "" | "Using legacy java formatter"
+        "palantir.native.formatter=true" | "Using the native-image to format"
     }
 }

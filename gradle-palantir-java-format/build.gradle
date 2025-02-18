@@ -93,10 +93,19 @@ dependencies {
 
 }
 
+tasks.register("copyNativeImage", Copy.class) {
+    from(configurations.formatterNativeImage)
+    rename { fileName ->
+        String.format("%s.bin", fileName)
+    }
+    into("$buildDir/nativeImage")
+}
+
 def writeImplClasspath = tasks.register("writeImplClasspath") {
+    inputs.files(tasks.named("copyNativeImage"))
     doLast {
         file("$buildDir/impl.classpath").text = configurations.impl.asPath
-        file("$buildDir/nativeImage.path").text = configurations.formatterNativeImage.asPath
+        file("$buildDir/nativeImage.path").text = tasks.named("copyNativeImage").get().getOutputs().getFiles().getSingleFile().listFiles()[0].getAbsolutePath()
     }
 }
 

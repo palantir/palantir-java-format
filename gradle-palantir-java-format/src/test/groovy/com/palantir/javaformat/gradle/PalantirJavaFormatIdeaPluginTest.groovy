@@ -17,7 +17,6 @@
 package com.palantir.javaformat.gradle
 
 import nebula.test.IntegrationTestKitSpec
-import spock.lang.Ignore
 
 class PalantirJavaFormatIdeaPluginTest extends IntegrationTestKitSpec {
 
@@ -29,19 +28,14 @@ class PalantirJavaFormatIdeaPluginTest extends IntegrationTestKitSpec {
                 id 'com.palantir.java-format-idea'
             }
             apply plugin: 'idea'
-            
+
             dependencies {
                 palantirJavaFormat project.files() // no need to store the real thing in here
-                palantirJavaFormatNative(files(file("${NATIVE_IMAGE_FILE}").text)) {
-                    attributes {
-                        attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "bin")
-                    }
-                }
+                palantirJavaFormatNative files(file("${NATIVE_IMAGE_FILE}").text)
             }
         """.stripIndent()
     }
 
-    @Ignore("TODO crogoz")
     def "idea_configuresIpr"() {
         when:
         runTasks('idea')

@@ -32,7 +32,6 @@ class ConfigureJavaFormatterXml {
         // configure nativeImageClasspath
         nativeImageUri.ifPresent { URI uri ->
             matchOrCreateChild(settings, 'option', [name: 'nativeImageClassPath']).attributes().put('value', uri)
-            // configure default classPath to use
             matchOrCreateChild(settings, 'option', [name: 'useNativeImageClassPath']).attributes().put('value', useNativeImage.toString())
         }
     }
