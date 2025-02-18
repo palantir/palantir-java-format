@@ -40,6 +40,8 @@ public final class PalantirJavaFormatPlugin implements Plugin<Project> {
 
         project.getPlugins().apply(PalantirJavaFormatSpotlessPlugin.class);
 
+        // TODO(dfox): in the future we may want to offer a simple 'format' task so people don't need to use
+        // spotless to try out our formatter
         project.getPlugins().withId("java", p -> {
             project.getTasks().register("formatDiff", FormatDiffTask.class, task -> {
                 if (NativeImageFormatProviderPlugin.isNativeImageSupported()
@@ -48,9 +50,6 @@ public final class PalantirJavaFormatPlugin implements Plugin<Project> {
                 }
             });
         });
-
-        // TODO(dfox): in the future we may want to offer a simple 'format' task so people don't need to use
-        // spotless to try out our formatter
     }
 
     private static Provider<Path> getNativeImplConfiguration(Project project) {
