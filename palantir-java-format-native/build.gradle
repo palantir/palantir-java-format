@@ -62,6 +62,7 @@ graalvmNative {
                     '--initialize-at-build-time=com.sun.tools.javac.file.Locations',
                     '-H:+ReportExceptionStackTraces',
                     '-H:-UseContainerSupport',
+                    '--exact-reachability-metadata',
                     "-march=compatibility")
             jvmArgs.addAll(jvmArgList)
         }
