@@ -20,7 +20,7 @@ buildscript {
         classpath 'com.palantir.javaformat:gradle-palantir-java-format:2.52.0'
         classpath 'com.palantir.suppressible-error-prone:gradle-suppressible-error-prone:2.4.0'
         classpath 'gradle.plugin.org.inferred:gradle-processors:3.7.0'
-        classpath 'me.champeau.jmh:jmh-gradle-plugin:0.7.2'
+        classpath 'me.champeau.jmh:jmh-gradle-plugin:0.7.3'
     }
 }
 
