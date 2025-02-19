@@ -68,6 +68,4 @@ public abstract class ExecutableTransform implements TransformAction<TransformPa
             throw new RuntimeException("Failed to set execute permissions on native-image", e);
         }
     }
-
-    interface Parameters extends TransformParameters {}
 }

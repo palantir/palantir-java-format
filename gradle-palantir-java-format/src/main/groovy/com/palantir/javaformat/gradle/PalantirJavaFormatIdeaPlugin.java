@@ -63,7 +63,7 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
     }
 
     private static Optional<Configuration> maybeGetNativeImplConfiguration(Project rootProject) {
-        return NativeImageFormatProviderPlugin.isNativeImageSupported()
+        return NativeImageFormatProviderPlugin.shouldUseNativeImage(rootProject)
                 ? Optional.of(rootProject
                         .getConfigurations()
                         .getByName(NativeImageFormatProviderPlugin.NATIVE_CONFIGURATION_NAME))

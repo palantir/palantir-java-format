@@ -20,9 +20,12 @@ import nebula.test.IntegrationTestKitSpec
 
 class PalantirJavaFormatIdeaPluginTest extends IntegrationTestKitSpec {
 
-    private static final NATIVE_IMAGE_FILE = new File("build/nativeImage.path").absolutePath
+    private static final NATIVE_IMAGE_FILE = new File("build/nativeImage.path")
+    private static final NATIVE_CONFIG = String.format("palantirJavaFormatNative files(\"%s\")", NATIVE_IMAGE_FILE.text)
 
-    void setup() {
+    def "idea_configuresIpr"() {
+        file('gradle.properties') << extraGradleProperties
+
         buildFile << """
             plugins {
                 id 'com.palantir.java-format-idea'
@@ -31,12 +34,10 @@ class PalantirJavaFormatIdeaPluginTest extends IntegrationTestKitSpec {
             
             dependencies {
                 palantirJavaFormat project.files() // no need to store the real thing in here
-                palantirJavaFormatNative files(file("${NATIVE_IMAGE_FILE}").text)
+                EXTRA_CONFIGURATION
             }
-        """.stripIndent()
-    }
+        """.replace("EXTRA_CONFIGURATION", extraDependencies).stripIndent()
 
-    def "idea_configuresIpr"() {
         when:
         runTasks('idea')
 
@@ -45,5 +46,10 @@ class PalantirJavaFormatIdeaPluginTest extends IntegrationTestKitSpec {
         def ipr = new XmlSlurper().parse(iprFile)
         def settings = ipr.component.findAll { it.@name == "PalantirJavaFormatSettings" }
         !settings.isEmpty()
+
+        where:
+        extraGradleProperties | extraDependencies
+        "" | ""
+        "palantir.native.formatter=true" | NATIVE_CONFIG
     }
 }
