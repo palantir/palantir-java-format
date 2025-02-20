@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Fix MissingResourceRegistration for native-image
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/1216
