@@ -51,6 +51,10 @@
       "allDeclaredFields": true
     },
     {
+      "type": "com.google.common.collect.RegularImmutableList",
+      "allDeclaredFields": true
+    },
+    {
       "type": "com.palantir.javaformat.java.JavacTokens$CommentSavingTokenizer"
     },
     {
