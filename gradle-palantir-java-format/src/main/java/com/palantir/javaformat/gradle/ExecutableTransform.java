@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -48,8 +49,13 @@ public abstract class ExecutableTransform implements TransformAction<TransformPa
     @Override
     public void transform(TransformOutputs outputs) {
         File inputFile = getInputArtifact().get().getAsFile();
-        makeFileExecutable(inputFile.toPath());
-        outputs.file(inputFile);
+        File outputFile = outputs.file(inputFile.getName() + ".executable");
+        try {
+            Files.copy(inputFile.toPath(), outputFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            makeFileExecutable(outputFile.toPath());
+        } catch (IOException e) {
+            throw new RuntimeException(String.format("Failed to create executable file %s", outputFile.toPath()), e);
+        }
     }
 
     private static void makeFileExecutable(Path pathToExe) {
@@ -68,6 +74,4 @@ public abstract class ExecutableTransform implements TransformAction<TransformPa
             throw new RuntimeException("Failed to set execute permissions on native-image", e);
         }
     }
-
-    interface Parameters extends TransformParameters {}
 }

@@ -33,8 +33,6 @@ public final class PalantirJavaFormatProviderPlugin implements Plugin<Project> {
 
         rootProject.getPluginManager().apply(NativeImageFormatProviderPlugin.class);
 
-        String implementationVersion = JavaFormatExtension.class.getPackage().getImplementationVersion();
-
         Configuration configuration = rootProject.getConfigurations().create(CONFIGURATION_NAME, conf -> {
             conf.setDescription("Internal configuration for resolving the palantir-java-format implementation");
             conf.setVisible(false);
@@ -43,7 +41,8 @@ public final class PalantirJavaFormatProviderPlugin implements Plugin<Project> {
                 deps.add(rootProject
                         .getDependencies()
                         .create(String.format(
-                                "com.palantir.javaformat:palantir-java-format:%s", implementationVersion)));
+                                "com.palantir.javaformat:palantir-java-format:%s",
+                                JavaFormatExtension.class.getPackage().getImplementationVersion())));
             });
         });
 

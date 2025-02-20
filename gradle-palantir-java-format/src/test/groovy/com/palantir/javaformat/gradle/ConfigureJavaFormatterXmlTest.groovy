@@ -59,7 +59,6 @@ class ConfigureJavaFormatterXmlTest extends Specification {
               </list>
             </option>
             <option name="nativeImageClassPath" value="nativeFoo"/>
-            <option name="useNativeImageClassPath" value="true"/>
           </component>
         </root>
         """.stripIndent()
@@ -69,7 +68,7 @@ class ConfigureJavaFormatterXmlTest extends Specification {
         def node = new XmlParser().parseText(MISSING_ENTIRE_BLOCK)
 
         when:
-        ConfigureJavaFormatterXml.configureJavaFormat(node, ['foo', 'bar'].collect { URI.create(it) }, Optional.of(URI.create('nativeFoo')), true)
+        ConfigureJavaFormatterXml.configureJavaFormat(node, ['foo', 'bar'].collect { URI.create(it) }, Optional.of(URI.create('nativeFoo')))
 
         then:
         xmlToString(node) == EXPECTED
@@ -79,7 +78,7 @@ class ConfigureJavaFormatterXmlTest extends Specification {
         def node = new XmlParser().parseText(MISSING_CLASS_PATH)
 
         when:
-        ConfigureJavaFormatterXml.configureJavaFormat(node, ['foo', 'bar'].collect { URI.create(it) },  Optional.of(URI.create('nativeFoo')), false)
+        ConfigureJavaFormatterXml.configureJavaFormat(node, ['foo', 'bar'].collect { URI.create(it) },  Optional.of(URI.create('nativeFoo')))
 
         then:
         xmlToString(node) == """\
@@ -94,7 +93,6 @@ class ConfigureJavaFormatterXmlTest extends Specification {
               </list>
             </option>
             <option name="nativeImageClassPath" value="nativeFoo"/>
-            <option name="useNativeImageClassPath" value="false"/>
           </component>
         </root>
         """.stripIndent()
@@ -104,7 +102,7 @@ class ConfigureJavaFormatterXmlTest extends Specification {
         def node = new XmlParser().parseText(EXISTING_CLASS_PATH)
 
         when:
-        ConfigureJavaFormatterXml.configureJavaFormat(node, ['foo', 'bar'].collect { URI.create(it) }, Optional.of(URI.create('nativeFoo')), true)
+        ConfigureJavaFormatterXml.configureJavaFormat(node, ['foo', 'bar'].collect { URI.create(it) }, Optional.of(URI.create('nativeFoo')))
 
         then:
         xmlToString(node) == EXPECTED

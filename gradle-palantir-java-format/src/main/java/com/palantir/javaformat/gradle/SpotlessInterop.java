@@ -38,8 +38,7 @@ final class SpotlessInterop {
     }
 
     static FormatterStep addSpotlessJavaFormatStep(Project project) {
-        if (NativeImageFormatProviderPlugin.shouldUseNativeImage(project)
-                && NativeImageFormatProviderPlugin.isNativeImageSupported()) {
+        if (NativeImageFormatProviderPlugin.shouldUseNativeImage(project)) {
             logger.info("Using the native-image palantir-java-formatter");
             return NativePalantirJavaFormatStep.create(project.getRootProject()
                     .getConfigurations()
