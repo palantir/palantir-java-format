@@ -114,12 +114,10 @@ class PalantirJavaFormatConfigurable extends BaseConfigurable implements Searcha
     public void disposeUIResources() {}
 
     private static String isUsingNativeImage(PalantirJavaFormatSettings settings) {
-        if (FormatterProvider.isNativeImageSupported()) {
-            return settings.getUseNativeImageClassPath()
-                    ? "Native image formatter (`palantir.native.formatter` gradle property is enabled)"
-                    : "(Default setup) Java-based formatter; native image is not enabled";
+        if (settings.getNativeImageClassPath().isPresent()) {
+            return "Native image formatter (`palantir.native.formatter` gradle property is enabled)";
         } else {
-            return "(Default setup) Java-based formatter; native image is not supported on this architecture";
+            return "(Default setup) Java-based formatter";
         }
     }
 

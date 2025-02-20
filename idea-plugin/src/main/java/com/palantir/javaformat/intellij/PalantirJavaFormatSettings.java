@@ -98,13 +98,6 @@ public class PalantirJavaFormatSettings implements PersistentStateComponent<Pala
         return state.nativeImageClassPath;
     }
 
-    /**
-     * Whether to use the legacy implementation(getImplementationClassPath) or the new implementation(getNativeImageClassPath)
-     */
-    Boolean getUseNativeImageClassPath() {
-        return state.useNativeImageClassPath;
-    }
-
     boolean injectedVersionIsOutdated() {
         Optional<String> formatterVersion = computeFormatterVersion();
         Optional<OrderableSlsVersion> implementationVersion = OrderableSlsVersion.safeValueOf(
@@ -154,7 +147,6 @@ public class PalantirJavaFormatSettings implements PersistentStateComponent<Pala
         private EnabledState enabled = EnabledState.UNKNOWN;
         private Optional<List<URI>> implementationClassPath = Optional.empty();
         private Optional<URI> nativeImageClassPath = Optional.empty();
-        private Boolean useNativeImageClassPath = false;
 
         public JavaFormatterOptions.Style style = JavaFormatterOptions.Style.PALANTIR;
 
@@ -176,14 +168,6 @@ public class PalantirJavaFormatSettings implements PersistentStateComponent<Pala
 
         public String getNativeImageClassPath() {
             return nativeImageClassPath.map(URI::toString).orElse(null);
-        }
-
-        public void setUseNativeImageClassPath(@Nullable String value) {
-            useNativeImageClassPath = Boolean.parseBoolean(value);
-        }
-
-        public String getUseNativeImageClassPath() {
-            return useNativeImageClassPath.toString();
         }
 
         // enabled used to be a boolean so we use bean property methods for backwards compatibility
@@ -218,8 +202,6 @@ public class PalantirJavaFormatSettings implements PersistentStateComponent<Pala
                     + implementationClassPath
                     + ", nativeImageClassPath="
                     + nativeImageClassPath
-                    + ", useNativeImageClassPath="
-                    + useNativeImageClassPath
                     + ", style="
                     + style
                     + '}';

@@ -33,8 +33,6 @@ import com.intellij.openapi.util.SystemInfo;
 import com.palantir.javaformat.bootstrap.BootstrappingFormatterService;
 import com.palantir.javaformat.bootstrap.NativeImageFormatterService;
 import com.palantir.javaformat.java.FormatterService;
-import com.palantir.platform.Architecture;
-import com.palantir.platform.OperatingSystem;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -68,21 +66,12 @@ final class FormatterProvider {
                 getSdkVersion(project),
                 settings.getImplementationClassPath(),
                 settings.getNativeImageClassPath(),
-                isNativeImageSupported() && settings.getUseNativeImageClassPath(),
                 settings.injectedVersionIsOutdated()));
-    }
-
-    public static boolean isNativeImageSupported() {
-        OperatingSystem os = OperatingSystem.get();
-        return os.equals(OperatingSystem.LINUX_GLIBC)
-                || (os.equals(OperatingSystem.MACOS) && Architecture.get().equals(Architecture.AARCH64));
     }
 
     @SuppressWarnings("for-rollout:Slf4jLogsafeArgs")
     private static Optional<FormatterService> createFormatter(FormatterCacheKey cacheKey) {
-        if (cacheKey.useNativeImageClassPath) {
-            Preconditions.checkState(
-                    cacheKey.nativeImageClassPath.isPresent(), "Unable to determine native image path %s", cacheKey);
+        if (cacheKey.nativeImageClassPath.isPresent()) {
             log.info("Using the native formatter with classpath: {}", cacheKey.nativeImageClassPath.get());
             return Optional.of(new NativeImageFormatterService(Path.of(cacheKey.nativeImageClassPath.get())));
         }
@@ -227,7 +216,6 @@ final class FormatterProvider {
         private final OptionalInt jdkMajorVersion;
         private final Optional<List<URI>> implementationClassPath;
         private final Optional<URI> nativeImageClassPath;
-        private final Boolean useNativeImageClassPath;
         private final boolean useBundledImplementation;
 
         FormatterCacheKey(
@@ -235,13 +223,11 @@ final class FormatterProvider {
                 OptionalInt jdkMajorVersion,
                 Optional<List<URI>> implementationClassPath,
                 Optional<URI> nativeImageClassPath,
-                Boolean useNativeImageClassPath,
                 boolean useBundledImplementation) {
             this.project = project;
             this.jdkMajorVersion = jdkMajorVersion;
             this.implementationClassPath = implementationClassPath;
             this.nativeImageClassPath = nativeImageClassPath;
-            this.useNativeImageClassPath = useNativeImageClassPath;
             this.useBundledImplementation = useBundledImplementation;
         }
 
@@ -258,19 +244,13 @@ final class FormatterProvider {
                     && useBundledImplementation == that.useBundledImplementation
                     && Objects.equals(project, that.project)
                     && Objects.equals(implementationClassPath, that.implementationClassPath)
-                    && Objects.equals(nativeImageClassPath, that.nativeImageClassPath)
-                    && Objects.equals(useNativeImageClassPath, that.useNativeImageClassPath);
+                    && Objects.equals(nativeImageClassPath, that.nativeImageClassPath);
         }
 
         @Override
         public int hashCode() {
             return Objects.hash(
-                    project,
-                    jdkMajorVersion,
-                    implementationClassPath,
-                    nativeImageClassPath,
-                    useNativeImageClassPath,
-                    useBundledImplementation);
+                    project, jdkMajorVersion, implementationClassPath, nativeImageClassPath, useBundledImplementation);
         }
     }
 }

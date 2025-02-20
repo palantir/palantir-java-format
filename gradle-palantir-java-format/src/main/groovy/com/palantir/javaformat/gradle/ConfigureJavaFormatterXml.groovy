@@ -18,7 +18,7 @@ package com.palantir.javaformat.gradle
 
 class ConfigureJavaFormatterXml {
 
-    static void configureJavaFormat(Node rootNode, List<URI> uris, Optional<URI> nativeImageUri, Boolean useNativeImage) {
+    static void configureJavaFormat(Node rootNode, List<URI> uris, Optional<URI> nativeImageUri) {
         def settings = matchOrCreateChild(rootNode, 'component', [name: 'PalantirJavaFormatSettings'])
         // enable
         matchOrCreateChild(settings, 'option', [name: 'enabled']).attributes().put('value', 'true')
@@ -32,7 +32,6 @@ class ConfigureJavaFormatterXml {
         // configure nativeImageClasspath
         nativeImageUri.ifPresent { URI uri ->
             matchOrCreateChild(settings, 'option', [name: 'nativeImageClassPath']).attributes().put('value', uri)
-            matchOrCreateChild(settings, 'option', [name: 'useNativeImageClassPath']).attributes().put('value', useNativeImage.toString())
         }
     }
 
