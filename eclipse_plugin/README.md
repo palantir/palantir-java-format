@@ -16,5 +16,5 @@
    --add-exports
    jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED
    ```
-1. Copy `build/libs/palantir-java-format-eclipse-plugin-<version>.jar` to the `dropins` folder of your Eclipse installation,
+1. Copy `eclipse_plugin/build/libs/palantir-java-format-eclipse-plugin-<version>.jar` to the `dropins` folder of your Eclipse installation,
 1. Run `eclipse -clean`.
