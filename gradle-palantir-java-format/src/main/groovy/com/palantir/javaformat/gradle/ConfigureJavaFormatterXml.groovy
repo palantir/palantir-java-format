@@ -30,11 +30,9 @@ class ConfigureJavaFormatterXml {
             listItems.appendNode('option', [value: uri])
         }
         // configure nativeImageClasspath
-        nativeImageUri.ifPresentOrElse({ URI uri ->
+        nativeImageUri.ifPresent { URI uri ->
             matchOrCreateChild(settings, 'option', [name: 'nativeImageClassPath']).attributes().put('value', uri)
-        }, {
-            matchChild(settings, 'option', [name: 'nativeImageClassPath']).ifPresent { it.parent().remove(it) }
-        })
+        }
     }
 
     static void configureExternalDependencies(Node rootNode) {

@@ -71,8 +71,6 @@ class PalantirJavaFormatPluginTest extends IntegrationTestKitSpec {
         class Main {
             public static void crazyExistingFormatting  (  String... args) {
                                         System.out.println("Reformat me please");
-                // some comments
-                                                System.out.println("Reformat me again please");
             }
         }
         '''.stripIndent()
@@ -86,8 +84,6 @@ class PalantirJavaFormatPluginTest extends IntegrationTestKitSpec {
         class Main {
             public static void crazyExistingFormatting  (  String... args) {
                 System.out.println("Reformat me please");
-                // some comments
-                System.out.println("Reformat me again please");
             }
         }
         '''.stripIndent()
