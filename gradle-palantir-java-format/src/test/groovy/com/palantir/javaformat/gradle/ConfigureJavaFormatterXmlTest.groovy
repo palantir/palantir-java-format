@@ -31,6 +31,7 @@ class ConfigureJavaFormatterXmlTest extends Specification {
                         <option value="aldfjh://barz" />
                       </list>
                     </option>
+                    <option name="nativeImageClassPath" value="nativeFoo"/>
                 </component>
             </root>
         """.stripIndent()
@@ -62,6 +63,21 @@ class ConfigureJavaFormatterXmlTest extends Specification {
           </component>
         </root>
         """.stripIndent()
+
+    public static final String EXPECTED_WITHOUT_NATIVE = """\
+        <root>
+          <component name="PalantirJavaFormatSettings">
+            <option name="enabled" value="true"/>
+            <option name="implementationClassPath">
+              <list>
+                <option value="foo"/>
+                <option value="bar"/>
+              </list>
+            </option>
+          </component>
+        </root>
+        """.stripIndent()
+
     public static final ArrayList<String> ACTIONS_ON_SAVE = ['Format', 'Optimize']
 
     void testConfigure_missingEntireBlock_added() {
@@ -106,6 +122,16 @@ class ConfigureJavaFormatterXmlTest extends Specification {
 
         then:
         xmlToString(node) == EXPECTED
+    }
+
+    void testConfigure_noNativeImageClassPath_removal() {
+        def node = new XmlParser().parseText(EXISTING_CLASS_PATH)
+
+        when:
+        ConfigureJavaFormatterXml.configureJavaFormat(node, ['foo', 'bar'].collect { URI.create(it) }, Optional.empty())
+
+        then:
+        xmlToString(node) == EXPECTED_WITHOUT_NATIVE
     }
 
     @Unroll
