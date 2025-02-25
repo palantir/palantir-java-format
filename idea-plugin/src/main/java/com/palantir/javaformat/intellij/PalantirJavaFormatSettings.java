@@ -166,6 +166,7 @@ public class PalantirJavaFormatSettings implements PersistentStateComponent<Pala
             nativeImageClassPath = Optional.ofNullable(value).map(URI::create);
         }
 
+        @SuppressWarnings("for-rollout:NullAway")
         public String getNativeImageClassPath() {
             return nativeImageClassPath.map(URI::toString).orElse(null);
         }
