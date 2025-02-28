@@ -126,6 +126,7 @@ class PalantirJavaFormatConfigurable extends BaseConfigurable implements Searcha
         return settings.computeFormatterVersion().orElse("(bundled)") + suffix;
     }
 
+    @SuppressWarnings("for-rollout:UnusedMethod")
     private void createUIComponents() {
         styleComboBox = new ComboBox<>(UiFormatterStyle.values());
     }

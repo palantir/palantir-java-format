@@ -1,0 +1,190 @@
+{
+  "reflection": [
+    {
+      "type": "[Lcom.fasterxml.jackson.databind.deser.Deserializers;"
+    },
+    {
+      "type": "[Lcom.fasterxml.jackson.databind.ser.BeanSerializerModifier;"
+    },
+    {
+      "type": "[Lcom.fasterxml.jackson.databind.ser.Serializers;"
+    },
+    {
+      "type": "[Ljava.lang.Object;"
+    },
+    {
+      "type": "com.fasterxml.jackson.databind.ext.Java7SupportImpl",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.fasterxml.jackson.datatype.guava.deser.util.RangeHelper$RangeProperties",
+      "fields": [
+        {
+          "name": "lowerBoundType"
+        },
+        {
+          "name": "lowerEndpoint"
+        },
+        {
+          "name": "upperBoundType"
+        },
+        {
+          "name": "upperEndpoint"
+        }
+      ]
+    },
+    {
+      "type": "com.google.common.collect.ImmutableCollection",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "com.google.common.collect.ImmutableList",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "com.google.common.collect.SingletonImmutableList",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "com.google.common.collect.RegularImmutableList",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "com.palantir.javaformat.java.JavacTokens$CommentSavingTokenizer"
+    },
+    {
+      "type": "com.palantir.javaformat.java.Replacement",
+      "allDeclaredFields": true,
+      "methods": [
+        {
+          "name": "getReplaceRange",
+          "parameterTypes": []
+        },
+        {
+          "name": "getReplacementString",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.palantir.javaformat.java.java14.Java14InputAstVisitor",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "com.palantir.javaformat.OpsBuilder",
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.source.tree.BindingPatternTree"
+    },
+    {
+      "type": "com.sun.source.tree.CaseTree"
+    },
+    {
+      "type": "com.sun.source.tree.ClassTree",
+      "methods": [
+        {
+          "name": "getPermitsClause",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.source.tree.CompilationUnitTree",
+      "methods": [
+        {
+          "name": "getModule",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.tools.javac.parser.JavaTokenizer",
+      "fields": [
+        {
+          "name": "reader"
+        }
+      ]
+    },
+    {
+      "type": "com.sun.tools.javac.parser.UnicodeReader",
+      "methods": [
+        {
+          "name": "getRawCharacters",
+          "parameterTypes": [
+            "int",
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.io.Serializable"
+    },
+    {
+      "type": "java.lang.Iterable"
+    },
+    {
+      "type": "java.util.AbstractCollection",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "java.util.Collection"
+    },
+    {
+      "type": "java.util.List"
+    },
+    {
+      "type": "java.util.RandomAccess"
+    }
+  ],
+  "resources": [
+    {
+      "glob": "META-INF/services/java.lang.System$LoggerFinder"
+    },
+    {
+      "glob": "com/sun/tools/javac/resources/compiler_en.properties"
+    },
+    {
+      "glob": "com/sun/tools/javac/resources/compiler_en_US.properties"
+    },
+    {
+      "module": "jdk.compiler",
+      "glob": "com/sun/tools/javac/resources/compiler_en.properties"
+    },
+    {
+      "module": "jdk.compiler",
+      "glob": "com/sun/tools/javac/resources/compiler_en_US.properties"
+    }
+  ],
+  "bundles": [
+    {
+      "name": "com.sun.tools.javac.resources.compiler",
+      "locales": [
+        "en-US"
+      ]
+    }
+  ],
+  "jni": [
+    {
+      "type": "java.lang.Boolean",
+      "methods": [
+        {
+          "name": "getBoolean",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    }
+  ]
+}
