@@ -1,5 +1,5 @@
 /*
- * (c) Copyright 2019 Palantir Technologies Inc. All rights reserved.
+ * (c) Copyright 2024 Palantir Technologies Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,15 +42,12 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 
 @Execution(ExecutionMode.CONCURRENT)
-public final class FileBasedTests {
+public final class FileBased21Tests {
     // Test files that are only used when run with a minimum Java version
     private static final ImmutableMultimap<Integer, String> VERSIONED_TESTS =
             ImmutableMultimap.<Integer, String>builder()
-                    .putAll(14, "Records", "RSL", "Var", "ExpressionSwitch", "I574", "I594")
-                    .putAll(15, "I603")
-                    .putAll(16, "I588")
-                    .putAll(17, "I683", "I684", "I696")
-                    // .putAll(21, "I683", "I684", "I696")
+                    // .putAll(21, "I959", "I960", "I961", "I962")
+                    .putAll(21, "I964", "I965")
                     .build();
 
     private final Class<?> testClass;
@@ -59,22 +56,23 @@ public final class FileBasedTests {
     /** Where to output test outputs when recreating. */
     private final Path fullTestPath;
 
-    public FileBasedTests(Class<?> testClass) {
+    public FileBased21Tests(Class<?> testClass) {
         this(testClass, testClass.getSimpleName());
     }
 
-    public FileBasedTests(Class<?> testClass, String testDirName) {
+    public FileBased21Tests(Class<?> testClass, String testDirName) {
         this.resourcePrefix =
                 Paths.get(testClass.getPackage().getName().replace('.', '/')).resolve(testDirName);
         this.testClass = testClass;
-        this.fullTestPath = Paths.get("src/test/resources").resolve(resourcePrefix);
+        this.fullTestPath = Paths.get("src/test21/resources").resolve(resourcePrefix);
+        System.out.println(this.fullTestPath.normalize().toAbsolutePath().toString());
     }
 
     public static void assumeJavaVersionForTest(String testName) {
         Optional<Integer> maybeJavaVersion =
                 VERSIONED_TESTS.inverse().get(testName).stream().collect(toOptional());
         maybeJavaVersion.ifPresent(version -> Assumptions.assumeTrue(
-                Formatter.getRuntimeVersion() >= version, String.format("Not running on jdk %d or later", version)));
+                Runtime.version().feature() >= version, String.format("Not running on jdk %d or later", version)));
     }
 
     public List<Object[]> paramsAsNameInputOutput() throws IOException {

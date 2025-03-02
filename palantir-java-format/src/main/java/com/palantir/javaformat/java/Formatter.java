@@ -45,6 +45,7 @@ import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.Log;
 import com.sun.tools.javac.util.Options;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.net.URI;
 import java.util.Collection;
 import javax.tools.Diagnostic;
@@ -131,7 +132,26 @@ public final class Formatter {
         OpsBuilder opsBuilder = new OpsBuilder(javaInput);
 
         JavaInputAstVisitor visitor;
-        if (getRuntimeVersion() >= 14) {
+
+        if (getRuntimeVersion() >= 21 && isEnabledPriew()) {
+            try {
+                visitor = Class.forName("com.palantir.javaformat.java.java21.Java21PreviewInputAstVisitor")
+                        .asSubclass(JavaInputAstVisitor.class)
+                        .getConstructor(OpsBuilder.class, int.class)
+                        .newInstance(opsBuilder, options.indentationMultiplier());
+            } catch (ReflectiveOperationException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+        } else if (getRuntimeVersion() >= 21) {
+            try {
+                visitor = Class.forName("com.palantir.javaformat.java.java21.Java21InputAstVisitor")
+                        .asSubclass(JavaInputAstVisitor.class)
+                        .getConstructor(OpsBuilder.class, int.class)
+                        .newInstance(opsBuilder, options.indentationMultiplier());
+            } catch (ReflectiveOperationException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+        } else if (getRuntimeVersion() >= 14) {
             try {
                 visitor = Class.forName("com.palantir.javaformat.java.java14.Java14InputAstVisitor")
                         .asSubclass(JavaInputAstVisitor.class)
@@ -204,6 +224,11 @@ public final class Formatter {
     @VisibleForTesting
     static int getRuntimeVersion() {
         return Runtime.version().feature();
+    }
+
+    @VisibleForTesting
+    static boolean isEnabledPriew() {
+        return ManagementFactory.getRuntimeMXBean().getInputArguments().contains("--enable-preview");
     }
 
     static boolean errorDiagnostic(Diagnostic<?> input) {

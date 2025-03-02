@@ -49,7 +49,7 @@ tasks.withType(JavaCompile).configureEach {
     options.compilerArgs += jvmArgList
 
     if (JavaVersion.current() < JavaVersion.VERSION_14) {
-        excludes = ['**/Java14InputAstVisitor.java']
+        excludes = ['**/Java14InputAstVisitor.java', '**/Java21InputAstVisitor.java']
     }
 }
 
@@ -62,7 +62,7 @@ tasks.withType(Javadoc).configureEach {
     options.optionFiles << file('../gradle/javadoc.options')
 
     if (JavaVersion.current() < JavaVersion.VERSION_14) {
-        exclude '**/Java14InputAstVisitor.java'
+        excludes = ['**/Java14InputAstVisitor.java', '**/Java21InputAstVisitor.java']
     }
 }
 
@@ -77,10 +77,111 @@ tasks.named("test") {
     systemProperty 'junit.jupiter.execution.parallel.mode.default', 'concurrent'
 }
 
-// necessary to compile Java14InputAstVisitor
-idea {
-    module.languageLevel = new org.gradle.plugins.ide.idea.model.IdeaLanguageLevel(14)
+
+def target21Compiler = javaToolchains.compilerFor {
+    it.languageVersion = JavaLanguageVersion.of(21)
 }
+
+def target21Launcher = javaToolchains.launcherFor {
+    it.languageVersion = JavaLanguageVersion.of(21)
+}
+
+
+sourceSets.create("java21") {
+}
+
+sourceSets.create("test21") {
+}
+
+tasks.named("compileJava21Java", JavaCompile) {
+    it.javaCompiler = target21Compiler
+    it.sourceCompatibility = 21
+    it.targetCompatibility = 21
+    it.source = sourceSets.named("java21").get().java
+    it.classpath = project.objects.fileCollection().from(
+            sourceSets.named("main").get().output,
+            sourceSets.named("main").get().compileClasspath,
+            sourceSets.named("java21").get().compileClasspath
+    )
+}
+
+tasks.named("compileTest21Java", JavaCompile) {
+    it.javaCompiler = target21Compiler
+    it.sourceCompatibility = 21
+    it.targetCompatibility = 21
+    it.source = sourceSets.named("test21").get().java
+    it.classpath = sourceSets.named("test").get().runtimeClasspath
+}
+
+tasks.register("testJava21", Test) {
+
+    it.group = "verification"
+    it.javaLauncher.set(target21Launcher.get())
+
+    useJUnitPlatform()
+
+    it.testClassesDirs = project.objects.fileCollection().from(
+            sourceSets.named("test21").get().output.classesDirs
+    )
+    it.classpath = project.objects.fileCollection().from(
+            sourceSets.named("test21").get().output,
+            sourceSets.named("java21").get().output,
+            sourceSets.named("test").get().runtimeClasspath
+    )
+}
+
+
+sourceSets.create("java21Preview") {
+    java.srcDirs(project.layout.projectDirectory.dir("src/java21Preview/java"))
+}
+
+sourceSets.create("test21Preview") {
+    java.srcDirs(project.layout.projectDirectory.dir("src/test21Preview/java"))
+}
+
+tasks.named("compileJava21PreviewJava", JavaCompile) {
+    it.javaCompiler = target21Compiler
+    it.sourceCompatibility = 21
+    it.targetCompatibility = 21
+    options.compilerArgs += '--enable-preview'
+    it.source = sourceSets.named("java21Preview").get().java
+    it.classpath = objects.fileCollection().from(
+            sourceSets.named("main").get().output,
+            sourceSets.named("java21").get().output,
+            sourceSets.named("main").get().compileClasspath,
+            sourceSets.named("java21Preview").get().compileClasspath
+
+    )
+}
+
+tasks.named("compileTest21PreviewJava", JavaCompile) {
+    it.javaCompiler = target21Compiler
+    it.sourceCompatibility = 21
+    it.targetCompatibility = 21
+    options.compilerArgs += '--enable-preview'
+    it.source = sourceSets.named("test21Preview").get().java
+    it.classpath = sourceSets.named("test").get().runtimeClasspath
+}
+
+tasks.register("testJava21Preview", Test) {
+
+    it.group = "verification"
+    it.javaLauncher.set(target21Launcher.get())
+    jvmArgs += '--enable-preview'
+    useJUnitPlatform()
+
+    it.testClassesDirs = project.objects.fileCollection().from(
+            sourceSets.named("test21Preview").get().output.classesDirs
+    )
+    it.classpath = project.objects.fileCollection().from(
+            sourceSets.named("test21Preview").get().output,
+            sourceSets.named("java21Preview").get().output,
+            sourceSets.named("java21").get().output,
+            sourceSets.named("test").get().runtimeClasspath
+    )
+}
+
+tasks.check { dependsOn(test,testJava21,testJava21Preview) }
 
 // This block may be replaced by BaselineExportsExtension exports
 // once https://github.com/gradle/gradle/issues/18824 is resolved.
@@ -88,4 +189,10 @@ tasks.named("jar", Jar) {
     manifest {
         attributes('Add-Exports': exports.join(' '))
     }
+    it.from(
+            sourceSets.named("main").get().output,
+            sourceSets.named("java21").get().output,
+            sourceSets.named("java21Preview").get().output
+    )
+
 }
