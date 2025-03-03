@@ -1,5 +1,5 @@
 /*
- * (c) Copyright 2019 Palantir Technologies Inc. All rights reserved.
+ * (c) Copyright 2025 Palantir Technologies Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,15 @@
  * limitations under the License.
  */
 
-package com.palantir.javaformat.gradle;
+package com.palantir.javaformat.gradle
+
+import com.google.common.base.Splitter
+import com.palantir.javaformat.bootstrap.BootstrappingFormatterService
+import com.palantir.javaformat.java.FormatterService
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
+
+import java.util.stream.Stream
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,14 +30,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.ByteStreams;
-import com.palantir.javaformat.java.FormatterServiceImpl;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import com.palantir.javaformat.bootstrap.NativeImageFormatterService;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
@@ -37,6 +42,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 class FormatDiffTest {
+
+    private static final CLASSPATH_FILE = new File("build/impl.classpath")
+    private static final NATIVE_IMAGE_FILE = new File("build/nativeImage.path")
+
     @TempDir
     Path repo;
 
@@ -58,8 +67,9 @@ class FormatDiffTest {
                 strings);
     }
 
-    @Test
-    void reformat_a_subpath_of_a_git_directory_for_only_changed_lines() throws IOException, InterruptedException {
+    @ParameterizedTest
+    @MethodSource("getFormatters")
+    void reformat_a_subpath_of_a_git_directory_for_only_changed_lines(FormatterService formatterService) throws IOException, InterruptedException {
         runCommandInRepo("git", "init");
         runCommandInRepo("git", "config", "user.name", "Test User");
         runCommandInRepo("git", "config", "user.email", "test-user@palantir.com");
@@ -77,7 +87,7 @@ class FormatDiffTest {
 
         runCommandInRepo("git", "add", "-N", ".");
 
-        FormatDiff.formatDiff(subdir, new FormatterServiceImpl());
+        FormatDiff.formatDiff(subdir, formatterService);
 
         assertThat(reformatMe).hasContent("class ReformatMe {}");
         assertThat(dontTouchMe).hasContent("                                 class DontTouchMe {}");
@@ -95,4 +105,27 @@ class FormatDiffTest {
 
         Preconditions.checkState(process.exitValue() == 0, "Expected return code of 0: " + stderr);
     }
+
+    private static Stream<FormatterService> getFormatters() {
+        return Stream.of(
+                new BootstrappingFormatterService(
+                        javaBinPath(), Runtime.version().feature(), getClasspath()),
+                new NativeImageFormatterService(
+                        Path.of(NATIVE_IMAGE_FILE.text)));
+    }
+
+    private static getClasspath() {
+        return Splitter.on(':')
+                .trimResults()
+                .omitEmptyStrings()
+                .splitToStream(CLASSPATH_FILE.text)
+                .map(Path::of)
+                .collect(Collectors.toList());
+    }
+
+    private static Path javaBinPath() {
+        String javaHome = Preconditions.checkNotNull(System.getProperty("java.home"), "java.home property not set");
+        return Path.of(javaHome).resolve("bin").resolve("java");
+    }
+
 }

@@ -25,7 +25,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'org.junit.vintage:junit-vintage-engine'
     testImplementation 'org.assertj:assertj-core'
-    testImplementation project(':palantir-java-format')
+    testImplementation project(':palantir-java-format-21')
 
     pluginClasspath 'com.diffplug.spotless:spotless-plugin-gradle'
 }
@@ -70,11 +70,6 @@ tasks.withType(PluginUnderTestMetadata).configureEach {
 }
 
 configurations {
-    impl {
-        canBeConsumed = false
-        canBeResolved = true
-    }
-
     impl21 {
         canBeConsumed = false
         canBeResolved = true
@@ -89,7 +84,6 @@ configurations {
 }
 
 dependencies {
-    impl project(':palantir-java-format')
     impl21 project(':palantir-java-format-21')
     formatterNativeImage(project(':palantir-java-format-native')) {
         attributes {

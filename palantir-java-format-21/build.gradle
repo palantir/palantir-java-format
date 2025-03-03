@@ -6,7 +6,7 @@ mainClassName = 'com.palantir.javaformat.java.Main'
 description = 'Palantir Java Format 21'
 
 dependencies {
-    implementation project(':palantir-java-format')
+    api project(':palantir-java-format')
 }
 
 def exports = [
@@ -35,11 +35,6 @@ tasks.withType(Test).configureEach {
 tasks.withType(Javadoc).configureEach {
     // Allow access to internal javac apis
     options.optionFiles << file('../gradle/javadoc.options')
-}
-
-// necessary to compile Java14InputAstVisitor
-idea {
-    module.languageLevel = new org.gradle.plugins.ide.idea.model.IdeaLanguageLevel(21)
 }
 
 // This block may be replaced by BaselineExportsExtension exports
