@@ -60,7 +60,7 @@ public final class PalantirJavaFormatStep {
          * Build a cacheable state for spotless from the given jars, that uses the given {@link FormatterService}.
          *
          * @param jars The jars that contain the palantir-java-format implementation. This is only used for caching and
-         *     up-to-dateness purposes.
+         * up-to-dateness purposes.
          */
         State(Iterable<File> jars, Supplier<FormatterService> memoizedFormatter) throws IOException {
             this.jarsSignature = FileSignature.signAsSet(jars);
