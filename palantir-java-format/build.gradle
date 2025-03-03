@@ -5,6 +5,14 @@ mainClassName = 'com.palantir.javaformat.java.Main'
 
 description = 'Palantir Java Format'
 
+configurations {
+    testFormatterNativeImage {
+        canBeConsumed = false
+        canBeResolved = true
+        extendsFrom(testImplementation)
+    }
+}
+
 dependencies {
     api project(':palantir-java-format-spi')
     api 'com.google.guava:guava'
@@ -20,6 +28,8 @@ dependencies {
     testImplementation 'org.assertj:assertj-core'
     testImplementation 'org.junit.jupiter:junit-jupiter-migrationsupport'
     testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    testFormatterNativeImage project(':palantir-java-format-native')
 
     compileOnly 'com.google.auto.service:auto-service'
     annotationProcessor 'com.google.auto.service:auto-service'

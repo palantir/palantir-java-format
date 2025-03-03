@@ -90,7 +90,6 @@ dependencies {
             attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements, 'nativeImage'))
         }
     }
-
 }
 
 tasks.register("copyNativeImage", Copy.class) {
@@ -111,4 +110,8 @@ def writeImplClasspath = tasks.register("writeImplClasspath") {
 
 tasks.named("test").configure {
     dependsOn(writeImplClasspath)
+}
+
+javaVersion {
+    runtime = 21
 }
