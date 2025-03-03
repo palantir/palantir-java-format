@@ -54,7 +54,7 @@ graalvmNative {
             sharedLibrary = false
             classpath.setFrom(configurations.named('runtimeClasspath'))
             configurationFileDirectories.from(file('src/main/resources/META-INF/native-image'))
-            buildArgs.addAll("-H:ConfigurationFileDirectories=${projectDir}/src/main/resources/META-INF/native-image",
+            buildArgs.addAll(
                     '-H:+UnlockExperimentalVMOptions',
                     '-H:IncludeResourceBundles=com.sun.tools.javac.resources.compiler',
                     '-H:IncludeResourceBundles=com.sun.tools.javac.resources.javac',

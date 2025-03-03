@@ -75,6 +75,11 @@ configurations {
         canBeResolved = true
     }
 
+    impl21 {
+        canBeConsumed = false
+        canBeResolved = true
+    }
+
     formatterNativeImage {
         canBeConsumed = false
         canBeResolved = true
@@ -85,6 +90,7 @@ configurations {
 
 dependencies {
     impl project(':palantir-java-format')
+    impl21 project(':palantir-java-format-21')
     formatterNativeImage(project(':palantir-java-format-native')) {
         attributes {
             attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements, 'nativeImage'))
@@ -100,16 +106,16 @@ tasks.register("copyNativeImage", Copy.class) {
     into("$buildDir/nativeImage")
 }
 
-def writeImplClasspath = tasks.register("writeImplClasspath") {
+def writeClasspathsForTests = tasks.register("writeClasspathsForTests") {
     inputs.files(tasks.named("copyNativeImage"))
     doLast {
-        file("$buildDir/impl.classpath").text = configurations.impl.asPath
+        file("$buildDir/impl.classpath").text = configurations.impl21.asPath
         file("$buildDir/nativeImage.path").text = tasks.named("copyNativeImage").get().getOutputs().getFiles().getSingleFile().listFiles()[0].getAbsolutePath()
     }
 }
 
 tasks.named("test").configure {
-    dependsOn(writeImplClasspath)
+    dependsOn(writeClasspathsForTests)
 }
 
 javaVersion {
