@@ -1,5 +1,5 @@
 /*
- * (c) Copyright 2019 Palantir Technologies Inc. All rights reserved.
+ * (c) Copyright 2025 Palantir Technologies Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import static com.google.common.truth.Truth.assertWithMessage;
 
 import com.google.common.collect.ImmutableList;
 import com.palantir.javaformat.jupiter.ParameterizedClass;
+import com.palantir.javaformat.utils.ImportOrdererUtils;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.TestTemplate;

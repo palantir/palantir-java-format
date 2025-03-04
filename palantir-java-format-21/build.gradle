@@ -7,6 +7,11 @@ description = 'Palantir Java Format 21'
 
 dependencies {
     api project(':palantir-java-format')
+
+    testImplementation 'com.google.truth:truth'
+    testImplementation 'org.assertj:assertj-core'
+    testImplementation 'org.junit.jupiter:junit-jupiter-migrationsupport'
+    testImplementation 'org.junit.jupiter:junit-jupiter'
 }
 
 def exports = [
