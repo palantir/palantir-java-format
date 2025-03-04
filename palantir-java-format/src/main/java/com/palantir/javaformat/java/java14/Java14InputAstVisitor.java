@@ -121,11 +121,7 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
         }
         scan(type, null);
         builder.breakOp(" ");
-        if (name.isEmpty()) {
-            token("_");
-        } else {
-            visit(name);
-        }
+        visit(name);
         builder.close();
     }
 
@@ -266,11 +262,6 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
             labels = node.getExpressions();
             isDefault = labels.isEmpty();
         }
-        builder.open(
-                node.getCaseKind().equals(CaseTree.CaseKind.RULE)
-                                && !node.getBody().getKind().equals(Tree.Kind.BLOCK)
-                        ? plusFour
-                        : ZERO);
         if (isDefault) {
             token("default", plusTwo);
         } else {
@@ -313,8 +304,8 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
                 builder.space();
                 token("-");
                 token(">");
+                builder.space();
                 if (node.getBody().getKind() == BLOCK) {
-                    builder.space();
                     // Explicit call with {@link CollapseEmptyOrNot.YES} to handle empty case blocks.
                     visitBlock(
                             (BlockTree) node.getBody(),
@@ -322,7 +313,6 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
                             AllowLeadingBlankLine.NO,
                             AllowTrailingBlankLine.NO);
                 } else {
-                    builder.breakOp(" ");
                     scan(node.getBody(), null);
                 }
                 builder.guessToken(";");
@@ -331,7 +321,6 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
             default:
                 throw new IllegalArgumentException(node.getCaseKind().name());
         }
-        builder.close();
         return null;
     }
 
@@ -367,6 +356,7 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
         }
     }
 
+    @SuppressWarnings("NullableProblems")
     protected ExpressionTree getGuard(final CaseTree node) {
         return null;
     }
