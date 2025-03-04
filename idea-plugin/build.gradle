@@ -62,7 +62,7 @@ dependencies {
     }
     implementation 'com.palantir.gradle.utils:platform'
 
-    formatter project(':palantir-java-format')
+    formatter project(':palantir-java-format-21')
 
     testImplementation 'org.assertj:assertj-core'
     testImplementation 'org.junit.jupiter:junit-jupiter'
