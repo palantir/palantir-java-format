@@ -21,11 +21,12 @@ dependencies {
     implementation project(':palantir-java-format-jdk-bootstrap')
     implementation 'com.palantir.gradle.utils:platform'
 
+    testImplementation project(':palantir-java-format-21')
     testImplementation 'com.netflix.nebula:nebula-test'
     testImplementation 'org.junit.jupiter:junit-jupiter'
-    testImplementation 'org.junit.vintage:junit-vintage-engine'
     testImplementation 'org.assertj:assertj-core'
-    testImplementation project(':palantir-java-format-21')
+
+    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine'
 
     pluginClasspath 'com.diffplug.spotless:spotless-plugin-gradle'
 }
