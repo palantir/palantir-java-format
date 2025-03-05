@@ -1,17 +1,17 @@
 /*
- * Copyright 2016 Google Inc.
+ * (c) Copyright 2025 Palantir Technologies Inc. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy
- * of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations
- * under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.palantir.javaformat.java;
@@ -32,23 +32,23 @@ public class ModifierOrdererTest {
     @Test
     public void simple() throws FormatterException {
         assertThat(ModifierOrderer.reorderModifiers("static abstract class InnerClass {}")
-                        .getText())
+                .getText())
                 .isEqualTo("abstract static class InnerClass {}");
     }
 
     @Test
     public void comment() throws FormatterException {
         assertThat(ModifierOrderer.reorderModifiers("static/*1*/abstract/*2*/public")
-                        .getText())
+                .getText())
                 .isEqualTo("public/*1*/abstract/*2*/static");
     }
 
     @Test
     public void everything() throws FormatterException {
         assertThat(ModifierOrderer.reorderModifiers(
-                                "strictfp native synchronized volatile transient final static abstract"
-                                        + " private protected public")
-                        .getText())
+                        "strictfp native synchronized volatile transient final static abstract"
+                                + " private protected public")
+                .getText())
                 .isEqualTo("public protected private abstract static final transient volatile synchronized"
                         + " native strictfp");
     }
@@ -56,9 +56,9 @@ public class ModifierOrdererTest {
     @Test
     public void everythingIncludingDefault() throws FormatterException {
         assertThat(ModifierOrderer.reorderModifiers(
-                                "strictfp native synchronized volatile transient final static default abstract"
-                                        + " private protected public")
-                        .getText())
+                        "strictfp native synchronized volatile transient final static default abstract"
+                                + " private protected public")
+                .getText())
                 .isEqualTo("public protected private abstract default static final transient volatile synchronized"
                         + " native strictfp");
     }
@@ -66,10 +66,10 @@ public class ModifierOrdererTest {
     @Test
     public void subRange() throws FormatterException {
         String[] lines = {
-            "class Test {", //
-            "  static public int a;",
-            "  static public int b;",
-            "}",
+                "class Test {", //
+                "  static public int a;",
+                "  static public int b;",
+                "}",
         };
         String input = Joiner.on('\n').join(lines);
         String substring = "static public int a";
@@ -85,10 +85,10 @@ public class ModifierOrdererTest {
     @Test
     public void whitespace() throws FormatterException {
         String[] lines = {
-            "class Test {", //
-            "  static",
-            "  public int a;",
-            "}",
+                "class Test {", //
+                "  static",
+                "  public int a;",
+                "}",
         };
         String input = Joiner.on('\n').join(lines);
         String substring = "static public int a";

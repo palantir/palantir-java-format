@@ -1,15 +1,17 @@
 /*
- * Copyright 2015 Google Inc.
+ * (c) Copyright 2025 Palantir Technologies Inc. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.palantir.javaformat.java;
@@ -295,7 +297,7 @@ public final class FormatterTest {
         StringWriter err = new StringWriter();
         Main main = new Main(new PrintWriter(out, true), new PrintWriter(err, true), System.in);
         String[] args =
-                sortArg != null ? new String[] {sortArg, "-i", path.toString()} : new String[] {"-i", path.toString()};
+                sortArg != null ? new String[]{sortArg, "-i", path.toString()} : new String[]{"-i", path.toString()};
         main.format(args);
 
         assertThat(err.toString()).isEmpty();
@@ -332,12 +334,12 @@ public final class FormatterTest {
     @Test
     public void wrapLineComment() throws Exception {
         assertThat(Formatter.create()
-                        .formatSource("class T {\n"
-                                + "  public static void main(String[] args) { // one long incredibly"
-                                + " unbroken sentence moving from topic to topic so that no-one had a"
-                                + " chance to interrupt;\n"
-                                + "  }\n"
-                                + "}\n"))
+                .formatSource("class T {\n"
+                        + "  public static void main(String[] args) { // one long incredibly"
+                        + " unbroken sentence moving from topic to topic so that no-one had a"
+                        + " chance to interrupt;\n"
+                        + "  }\n"
+                        + "}\n"))
                 .isEqualTo("class T {\n"
                         + "  public static void main(\n"
                         + "      String[]\n"
@@ -351,12 +353,12 @@ public final class FormatterTest {
     @Test
     public void onlyWrapLineCommentOnWhitespace() throws Exception {
         assertThat(Formatter.create()
-                        .formatSource("class T {\n"
-                                + "  public static void main(String[] args) { // one_long_incredibly"
-                                + "_unbroken_sentence_moving_from_topic_to_topic_so_that_no-one_had_a"
-                                + "_chance_to_interrupt;\n"
-                                + "  }\n"
-                                + "}\n"))
+                .formatSource("class T {\n"
+                        + "  public static void main(String[] args) { // one_long_incredibly"
+                        + "_unbroken_sentence_moving_from_topic_to_topic_so_that_no-one_had_a"
+                        + "_chance_to_interrupt;\n"
+                        + "  }\n"
+                        + "}\n"))
                 .isEqualTo("class T {\n"
                         + "  public static void main(\n"
                         + "      String[]\n"
@@ -370,12 +372,12 @@ public final class FormatterTest {
     @Test
     public void onlyWrapLineCommentOnWhitespace_noLeadingWhitespace() throws Exception {
         assertThat(Formatter.create()
-                        .formatSource("class T {\n"
-                                + "  public static void main(String[] args) { //one_long_incredibly"
-                                + "_unbroken_sentence_moving_from_topic_to_topic_so_that_no-one_had_a"
-                                + "_chance_to_interrupt;\n"
-                                + "  }\n"
-                                + "}\n"))
+                .formatSource("class T {\n"
+                        + "  public static void main(String[] args) { //one_long_incredibly"
+                        + "_unbroken_sentence_moving_from_topic_to_topic_so_that_no-one_had_a"
+                        + "_chance_to_interrupt;\n"
+                        + "  }\n"
+                        + "}\n"))
                 .isEqualTo("class T {\n"
                         + "  public static void main(\n"
                         + "      String[]\n"
@@ -422,11 +424,11 @@ public final class FormatterTest {
     @Test
     public void dontWrapMoeLineComments() throws Exception {
         assertThat(Formatter.create()
-                        .formatSource("class T {\n"
-                                + "  // MOE: one long incredibly"
-                                + " unbroken sentence moving from topic to topic so that no-one had a"
-                                + " chance to interrupt;\n"
-                                + "}\n"))
+                .formatSource("class T {\n"
+                        + "  // MOE: one long incredibly"
+                        + " unbroken sentence moving from topic to topic so that no-one had a"
+                        + " chance to interrupt;\n"
+                        + "}\n"))
                 .isEqualTo("class T {\n"
                         + "  // MOE: one long incredibly"
                         + " unbroken sentence moving from topic to topic so that no-one had a"
@@ -437,10 +439,10 @@ public final class FormatterTest {
     @Test
     void canParse_java9_private_interface_methods() {
         assertThatCode(() -> Formatter.create()
-                        .formatSourceAndFixImports(""
-                                + "interface T {\n"
-                                + "    private static void foo() {}\n" //
-                                + "}"))
+                .formatSourceAndFixImports(""
+                        + "interface T {\n"
+                        + "    private static void foo() {}\n" //
+                        + "}"))
                 .doesNotThrowAnyException();
     }
 }

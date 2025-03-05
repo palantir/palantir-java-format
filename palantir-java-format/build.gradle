@@ -1,101 +1,19 @@
 apply plugin: 'application'
 apply plugin: 'com.palantir.external-publish-jar'
 
-mainClassName = 'com.palantir.javaformat.java.Main'
-
-description = 'Palantir Java Format'
-
-configurations {
-    testFormatterNativeImage {
-        canBeConsumed = false
-        canBeResolved = true
-        extendsFrom(testImplementation)
-    }
-}
-
 dependencies {
-    api project(':palantir-java-format-spi')
-    api 'com.google.guava:guava'
-    implementation 'org.functionaljava:functionaljava'
-    implementation 'com.fasterxml.jackson.core:jackson-core'
-    implementation 'com.fasterxml.jackson.core:jackson-databind'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8'
-    implementation 'com.fasterxml.jackson.module:jackson-module-parameter-names'
+    api project(':palantir-java-format-21')
 
-    testImplementation 'com.google.guava:guava-testlib'
+    testImplementation project(':palantir-java-format-all')
     testImplementation 'com.google.truth:truth'
-    testImplementation 'com.google.testing.compile:compile-testing'
     testImplementation 'org.assertj:assertj-core'
     testImplementation 'org.junit.jupiter:junit-jupiter-migrationsupport'
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
-    testFormatterNativeImage project(':palantir-java-format-native')
-
-    compileOnly 'com.google.auto.service:auto-service'
-    annotationProcessor 'com.google.auto.service:auto-service'
-    compileOnly "org.immutables:value::annotations"
-    annotationProcessor "org.immutables:value"
-
-    compileOnly 'org.derive4j:derive4j-annotation'
-    annotationProcessor 'org.derive4j:derive4j'
+    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine'
+    testRuntimeOnly project(':palantir-java-format-21')
 }
 
-def exports = [
-        'jdk.compiler/com.sun.tools.javac.file',
-        'jdk.compiler/com.sun.tools.javac.main',
-        'jdk.compiler/com.sun.tools.javac.parser',
-        'jdk.compiler/com.sun.tools.javac.tree',
-        'jdk.compiler/com.sun.tools.javac.util',
-        'jdk.compiler/com.sun.tools.javac.code',
-        'jdk.compiler/com.sun.tools.javac.api'
-]
-
-def jvmArgList = exports.collect { value -> "--add-exports=${value}=ALL-UNNAMED".toString() }
-
-tasks.withType(JavaCompile).configureEach {
-    options.errorprone.disable 'StrictUnusedVariable'
-
-    // Allow access to internal javac apis
-    options.compilerArgs += jvmArgList
-
-    if (JavaVersion.current() < JavaVersion.VERSION_14) {
-        excludes = ['**/Java14InputAstVisitor.java']
-    }
-}
-
-tasks.withType(Test).configureEach {
-    jvmArgs = jvmArgList
-}
-
-tasks.withType(Javadoc).configureEach {
-    // Allow access to internal javac apis
-    options.optionFiles << file('../gradle/javadoc.options')
-
-    if (JavaVersion.current() < JavaVersion.VERSION_14) {
-        exclude '**/Java14InputAstVisitor.java'
-    }
-}
-
-// false positives due to org.junit.runners.* in the test cases
-tasks.named("checkJUnitDependencies") {
-    enabled = false
-}
-
-tasks.named("test") {
-    // Run all classes and tests in parallel
-    // https://junit.org/junit5/docs/current/user-guide/#writing-tests-parallel-execution
-    systemProperty 'junit.jupiter.execution.parallel.mode.default', 'concurrent'
-}
-
-// necessary to compile Java14InputAstVisitor
-idea {
-    module.languageLevel = new org.gradle.plugins.ide.idea.model.IdeaLanguageLevel(14)
-}
-
-// This block may be replaced by BaselineExportsExtension exports
-// once https://github.com/gradle/gradle/issues/18824 is resolved.
-tasks.named("jar", Jar) {
-    manifest {
-        attributes('Add-Exports': exports.join(' '))
-    }
+javaVersion {
+    runtime = 21
 }

@@ -1,15 +1,17 @@
 /*
- * Copyright 2016 Google Inc.
+ * (c) Copyright 2025 Palantir Technologies Inc. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.palantir.javaformat.java;
@@ -38,12 +40,12 @@ public final class JavadocFormattingTest {
     @Test
     public void notJavadoc() {
         String[] input = {
-            "/**/", //
-            "class Test {}",
+                "/**/", //
+                "class Test {}",
         };
         String[] expected = {
-            "/**/", //
-            "class Test {}",
+                "/**/", //
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -51,11 +53,11 @@ public final class JavadocFormattingTest {
     @Test
     public void empty() {
         String[] input = {
-            "/***/", //
-            "class Test {}",
+                "/***/", //
+                "class Test {}",
         };
         String[] expected = {
-            "/** */", "class Test {}",
+                "/** */", "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -63,12 +65,12 @@ public final class JavadocFormattingTest {
     @Test
     public void emptyMultipleLines() {
         String[] input = {
-            "/**", //
-            " */",
-            "class Test {}",
+                "/**", //
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/** */", "class Test {}",
+                "/** */", "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -76,11 +78,11 @@ public final class JavadocFormattingTest {
     @Test
     public void simple() {
         String[] input = {
-            "/** */", //
-            "class Test {}",
+                "/** */", //
+                "class Test {}",
         };
         String[] expected = {
-            "/** */", "class Test {}",
+                "/** */", "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -89,10 +91,10 @@ public final class JavadocFormattingTest {
     public void commentMostlyUntouched() {
         // This test isn't necessarily what we'd want to do, but it's what we do now, and it's OK-ish.
         String[] input = {
-            "/**", " * Foo.", " *", " *  <!--", "*abc", " *   def   ", " * </tr>", " *-->bar", " */", "class Test {}",
+                "/**", " * Foo.", " *", " *  <!--", "*abc", " *   def   ", " * </tr>", " *-->bar", " */", "class Test {}",
         };
         String[] expected = {
-            "/**", " * Foo.", " * <!--", " *abc", " *   def", " * </tr>", " *-->", " * bar", " */", "class Test {}",
+                "/**", " * Foo.", " * <!--", " *abc", " *   def", " * </tr>", " *-->", " * bar", " */", "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -100,52 +102,52 @@ public final class JavadocFormattingTest {
     @Test
     public void moeComments() {
         String[] input = {
-            "/**",
-            " * Deatomizes the given user.",
-            " * <!-- MOE:begin_intracomment_strip -->",
-            " * See go/deatomizer-v5 for the design doc.",
-            " * <!-- MOE:end_intracomment_strip -->",
-            " * To reatomize, call {@link reatomize}.",
-            " *",
-            " * <!-- MOE:begin_intracomment_strip -->",
-            " * <p>This method is used in the Google teleporter.",
-            " *",
-            " * <p>Yes, we have a teleporter.",
-            " * <!-- MOE:end_intracomment_strip -->",
-            " *",
-            " * @param user the person to teleport.",
-            " *     <!-- MOE:begin_intracomment_strip -->",
-            " *     Users must sign go/deatomize-waiver ahead of time.",
-            " *     <!-- MOE:end_intracomment_strip -->",
-            " * <!-- MOE:begin_intracomment_strip -->",
-            " * @deprecated Sometimes turns the user into a goat.",
-            " * <!-- MOE:end_intracomment_strip -->",
-            " */",
-            "class Test {}",
+                "/**",
+                " * Deatomizes the given user.",
+                " * <!-- MOE:begin_intracomment_strip -->",
+                " * See go/deatomizer-v5 for the design doc.",
+                " * <!-- MOE:end_intracomment_strip -->",
+                " * To reatomize, call {@link reatomize}.",
+                " *",
+                " * <!-- MOE:begin_intracomment_strip -->",
+                " * <p>This method is used in the Google teleporter.",
+                " *",
+                " * <p>Yes, we have a teleporter.",
+                " * <!-- MOE:end_intracomment_strip -->",
+                " *",
+                " * @param user the person to teleport.",
+                " *     <!-- MOE:begin_intracomment_strip -->",
+                " *     Users must sign go/deatomize-waiver ahead of time.",
+                " *     <!-- MOE:end_intracomment_strip -->",
+                " * <!-- MOE:begin_intracomment_strip -->",
+                " * @deprecated Sometimes turns the user into a goat.",
+                " * <!-- MOE:end_intracomment_strip -->",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**",
-            " * Deatomizes the given user.",
-            " * <!-- MOE:begin_intracomment_strip -->",
-            " * See go/deatomizer-v5 for the design doc.",
-            " * <!-- MOE:end_intracomment_strip -->",
-            " * To reatomize, call {@link reatomize}.",
-            " *",
-            " * <!-- MOE:begin_intracomment_strip -->",
-            " * <p>This method is used in the Google teleporter.",
-            " *",
-            " * <p>Yes, we have a teleporter.",
-            " * <!-- MOE:end_intracomment_strip -->",
-            " *",
-            " * @param user the person to teleport.",
-            " *     <!-- MOE:begin_intracomment_strip -->",
-            " *     Users must sign go/deatomize-waiver ahead of time.",
-            " *     <!-- MOE:end_intracomment_strip -->",
-            " * <!-- MOE:begin_intracomment_strip -->",
-            " * @deprecated Sometimes turns the user into a goat.",
-            " * <!-- MOE:end_intracomment_strip -->",
-            " */",
-            "class Test {}",
+                "/**",
+                " * Deatomizes the given user.",
+                " * <!-- MOE:begin_intracomment_strip -->",
+                " * See go/deatomizer-v5 for the design doc.",
+                " * <!-- MOE:end_intracomment_strip -->",
+                " * To reatomize, call {@link reatomize}.",
+                " *",
+                " * <!-- MOE:begin_intracomment_strip -->",
+                " * <p>This method is used in the Google teleporter.",
+                " *",
+                " * <p>Yes, we have a teleporter.",
+                " * <!-- MOE:end_intracomment_strip -->",
+                " *",
+                " * @param user the person to teleport.",
+                " *     <!-- MOE:begin_intracomment_strip -->",
+                " *     Users must sign go/deatomize-waiver ahead of time.",
+                " *     <!-- MOE:end_intracomment_strip -->",
+                " * <!-- MOE:begin_intracomment_strip -->",
+                " * @deprecated Sometimes turns the user into a goat.",
+                " * <!-- MOE:end_intracomment_strip -->",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -154,20 +156,20 @@ public final class JavadocFormattingTest {
     public void moeCommentBeginOnlyInMiddleOfDoc() {
         // We don't really care what happens here so long as we don't explode.
         String[] input = {
-            "/**", //
-            " * Foo.",
-            " * <!-- MOE:begin_intracomment_strip -->",
-            " * Bar.",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * Foo.",
+                " * <!-- MOE:begin_intracomment_strip -->",
+                " * Bar.",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**", //
-            " * Foo.",
-            " * <!-- MOE:begin_intracomment_strip -->",
-            " * Bar.",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * Foo.",
+                " * <!-- MOE:begin_intracomment_strip -->",
+                " * Bar.",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -177,15 +179,15 @@ public final class JavadocFormattingTest {
         // We don't really care what happens here so long as we don't explode.
         // TODO(cpovirk): OK, maybe try to leave it in....
         String[] input = {
-            "/**", //
-            " * Foo.",
-            " * <!-- MOE:begin_intracomment_strip -->",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * Foo.",
+                " * <!-- MOE:begin_intracomment_strip -->",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/** Foo. */", //
-            "class Test {}",
+                "/** Foo. */", //
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -194,18 +196,18 @@ public final class JavadocFormattingTest {
     public void moeCommentEndOnly() {
         // We don't really care what happens here so long as we don't explode.
         String[] input = {
-            "/**", //
-            " * Foo.",
-            " * <!-- MOE:end_intracomment_strip -->",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * Foo.",
+                " * <!-- MOE:end_intracomment_strip -->",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**", //
-            " * Foo.",
-            " * <!-- MOE:end_intracomment_strip -->",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * Foo.",
+                " * <!-- MOE:end_intracomment_strip -->",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -213,32 +215,32 @@ public final class JavadocFormattingTest {
     @Test
     public void tableMostlyUntouched() {
         String[] input = {
-            "/**",
-            " * Foo.",
-            " *",
-            " *  <table>",
-            "*<tr><td>a<td>b</tr>",
-            " * <tr>",
-            " * <td>A",
-            " *     <td>B",
-            " * </tr>",
-            " *</table>",
-            " */",
-            "class Test {}",
+                "/**",
+                " * Foo.",
+                " *",
+                " *  <table>",
+                "*<tr><td>a<td>b</tr>",
+                " * <tr>",
+                " * <td>A",
+                " *     <td>B",
+                " * </tr>",
+                " *</table>",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**",
-            " * Foo.",
-            " *",
-            " * <table>",
-            " * <tr><td>a<td>b</tr>",
-            " * <tr>",
-            " * <td>A",
-            " *     <td>B",
-            " * </tr>",
-            " * </table>",
-            " */",
-            "class Test {}",
+                "/**",
+                " * Foo.",
+                " *",
+                " * <table>",
+                " * <tr><td>a<td>b</tr>",
+                " * <tr>",
+                " * <td>A",
+                " *     <td>B",
+                " * </tr>",
+                " * </table>",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -256,28 +258,28 @@ public final class JavadocFormattingTest {
          * accommodate it.)
          */
         String[] input = {
-            "/**", //
-            " * Example:",
-            " *",
-            " *  <pre>",
-            "*    1 2<br>    3   ",
-            " *4 5 6",
-            "7 8",
-            " *</pre>",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * Example:",
+                " *",
+                " *  <pre>",
+                "*    1 2<br>    3   ",
+                " *4 5 6",
+                "7 8",
+                " *</pre>",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**", //
-            " * Example:",
-            " *",
-            " * <pre>",
-            " *    1 2<br>    3",
-            " * 4 5 6",
-            " * 7 8",
-            " * </pre>",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * Example:",
+                " *",
+                " * <pre>",
+                " *    1 2<br>    3",
+                " * 4 5 6",
+                " * 7 8",
+                " * </pre>",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -286,24 +288,24 @@ public final class JavadocFormattingTest {
     public void preCodeExample() {
         // We should figure out whether we want a newline or blank line before <pre> or not.
         String[] input = {
-            "/**",
-            " * Example:",
-            " *",
-            " * <pre>   {@code",
-            " *",
-            " *   Abc.def(foo, 7, true); // blah}</pre>",
-            " */",
-            "class Test {}",
+                "/**",
+                " * Example:",
+                " *",
+                " * <pre>   {@code",
+                " *",
+                " *   Abc.def(foo, 7, true); // blah}</pre>",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**",
-            " * Example:",
-            " *",
-            " * <pre>{@code",
-            " * Abc.def(foo, 7, true); // blah",
-            " * }</pre>",
-            " */",
-            "class Test {}",
+                "/**",
+                " * Example:",
+                " *",
+                " * <pre>{@code",
+                " * Abc.def(foo, 7, true); // blah",
+                " * }</pre>",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -311,26 +313,26 @@ public final class JavadocFormattingTest {
     @Test
     public void preNotWrapped() {
         String[] input = {
-            "/**",
-            " * Example:",
-            " *",
-            " * <pre>",
-            " * 456789012 456789012 456789012 456789012 456789012 456789012 456789012 456789012 "
-                    + "456789012 45678901",
-            " * </pre>",
-            " */",
-            "class Test {}",
+                "/**",
+                " * Example:",
+                " *",
+                " * <pre>",
+                " * 456789012 456789012 456789012 456789012 456789012 456789012 456789012 456789012 "
+                        + "456789012 45678901",
+                " * </pre>",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**",
-            " * Example:",
-            " *",
-            " * <pre>",
-            " * 456789012 456789012 456789012 456789012 456789012 456789012 456789012 456789012 "
-                    + "456789012 45678901",
-            " * </pre>",
-            " */",
-            "class Test {}",
+                "/**",
+                " * Example:",
+                " *",
+                " * <pre>",
+                " * 456789012 456789012 456789012 456789012 456789012 456789012 456789012 456789012 "
+                        + "456789012 45678901",
+                " * </pre>",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -338,26 +340,26 @@ public final class JavadocFormattingTest {
     @Test
     public void javaCodeInPre() {
         String[] input = {
-            "/**",
-            " * Example:",
-            " *",
-            " *<pre>",
-            " * aaaaa    |   a  |   +",
-            " * \"bbbb    |   b  |  \"",
-            " *</pre>",
-            " */",
-            "class Test {}",
+                "/**",
+                " * Example:",
+                " *",
+                " *<pre>",
+                " * aaaaa    |   a  |   +",
+                " * \"bbbb    |   b  |  \"",
+                " *</pre>",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**",
-            " * Example:",
-            " *",
-            " * <pre>",
-            " * aaaaa    |   a  |   +",
-            " * \"bbbb    |   b  |  \"",
-            " * </pre>",
-            " */",
-            "class Test {}",
+                "/**",
+                " * Example:",
+                " *",
+                " * <pre>",
+                " * aaaaa    |   a  |   +",
+                " * \"bbbb    |   b  |  \"",
+                " * </pre>",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -365,16 +367,16 @@ public final class JavadocFormattingTest {
     @Test
     public void joinLines() {
         String[] input = {
-            "/**", //
-            " * foo",
-            " * bar",
-            " * baz",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * foo",
+                " * bar",
+                " * baz",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/** foo bar baz */", //
-            "class Test {}",
+                "/** foo bar baz */", //
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -382,14 +384,14 @@ public final class JavadocFormattingTest {
     @Test
     public void oneLinerIs100() {
         String[] input = {
-            "/**",
-            " * 567890123 567890123 567890123 567890123 567890123 567890123 567890123 567890123 " + "567890123 567",
-            " */",
-            "class Test {}",
+                "/**",
+                " * 567890123 567890123 567890123 567890123 567890123 567890123 567890123 567890123 " + "567890123 567",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/** 567890123 567890123 567890123 567890123 567890123 567890123 567890123 567890123 " + "567890123 567 */",
-            "class Test {}",
+                "/** 567890123 567890123 567890123 567890123 567890123 567890123 567890123 567890123 " + "567890123 567 */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -397,16 +399,16 @@ public final class JavadocFormattingTest {
     @Test
     public void oneLinerWouldBe101() {
         String[] input = {
-            "/**",
-            " * 567890123 567890123 567890123 567890123 567890123 567890123 567890123 567890123 " + "567890123 5678",
-            " */",
-            "class Test {}",
+                "/**",
+                " * 567890123 567890123 567890123 567890123 567890123 567890123 567890123 567890123 " + "567890123 5678",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**",
-            " * 567890123 567890123 567890123 567890123 567890123 567890123 567890123 567890123 " + "567890123 5678",
-            " */",
-            "class Test {}",
+                "/**",
+                " * 567890123 567890123 567890123 567890123 567890123 567890123 567890123 567890123 " + "567890123 5678",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -414,18 +416,18 @@ public final class JavadocFormattingTest {
     @Test
     public void multilineWrap() {
         String[] input = {
-            "/**",
-            " * 456789012 456789012 456789012 456789012 456789012 456789012 456789012 456789012 "
-                    + "456789012 45678901",
-            " */",
-            "class Test {}",
+                "/**",
+                " * 456789012 456789012 456789012 456789012 456789012 456789012 456789012 456789012 "
+                        + "456789012 45678901",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**",
-            " * 456789012 456789012 456789012 456789012 456789012 456789012 456789012 456789012 " + "456789012",
-            " * 45678901",
-            " */",
-            "class Test {}",
+                "/**",
+                " * 456789012 456789012 456789012 456789012 456789012 456789012 456789012 456789012 " + "456789012",
+                " * 45678901",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -433,22 +435,22 @@ public final class JavadocFormattingTest {
     @Test
     public void tooLong() {
         String[] input = {
-            "/**",
-            " * abc",
-            " *",
-            " * <p>789012345678901234567890123456789012345678901234567890123456789012345678901234567"
-                    + "8901234567890123456",
-            " */",
-            "class Test {}",
+                "/**",
+                " * abc",
+                " *",
+                " * <p>789012345678901234567890123456789012345678901234567890123456789012345678901234567"
+                        + "8901234567890123456",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**",
-            " * abc",
-            " *",
-            " * <p>789012345678901234567890123456789012345678901234567890123456789012345678901234567"
-                    + "8901234567890123456",
-            " */",
-            "class Test {}",
+                "/**",
+                " * abc",
+                " *",
+                " * <p>789012345678901234567890123456789012345678901234567890123456789012345678901234567"
+                        + "8901234567890123456",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -460,18 +462,18 @@ public final class JavadocFormattingTest {
          * split them across lines).
          */
         String[] input = {
-            "/**",
-            " * 456789012 456789012 456789012 456789012 456789012 456789012 456789012 456789012 "
-                    + "456789012 4<b>8901",
-            " */",
-            "class Test {}",
+                "/**",
+                " * 456789012 456789012 456789012 456789012 456789012 456789012 456789012 456789012 "
+                        + "456789012 4<b>8901",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**",
-            " * 456789012 456789012 456789012 456789012 456789012 456789012 456789012 456789012 " + "456789012",
-            " * 4<b>8901",
-            " */",
-            "class Test {}",
+                "/**",
+                " * 456789012 456789012 456789012 456789012 456789012 456789012 456789012 456789012 " + "456789012",
+                " * 4<b>8901",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -483,18 +485,18 @@ public final class JavadocFormattingTest {
          * mean the next line would start with @5678901, which would then be interpreted as a tag.
          */
         String[] input = {
-            "/**",
-            " * 456789012 456789012 456789012 456789012 456789012 456789012 456789012 456789012 "
-                    + "456789012 @5678901",
-            " */",
-            "class Test {}",
+                "/**",
+                " * 456789012 456789012 456789012 456789012 456789012 456789012 456789012 456789012 "
+                        + "456789012 @5678901",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**",
-            " * 456789012 456789012 456789012 456789012 456789012 456789012 456789012 456789012",
-            " * 456789012 @5678901",
-            " */",
-            "class Test {}",
+                "/**",
+                " * 456789012 456789012 456789012 456789012 456789012 456789012 456789012 456789012",
+                " * 456789012 @5678901",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -503,18 +505,18 @@ public final class JavadocFormattingTest {
     public void joinedMultipleAtSign() {
         // This is the same as above except that it tests multiple consecutive @... tokens.
         String[] input = {
-            "/**",
-            " * 456789012 456789012 456789012 456789012 456789012 456789012 456789012 456789012 "
-                    + "@56789012 @5678901",
-            " */",
-            "class Test {}",
+                "/**",
+                " * 456789012 456789012 456789012 456789012 456789012 456789012 456789012 456789012 "
+                        + "@56789012 @5678901",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**",
-            " * 456789012 456789012 456789012 456789012 456789012 456789012 456789012",
-            " * 456789012 @56789012 @5678901",
-            " */",
-            "class Test {}",
+                "/**",
+                " * 456789012 456789012 456789012 456789012 456789012 456789012 456789012",
+                " * 456789012 @56789012 @5678901",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -522,18 +524,18 @@ public final class JavadocFormattingTest {
     @Test
     public void noAsterisk() {
         String[] input = {
-            "/**", //
-            " abc<p>def",
-            " */",
-            "class Test {}",
+                "/**", //
+                " abc<p>def",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**", //
-            " * abc",
-            " *",
-            " * <p>def",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * abc",
+                " *",
+                " * <p>def",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -541,14 +543,14 @@ public final class JavadocFormattingTest {
     @Test
     public void significantAsterisks() {
         String[] input = {
-            "/** *", //
-            " * *",
-            " */",
-            "class Test {}",
+                "/** *", //
+                " * *",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/** * * */", //
-            "class Test {}",
+                "/** * * */", //
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -556,58 +558,58 @@ public final class JavadocFormattingTest {
     @Test
     public void links() {
         String[] input = {
-            "/**",
-            " * 456789012 456789012 456789012 456789012 456789012 456789012 456789012 456789012 " + "456789012 4567 <a",
-            " * href=foo>foo</a>.",
-            " *",
-            " * <p>789012 456789012 456789012 456789012 456789012 456789012 456789012 456789 " + "<a href=foo>",
-            " * foo</a>.",
-            " *",
-            " * <p>789012 456789012 456789012 456789012 456789012 456789012 456789012 4567890 " + "<a href=foo>",
-            " * foo</a>.",
-            " *",
-            " * <p><a href=foo>",
-            " * foo</a>.",
-            " *",
-            " * <p>foo <a href=bar>",
-            " * bar</a>.",
-            " *",
-            " * <p>foo-<a href=bar>",
-            " * bar</a>.",
-            " *",
-            " * <p>foo<a href=bar>",
-            " * bar</a>.",
-            " *",
-            " * <p><a href=foo>foo</a> bar.",
-            " */",
-            "class Test {}",
+                "/**",
+                " * 456789012 456789012 456789012 456789012 456789012 456789012 456789012 456789012 " + "456789012 4567 <a",
+                " * href=foo>foo</a>.",
+                " *",
+                " * <p>789012 456789012 456789012 456789012 456789012 456789012 456789012 456789 " + "<a href=foo>",
+                " * foo</a>.",
+                " *",
+                " * <p>789012 456789012 456789012 456789012 456789012 456789012 456789012 4567890 " + "<a href=foo>",
+                " * foo</a>.",
+                " *",
+                " * <p><a href=foo>",
+                " * foo</a>.",
+                " *",
+                " * <p>foo <a href=bar>",
+                " * bar</a>.",
+                " *",
+                " * <p>foo-<a href=bar>",
+                " * bar</a>.",
+                " *",
+                " * <p>foo<a href=bar>",
+                " * bar</a>.",
+                " *",
+                " * <p><a href=foo>foo</a> bar.",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**",
-            " * 456789012 456789012 456789012 456789012 456789012 456789012 456789012 456789012 " + "456789012 4567 <a",
-            " * href=foo>foo</a>.",
-            " *",
-            " * <p>789012 456789012 456789012 456789012 456789012 456789012 456789012 456789 " + "<a href=foo>foo</a>.",
-            " *",
-            " * <p>789012 456789012 456789012 456789012 456789012 456789012 456789012 4567890 " + "<a href=foo>",
-            " * foo</a>.",
-            " *",
-            " * <p><a href=foo>foo</a>.",
-            " *",
-            " * <p>foo <a href=bar>bar</a>.",
-            " *",
-            " * <p>foo-<a href=bar>bar</a>.",
-            " *",
-            /*
-             * In this next case, we've removed a space from the output. Fortunately, the depot doesn't
-             * appear to contain any occurrences of this pattern. And if it does, the better fix is to
-             * insert a space before <a href> rather than after.
-             */
-            " * <p>foo<a href=bar>bar</a>.",
-            " *",
-            " * <p><a href=foo>foo</a> bar.",
-            " */",
-            "class Test {}",
+                "/**",
+                " * 456789012 456789012 456789012 456789012 456789012 456789012 456789012 456789012 " + "456789012 4567 <a",
+                " * href=foo>foo</a>.",
+                " *",
+                " * <p>789012 456789012 456789012 456789012 456789012 456789012 456789012 456789 " + "<a href=foo>foo</a>.",
+                " *",
+                " * <p>789012 456789012 456789012 456789012 456789012 456789012 456789012 4567890 " + "<a href=foo>",
+                " * foo</a>.",
+                " *",
+                " * <p><a href=foo>foo</a>.",
+                " *",
+                " * <p>foo <a href=bar>bar</a>.",
+                " *",
+                " * <p>foo-<a href=bar>bar</a>.",
+                " *",
+                /*
+                 * In this next case, we've removed a space from the output. Fortunately, the depot doesn't
+                 * appear to contain any occurrences of this pattern. And if it does, the better fix is to
+                 * insert a space before <a href> rather than after.
+                 */
+                " * <p>foo<a href=bar>bar</a>.",
+                " *",
+                " * <p><a href=foo>foo</a> bar.",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -615,20 +617,20 @@ public final class JavadocFormattingTest {
     @Test
     public void heading() {
         String[] input = {
-            "/**", //
-            " * abc<h1>def</h1>ghi",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * abc<h1>def</h1>ghi",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**", //
-            " * abc",
-            " *",
-            " * <h1>def</h1>",
-            " *",
-            " * ghi",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * abc",
+                " *",
+                " * <h1>def</h1>",
+                " *",
+                " * ghi",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -636,24 +638,24 @@ public final class JavadocFormattingTest {
     @Test
     public void blockquote() {
         String[] input = {
-            "/**", //
-            " * abc<blockquote><p>def</blockquote>ghi",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * abc<blockquote><p>def</blockquote>ghi",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**", //
-            " * abc",
-            " *",
-            " * <blockquote>",
-            " *",
-            " * <p>def",
-            " *",
-            " * </blockquote>",
-            " *",
-            " * ghi",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * abc",
+                " *",
+                " * <blockquote>",
+                " *",
+                " * <p>def",
+                " *",
+                " * </blockquote>",
+                " *",
+                " * ghi",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -661,31 +663,31 @@ public final class JavadocFormattingTest {
     @Test
     public void lists() {
         String[] input = {
-            "/**", //
-            "* hi",
-            "*",
-            "* <ul>",
-            "* <li>",
-            "* <ul>",
-            "* <li>a</li>",
-            "* </ul>",
-            "* </li>",
-            "* </ul>",
-            "*/",
-            "class Test {}",
+                "/**", //
+                "* hi",
+                "*",
+                "* <ul>",
+                "* <li>",
+                "* <ul>",
+                "* <li>a</li>",
+                "* </ul>",
+                "* </li>",
+                "* </ul>",
+                "*/",
+                "class Test {}",
         };
         String[] expected = {
-            "/**", //
-            " * hi",
-            " *",
-            " * <ul>",
-            " *   <li>",
-            " *       <ul>",
-            " *         <li>a",
-            " *       </ul>",
-            " * </ul>",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * hi",
+                " *",
+                " * <ul>",
+                " *   <li>",
+                " *       <ul>",
+                " *         <li>a",
+                " *       </ul>",
+                " * </ul>",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -693,29 +695,29 @@ public final class JavadocFormattingTest {
     @Test
     public void lists2() {
         String[] input = {
-            "/**", //
-            " * Foo.",
-            " *",
-            " * <ul><li>1<ul><li>1a<li>1b</ul>more 1<p>still more 1<li>2</ul>",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * Foo.",
+                " *",
+                " * <ul><li>1<ul><li>1a<li>1b</ul>more 1<p>still more 1<li>2</ul>",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**", //
-            " * Foo.",
-            " *",
-            " * <ul>",
-            " *   <li>1",
-            " *       <ul>",
-            " *         <li>1a",
-            " *         <li>1b",
-            " *       </ul>",
-            " *       more 1",
-            " *       <p>still more 1",
-            " *   <li>2",
-            " * </ul>",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * Foo.",
+                " *",
+                " * <ul>",
+                " *   <li>1",
+                " *       <ul>",
+                " *         <li>1a",
+                " *         <li>1b",
+                " *       </ul>",
+                " *       more 1",
+                " *       <p>still more 1",
+                " *   <li>2",
+                " * </ul>",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -723,26 +725,26 @@ public final class JavadocFormattingTest {
     @Test
     public void closeInnerListStillNewline() {
         String[] input = {
-            "/**", //
-            " * Foo.",
-            " *",
-            " * <ul><li><ul><li>a</ul>b</ul>",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * Foo.",
+                " *",
+                " * <ul><li><ul><li>a</ul>b</ul>",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**", //
-            " * Foo.",
-            " *",
-            " * <ul>",
-            " *   <li>",
-            " *       <ul>",
-            " *         <li>a",
-            " *       </ul>",
-            " *       b",
-            " * </ul>",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * Foo.",
+                " *",
+                " * <ul>",
+                " *   <li>",
+                " *       <ul>",
+                " *         <li>a",
+                " *       </ul>",
+                " *       b",
+                " * </ul>",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -750,24 +752,24 @@ public final class JavadocFormattingTest {
     @Test
     public void listItemWrap() {
         String[] input = {
-            "/**", //
-            " * Foo.",
-            " *",
-            " * <ul><li>234567890 234567890 234567890 234567890 234567890 234567890 234567890 234567890"
-                    + " 234567890 234567890</ul>",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * Foo.",
+                " *",
+                " * <ul><li>234567890 234567890 234567890 234567890 234567890 234567890 234567890 234567890"
+                        + " 234567890 234567890</ul>",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**", //
-            " * Foo.",
-            " *",
-            " * <ul>",
-            " *   <li>234567890 234567890 234567890 234567890 234567890 234567890 234567890 234567890" + " 234567890",
-            " *       234567890",
-            " * </ul>",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * Foo.",
+                " *",
+                " * <ul>",
+                " *   <li>234567890 234567890 234567890 234567890 234567890 234567890 234567890 234567890" + " 234567890",
+                " *       234567890",
+                " * </ul>",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -775,24 +777,24 @@ public final class JavadocFormattingTest {
     @Test
     public void unclosedList() {
         String[] input = {
-            "/**", //
-            " * Foo.",
-            " *",
-            " * <ul><li>1",
-            " * @return blah",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * Foo.",
+                " *",
+                " * <ul><li>1",
+                " * @return blah",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**", //
-            " * Foo.",
-            " *",
-            " * <ul>",
-            " *   <li>1",
-            " *",
-            " * @return blah",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * Foo.",
+                " *",
+                " * <ul>",
+                " *   <li>1",
+                " *",
+                " * @return blah",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -800,17 +802,17 @@ public final class JavadocFormattingTest {
     @Test
     public void br() {
         String[] input = {
-            "/**", //
-            " * abc<br>def",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * abc<br>def",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**", //
-            " * abc<br>",
-            " * def",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * abc<br>",
+                " * def",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -819,17 +821,17 @@ public final class JavadocFormattingTest {
     public void brSpaceBug() {
         // TODO(b/28983091): Remove the space before <br> here.
         String[] input = {
-            "/**", //
-            " * abc <br>def",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * abc <br>def",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**", //
-            " * abc <br>",
-            " * def",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * abc <br>",
+                " * def",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -841,17 +843,17 @@ public final class JavadocFormattingTest {
          * Fortunately, some very quick searching didn't turn up any instances in the Google codebase.
          */
         String[] input = {
-            "/**", //
-            " * abc<br>@foo ",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * abc<br>@foo ",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**", //
-            " * abc<br>",
-            " * @foo", // interpreted as a block tag now!
-            " */",
-            "class Test {}",
+                "/**", //
+                " * abc<br>",
+                " * @foo", // interpreted as a block tag now!
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -864,18 +866,18 @@ public final class JavadocFormattingTest {
          * currently we just count chars.
          */
         String[] input = {
-            "/**",
-            " * 456789𝄞12 456789𝄞12 456789𝄞12 456789𝄞12 456789𝄞12 456789𝄞12 456789𝄞12 456789𝄞12 "
-                    + "456789𝄞12 456789𝄞",
-            " */",
-            "class Test {}",
+                "/**",
+                " * 456789𝄞12 456789𝄞12 456789𝄞12 456789𝄞12 456789𝄞12 456789𝄞12 456789𝄞12 456789𝄞12 "
+                        + "456789𝄞12 456789𝄞",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**",
-            " * 456789𝄞12 456789𝄞12 456789𝄞12 456789𝄞12 456789𝄞12 456789𝄞12 456789𝄞12 456789𝄞12",
-            " * 456789𝄞12 456789𝄞",
-            " */",
-            "class Test {}",
+                "/**",
+                " * 456789𝄞12 456789𝄞12 456789𝄞12 456789𝄞12 456789𝄞12 456789𝄞12 456789𝄞12 456789𝄞12",
+                " * 456789𝄞12 456789𝄞",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -883,19 +885,19 @@ public final class JavadocFormattingTest {
     @Test
     public void blankLineBeforeParams() {
         String[] input = {
-            "/**", //
-            " * hello world",
-            " * @param this is a param",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * hello world",
+                " * @param this is a param",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**", //
-            " * hello world",
-            " *",
-            " * @param this is a param",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * hello world",
+                " *",
+                " * @param this is a param",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -903,16 +905,16 @@ public final class JavadocFormattingTest {
     @Test
     public void onlyParams() {
         String[] input = {
-            "/**", //
-            " *",
-            " *",
-            " * @param this is a param",
-            " */",
-            "class Test {}",
+                "/**", //
+                " *",
+                " *",
+                " * @param this is a param",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/** @param this is a param */", //
-            "class Test {}",
+                "/** @param this is a param */", //
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -920,24 +922,24 @@ public final class JavadocFormattingTest {
     @Test
     public void paramsContinuationIndented() {
         String[] input = {
-            "/**", //
-            " * hello world",
-            " *",
-            " * @param foo 567890123 567890123 567890123 567890123 567890123 567890123 567890123"
-                    + " 567890123 567890123",
-            " * @param bar another",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * hello world",
+                " *",
+                " * @param foo 567890123 567890123 567890123 567890123 567890123 567890123 567890123"
+                        + " 567890123 567890123",
+                " * @param bar another",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**", //
-            " * hello world",
-            " *",
-            " * @param foo 567890123 567890123 567890123 567890123 567890123 567890123 567890123" + " 567890123",
-            " *     567890123",
-            " * @param bar another",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * hello world",
+                " *",
+                " * @param foo 567890123 567890123 567890123 567890123 567890123 567890123 567890123" + " 567890123",
+                " *     567890123",
+                " * @param bar another",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -945,30 +947,30 @@ public final class JavadocFormattingTest {
     @Test
     public void paramsOtherIndents() {
         String[] input = {
-            "/**", //
-            " * hello world",
-            " *",
-            " * @param foo a<p>b<ul><li>a<ul><li>x</ul></ul>",
-            " * @param bar another",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * hello world",
+                " *",
+                " * @param foo a<p>b<ul><li>a<ul><li>x</ul></ul>",
+                " * @param bar another",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**", //
-            " * hello world",
-            " *",
-            " * @param foo a",
-            " *     <p>b",
-            " *     <ul>",
-            " *       <li>a",
-            " *           <ul>",
-            " *             <li>x",
-            " *           </ul>",
-            " *     </ul>",
-            " *", // TODO(cpovirk): Ideally we would probably eliminate this.
-            " * @param bar another",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * hello world",
+                " *",
+                " * @param foo a",
+                " *     <p>b",
+                " *     <ul>",
+                " *       <li>a",
+                " *           <ul>",
+                " *             <li>x",
+                " *           </ul>",
+                " *     </ul>",
+                " *", // TODO(cpovirk): Ideally we would probably eliminate this.
+                " * @param bar another",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -976,36 +978,36 @@ public final class JavadocFormattingTest {
     @Test
     public void paragraphTag() {
         String[] input = {
-            "class Test {",
-            "  /**",
-            "   * hello<p>world",
-            "   */",
-            "  void f() {}",
-            "",
-            "  /**",
-            "   * hello",
-            "   * <p>",
-            "   * world",
-            "   */",
-            "  void f() {}",
-            "}",
+                "class Test {",
+                "  /**",
+                "   * hello<p>world",
+                "   */",
+                "  void f() {}",
+                "",
+                "  /**",
+                "   * hello",
+                "   * <p>",
+                "   * world",
+                "   */",
+                "  void f() {}",
+                "}",
         };
         String[] expected = {
-            "class Test {",
-            "  /**",
-            "   * hello",
-            "   *",
-            "   * <p>world",
-            "   */",
-            "  void f() {}",
-            "",
-            "  /**",
-            "   * hello",
-            "   *",
-            "   * <p>world",
-            "   */",
-            "  void f() {}",
-            "}",
+                "class Test {",
+                "  /**",
+                "   * hello",
+                "   *",
+                "   * <p>world",
+                "   */",
+                "  void f() {}",
+                "",
+                "  /**",
+                "   * hello",
+                "   *",
+                "   * <p>world",
+                "   */",
+                "  void f() {}",
+                "}",
         };
         doFormatTest(input, expected);
     }
@@ -1013,10 +1015,10 @@ public final class JavadocFormattingTest {
     @Test
     public void xhtmlParagraphTag() {
         String[] input = {
-            "class Test {", "  /**", "   * hello<p/>world", "   */", "  void f() {}", "", "}",
+                "class Test {", "  /**", "   * hello<p/>world", "   */", "  void f() {}", "", "}",
         };
         String[] expected = {
-            "class Test {", "  /**", "   * hello", "   *", "   * <p>world", "   */", "  void f() {}", "}",
+                "class Test {", "  /**", "   * hello", "   *", "   * <p>world", "   */", "  void f() {}", "}",
         };
         doFormatTest(input, expected);
     }
@@ -1024,18 +1026,18 @@ public final class JavadocFormattingTest {
     @Test
     public void removeInitialParagraphTag() {
         String[] input = {
-            "/**", //
-            " * <p>hello<p>world",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * <p>hello<p>world",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**", //
-            " * hello",
-            " *",
-            " * <p>world",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * hello",
+                " *",
+                " * <p>world",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -1043,53 +1045,53 @@ public final class JavadocFormattingTest {
     @Test
     public void inferParagraphTags() {
         String[] input = {
-            "/**",
-            " *",
-            " *",
-            " * foo",
-            " * foo",
-            " *",
-            " *",
-            " * foo",
-            " *",
-            " * bar",
-            " *",
-            " * <pre>",
-            " *",
-            " * baz",
-            " *",
-            " * </pre>",
-            " *",
-            " * <ul>",
-            " * <li>foo",
-            " *",
-            " * bar",
-            " * </ul>",
-            " *",
-            " *",
-            " */",
-            "class Test {}",
+                "/**",
+                " *",
+                " *",
+                " * foo",
+                " * foo",
+                " *",
+                " *",
+                " * foo",
+                " *",
+                " * bar",
+                " *",
+                " * <pre>",
+                " *",
+                " * baz",
+                " *",
+                " * </pre>",
+                " *",
+                " * <ul>",
+                " * <li>foo",
+                " *",
+                " * bar",
+                " * </ul>",
+                " *",
+                " *",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**",
-            " * foo foo",
-            " *",
-            " * <p>foo",
-            " *",
-            " * <p>bar",
-            " *",
-            " * <pre>",
-            " *",
-            " * baz",
-            " *",
-            " * </pre>",
-            " *",
-            " * <ul>",
-            " *   <li>foo",
-            " *       <p>bar",
-            " * </ul>",
-            " */",
-            "class Test {}",
+                "/**",
+                " * foo foo",
+                " *",
+                " * <p>foo",
+                " *",
+                " * <p>bar",
+                " *",
+                " * <pre>",
+                " *",
+                " * baz",
+                " *",
+                " * </pre>",
+                " *",
+                " * <ul>",
+                " *   <li>foo",
+                " *       <p>bar",
+                " * </ul>",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -1117,12 +1119,12 @@ public final class JavadocFormattingTest {
     @Test
     public void htmlTagsInCode() {
         String[] input = {
-            "/** abc {@code {} <p> <li> <pre> <table>} def */", //
-            "class Test {}",
+                "/** abc {@code {} <p> <li> <pre> <table>} def */", //
+                "class Test {}",
         };
         String[] expected = {
-            "/** abc {@code {} <p> <li> <pre> <table>} def */", //
-            "class Test {}",
+                "/** abc {@code {} <p> <li> <pre> <table>} def */", //
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -1130,16 +1132,16 @@ public final class JavadocFormattingTest {
     @Test
     public void loneBraceDoesNotStartInlineTag() {
         String[] input = {
-            "/** {  <p> } */", //
-            "class Test {}",
+                "/** {  <p> } */", //
+                "class Test {}",
         };
         String[] expected = {
-            "/**", //
-            " * {",
-            " *",
-            " * <p>}",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * {",
+                " *",
+                " * <p>}",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -1148,12 +1150,12 @@ public final class JavadocFormattingTest {
     public void unicodeEscapesNotReplaced() {
         // Test that we don't replace them with their interpretations.
         String[] input = {
-            "/** foo \\u0000 bar \\u6c34 baz */", //
-            "class Test {}",
+                "/** foo \\u0000 bar \\u6c34 baz */", //
+                "class Test {}",
         };
         String[] expected = {
-            "/** foo \\u0000 bar \\u6c34 baz */", //
-            "class Test {}",
+                "/** foo \\u0000 bar \\u6c34 baz */", //
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -1167,12 +1169,12 @@ public final class JavadocFormattingTest {
          * effectively "<p>" on a new line.
          */
         String[] input = {
-            "/** a\\u003Cp>b */", //
-            "class Test {}",
+                "/** a\\u003Cp>b */", //
+                "class Test {}",
         };
         String[] expected = {
-            "/** a\\u003Cp>b */", //
-            "class Test {}",
+                "/** a\\u003Cp>b */", //
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -1181,15 +1183,15 @@ public final class JavadocFormattingTest {
     public void trailingLink() {
         // Eclipse's parser seems to want to discard the line break after {@link}. Test that we see it.
         String[] input = {
-            "/**", //
-            " * abc {@link Foo}",
-            " * def",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * abc {@link Foo}",
+                " * def",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/** abc {@link Foo} def */", //
-            "class Test {}",
+                "/** abc {@link Foo} def */", //
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -1197,17 +1199,17 @@ public final class JavadocFormattingTest {
     @Test
     public void doesNotBreakLink() {
         String[] input = {
-            "/**", //
-            " * This line is too long for the link to fit on a single line isn't it yes indeed too long {@link Foo}",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * This line is too long for the link to fit on a single line isn't it yes indeed too long {@link Foo}",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**", //
-            " * This line is too long for the link to fit on a single line isn't it yes indeed too long",
-            " * {@link Foo}",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * This line is too long for the link to fit on a single line isn't it yes indeed too long",
+                " * {@link Foo}",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -1219,19 +1221,19 @@ public final class JavadocFormattingTest {
     @Test
     public void wrapsLongInlineTag_withoutBreakingFirstWhitespace() {
         String[] input = {
-            "/**", //
-            " * This line is too long for the link to fit on a single line isn't it yes indeed too long {@link "
-                    + "#foo(bar, baz, there, are, just, so, many, arguments, arent, there, yep, indeed, yessir, yaya)}",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * This line is too long for the link to fit on a single line isn't it yes indeed too long {@link "
+                        + "#foo(bar, baz, there, are, just, so, many, arguments, arent, there, yep, indeed, yessir, yaya)}",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**", //
-            " * This line is too long for the link to fit on a single line isn't it yes indeed too long",
-            " * {@link #foo(bar, baz, there, are, just, so, many, arguments, arent, there, yep, indeed, yessir,",
-            " * yaya)}",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * This line is too long for the link to fit on a single line isn't it yes indeed too long",
+                " * {@link #foo(bar, baz, there, are, just, so, many, arguments, arent, there, yep, indeed, yessir,",
+                " * yaya)}",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -1239,26 +1241,26 @@ public final class JavadocFormattingTest {
     @Test
     void mergesClosingBraceWithFollowingTag() {
         String[] input = {
-            "/**", //
-            " * Example:",
-            " *",
-            " * <pre>    {@code",
-            " *   class T {",
-            " *   }",
-            " * }</pre>",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * Example:",
+                " *",
+                " * <pre>    {@code",
+                " *   class T {",
+                " *   }",
+                " * }</pre>",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**", //
-            " * Example:",
-            " *",
-            " * <pre>{@code",
-            " * class T {",
-            " * }",
-            " * }</pre>",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * Example:",
+                " *",
+                " * <pre>{@code",
+                " * class T {",
+                " * }",
+                " * }</pre>",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -1267,12 +1269,12 @@ public final class JavadocFormattingTest {
     public void codeInCode() {
         // Eclipse's parser seems to get confused at the second {@code}. Test that we handle it.
         String[] input = {
-            "/** abc {@code {@code foo}} def */", //
-            "class Test {}",
+                "/** abc {@code {@code foo}} def */", //
+                "class Test {}",
         };
         String[] expected = {
-            "/** abc {@code {@code foo}} def */", //
-            "class Test {}",
+                "/** abc {@code {@code foo}} def */", //
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -1284,15 +1286,15 @@ public final class JavadocFormattingTest {
          * Eclipse's lexer as if it were Java code.
          */
         String[] input = {
-            "/**", //
-            " * abc \"foo",
-            " * bar baz\" def",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * abc \"foo",
+                " * bar baz\" def",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/** abc \"foo bar baz\" def */", //
-            "class Test {}",
+                "/** abc \"foo bar baz\" def */", //
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -1300,10 +1302,10 @@ public final class JavadocFormattingTest {
     @Test
     public void standardizeTags() {
         String[] input = {
-            "/**", " * foo", " *", " * <P>bar", " *", " * <p class=clazz>baz<BR>", " * baz", " */", "class Test {}",
+                "/**", " * foo", " *", " * <P>bar", " *", " * <p class=clazz>baz<BR>", " * baz", " */", "class Test {}",
         };
         String[] expected = {
-            "/**", " * foo", " *", " * <p>bar", " *", " * <p class=clazz>baz<br>", " * baz", " */", "class Test {}",
+                "/**", " * foo", " *", " * <p>bar", " *", " * <p class=clazz>baz<br>", " * baz", " */", "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -1311,20 +1313,20 @@ public final class JavadocFormattingTest {
     @Test
     public void removeCloseTags() {
         String[] input = {
-            "/**", //
-            " * foo</p>",
-            " *",
-            " * <p>bar</p>",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * foo</p>",
+                " *",
+                " * <p>bar</p>",
+                " */",
+                "class Test {}",
         };
         String[] expected = {
-            "/**", //
-            " * foo",
-            " *",
-            " * <p>bar",
-            " */",
-            "class Test {}",
+                "/**", //
+                " * foo",
+                " *",
+                " * <p>bar",
+                " */",
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -1332,18 +1334,18 @@ public final class JavadocFormattingTest {
     @Test
     public void javadocFullSentences() {
         String[] input = {
-            "/** In our application, bats are often found hanging from the ceiling, especially on"
-                    + " Wednesdays.  Sometimes sick bats have issues where their claws do not close entirely."
-                    + "  This class provides a nice, grippable surface for them to cling to. */",
-            "class Grippable {}",
+                "/** In our application, bats are often found hanging from the ceiling, especially on"
+                        + " Wednesdays.  Sometimes sick bats have issues where their claws do not close entirely."
+                        + "  This class provides a nice, grippable surface for them to cling to. */",
+                "class Grippable {}",
         };
         String[] expected = {
-            "/**",
-            " * In our application, bats are often found hanging from the ceiling, especially on" + " Wednesdays.",
-            " * Sometimes sick bats have issues where their claws do not close entirely. This class" + " provides a",
-            " * nice, grippable surface for them to cling to.",
-            " */",
-            "class Grippable {}",
+                "/**",
+                " * In our application, bats are often found hanging from the ceiling, especially on" + " Wednesdays.",
+                " * Sometimes sick bats have issues where their claws do not close entirely. This class" + " provides a",
+                " * nice, grippable surface for them to cling to.",
+                " */",
+                "class Grippable {}",
         };
         doFormatTest(input, expected);
     }
@@ -1351,16 +1353,16 @@ public final class JavadocFormattingTest {
     @Test
     public void javadocSentenceFragment() {
         String[] input = {
-            "/** Provides a comfy, grippable surface for sick bats with claw-closing problems, which are"
-                    + " sometimes found hanging from the ceiling on Wednesdays. */",
-            "class Grippable {}",
+                "/** Provides a comfy, grippable surface for sick bats with claw-closing problems, which are"
+                        + " sometimes found hanging from the ceiling on Wednesdays. */",
+                "class Grippable {}",
         };
         String[] expected = {
-            "/**",
-            " * Provides a comfy, grippable surface for sick bats with claw-closing problems, which are" + " sometimes",
-            " * found hanging from the ceiling on Wednesdays.",
-            " */",
-            "class Grippable {}",
+                "/**",
+                " * Provides a comfy, grippable surface for sick bats with claw-closing problems, which are" + " sometimes",
+                " * found hanging from the ceiling on Wednesdays.",
+                " */",
+                "class Grippable {}",
         };
         doFormatTest(input, expected);
     }
@@ -1368,12 +1370,12 @@ public final class JavadocFormattingTest {
     @Test
     public void javadocCanEndAnywhere() {
         String[] input = {
-            "/** foo <pre*/", //
-            "class Test {}",
+                "/** foo <pre*/", //
+                "class Test {}",
         };
         String[] expected = {
-            "/** foo <pre */", //
-            "class Test {}",
+                "/** foo <pre */", //
+                "class Test {}",
         };
         doFormatTest(input, expected);
     }
@@ -1390,7 +1392,7 @@ public final class JavadocFormattingTest {
     @Test
     public void windowsLineSeparator() throws FormatterException {
         String[] input = {
-            "/**", " * hello", " *", " * <p>world", " */", "class Test {}",
+                "/**", " * hello", " *", " * <p>world", " */", "class Test {}",
         };
         for (String separator : Arrays.asList("\r", "\r\n")) {
             String actual = formatter.formatSource(Joiner.on(separator).join(input));
@@ -1401,20 +1403,20 @@ public final class JavadocFormattingTest {
     @Test
     public void u2028LineSeparator() {
         String[] input = {
-            "public class Foo {",
-            "  /**\u2028",
-            "   * Set and enable something.",
-            "   */",
-            "  public void setSomething() {}",
-            "}",
+                "public class Foo {",
+                "  /**\u2028",
+                "   * Set and enable something.",
+                "   */",
+                "  public void setSomething() {}",
+                "}",
         };
         String[] expected = {
-            "public class Foo {",
-            "  /**",
-            "   * \u2028 Set and enable something.",
-            "   */",
-            "  public void setSomething() {}",
-            "}",
+                "public class Foo {",
+                "  /**",
+                "   * \u2028 Set and enable something.",
+                "   */",
+                "  public void setSomething() {}",
+                "}",
         };
         doFormatTest(input, expected);
     }

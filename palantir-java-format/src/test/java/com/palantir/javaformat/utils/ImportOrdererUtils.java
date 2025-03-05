@@ -29,8 +29,8 @@ public final class ImportOrdererUtils {
             output = input;
         }
         Object[] row = {
-            Joiner.on('\n').join(input) + '\n', //
-            Joiner.on('\n').join(output) + '\n',
+                Joiner.on('\n').join(input) + '\n', //
+                Joiner.on('\n').join(output) + '\n',
         };
         // If a line ends with \ then we remove the \ and don't append a \n. That allows us to check
         // some parsing edge cases.
@@ -38,5 +38,6 @@ public final class ImportOrdererUtils {
         return row;
     }
 
-    private ImportOrdererUtils() {}
+    private ImportOrdererUtils() {
+    }
 }
