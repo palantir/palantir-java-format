@@ -4,16 +4,14 @@ apply plugin: 'com.palantir.external-publish-jar'
 dependencies {
     api project(':palantir-java-format-21')
 
-    testImplementation project(':palantir-java-format-all')
     testImplementation 'com.google.truth:truth'
     testImplementation 'org.assertj:assertj-core'
     testImplementation 'org.junit.jupiter:junit-jupiter-migrationsupport'
     testImplementation 'org.junit.jupiter:junit-jupiter'
-
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine'
-    testRuntimeOnly project(':palantir-java-format-21')
 }
 
 javaVersion {
+    target = 21
     runtime = 21
 }
