@@ -121,7 +121,11 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
         }
         scan(type, null);
         builder.breakOp(" ");
-        visit(name);
+        if (name.isEmpty()) {
+            token("_");
+        } else {
+            visit(name);
+        }
         builder.close();
     }
 
@@ -266,8 +270,8 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
             token("default", plusTwo);
         } else {
             token("case", plusTwo);
-            builder.space();
             builder.open(labels.size() > 1 ? plusFour : ZERO);
+            builder.space();
             boolean first = true;
             for (Tree expression : labels) {
                 if (!first) {
