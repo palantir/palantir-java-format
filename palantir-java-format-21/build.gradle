@@ -6,14 +6,7 @@ mainClassName = 'com.palantir.javaformat.java.Main'
 description = 'Palantir Java Format 21'
 
 dependencies {
-    api project(':palantir-java-format')
-
-    testImplementation 'com.google.truth:truth'
-    testImplementation 'org.assertj:assertj-core'
-    testImplementation 'org.junit.jupiter:junit-jupiter-migrationsupport'
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-
-    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine'
+    api project(':palantir-java-format-all')
 }
 
 def exports = [

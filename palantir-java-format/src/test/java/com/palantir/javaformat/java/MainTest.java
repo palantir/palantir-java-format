@@ -1,15 +1,17 @@
 /*
- * Copyright 2015 Google Inc.
+ * (c) Copyright 2025 Palantir Technologies Inc. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.palantir.javaformat.java;
@@ -121,37 +123,37 @@ public class MainTest {
     @Test
     public void javadoc() throws Exception {
         String[] input = {
-            "/**",
-            " * graph",
-            " *",
-            " * graph",
-            " *",
-            " * @param foo lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do"
-                    + " eiusmod tempor incididunt ut labore et dolore magna aliqua",
-            " */",
-            "class Test {",
-            "  /**",
-            "   * creates entropy",
-            "   */",
-            "  public static void main(String... args) {}",
-            "}",
+                "/**",
+                " * graph",
+                " *",
+                " * graph",
+                " *",
+                " * @param foo lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do"
+                        + " eiusmod tempor incididunt ut labore et dolore magna aliqua",
+                " */",
+                "class Test {",
+                "  /**",
+                "   * creates entropy",
+                "   */",
+                "  public static void main(String... args) {}",
+                "}",
         };
         String[] expected = {
-            "/**",
-            " * graph",
-            " *",
-            " * graph",
-            " *",
-            " * @param foo lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do"
-                    + " eiusmod tempor incididunt ut labore et dolore magna aliqua",
-            " */",
-            "class Test {",
-            "  /**",
-            "   * creates entropy",
-            "   */",
-            "  public static void main(String... args) {}",
-            "}",
-            "",
+                "/**",
+                " * graph",
+                " *",
+                " * graph",
+                " *",
+                " * @param foo lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do"
+                        + " eiusmod tempor incididunt ut labore et dolore magna aliqua",
+                " */",
+                "class Test {",
+                "  /**",
+                "   * creates entropy",
+                "   */",
+                "  public static void main(String... args) {}",
+                "}",
+                "",
         };
         InputStream in = new ByteArrayInputStream(joiner.join(input).getBytes(UTF_8));
         StringWriter out = new StringWriter();
@@ -167,26 +169,26 @@ public class MainTest {
     @Test
     public void imports() throws Exception {
         String[] input = {
-            "import java.util.LinkedList;",
-            "import java.util.List;",
-            "import java.util.ArrayList;",
-            "class Test {",
-            "  /**",
-            "   * May be an {@link ArrayList}.",
-            "   */",
-            "  public static List<String> names;",
-            "}",
+                "import java.util.LinkedList;",
+                "import java.util.List;",
+                "import java.util.ArrayList;",
+                "class Test {",
+                "  /**",
+                "   * May be an {@link ArrayList}.",
+                "   */",
+                "  public static List<String> names;",
+                "}",
         };
         String[] expected = {
-            "import java.util.ArrayList;",
-            "import java.util.List;",
-            "",
-            "class Test {",
-            "  /**",
-            "   * May be an {@link ArrayList}.",
-            "   */",
-            "  public static List<String> names;",
-            "}",
+                "import java.util.ArrayList;",
+                "import java.util.List;",
+                "",
+                "class Test {",
+                "  /**",
+                "   * May be an {@link ArrayList}.",
+                "   */",
+                "  public static List<String> names;",
+                "}",
         };
         InputStream in = new ByteArrayInputStream(joiner.join(input).getBytes(UTF_8));
         StringWriter out = new StringWriter();
@@ -201,27 +203,27 @@ public class MainTest {
     @Test
     public void optimizeImportsDoesNotLeaveEmptyLines() throws Exception {
         String[] input = {
-            "package abc;",
-            "",
-            "import java.util.LinkedList;",
-            "import java.util.List;",
-            "import java.util.ArrayList;",
-            "",
-            "import static java.nio.charset.StandardCharsets.UTF_8;",
-            "",
-            "import java.util.EnumSet;",
-            "",
-            "class Test ",
-            "extends ArrayList {",
-            "}"
+                "package abc;",
+                "",
+                "import java.util.LinkedList;",
+                "import java.util.List;",
+                "import java.util.ArrayList;",
+                "",
+                "import static java.nio.charset.StandardCharsets.UTF_8;",
+                "",
+                "import java.util.EnumSet;",
+                "",
+                "class Test ",
+                "extends ArrayList {",
+                "}"
         };
         String[] expected = {
-            "package abc;", //
-            "",
-            "import java.util.ArrayList;",
-            "",
-            "class Test extends ArrayList {}",
-            ""
+                "package abc;", //
+                "",
+                "import java.util.ArrayList;",
+                "",
+                "class Test extends ArrayList {}",
+                ""
         };
 
         // pre-check expectation with local formatter instance
@@ -242,20 +244,20 @@ public class MainTest {
     @Test
     public void importRemovalLines() throws Exception {
         String[] input = {
-            "import java.util.ArrayList;",
-            "import java.util.List;",
-            "class Test {",
-            "ArrayList<String> a = new ArrayList<>();",
-            "ArrayList<String> b = new ArrayList<>();",
-            "}",
+                "import java.util.ArrayList;",
+                "import java.util.List;",
+                "class Test {",
+                "ArrayList<String> a = new ArrayList<>();",
+                "ArrayList<String> b = new ArrayList<>();",
+                "}",
         };
         String[] expected = {
-            "import java.util.ArrayList;",
-            "",
-            "class Test {",
-            "  ArrayList<String> a = new ArrayList<>();",
-            "ArrayList<String> b = new ArrayList<>();",
-            "}",
+                "import java.util.ArrayList;",
+                "",
+                "class Test {",
+                "  ArrayList<String> a = new ArrayList<>();",
+                "ArrayList<String> b = new ArrayList<>();",
+                "}",
         };
         StringWriter out = new StringWriter();
         Main main = new Main(
@@ -274,10 +276,10 @@ public class MainTest {
             Locale.setDefault(Locale.ROOT);
 
             String[] input = {
-                "import java.util.ArrayList;", //
-                "import java.util.List;",
-                "class Test {",
-                "}}",
+                    "import java.util.ArrayList;", //
+                    "import java.util.List;",
+                    "class Test {",
+                    "}}",
             };
             StringWriter out = new StringWriter();
             StringWriter err = new StringWriter();
@@ -296,13 +298,13 @@ public class MainTest {
     @Test
     public void packageInfo() throws Exception {
         String[] input = {
-            "@CheckReturnValue",
-            "@ParametersAreNonnullByDefault",
-            "package com.google.common.labs.base;",
-            "",
-            "import javax.annotation.CheckReturnValue;",
-            "import javax.annotation.ParametersAreNonnullByDefault;",
-            "",
+                "@CheckReturnValue",
+                "@ParametersAreNonnullByDefault",
+                "package com.google.common.labs.base;",
+                "",
+                "import javax.annotation.CheckReturnValue;",
+                "import javax.annotation.ParametersAreNonnullByDefault;",
+                "",
         };
         StringWriter out = new StringWriter();
         StringWriter err = new StringWriter();
@@ -418,7 +420,7 @@ public class MainTest {
         Files.write(path, "class Test {\n}\n".getBytes(UTF_8));
         Process process = formatterMain("-").redirectInput(path.toFile()).start();
         process.waitFor();
-        String err = new String(ByteStreams.toByteArray(process.getErrorStream()), UTF_8);
+        String _err = new String(ByteStreams.toByteArray(process.getErrorStream()), UTF_8);
         String out = new String(ByteStreams.toByteArray(process.getInputStream()), UTF_8);
         assertThat(out).isEqualTo("<stdin>" + System.lineSeparator());
         assertThat(process.exitValue()).isEqualTo(1);
@@ -430,7 +432,7 @@ public class MainTest {
         Files.write(path, "class Test {\n}\n".getBytes(UTF_8));
         Process process = formatterMain(path.toAbsolutePath().toString()).start();
         process.waitFor();
-        String err = new String(ByteStreams.toByteArray(process.getErrorStream()), UTF_8);
+        String _err = new String(ByteStreams.toByteArray(process.getErrorStream()), UTF_8);
         String out = new String(ByteStreams.toByteArray(process.getInputStream()), UTF_8);
         assertThat(out).isEqualTo(path.toAbsolutePath().toString() + System.lineSeparator());
         assertThat(process.exitValue()).isEqualTo(1);
@@ -439,7 +441,7 @@ public class MainTest {
     @Test
     public void assumeFilename_error() throws Exception {
         String[] input = {
-            "class Test {}}",
+                "class Test {}}",
         };
         StringWriter out = new StringWriter();
         StringWriter err = new StringWriter();
@@ -454,8 +456,8 @@ public class MainTest {
     @Test
     public void assumeFilename_dryRun() throws Exception {
         String[] input = {
-            "class Test {", //
-            "}",
+                "class Test {", //
+                "}",
         };
         StringWriter out = new StringWriter();
         StringWriter err = new StringWriter();
@@ -470,17 +472,17 @@ public class MainTest {
     @Test
     public void reflowLongStrings() throws Exception {
         String[] input = {
-            "class T {", //
-            "  String s = \"one long incredibly unbroken sentence moving from topic to topic so that no"
-                    + " one had a chance to interrupt\";",
-            "}"
+                "class T {", //
+                "  String s = \"one long incredibly unbroken sentence moving from topic to topic so that no"
+                        + " one had a chance to interrupt\";",
+                "}"
         };
         String[] expected = {
-            "class T {",
-            "  String s = \"one long incredibly unbroken sentence moving from topic to topic so that no one had a\"",
-            "      + \" chance to interrupt\";",
-            "}",
-            "",
+                "class T {",
+                "  String s = \"one long incredibly unbroken sentence moving from topic to topic so that no one had a\"",
+                "      + \" chance to interrupt\";",
+                "}",
+                "",
         };
         InputStream in = new ByteArrayInputStream(joiner.join(input).getBytes(UTF_8));
         StringWriter out = new StringWriter();
@@ -495,18 +497,18 @@ public class MainTest {
     @Test
     public void noReflowLongStrings() throws Exception {
         String[] input = {
-            "class T {", //
-            "  String s = \"one long incredibly unbroken sentence moving from topic to topic so that no"
-                    + " one had a chance to interrupt\";",
-            "}"
+                "class T {", //
+                "  String s = \"one long incredibly unbroken sentence moving from topic to topic so that no"
+                        + " one had a chance to interrupt\";",
+                "}"
         };
         String[] expected = {
-            "class T {",
-            "  String s =",
-            "      \"one long incredibly unbroken sentence moving from topic to topic so that no"
-                    + " one had a chance to interrupt\";",
-            "}",
-            "",
+                "class T {",
+                "  String s =",
+                "      \"one long incredibly unbroken sentence moving from topic to topic so that no"
+                        + " one had a chance to interrupt\";",
+                "}",
+                "",
         };
         InputStream in = new ByteArrayInputStream(joiner.join(input).getBytes(UTF_8));
         StringWriter out = new StringWriter();
@@ -520,16 +522,16 @@ public class MainTest {
 
     private static ProcessBuilder formatterMain(String... args) {
         return new ProcessBuilder(ImmutableList.<String>builder()
-                        .add(Paths.get(System.getProperty("java.home"))
-                                .resolve("bin/java")
-                                .toString())
-                        .addAll(ADD_EXPORTS)
-                        .add("-cp", System.getProperty("java.class.path"))
-                        .add(Main.class.getName())
-                        .add("-n")
-                        .add("--set-exit-if-changed")
-                        .add(args)
-                        .build())
+                .add(Paths.get(System.getProperty("java.home"))
+                        .resolve("bin/java")
+                        .toString())
+                .addAll(ADD_EXPORTS)
+                .add("-cp", System.getProperty("java.class.path"))
+                .add(Main.class.getName())
+                .add("-n")
+                .add("--set-exit-if-changed")
+                .add(args)
+                .build())
                 .redirectError(Redirect.PIPE)
                 .redirectOutput(Redirect.PIPE);
     }

@@ -1,15 +1,17 @@
 /*
- * Copyright 2016 Google Inc.
+ * (c) Copyright 2025 Palantir Technologies Inc. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.palantir.javaformat.java;
@@ -85,16 +87,16 @@ public class CommandLineOptionsParserTest {
     @Test
     public void lengths() {
         assertThat(CommandLineOptionsParser.parse(Arrays.asList("-length", "1", "--length", "2"))
-                        .lengths())
+                .lengths())
                 .containsExactly(1, 2);
     }
 
     @Test
     public void lines() {
         assertThat(CommandLineOptionsParser.parse(
-                                Arrays.asList("--lines", "1:2", "-lines=4:5", "--line", "7:8", "-line=10:11"))
-                        .lines()
-                        .asRanges())
+                        Arrays.asList("--lines", "1:2", "-lines=4:5", "--line", "7:8", "-line=10:11"))
+                .lines()
+                .asRanges())
                 .containsExactly(
                         Range.closedOpen(0, 2),
                         Range.closedOpen(3, 5),
@@ -105,7 +107,7 @@ public class CommandLineOptionsParserTest {
     @Test
     public void offset() {
         assertThat(CommandLineOptionsParser.parse(Arrays.asList("-offset", "1", "--offset", "2"))
-                        .offsets())
+                .offsets())
                 .containsExactly(1, 2);
     }
 
@@ -124,14 +126,14 @@ public class CommandLineOptionsParserTest {
     @Test
     public void skipSortingImports() {
         assertThat(CommandLineOptionsParser.parse(Arrays.asList("--skip-sorting-imports"))
-                        .sortImports())
+                .sortImports())
                 .isFalse();
     }
 
     @Test
     public void skipRemovingUnusedImports() {
         assertThat(CommandLineOptionsParser.parse(Arrays.asList("--skip-removing-unused-imports"))
-                        .removeUnusedImports())
+                .removeUnusedImports())
                 .isFalse();
     }
 
@@ -145,7 +147,7 @@ public class CommandLineOptionsParserTest {
     @Test
     public void setExitIfChanged() {
         assertThat(CommandLineOptionsParser.parse(Arrays.asList("--set-exit-if-changed"))
-                        .setExitIfChanged())
+                .setExitIfChanged())
                 .isTrue();
     }
 
@@ -179,7 +181,7 @@ public class CommandLineOptionsParserTest {
     @Test
     public void assumeFilename() {
         assertThat(CommandLineOptionsParser.parse(Arrays.asList("--assume-filename", "Foo.java"))
-                        .assumeFilename())
+                .assumeFilename())
                 .hasValue("Foo.java");
         assertThat(CommandLineOptionsParser.parse(Arrays.asList("Foo.java")).assumeFilename())
                 .isEmpty();
@@ -188,7 +190,7 @@ public class CommandLineOptionsParserTest {
     @Test
     public void skipReflowLongStrings() {
         assertThat(CommandLineOptionsParser.parse(Arrays.asList("--skip-reflowing-long-strings"))
-                        .reflowLongStrings())
+                .reflowLongStrings())
                 .isFalse();
     }
 }

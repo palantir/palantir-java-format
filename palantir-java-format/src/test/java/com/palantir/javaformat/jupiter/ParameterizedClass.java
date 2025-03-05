@@ -1,5 +1,5 @@
 /*
- * (c) Copyright 2019 Palantir Technologies Inc. All rights reserved.
+ * (c) Copyright 2025 Palantir Technologies Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -148,7 +148,7 @@ public final class ParameterizedClass implements TestTemplateInvocationContextPr
         @Override
         public void beforeEach(ExtensionContext context) throws Exception {
             List<Field> annotatedFields = context.getTestClass()
-                    .map(clazz -> AnnotationUtils.findAnnotatedFields(clazz, Parameter.class, field -> true))
+                    .map(clazz -> AnnotationUtils.findAnnotatedFields(clazz, Parameter.class, _field -> true))
                     .orElseGet(Collections::emptyList);
 
             Object testClassInstance = context.getTestInstance().get();
@@ -176,7 +176,7 @@ public final class ParameterizedClass implements TestTemplateInvocationContextPr
         return extensionContext
                 .getStore(namespace)
                 .getOrComputeIfAbsent(
-                        "invokeUserParametersMethod", unused -> allParameters(userParametersMethod), List.class);
+                        "invokeUserParametersMethod", _unused -> allParameters(userParametersMethod), List.class);
     }
 
     @SuppressWarnings("unchecked")
@@ -208,7 +208,7 @@ public final class ParameterizedClass implements TestTemplateInvocationContextPr
                 .getStore(namespace)
                 .getOrComputeIfAbsent(
                         "findStringFormatTemplate",
-                        unused -> {
+                        _unused -> {
                             List<Method> methods = AnnotationUtils.findAnnotatedMethods(
                                     testClass, Parameters.class, ReflectionUtils.HierarchyTraversalMode.BOTTOM_UP);
 

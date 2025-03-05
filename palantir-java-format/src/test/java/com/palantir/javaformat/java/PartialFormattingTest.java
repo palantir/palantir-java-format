@@ -1,15 +1,17 @@
 /*
- * Copyright 2015 Google Inc.
+ * (c) Copyright 2025 Palantir Technologies Inc. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.palantir.javaformat.java;
@@ -44,7 +46,7 @@ public final class PartialFormattingTest {
 
     @ParameterizedClass.Parameters
     public static List<Object[]> parameters() {
-        return ImmutableList.copyOf(new Object[][] {{"\n"}, {"\r"}, {"\r\n"}});
+        return ImmutableList.copyOf(new Object[][]{{"\n"}, {"\r"}, {"\r\n"}});
     }
 
     @TempDir
@@ -1252,18 +1254,18 @@ public final class PartialFormattingTest {
     @TestTemplate
     public void commentBeforeBadConstructor() throws Exception {
         String[] lines = {
-            "class D {", //
-            "  /** */",
-            "  F() {}",
-            "}",
+                "class D {", //
+                "  /** */",
+                "  F() {}",
+                "}",
         };
         String output = Formatter.create().formatSource(lines(lines));
         String[] expected = {
-            "class D {", //
-            "  /** */",
-            "  F() {}",
-            "}",
-            "",
+                "class D {", //
+                "  /** */",
+                "  F() {}",
+                "}",
+                "",
         };
         assertThat(output).isEqualTo(lines(expected));
     }
@@ -1271,18 +1273,18 @@ public final class PartialFormattingTest {
     @TestTemplate
     public void partialEnum() throws Exception {
         String[] input = {
-            "enum E {", //
-            "ONE,",
-            "TWO,",
-            "THREE;",
-            "}",
+                "enum E {", //
+                "ONE,",
+                "TWO,",
+                "THREE;",
+                "}",
         };
         String[] expected = {
-            "enum E {", //
-            "ONE,",
-            "  TWO,",
-            "THREE;",
-            "}",
+                "enum E {", //
+                "ONE,",
+                "  TWO,",
+                "THREE;",
+                "}",
         };
 
         Path path = testFolder.resolve("Foo.java");
@@ -1300,18 +1302,18 @@ public final class PartialFormattingTest {
     @TestTemplate
     public void partialModifierOrder() throws Exception {
         String[] input = {
-            "class T {", //
-            "final private int a = 0;",
-            "final private int b = 0;",
-            "final private int c = 0;",
-            "}",
+                "class T {", //
+                "final private int a = 0;",
+                "final private int b = 0;",
+                "final private int c = 0;",
+                "}",
         };
         String[] expected = {
-            "class T {", //
-            "final private int a = 0;",
-            "  private final int b = 0;",
-            "final private int c = 0;",
-            "}",
+                "class T {", //
+                "final private int a = 0;",
+                "  private final int b = 0;",
+                "final private int c = 0;",
+                "}",
         };
 
         Path path = testFolder.resolve("Foo.java");
@@ -1329,22 +1331,22 @@ public final class PartialFormattingTest {
     @TestTemplate
     public void endOfLine() throws Exception {
         String[] input = {
-            "class foo {",
-            "  foo(",
-            "      int aaaaaaaaaaaaaaa,",
-            "      int ccccccccccccc) {",
-            "    int a = 0;",
-            "    int c = 0;",
-            "  }",
-            "}",
+                "class foo {",
+                "  foo(",
+                "      int aaaaaaaaaaaaaaa,",
+                "      int ccccccccccccc) {",
+                "    int a = 0;",
+                "    int c = 0;",
+                "  }",
+                "}",
         };
         String[] expected = {
-            "class foo {",
-            "  foo(int aaaaaaaaaaaaaaa, int ccccccccccccc) {",
-            "    int a = 0;",
-            "    int c = 0;",
-            "  }",
-            "}",
+                "class foo {",
+                "  foo(int aaaaaaaaaaaaaaa, int ccccccccccccc) {",
+                "    int a = 0;",
+                "    int c = 0;",
+                "  }",
+                "}",
         };
         String in = lines(input);
         // request partial formatting of the end of the first parameter
@@ -1374,16 +1376,16 @@ public final class PartialFormattingTest {
     @TestTemplate
     public void endOfLineStatement() throws Exception {
         String[] input = {
-            "class foo {{", //
-            "  int a = 0; ",
-            "  int c = 0;",
-            "}}",
+                "class foo {{", //
+                "  int a = 0; ",
+                "  int c = 0;",
+                "}}",
         };
         String[] expected = {
-            "class foo {{", //
-            "    int a = 0;",
-            "  int c = 0;",
-            "}}",
+                "class foo {{", //
+                "    int a = 0;",
+                "  int c = 0;",
+                "}}",
         };
         String in = lines(input);
         int idx = in.indexOf(';');
@@ -1395,10 +1397,10 @@ public final class PartialFormattingTest {
     @TestTemplate
     public void endOfLineStatementNewline() throws Exception {
         String[] input = {
-            "class foo {{", //
-            "  int a = 0; ",
-            "  int c = 0;",
-            "}}",
+                "class foo {{", //
+                "  int a = 0; ",
+                "  int c = 0;",
+                "}}",
         };
         String in = lines(input);
         int idx = in.indexOf(';');
@@ -1425,7 +1427,7 @@ public final class PartialFormattingTest {
                 "}",
                 "");
 
-        String output = runFormatter(input, new String[] {"-lines", "2"});
+        String output = runFormatter(input, new String[]{"-lines", "2"});
         assertThat(output).isEqualTo(expectedOutput);
     }
 
@@ -1444,7 +1446,7 @@ public final class PartialFormattingTest {
                 "class Foo {{ c(); }}",
                 "");
 
-        String output = runFormatter(input, new String[] {"-lines", "4"});
+        String output = runFormatter(input, new String[]{"-lines", "4"});
         assertThat(output).isEqualTo(expectedOutput);
     }
 
@@ -1462,7 +1464,7 @@ public final class PartialFormattingTest {
                 "class X {}",
                 "");
 
-        String output = runFormatter(input, new String[] {"-lines", "3"});
+        String output = runFormatter(input, new String[]{"-lines", "3"});
         assertThat(output).isEqualTo(expectedOutput);
     }
 
@@ -1487,7 +1489,7 @@ public final class PartialFormattingTest {
                 "}",
                 "");
 
-        String output = runFormatter(input, new String[] {"-lines", "4:5"});
+        String output = runFormatter(input, new String[]{"-lines", "4:5"});
         assertThat(output).isEqualTo(expectedOutput);
     }
 
@@ -1561,7 +1563,7 @@ public final class PartialFormattingTest {
                 "}",
                 "");
 
-        String output = runFormatter(input, new String[] {"-lines", "2"});
+        String output = runFormatter(input, new String[]{"-lines", "2"});
         assertThat(output).isEqualTo(expectedOutput);
     }
 
@@ -1625,7 +1627,7 @@ public final class PartialFormattingTest {
                 "}",
                 "");
 
-        String output = runFormatter(input, new String[] {"-offset", "13", "-length", "1"});
+        String output = runFormatter(input, new String[]{"-offset", "13", "-length", "1"});
         assertThat(output).isEqualTo(expectedOutput);
     }
 }

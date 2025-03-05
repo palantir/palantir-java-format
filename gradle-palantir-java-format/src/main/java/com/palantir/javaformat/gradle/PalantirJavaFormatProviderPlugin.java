@@ -41,7 +41,7 @@ public final class PalantirJavaFormatProviderPlugin implements Plugin<Project> {
                 deps.add(rootProject
                         .getDependencies()
                         .create(String.format(
-                                "com.palantir.javaformat:palantir-java-format-21:%s",
+                                "com.palantir.javaformat:palantir-java-format:%s",
                                 JavaFormatExtension.class.getPackage().getImplementationVersion())));
             });
         });

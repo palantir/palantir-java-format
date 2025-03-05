@@ -20,7 +20,7 @@ apply plugin: 'org.graalvm.buildtools.native'
 apply plugin: 'com.palantir.external-publish-custom'
 
 dependencies {
-    implementation project(':palantir-java-format-21')
+    implementation project(':palantir-java-format')
 }
 
 import com.palantir.platform.OperatingSystem
