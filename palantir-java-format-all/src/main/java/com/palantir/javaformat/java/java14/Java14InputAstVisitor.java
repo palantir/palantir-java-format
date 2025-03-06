@@ -303,7 +303,6 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
                 }
                 visitStatements(node.getStatements(), isBlock);
                 builder.close();
-                //builder.close();
                 break;
             case RULE:
                 builder.open(plusTwo);

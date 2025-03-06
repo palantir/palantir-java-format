@@ -104,7 +104,7 @@ tasks.register("copyNativeImage", Copy.class) {
 def writeClasspathsForTests = tasks.register("writeClasspathsForTests") {
     inputs.files(tasks.named("copyNativeImage"))
     doLast {
-        file("$buildDir/impl.classpath").text = configurations.impl21.asPath
+        file("$buildDir/impl.classpath").text = configurations.impl.asPath
         file("$buildDir/nativeImage.path").text = tasks.named("copyNativeImage").get().getOutputs().getFiles().getSingleFile().listFiles()[0].getAbsolutePath()
     }
 }

@@ -6,7 +6,7 @@ mainClassName = 'com.palantir.javaformat.java.Main'
 description = 'Palantir Java Format 21'
 
 dependencies {
-    api project(':palantir-java-format-all')
+    implementation project(':palantir-java-format-all')
 }
 
 def exports = [
