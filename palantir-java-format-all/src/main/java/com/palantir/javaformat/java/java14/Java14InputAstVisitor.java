@@ -267,26 +267,26 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
             isDefault = labels.isEmpty();
         }
         if (isDefault) {
-            token("default", plusTwo);
+            token("default", ZERO);
         } else {
-            token("case", plusTwo);
+            token("case", ZERO);
             builder.open(labels.size() > 1 ? plusFour : ZERO);
             builder.space();
-            boolean first = true;
+            boolean afterFirstToken = false;
             for (Tree expression : labels) {
-                if (!first) {
+                if (afterFirstToken) {
                     token(",");
                     builder.breakOp(" ");
                 }
                 scan(expression, null);
-                first = false;
+                afterFirstToken = true;
             }
             builder.close();
         }
 
         final ExpressionTree guard = getGuard(node);
         if (guard != null) {
-            builder.space();
+            builder.breakToFill(" ");
             token("when");
             builder.space();
             scan(guard, null);
@@ -303,13 +303,16 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
                 }
                 visitStatements(node.getStatements(), isBlock);
                 builder.close();
+                //builder.close();
                 break;
             case RULE:
+                builder.open(plusTwo);
                 builder.space();
                 token("-");
                 token(">");
-                builder.space();
                 if (node.getBody().getKind() == BLOCK) {
+                    builder.close();
+                    builder.space();
                     // Explicit call with {@link CollapseEmptyOrNot.YES} to handle empty case blocks.
                     visitBlock(
                             (BlockTree) node.getBody(),
@@ -317,7 +320,9 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
                             AllowLeadingBlankLine.NO,
                             AllowTrailingBlankLine.NO);
                 } else {
+                    builder.breakOp(" ");
                     scan(node.getBody(), null);
+                    builder.close();
                 }
                 builder.guessToken(";");
                 builder.forcedBreak(minusTwo);

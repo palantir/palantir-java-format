@@ -33,11 +33,11 @@ record SwitchRecord(int i) {
                     int six,
                     int seven,
                     int eight,
-                    int nine) -> System.err.println(
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor"
-                            + " incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis"
-                            + " nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo"
-                            + " consequat.");
+                    int nine) ->
+                System.err.println("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor"
+                        + " incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis"
+                        + " nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo"
+                        + " consequat.");
             default -> 0;
         };
     }
