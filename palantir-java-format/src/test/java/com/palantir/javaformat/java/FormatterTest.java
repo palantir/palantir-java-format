@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Range;
 import com.google.common.io.CharStreams;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -31,6 +32,7 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.parallel.Execution;
@@ -442,5 +444,30 @@ public final class FormatterTest {
                                 + "    private static void foo() {}\n" //
                                 + "}"))
                 .doesNotThrowAnyException();
+    }
+
+    @Test
+    void doesntProduceFormattingChangesOnFormattedFiles() throws FormatterException {
+        Formatter formatter = Formatter.create();
+        String simpleClass = "package com.palantir;\n"
+                + "\n"
+                + "public final class Formatted {\n"
+                + "  public static int count(int number) {\n"
+                + "    return number;\n"
+                + "  }\n"
+                + "}";
+        // This is kinda overkill but the point of the test is to show that it
+        // is for sure formatted and still producing a replacement.
+        String formattedClass = formatter.formatSourceAndFixImports(simpleClass);
+        String reformattedClass = formatter.formatSourceAndFixImports(formattedClass);
+
+        // The formatSourceAndFixImports code path flows through getFormatReplacements and
+        // this shows that despite the replacements happening they are superfluous
+        assertThat(formattedClass).isEqualTo(reformattedClass);
+
+        // Proof that the replacements are produced when fully formatted
+        assertThat(formatter.getFormatReplacements(
+                        formattedClass, List.of(Range.closedOpen(0, formattedClass.length()))))
+                .isEmpty();
     }
 }
