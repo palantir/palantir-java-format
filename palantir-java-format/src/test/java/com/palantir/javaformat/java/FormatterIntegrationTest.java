@@ -49,6 +49,10 @@ public class FormatterIntegrationTest {
         this.input = input;
         this.expected = expected;
         this.separator = isRecreate() ? null : Newlines.getLineEnding(expected);
+
+        String _lookATextBlock = """
+            hello
+            """;
     }
 
     /**
