@@ -52,6 +52,7 @@ import javax.lang.model.element.Name;
 /**
  * Extends {@link JavaInputAstVisitor} with support for AST nodes that were added or modified for Java 14.
  */
+@SuppressWarnings("Since15")
 public class Java14InputAstVisitor extends JavaInputAstVisitor {
     private static final Method COMPILATION_UNIT_TREE_GET_MODULE =
             maybeGetMethod(CompilationUnitTree.class, "getModule");
