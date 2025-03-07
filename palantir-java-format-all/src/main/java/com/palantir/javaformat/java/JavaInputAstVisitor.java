@@ -1869,13 +1869,13 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         tokenBreakTrailingComment("{", plusTwo);
         builder.blankLineWanted(BlankLineWanted.NO);
         builder.open(plusTwo);
-        boolean first = true;
+        boolean afterFirstToken = false;
         for (CaseTree caseTree : cases) {
-            if (!first) {
+            if (afterFirstToken) {
                 builder.blankLineWanted(BlankLineWanted.PRESERVE);
             }
             scan(caseTree, null);
-            first = false;
+            afterFirstToken = true;
         }
         builder.close();
         builder.forcedBreak();
@@ -2928,7 +2928,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
      *   <li>{@code foo().bar()[0]}
      *   <li>{@code foo().bar()[0][0]}
      * </ul>
-     *
+     * <p>
      * Whereas an expression like a name {@code com.palantir.foo.bar.Baz} would not.
      */
     private boolean shouldHaveColumnLimit(ExpressionTree expr) {
@@ -3523,7 +3523,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
      *
      * @param dimExpressions an ordered list of dimension expressions (e.g. the {@code 0} in {@code new int[0]}
      * @param annotations an ordered list of type annotations grouped by dimension (e.g. {@code [[@A, @B], [@C]]} for
-     *     {@code int @A [] @B @C []}
+     * {@code int @A [] @B @C []}
      */
     private void maybeAddDims(Deque<ExpressionTree> dimExpressions, Deque<List<? extends AnnotationTree>> annotations) {
         boolean lastWasAnnotation = false;
@@ -3679,6 +3679,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             }
         }
     }
+
     /** Gets the permits clause for the given node. This is only available in Java 15 and later. */
     protected List<? extends Tree> getPermitsClause(ClassTree node) {
         return ImmutableList.of();

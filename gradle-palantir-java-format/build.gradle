@@ -113,6 +113,3 @@ tasks.named("test").configure {
     dependsOn(writeClasspathsForTests)
 }
 
-javaVersion {
-    runtime = 21
-}
