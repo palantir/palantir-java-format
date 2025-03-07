@@ -58,6 +58,7 @@ subprojects {
 
     tasks.withType(JavaCompile).configureEach {
         options.errorprone.disable 'PreconditionsConstantMessage', 'PreferSafeLoggableExceptions', 'PreferSafeLoggingPreconditions'
+        options.errorprone.disable 'StrictUnusedVariable'
     }
 
     // Run `./gradlew test -Drecreate=true` to recreate all the expected
@@ -69,7 +70,7 @@ subprojects {
 
 javaVersions {
     libraryTarget = 17
-    runtime = 17
+    runtime = 21
 }
 
 jdks {

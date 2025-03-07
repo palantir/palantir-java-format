@@ -41,9 +41,7 @@ moduleJvmArgs {
             'jdk.compiler/com.sun.tools.javac.api')
 }
 
-tasks.withType(JavaCompile).configureEach {
-    options.errorprone.disable 'StrictUnusedVariable'
-
+tasks.withType(JavaCompile).named('compileJava').configure {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
 }

@@ -69,14 +69,6 @@ dependencies {
     testImplementation 'org.junit.platform:junit-platform-launcher'
 }
 
-tasks.withType(JavaCompile).configureEach {
-    options.errorprone.disable 'StrictUnusedVariable'
-    // opt out of safe-logging checks which don't map correctly to idea plugins
-    options.errorprone.disable 'PreferSafeLogger'
-    options.errorprone.disable 'PreferSafeLoggableExceptions'
-    options.errorprone.disable 'PreferSafeLoggingPreconditions'
-}
-
 // Javadoc fails if there are no public classes to javadoc, so make it stop complaining.
 tasks.named("javadoc", Javadoc) {
     failOnError = false
