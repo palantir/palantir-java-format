@@ -50,10 +50,6 @@ tasks.withType(JavaCompile).named('compileJava') {
     targetCompatibility = JavaVersion.VERSION_11
 }
 
-tasks.withType(Javadoc).configureEach {
-    enabled = false
-}
-
 // false positives due to org.junit.runners.* in the test cases
 tasks.named("checkJUnitDependencies") {
     enabled = false
