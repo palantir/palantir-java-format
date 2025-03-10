@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Use modern infra to support multiple JDK versions
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/1226

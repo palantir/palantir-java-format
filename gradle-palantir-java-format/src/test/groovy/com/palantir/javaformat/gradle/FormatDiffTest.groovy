@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.palantir.javaformat.gradle
+package com.palantir.javaformat.gradle;
 
 import com.google.common.base.Splitter
 import com.palantir.javaformat.bootstrap.BootstrappingFormatterService

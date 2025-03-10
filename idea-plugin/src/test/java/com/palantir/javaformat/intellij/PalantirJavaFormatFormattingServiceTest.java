@@ -78,10 +78,10 @@ public class PalantirJavaFormatFormattingServiceTest {
 
     @Test
     public void defaultFormatSettings() throws Exception {
-        String input = Files.readString(Paths.get(
-                "../palantir-java-format-tests/src/test/resources/com/palantir/javaformat/java/testdata/A.input"));
-        String output = Files.readString(Path.of(
-                "../palantir-java-format-tests/src/test/resources/com/palantir/javaformat/java/testdata/A.output"));
+        String input = Files.readString(
+                Paths.get("../palantir-java-format/src/test/resources/com/palantir/javaformat/java/testdata/A.input"));
+        String output = Files.readString(
+                Path.of("../palantir-java-format/src/test/resources/com/palantir/javaformat/java/testdata/A.output"));
         PsiFile file = createPsiFile("com/foo/FormatTest.java", input);
         ReformatCodeProcessor processor = new ReformatCodeProcessor(file, false);
         WriteCommandAction.runWriteCommandAction(file.getProject(), () -> {

@@ -129,8 +129,3 @@ configurations {
         }
     }
 }
-
-javaVersion {
-    target = 21
-    runtime = 21
-}

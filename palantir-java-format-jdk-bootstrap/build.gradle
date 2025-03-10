@@ -16,7 +16,6 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind'
 
     // So that we have pjf on our test classpath
-    // TODO(crogoz)
     testImplementation project(':palantir-java-format')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'org.assertj:assertj-core'

@@ -101,7 +101,7 @@ tasks.register("copyNativeImage", Copy.class) {
     into("$buildDir/nativeImage")
 }
 
-def writeClasspathsForTests = tasks.register("writeClasspathsForTests") {
+def writeImplClasspath = tasks.register("writeImplClasspath") {
     inputs.files(tasks.named("copyNativeImage"))
     doLast {
         file("$buildDir/impl.classpath").text = configurations.impl.asPath
@@ -110,6 +110,5 @@ def writeClasspathsForTests = tasks.register("writeClasspathsForTests") {
 }
 
 tasks.named("test").configure {
-    dependsOn(writeClasspathsForTests)
+    dependsOn(writeImplClasspath)
 }
-

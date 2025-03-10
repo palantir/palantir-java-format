@@ -50,7 +50,7 @@ public class BenchmarkMultiFiles {
         private static List<String> getFilesToFormat() {
             Path srcJavaFormatFiles = Paths.get(".")
                     .toAbsolutePath()
-                    .resolve("../palantir-java-format-all/src/main/java/com/palantir/javaformat/java");
+                    .resolve("../palantir-java-format/src/main/java/com/palantir/javaformat/java");
             try (Stream<String> paths = Files.list(srcJavaFormatFiles)
                     .filter(Files::isRegularFile)
                     .map(path -> path.toAbsolutePath().toString())) {

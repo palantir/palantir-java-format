@@ -13,14 +13,11 @@ rootProject.name = 'palantir-java-format-parent'
 include ':gradle-palantir-java-format'
 include ':eclipse_plugin'
 include ':idea-plugin'
-include 'palantir-java-format'
-include ':palantir-java-format-all'
-include 'palantir-java-format-21'
 include ':palantir-java-format-spi'
+include ':palantir-java-format'
 include ':palantir-java-format-jdk-bootstrap'
 include ':palantir-java-format-benchmarks'
 include ':palantir-java-format-native'
-include 'palantir-java-format-tests'
 
 boolean isCiServer = System.getenv().containsKey('CI')
 buildCache {
