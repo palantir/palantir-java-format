@@ -11,3 +11,12 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'com.fasterxml.jackson.core:jackson-databind'
 }
+
+tasks.withType(JavaCompile).named('compileJava') {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+javaVersion {
+    target = 21
+}

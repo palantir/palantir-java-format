@@ -51,9 +51,6 @@ subprojects {
     apply plugin: 'java-library'
     apply plugin: 'org.inferred.processors'
 
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-
     tasks.withType(Checkstyle).configureEach {
         enabled = false
     }
@@ -71,7 +68,7 @@ subprojects {
 }
 
 javaVersions {
-    libraryTarget = 21
+    libraryTarget = 17
     runtime = 21
 }
 
