@@ -423,7 +423,7 @@ public final class Level extends Doc {
                             commentsHelper, maxWidth, explorationNode, innerLevel, state1);
                     break;
                 }
-                // Otherwise, fall through to CHECK_INNER.
+            // Otherwise, fall through to CHECK_INNER.
             case CHECK_INNER:
                 state2 = tryBreakInnerLevel_checkInner(
                         commentsHelper, maxWidth, explorationNode, innerLevel, isSimpleInlining, state1);
