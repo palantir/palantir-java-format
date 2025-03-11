@@ -1,4 +1,4 @@
-<idea-plugin url="https://github.com/palantir/palantir-java-format">
+<idea-plugin url="https://github.com/palantir/palantir-java-format" require-restart="false">
   <id>palantir-java-format</id>
   <name>palantir-java-format</name>
   <vendor url="https://github.com/palantir/palantir-java-format">
