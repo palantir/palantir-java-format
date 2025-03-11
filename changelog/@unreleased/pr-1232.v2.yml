@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Make palantir-java-format dynamically unloadable
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/1232
