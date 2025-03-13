@@ -1,5 +1,5 @@
-type: fix
-fix:
+type: improvement
+improvement:
   description: Sets min-version for pjf Intellij plugin
   links:
   - https://github.com/palantir/palantir-java-format/pull/1237
