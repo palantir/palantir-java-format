@@ -39,7 +39,7 @@ class ConfigureJavaFormatterXml {
 
     static void configureExternalDependencies(Node rootNode, String minVersion) {
         def externalDependencies = matchOrCreateChild(rootNode, 'component', [name: 'ExternalDependencies'])
-        matchOrCreateChild(externalDependencies, 'plugin', [id: 'palantir-java-format'], ['min-version' : minVersion])
+        matchOrCreateChild(externalDependencies, 'plugin', [id: 'palantir-java-format'], [:], ['min-version' : minVersion])
     }
 
     static void configureWorkspaceXml(Node rootNode) {
@@ -76,15 +76,15 @@ class ConfigureJavaFormatterXml {
         matchOrCreateChild(set, 'option', [value: 'JAVA'])
     }
 
-    private static Node matchOrCreateChild(Node base, String name, Map keyAttributes = [:], Map otherAttributes = [:]) {
-        Node node = base[name].find { it.attributes().entrySet().containsAll(keyAttributes.entrySet()) } as Node
-        if (Optional.ofNullable(node).isEmpty()) {
-            return base.appendNode(name, keyAttributes + otherAttributes)
-        } else {
-            node.attributes().clear()
-            node.attributes().putAll(keyAttributes + otherAttributes)
+
+    private static Node matchOrCreateChild(Node base, String name, Map attributes = [:], Map defaults = [:], Map overrides = [:]) {
+        matchChild(base, name, attributes).map {it -> {
+            it.attributes().putAll(overrides)
+            return it
+        } }.orElseGet {
+            base.appendNode(name, attributes + defaults + overrides)
         }
-        return node
+
     }
 
     private static Optional<Node> matchChild(Node base, String name, Map attributes = [:]) {
