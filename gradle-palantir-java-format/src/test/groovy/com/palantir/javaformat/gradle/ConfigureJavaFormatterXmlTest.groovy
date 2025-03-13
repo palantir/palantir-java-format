@@ -21,6 +21,42 @@ import spock.lang.Unroll
 
 class ConfigureJavaFormatterXmlTest extends Specification {
 
+    private static final String EXTERNAL_DEPENDENCIES_NO_PJF = """\
+            <project version="4">
+              <component name="ExternalDependencies">
+                <plugin id="CheckStyle-IDEA"/>
+              </component>
+            </project>
+        """.stripIndent(true)
+
+    private static final String EXTERNAL_DEPENDENCIES_WITH_PJF = """\
+            <project version="4">
+              <component name="ExternalDependencies">
+                <plugin id="CheckStyle-IDEA"/>
+                <plugin id="palantir-java-format"/>
+              </component>
+            </project>
+        """.stripIndent(true)
+
+    private static final String EXTERNAL_DEPENDENCIES_WITH_PINNED_PJF = """\
+            <project version="4">
+              <component name="ExternalDependencies">
+                <plugin id="CheckStyle-IDEA"/>
+                <plugin id="palantir-java-format" min-version="1.0.0"/>
+              </component>
+            </project>
+        """.stripIndent(true)
+
+
+    private static final String EXPECTED_EXTERNAL_DEPENDENCIES = """\
+            <project version="4">
+              <component name="ExternalDependencies">
+                <plugin id="CheckStyle-IDEA"/>
+                <plugin id="palantir-java-format" min-version="9.9.9"/>
+              </component>
+            </project>
+        """.stripIndent(true)
+
     private static final String EXISTING_CLASS_PATH = """
             <root>
                 <component name="PalantirJavaFormatSettings">
@@ -274,6 +310,20 @@ class ConfigureJavaFormatterXmlTest extends Specification {
 
         where:
         action << ACTIONS_ON_SAVE
+    }
+
+    @Unroll
+    def 'can update externalDependencies file'(input) {
+        def node = new XmlParser().parseText(input)
+
+        when:
+        ConfigureJavaFormatterXml.configureExternalDependencies(node, "9.9.9")
+
+        then:
+        xmlToString(node) == EXPECTED_EXTERNAL_DEPENDENCIES
+
+        where:
+        input << [EXTERNAL_DEPENDENCIES_NO_PJF, EXTERNAL_DEPENDENCIES_WITH_PINNED_PJF, EXTERNAL_DEPENDENCIES_WITH_PJF]
     }
 
     private static String xmlSubcomponentToString(Node node, String name) {

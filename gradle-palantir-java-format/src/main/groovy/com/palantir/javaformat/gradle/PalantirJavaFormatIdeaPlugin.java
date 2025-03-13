@@ -41,6 +41,8 @@ import org.xml.sax.SAXException;
 
 public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
 
+    private static final String MIN_IDEA_PLUGIN_VERSION = "2.57.0";
+
     @Override
     public void apply(Project rootProject) {
         Preconditions.checkState(
@@ -77,7 +79,7 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
             Optional<URI> nativeUri =
                     nativeImplConfiguration.map(conf -> conf.getSingleFile().toURI());
             ConfigureJavaFormatterXml.configureJavaFormat(xmlProvider.asNode(), uris, nativeUri);
-            ConfigureJavaFormatterXml.configureExternalDependencies(xmlProvider.asNode());
+            ConfigureJavaFormatterXml.configureExternalDependencies(xmlProvider.asNode(), MIN_IDEA_PLUGIN_VERSION);
         });
 
         ideaModel.getWorkspace().getIws().withXml(xmlProvider -> {
@@ -106,18 +108,17 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
                     node -> ConfigureJavaFormatterXml.configureJavaFormat(node, uris, nativeImageUri));
             createOrUpdateIdeaXmlFile(
                     project.file(".idea/externalDependencies.xml"),
-                    node -> ConfigureJavaFormatterXml.configureExternalDependencies(node));
+                    node -> ConfigureJavaFormatterXml.configureExternalDependencies(node, MIN_IDEA_PLUGIN_VERSION));
             createOrUpdateIdeaXmlFile(
-                    project.file(".idea/workspace.xml"), node -> ConfigureJavaFormatterXml.configureWorkspaceXml(node));
+                    project.file(".idea/workspace.xml"), ConfigureJavaFormatterXml::configureWorkspaceXml);
 
             // Still configure legacy idea if using intellij import
             updateIdeaXmlFileIfExists(project.file(project.getName() + ".ipr"), node -> {
                 ConfigureJavaFormatterXml.configureJavaFormat(node, uris, nativeImageUri);
-                ConfigureJavaFormatterXml.configureExternalDependencies(node);
+                ConfigureJavaFormatterXml.configureExternalDependencies(node, MIN_IDEA_PLUGIN_VERSION);
             });
-            updateIdeaXmlFileIfExists(project.file(project.getName() + ".iws"), node -> {
-                ConfigureJavaFormatterXml.configureWorkspaceXml(node);
-            });
+            updateIdeaXmlFileIfExists(
+                    project.file(project.getName() + ".iws"), ConfigureJavaFormatterXml::configureWorkspaceXml);
         });
     }
 
