@@ -365,7 +365,7 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
         }
     }
 
-    @SuppressWarnings("NullableProblems")
+    @SuppressWarnings({"NullableProblems", "for-rollout:NullAway"})
     protected ExpressionTree getGuard(final CaseTree node) {
         return null;
     }
