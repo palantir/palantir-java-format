@@ -56,13 +56,13 @@ graalvmNative {
             configurationFileDirectories.from(file('src/main/resources/META-INF/native-image'))
             buildArgs.addAll(
                     '-H:+UnlockExperimentalVMOptions',
-                    '-H:IncludeResourceBundles=com.sun.tools.javac.resources.compiler',
-                    '-H:IncludeResourceBundles=com.sun.tools.javac.resources.javac',
+                    '-H:+IncludeAllLocales',
                     '--no-fallback',
                     '--initialize-at-build-time=com.sun.tools.javac.file.Locations',
                     '-H:+ReportExceptionStackTraces',
                     '-H:-UseContainerSupport',
-                    '--exact-reachability-metadata',
+                    '-H:+GenerateEmbeddedResourcesFile',
+                    //'--exact-reachability-metadata',
                     "-march=compatibility")
             jvmArgs.addAll(jvmArgList)
         }

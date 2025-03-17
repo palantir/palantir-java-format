@@ -164,26 +164,22 @@
       "glob": "META-INF/services/java.lang.System$LoggerFinder"
     },
     {
-      "glob": "com/sun/tools/javac/resources/compiler_en.properties"
-    },
-    {
-      "glob": "com/sun/tools/javac/resources/compiler_en_US.properties"
+      "glob": "com/sun/tools/javac/resources/compiler.properties"
     },
     {
       "module": "jdk.compiler",
-      "glob": "com/sun/tools/javac/resources/compiler_en.properties"
+      "glob": "com/sun/tools/javac/resources/compiler_*.properties"
     },
     {
-      "module": "jdk.compiler",
-      "glob": "com/sun/tools/javac/resources/compiler_en_US.properties"
+      "glob": "com/sun/tools/javac/resources/javac_en.properties"
     }
   ],
   "bundles": [
     {
-      "name": "com.sun.tools.javac.resources.compiler",
-      "locales": [
-        "en-US"
-      ]
+      "name": "com.sun.tools.javac.resources.compiler"
+    },
+    {
+      "name": "com.sun.tools.javac.resources.javac"
     }
   ],
   "jni": [
