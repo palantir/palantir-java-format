@@ -62,7 +62,6 @@ graalvmNative {
                     '-H:+ReportExceptionStackTraces',
                     '-H:-UseContainerSupport',
                     '--exact-reachability-metadata',
-                    '-H:+GenerateEmbeddedResourcesFile',
                     "-march=compatibility")
             jvmArgs.addAll(jvmArgList)
         }
