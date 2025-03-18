@@ -69,7 +69,7 @@ public final class NativeImageFormatProviderPlugin implements Plugin<Project> {
         });
     }
 
-    // Used only by the Gradle workflow; native images have a lower throughput than Java-based implementations,
+    // Used only by the spotlessApply workflow; native images have a lower throughput than Java-based implementations,
     // when running the formatter on a large amount of
     public static boolean shouldUseNativeImage(Project project) {
         return canUseNativeImage(project) && JavaVersion.current().compareTo(JavaVersion.VERSION_21) < 0;
