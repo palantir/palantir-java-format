@@ -61,18 +61,12 @@ graalvmNative {
                     '--initialize-at-build-time=com.sun.tools.javac.file.Locations',
                     '-H:+ReportExceptionStackTraces',
                     '-H:-UseContainerSupport',
+                    '--exact-reachability-metadata',
                     '-H:+GenerateEmbeddedResourcesFile',
-                    //'--exact-reachability-metadata',
                     "-march=compatibility")
             jvmArgs.addAll(jvmArgList)
         }
     }
-}
-
-
-// The image requires parameters to be passed to; eg. gw nativeRun -Pargs=--palantir,-i,<file>
-tasks.named("nativeRun", org.graalvm.buildtools.gradle.tasks.NativeRunTask) {
-    runtimeArgs.addAll(project.hasProperty('appArgs') ? project.appArgs.split(',') : [])
 }
 
 if (Optional.ofNullable(System.getenv("CI")).isPresent()) {

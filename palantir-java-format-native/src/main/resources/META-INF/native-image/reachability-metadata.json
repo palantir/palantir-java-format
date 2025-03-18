@@ -47,11 +47,11 @@
       "allDeclaredFields": true
     },
     {
-      "type": "com.google.common.collect.SingletonImmutableList",
+      "type": "com.google.common.collect.RegularImmutableList",
       "allDeclaredFields": true
     },
     {
-      "type": "com.google.common.collect.RegularImmutableList",
+      "type": "com.google.common.collect.SingletonImmutableList",
       "allDeclaredFields": true
     },
     {
@@ -164,14 +164,11 @@
       "glob": "META-INF/services/java.lang.System$LoggerFinder"
     },
     {
-      "glob": "com/sun/tools/javac/resources/compiler.properties"
+      "glob": "com/sun/tools/javac/resources/**"
     },
     {
       "module": "jdk.compiler",
-      "glob": "com/sun/tools/javac/resources/compiler_*.properties"
-    },
-    {
-      "glob": "com/sun/tools/javac/resources/javac_en.properties"
+      "glob": "com/sun/tools/javac/resources/**"
     }
   ],
   "bundles": [
