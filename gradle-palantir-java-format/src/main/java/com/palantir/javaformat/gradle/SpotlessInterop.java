@@ -39,7 +39,13 @@ final class SpotlessInterop {
     }
 
     static FormatterStep addSpotlessJavaFormatStep(Project project) {
-        if (NativeImageFormatProviderPlugin.shouldUseNativeImage(project)) {
+
+        if (NativeImageFormatProviderPlugin.isNativeImageConfigured(project)
+                // Native images have lower throughput than Java implementations. This logic gets called by the
+                // Gradle spotlessApply step, which formats a full project.
+                // If we are already running on java 21, then we can run the spotlessApply logic using the Java
+                // formatter. Otherwise, we need to run the native-image.
+                && JavaVersion.current().compareTo(JavaVersion.VERSION_21) < 0) {
             logger.info("Using the native-image formatter");
             return NativePalantirJavaFormatStep.create(project.getRootProject()
                     .getConfigurations()

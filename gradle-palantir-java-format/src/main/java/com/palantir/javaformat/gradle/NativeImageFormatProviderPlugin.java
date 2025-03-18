@@ -20,7 +20,6 @@ import com.google.common.base.Preconditions;
 import com.palantir.platform.Architecture;
 import com.palantir.platform.OperatingSystem;
 import java.util.Optional;
-import org.gradle.api.JavaVersion;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.type.ArtifactTypeDefinition;
@@ -38,7 +37,7 @@ public final class NativeImageFormatProviderPlugin implements Plugin<Project> {
                 rootProject == rootProject.getRootProject(),
                 "May only apply com.palantir.java-format-provider to the root project");
 
-        if (!canUseNativeImage(rootProject)) {
+        if (!isNativeImageConfigured(rootProject)) {
             log.info("Skipping native image configuration as it is not supported on this platform");
             return;
         }
@@ -69,13 +68,7 @@ public final class NativeImageFormatProviderPlugin implements Plugin<Project> {
         });
     }
 
-    // Used only by the spotlessApply workflow; native images have a lower throughput than Java-based implementations,
-    // when running the formatter on a large amount of
-    public static boolean shouldUseNativeImage(Project project) {
-        return canUseNativeImage(project) && JavaVersion.current().compareTo(JavaVersion.VERSION_21) < 0;
-    }
-
-    public static boolean canUseNativeImage(Project project) {
+    public static boolean isNativeImageConfigured(Project project) {
         return isNativeImageSupported() && isNativeFlagEnabled(project);
     }
 
