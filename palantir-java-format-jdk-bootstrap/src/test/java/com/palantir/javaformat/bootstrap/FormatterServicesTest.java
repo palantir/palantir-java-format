@@ -80,7 +80,7 @@ final class FormatterServicesTest {
 
     @ParameterizedTest
     @MethodSource("getFormatters")
-    void fails_for_invalid_input(FormatterService formatterService) throws FormatterException {
+    void no_replacements_for_invalid_input(FormatterService formatterService) throws FormatterException {
         String input =
                 """
             class Foo {
