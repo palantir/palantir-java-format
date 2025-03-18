@@ -76,13 +76,13 @@ public final class PalantirJavaFormatPlugin implements Plugin<Project> {
         @TaskAction
         public final void formatDiff() throws IOException, InterruptedException {
             if (getNativeImage().isPresent()) {
-                log.info("Using the native-image to format");
+                log.info("Using the native-image formatter");
                 FormatDiff.formatDiff(
                         getProject().getProjectDir().toPath(),
                         new NativeImageFormatterService(
                                 getNativeImage().get().getAsFile().toPath()));
             } else {
-                log.info("Using legacy java formatter");
+                log.info("Using the Java-based formatter");
                 JavaFormatExtension extension =
                         getProject().getRootProject().getExtensions().getByType(JavaFormatExtension.class);
                 FormatterService formatterService = extension.serviceLoad();

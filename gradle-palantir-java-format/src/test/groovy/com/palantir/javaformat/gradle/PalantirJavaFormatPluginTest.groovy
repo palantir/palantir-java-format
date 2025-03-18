@@ -93,8 +93,9 @@ class PalantirJavaFormatPluginTest extends IntegrationTestKitSpec {
         '''.stripIndent()
 
         where:
-        extraGradleProperties    | expectedOutput
-        ""                          | "Using legacy java formatter"
-        "palantir.native.formatter=true"  | "Using the native-image to format"
+        // When running on Java 21, gradle will always use the Java formatter
+        extraGradleProperties | expectedOutput
+        "" | "Using the Java-based formatter"
+        "palantir.native.formatter=true" |  "Using the Java-based formatter"
     }
 }

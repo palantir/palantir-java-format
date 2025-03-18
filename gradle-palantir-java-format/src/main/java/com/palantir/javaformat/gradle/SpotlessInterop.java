@@ -19,6 +19,7 @@ import com.diffplug.gradle.spotless.SpotlessExtension;
 import com.diffplug.spotless.FormatterStep;
 import com.palantir.javaformat.gradle.spotless.NativePalantirJavaFormatStep;
 import com.palantir.javaformat.gradle.spotless.PalantirJavaFormatStep;
+import org.gradle.api.JavaVersion;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -39,12 +40,12 @@ final class SpotlessInterop {
 
     static FormatterStep addSpotlessJavaFormatStep(Project project) {
         if (NativeImageFormatProviderPlugin.shouldUseNativeImage(project)) {
-            logger.info("Using the native-image palantir-java-formatter");
+            logger.info("Using the native-image formatter");
             return NativePalantirJavaFormatStep.create(project.getRootProject()
                     .getConfigurations()
                     .getByName(NativeImageFormatProviderPlugin.NATIVE_CONFIGURATION_NAME));
         }
-        logger.info("Using the legacy palantir-java-formatter");
+        logger.info("Using the Java-based formatter {}", JavaVersion.current());
         return PalantirJavaFormatStep.create(
                 project.getRootProject()
                         .getConfigurations()

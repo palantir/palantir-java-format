@@ -18,6 +18,11 @@ package com.palantir.javaformat.gradle
 import nebula.test.IntegrationTestKitSpec
 import spock.lang.Unroll
 
+import java.nio.charset.StandardCharsets
+import java.nio.file.Path
+import java.util.stream.Collectors
+import java.util.stream.Stream
+
 class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
     /** ./gradlew writeImplClasspath generates this file. */
     private static final CLASSPATH_FILE = new File("build/impl.classpath").absolutePath
@@ -26,20 +31,61 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
 
 
     @Unroll
-    def "formats with spotless when spotless is applied"(String extraGradleProperties, String expectedOutput) {
+    def "formats with spotless when spotless is applied"(String extraGradleProperties, String javaVersion, String expectedOutput) {
         def extraDependencies = extraGradleProperties.isEmpty() ? "" : NATIVE_CONFIG
+        settingsFile << """
+             buildscript {
+                repositories {
+                    mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
+                    gradlePluginPortal() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
+                }
+                 dependencies {
+                     classpath 'com.palantir.gradle.jdks:gradle-jdks-settings:0.62.0'
+                 }
+             }
+            apply plugin: 'com.palantir.jdks.settings'
+        """.stripIndent(true)
+
         buildFile << """
+             buildscript {
+                repositories {
+                    mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
+                    gradlePluginPortal() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
+                }
+                 dependencies {
+                     classpath 'com.palantir.baseline:gradle-baseline-java:6.21.0'
+                     classpath 'com.palantir.gradle.jdks:gradle-jdks:0.62.0'
+                     classpath 'com.palantir.gradle.jdkslatest:gradle-jdks-latest:0.17.0'
+                     classpath files(FILES)
+                 }
+             }
+
             // The 'com.diffplug.spotless:spotless-plugin-gradle' dependency is already added by palantir-java-format
             plugins {
                 id 'java'
-                id 'com.palantir.java-format'
             }
+
+            apply plugin: 'com.palantir.java-format'     
+            apply plugin: 'com.palantir.baseline-java-versions'
+            apply plugin: 'com.palantir.jdks'
+            apply plugin: 'com.palantir.jdks.latest'
             
             dependencies {
                 palantirJavaFormat files(file("${CLASSPATH_FILE}").text.split(':'))
                 EXTRA_CONFIGURATION
             }
-        """.replace("EXTRA_CONFIGURATION", extraDependencies).stripIndent()
+            
+            javaVersions {
+                libraryTarget = JAVA_VERSION
+            }
+            
+            jdks {
+                daemonTarget = JAVA_VERSION
+            }
+            
+        """.replace("FILES", getBuildPluginClasspathInjector().join(","))
+                .replace("JAVA_VERSION", javaVersion)
+                .replace("EXTRA_CONFIGURATION", extraDependencies).stripIndent()
 
         // Add jvm args to allow spotless and formatter gradle plugins to run with Java 16+
         file('gradle.properties') << """
@@ -48,6 +94,7 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
           --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED \
           --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED \
           --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED
+        palantir.jdk.setup.enabled=true
         """.stripIndent()
         file('gradle.properties') << extraGradleProperties
 
@@ -56,19 +103,58 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
         """.stripIndent()
 
         file('src/main/java/Main.java').text = invalidJavaFile
+        runTasks('wrapper')
 
         when:
-        def result = runTasks('spotlessApply', '--info')
+        def result = runGradlewTasks('spotlessApply', '--info')
 
         then:
-        result.output.contains(expectedOutput)
+        result.contains(expectedOutput)
         file('src/main/java/Main.java').text == validJavaFile
 
         where:
-        extraGradleProperties   | expectedOutput
-        "" | "Using the legacy palantir-java-formatter"
-        "palantir.native.formatter=true"  | "Using the native-image"
+        extraGradleProperties               | javaVersion   | expectedOutput
+        ""                                  | 21            | "Using the Java-based formatter"
+        "palantir.native.formatter=true"    | 21            | "Using the Java-based formatter"
+        "palantir.native.formatter=true"    | 17            | "Using the native-image formatter"
 
+    }
+
+    private static Iterable<File> getBuildPluginClasspathInjector() {
+        return getPluginClasspathInjector(Path.of("../gradle-palantir-java-format/build/pluginUnderTestMetadata/plugin-under-test-metadata.properties"))
+    }
+
+    private static Iterable<File> getPluginClasspathInjector(Path path) {
+        File propertiesFile = path.toFile()
+        Properties properties = new Properties()
+        propertiesFile.withInputStream { inputStream ->
+            properties.load(inputStream)
+        }
+        String classpath = properties.getProperty('implementation-classpath')
+        return classpath.split(File.pathSeparator).collect { "'" + it + "'" }
+    }
+
+    private String runGradlewTasks(String... tasks) {
+        ProcessBuilder processBuilder = getProcessBuilder(tasks)
+        Process process = processBuilder.start()
+        String output = readAllInput(process.getInputStream())
+        return output
+    }
+
+    public static String readAllInput(InputStream inputStream) {
+        try (Stream<String> lines =
+                new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8)).lines()) {
+            return lines.collect(Collectors.joining("\n"));
+        }
+    }
+
+    private ProcessBuilder getProcessBuilder(String... tasks) {
+        List<String> arguments = ["./gradlew"]
+        Arrays.asList(tasks).forEach(arguments::add)
+        ProcessBuilder processBuilder = new ProcessBuilder()
+                .command(arguments)
+                .directory(projectDir).redirectErrorStream(true)
+        return processBuilder
     }
 
     def validJavaFile = '''\
