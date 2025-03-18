@@ -1,0 +1,6 @@
+type: fix
+fix:
+  description: Native image IncludeAllLocales and updates reachability-metadata's
+    resources glob to include all entries under `com/sun/tools/javac/resources/**`
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/1240
