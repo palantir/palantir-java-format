@@ -78,6 +78,23 @@ final class FormatterServicesTest {
         });
     }
 
+    @ParameterizedTest
+    @MethodSource("getFormatters")
+    void fails_for_invalid_input(FormatterService formatterService) throws FormatterException {
+        String input =
+                """
+            class Foo {
+
+            /* hello*/
+            public void main(     String    aaaa ) {
+                System.out.println("aaaaa"}; }
+            }
+        """;
+
+        assertThat(formatterService.getFormatReplacements(input, List.of(Range.open(0, input.length()))))
+                .isEmpty();
+    }
+
     private static Stream<FormatterService> getFormatters() {
         return Stream.of(
                 new BootstrappingFormatterService(
