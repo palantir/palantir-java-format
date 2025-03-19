@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: SpotlessApply uses Java 21 version
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/1243
