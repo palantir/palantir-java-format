@@ -36,10 +36,10 @@ public final class JsonSink implements Sink {
 
     private final Map<Integer, ArrayNode> childrenMap = new HashMap<>();
 
-    @SuppressWarnings("for-rollout:NullAway")
+    @SuppressWarnings({"for-rollout:NullAway", "for-rollout:RemoveRolloutSuppressions"})
     private ObjectNode rootNode;
 
-    @SuppressWarnings("for-rollout:NullAway")
+    @SuppressWarnings({"for-rollout:NullAway", "for-rollout:RemoveRolloutSuppressions"})
     @Override
     public FinishExplorationNode startExplorationNode(
             int exporationId,
@@ -71,7 +71,7 @@ public final class JsonSink implements Sink {
 
     @Override
     public FinishLevelNode writeLevelNode(int levelNodeId, int parentExplorationId, State incomingState, Level level) {
-        @SuppressWarnings("for-rollout:NullAway")
+        @SuppressWarnings({"for-rollout:NullAway", "for-rollout:RemoveRolloutSuppressions"})
         ObjectNode json = childrenMap.get(parentExplorationId).addObject();
         json.put("type", "level");
         json.put("id", levelNodeId);

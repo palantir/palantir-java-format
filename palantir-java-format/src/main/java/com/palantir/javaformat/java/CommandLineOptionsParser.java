@@ -39,7 +39,7 @@ final class CommandLineOptionsParser {
             Splitter.on(CharMatcher.breakingWhitespace()).omitEmptyStrings().trimResults();
 
     /** Parses {@link CommandLineOptions}. */
-    @SuppressWarnings("for-rollout:NullAway")
+    @SuppressWarnings({"for-rollout:NullAway", "for-rollout:RemoveRolloutSuppressions"})
     static CommandLineOptions parse(Iterable<String> options) {
         CommandLineOptions.Builder optionsBuilder = CommandLineOptions.builder();
         List<String> expandedOptions = new ArrayList<>();

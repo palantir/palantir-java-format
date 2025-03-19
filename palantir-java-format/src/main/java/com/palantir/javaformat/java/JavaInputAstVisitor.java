@@ -984,7 +984,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         }
     }
 
-    @SuppressWarnings("for-rollout:NullAway")
+    @SuppressWarnings({"for-rollout:NullAway", "for-rollout:RemoveRolloutSuppressions"})
     private TypeWithDims variableFragmentDims(boolean first, int leadingDims, Tree type) {
         if (type == null) {
             return null;
@@ -1382,7 +1382,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
 
     protected static final long RECORD = 1L << 61;
 
-    @SuppressWarnings("for-rollout:NullAway")
+    @SuppressWarnings({"for-rollout:NullAway", "for-rollout:RemoveRolloutSuppressions"})
     @Override
     public Void visitMethod(MethodTree node, Void unused) {
         sync(node);
@@ -2999,7 +2999,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         return node;
     }
 
-    @SuppressWarnings("for-rollout:NullAway")
+    @SuppressWarnings({"for-rollout:NullAway", "for-rollout:RemoveRolloutSuppressions"})
     private ExpressionTree getMethodReceiver(MethodInvocationTree methodInvocation) {
         ExpressionTree select = methodInvocation.getMethodSelect();
         return select instanceof MemberSelectTree ? ((MemberSelectTree) select).getExpression() : null;
@@ -3331,7 +3331,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         return size;
     }
 
-    @SuppressWarnings("for-rollout:NullAway")
+    @SuppressWarnings({"for-rollout:NullAway", "for-rollout:RemoveRolloutSuppressions"})
     private Integer actualColumn(ExpressionTree expression) {
         Map<Integer, Integer> positionToColumnMap = builder.getInput().getPositionToColumnMap();
         return positionToColumnMap.get(builder.actualStartColumn(getStartPosition(expression)));

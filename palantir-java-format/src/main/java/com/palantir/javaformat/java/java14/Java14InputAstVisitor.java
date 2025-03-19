@@ -96,7 +96,7 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
         }
     }
 
-    @SuppressWarnings("for-rollout:NullAway")
+    @SuppressWarnings({"for-rollout:NullAway", "for-rollout:RemoveRolloutSuppressions"})
     @Override
     public Void visitBindingPattern(BindingPatternTree node, Void unused) {
         sync(node);
@@ -348,7 +348,7 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
         return null;
     }
 
-    @SuppressWarnings("for-rollout:NullAway")
+    @SuppressWarnings({"for-rollout:NullAway", "for-rollout:RemoveRolloutSuppressions"})
     private static Method maybeGetMethod(Class<?> c, String name) {
         try {
             return c.getMethod(name);
@@ -365,7 +365,7 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
         }
     }
 
-    @SuppressWarnings({"NullableProblems", "for-rollout:NullAway"})
+    @SuppressWarnings({"NullableProblems", "for-rollout:NullAway", "for-rollout:RemoveRolloutSuppressions"})
     protected ExpressionTree getGuard(final CaseTree node) {
         return null;
     }

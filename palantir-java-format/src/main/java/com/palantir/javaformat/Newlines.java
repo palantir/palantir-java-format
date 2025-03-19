@@ -53,7 +53,7 @@ public class Newlines {
     }
 
     /** Returns the terminating line break in the input, or {@code null} if the input does not end in a break. */
-    @SuppressWarnings("for-rollout:NullAway")
+    @SuppressWarnings({"for-rollout:NullAway", "for-rollout:RemoveRolloutSuppressions"})
     public static String getLineEnding(String input) {
         for (String b : BREAKS) {
             if (input.endsWith(b)) {
@@ -159,7 +159,7 @@ public class Newlines {
         private final String input;
         private final Iterator<Integer> indices;
 
-        @SuppressWarnings("for-rollout:NullAway")
+        @SuppressWarnings({"for-rollout:NullAway", "for-rollout:RemoveRolloutSuppressions"})
         private LineIterator(String input) {
             this.input = input;
             this.indices = lineOffsetIterator(input);

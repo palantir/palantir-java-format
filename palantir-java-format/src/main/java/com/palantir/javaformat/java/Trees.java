@@ -68,7 +68,7 @@ class Trees {
     }
 
     /** Returns the receiver of a qualified method invocation expression, or {@code null}. */
-    @SuppressWarnings("for-rollout:NullAway")
+    @SuppressWarnings({"for-rollout:NullAway", "for-rollout:RemoveRolloutSuppressions"})
     static ExpressionTree getMethodReceiver(MethodInvocationTree methodInvocation) {
         ExpressionTree select = methodInvocation.getMethodSelect();
         return select instanceof MemberSelectTree ? ((MemberSelectTree) select).getExpression() : null;

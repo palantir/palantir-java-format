@@ -64,7 +64,7 @@ public final class Obs {
         String getOutput();
     }
 
-    @SuppressWarnings("for-rollout:NullAway")
+    @SuppressWarnings({"for-rollout:NullAway", "for-rollout:RemoveRolloutSuppressions"})
     public static ExplorationNode createRoot(Sink sink) {
         return new ExplorationNodeImpl(null, "(initial node)", sink, 0, Optional.empty());
     }

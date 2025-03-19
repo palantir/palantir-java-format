@@ -107,7 +107,7 @@ final class ModifierOrderer {
     /**
      * Returns the given token as a {@link javax.lang.model.element.Modifier}, or {@code null} if it is not a modifier.
      */
-    @SuppressWarnings("for-rollout:NullAway")
+    @SuppressWarnings({"for-rollout:NullAway", "for-rollout:RemoveRolloutSuppressions"})
     private static Modifier asModifier(Token token) {
         TokenKind kind = ((JavaInput.Tok) token.getTok()).kind();
         if (kind != null) {

@@ -37,14 +37,14 @@ class PalantirJavaFormatConfigurable extends BaseConfigurable implements Searcha
     private JPanel panel;
     private JCheckBox enable;
 
-    @SuppressWarnings("for-rollout:RawTypes")
+    @SuppressWarnings({"for-rollout:RawTypes", "for-rollout:RemoveRolloutSuppressions"})
     private JComboBox styleComboBox;
 
     private JLabel isUsingNativeImage;
     private JLabel formatterVersion;
     private JLabel pluginVersion;
 
-    @SuppressWarnings("for-rollout:NullAway")
+    @SuppressWarnings({"for-rollout:NullAway", "for-rollout:RemoveRolloutSuppressions"})
     public PalantirJavaFormatConfigurable(Project project) {
         this.project = project;
     }
@@ -126,7 +126,7 @@ class PalantirJavaFormatConfigurable extends BaseConfigurable implements Searcha
         return settings.computeFormatterVersion().orElse("(bundled)") + suffix;
     }
 
-    @SuppressWarnings("for-rollout:UnusedMethod")
+    @SuppressWarnings({"for-rollout:RemoveRolloutSuppressions", "for-rollout:UnusedMethod"})
     private void createUIComponents() {
         styleComboBox = new ComboBox<>(UiFormatterStyle.values());
     }

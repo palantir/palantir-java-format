@@ -107,7 +107,7 @@ public final class Main {
         }
     }
 
-    @SuppressWarnings("for-rollout:RedundantControlFlow")
+    @SuppressWarnings({"for-rollout:RedundantControlFlow", "for-rollout:RemoveRolloutSuppressions"})
     private int formatFiles(CommandLineOptions parameters, JavaFormatterOptions options) {
         int numThreads = Math.min(MAX_THREADS, parameters.files().size());
         ExecutorService executorService = Executors.newFixedThreadPool(numThreads);

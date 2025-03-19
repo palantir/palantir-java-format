@@ -201,7 +201,7 @@ public final class Formatter {
         return Runtime.version().feature();
     }
 
-    @SuppressWarnings("for-rollout:ThrowError")
+    @SuppressWarnings({"for-rollout:RemoveRolloutSuppressions", "for-rollout:ThrowError"})
     private static JavaInputAstVisitor createVisitor(
             final String className, final OpsBuilder builder, final JavaFormatterOptions options) {
         try {

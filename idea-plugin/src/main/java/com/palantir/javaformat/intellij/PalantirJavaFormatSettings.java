@@ -34,20 +34,20 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 
-@SuppressWarnings("for-rollout:SameNameButDifferent")
+@SuppressWarnings({"for-rollout:RemoveRolloutSuppressions", "for-rollout:SameNameButDifferent"})
 @State(
         name = "PalantirJavaFormatSettings",
         storages = {@Storage("palantir-java-format.xml")})
 public class PalantirJavaFormatSettings implements PersistentStateComponent<PalantirJavaFormatSettings.State> {
 
-    @SuppressWarnings("for-rollout:SameNameButDifferent")
+    @SuppressWarnings({"for-rollout:RemoveRolloutSuppressions", "for-rollout:SameNameButDifferent"})
     private State state = new State();
 
     static PalantirJavaFormatSettings getInstance(Project project) {
         return ServiceManager.getService(project, PalantirJavaFormatSettings.class);
     }
 
-    @SuppressWarnings("for-rollout:SameNameButDifferent")
+    @SuppressWarnings({"for-rollout:RemoveRolloutSuppressions", "for-rollout:SameNameButDifferent"})
     @Nullable
     @Override
     public State getState() {
@@ -55,7 +55,7 @@ public class PalantirJavaFormatSettings implements PersistentStateComponent<Pala
     }
 
     @Override
-    public void loadState(@SuppressWarnings("for-rollout:SameNameButDifferent") State state) {
+    public void loadState(@SuppressWarnings({"for-rollout:RemoveRolloutSuppressions", "for-rollout:SameNameButDifferent"}) State state) {
         this.state = state;
     }
 
@@ -155,7 +155,7 @@ public class PalantirJavaFormatSettings implements PersistentStateComponent<Pala
                     .map(strings -> strings.stream().map(URI::create).collect(Collectors.toList()));
         }
 
-        @SuppressWarnings("for-rollout:NullAway")
+        @SuppressWarnings({"for-rollout:NullAway", "for-rollout:RemoveRolloutSuppressions"})
         public List<String> getImplementationClassPath() {
             return implementationClassPath
                     .map(paths -> paths.stream().map(URI::toString).collect(Collectors.toList()))
@@ -166,7 +166,7 @@ public class PalantirJavaFormatSettings implements PersistentStateComponent<Pala
             nativeImageClassPath = Optional.ofNullable(value).map(URI::create);
         }
 
-        @SuppressWarnings("for-rollout:NullAway")
+        @SuppressWarnings({"for-rollout:NullAway", "for-rollout:RemoveRolloutSuppressions"})
         public String getNativeImageClassPath() {
             return nativeImageClassPath.map(URI::toString).orElse(null);
         }
@@ -182,7 +182,7 @@ public class PalantirJavaFormatSettings implements PersistentStateComponent<Pala
             }
         }
 
-        @SuppressWarnings("for-rollout:NullAway")
+        @SuppressWarnings({"for-rollout:NullAway", "for-rollout:RemoveRolloutSuppressions"})
         public String getEnabled() {
             switch (enabled) {
                 case ENABLED:
