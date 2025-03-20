@@ -16,14 +16,10 @@
 
 package com.palantir.javaformat.intellij;
 
-import com.google.common.base.Preconditions;
-import com.intellij.ide.plugins.IdeaPluginDescriptor;
-import com.intellij.ide.plugins.PluginManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
-import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.project.Project;
 import com.palantir.javaformat.java.FormatterService;
 import com.palantir.javaformat.java.JavaFormatterOptions;
@@ -115,11 +111,7 @@ public class PalantirJavaFormatSettings implements PersistentStateComponent<Pala
     }
 
     Optional<String> getImplementationVersion() {
-        IdeaPluginDescriptor ourPlugin = Preconditions.checkNotNull(
-                PluginManager.getPlugin(PluginId.getId(FormatterProvider.PLUGIN_ID)),
-                "Couldn't find our own plugin: %s",
-                FormatterProvider.PLUGIN_ID);
-        return Optional.ofNullable(ourPlugin.getVersion());
+        return Optional.ofNullable(FormatterProvider.getPluginDescriptor().getVersion());
     }
 
     Optional<String> computeFormatterVersion() {

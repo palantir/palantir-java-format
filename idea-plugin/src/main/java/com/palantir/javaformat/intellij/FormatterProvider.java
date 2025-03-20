@@ -60,6 +60,11 @@ final class FormatterProvider {
     private final LoadingCache<FormatterCacheKey, Optional<FormatterService>> implementationCache =
             Caffeine.newBuilder().maximumSize(1).build(FormatterProvider::createFormatter);
 
+    static IdeaPluginDescriptor getPluginDescriptor() {
+        return Preconditions.checkNotNull(
+                PluginManager.getPlugin(PluginId.getId(PLUGIN_ID)), "Couldn't find our own plugin: %s", PLUGIN_ID);
+    }
+
     Optional<FormatterService> get(Project project, PalantirJavaFormatSettings settings) {
         return implementationCache.get(new FormatterCacheKey(
                 project,
@@ -117,8 +122,7 @@ final class FormatterProvider {
     @SuppressWarnings("for-rollout:Slf4jLogsafeArgs")
     private static List<Path> getBundledImplementationUrls() {
         // Load from the jars bundled with the plugin.
-        IdeaPluginDescriptor ourPlugin = Preconditions.checkNotNull(
-                PluginManager.getPlugin(PluginId.getId(PLUGIN_ID)), "Couldn't find our own plugin: %s", PLUGIN_ID);
+        IdeaPluginDescriptor ourPlugin = getPluginDescriptor();
         Path implDir = ourPlugin.getPath().toPath().resolve("impl");
         log.debug("Using palantir-java-format implementation bundled with plugin: {}", implDir);
         return listDirAsUrlsUnchecked(implDir);
