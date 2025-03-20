@@ -54,7 +54,7 @@ import org.slf4j.LoggerFactory;
 final class FormatterProvider {
     private static final Logger log = LoggerFactory.getLogger(FormatterProvider.class);
 
-    private static final String PLUGIN_ID = "palantir-java-format";
+    static final String PLUGIN_ID = "palantir-java-format";
 
     // Cache to avoid creating a URLClassloader every time we want to format from IntelliJ
     private final LoadingCache<FormatterCacheKey, Optional<FormatterService>> implementationCache =
