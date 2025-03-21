@@ -182,6 +182,25 @@ shortcut.
 
 ![Install plugin from disk](./docs/images/install_plugin_from_disk.png)
 
+## Java 21 Support
+
+In [1211](https://github.com/palantir/palantir-java-format/pull/1211) we shipped Java 21 support. In order to use the 
+Java 21 formatting capabilities, ensure that either: 
+
+- the Gradle daemon and the Intellij Project SDK are set to Java 21
+- or that the gradle property `palantir.native.formatter=true`. This will run the formatter as a native image, 
+- independent of the Gradle daemon/Intellij project JDK version. 
+
+### Native image formatter
+
+[This comment](https://github.com/palantir/palantir-java-format/issues/952#issuecomment-2575750610) explains why we 
+switched to a native image for the formatter. The startup time for the native image esp. in Intellij is >10x faster than
+spinning up a new process that does the formatting.
+However, the throughput of running the native image for a large set of files (eg. running `./gradlew spotlessApply`) is 
+considerably slower (eg. 30ms using the Java implementation vs 1m20s using the native image implementation). Therefore,
+when running the formatter from `spotlessApply` we will default to using the Java implementation (if the Java version >= 21).
+
+
 ## Future works
 
 - [ ] preserve [NON-NLS markers][] - these are comments that are used when implementing NLS internationalisation, and need to stay on the same line with the strings they come after.
