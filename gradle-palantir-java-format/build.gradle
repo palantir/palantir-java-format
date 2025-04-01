@@ -112,3 +112,7 @@ def writeImplClasspath = tasks.register("writeImplClasspath") {
 tasks.named("test").configure {
     dependsOn(writeImplClasspath)
 }
+
+gradleTestUtils {
+    gradleVersions = ['7.6.4', '8.8', '8.12.1']
+}
