@@ -31,7 +31,6 @@ import com.intellij.psi.PsiFile;
 import com.palantir.javaformat.java.FormatterException;
 import com.palantir.javaformat.java.FormatterService;
 import com.palantir.javaformat.java.Replacement;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -93,19 +92,25 @@ class PalantirJavaFormatFormattingService extends AsyncDocumentFormattingService
             }
 
             try {
-                logger.info(String.format(
-                        "Received request to format file=%s, length=%s with ranges=%s",
-                        Optional.ofNullable(request.getIOFile())
-                                .map(file -> file.toPath().toString())
-                                .orElse("null"),
-                        request.getDocumentText().length(),
-                        request.getFormattingRanges()));
+                if (logger.isDebugEnabled()) {
+                    logger.debug(String.format(
+                            "Received request to format file=%s, length=%s with ranges=%s",
+                            Optional.ofNullable(request.getIOFile())
+                                    .map(file -> file.toPath().toString())
+                                    .orElse("null"),
+                            request.getDocumentText().length(),
+                            request.getFormattingRanges()));
+                }
                 List<Replacement> replacements =
                         formatterService.get().getFormatReplacements(request.getDocumentText(), toRanges(request));
-                logger.debug(String.format(
-                        "Applying %s replacements with ranges=%s",
-                        replacements.size(),
-                        replacements.stream().map(Replacement::getReplaceRange).collect(Collectors.toSet())));
+                if (logger.isDebugEnabled()) {
+                    logger.debug(String.format(
+                            "Applying %s replacements with ranges=%s",
+                            replacements.size(),
+                            replacements.stream()
+                                    .map(Replacement::getReplaceRange)
+                                    .collect(Collectors.toSet())));
+                }
                 String formattedText = applyReplacements(request.getDocumentText(), replacements);
                 request.onTextReady(formattedText);
             } catch (FormatterException e) {
