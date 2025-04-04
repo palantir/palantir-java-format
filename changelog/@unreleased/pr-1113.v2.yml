@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: "fix issue #975: last character not a \n after format in Intellij"
+  links:
+    - https://github.com/palantir/palantir-java-format/pull/1113
