@@ -195,7 +195,7 @@ Java 21 formatting capabilities, ensure that either:
 
 [This comment](https://github.com/palantir/palantir-java-format/issues/952#issuecomment-2575750610) explains why we 
 switched to a native image for the formatter. The startup time for the native image esp. in Intellij is >10x faster than
-spinning up a new process that does the formatting.
+spinning up a new JVM process that does the formatting.
 However, the throughput of running the native image for a large set of files (eg. running `./gradlew spotlessApply`) is 
 considerably slower (eg. 30s using the Java implementation vs 1m20s using the native image implementation). Therefore,
 when running the formatter from `spotlessApply` we will default to using the Java implementation (if the Java version >= 21).
