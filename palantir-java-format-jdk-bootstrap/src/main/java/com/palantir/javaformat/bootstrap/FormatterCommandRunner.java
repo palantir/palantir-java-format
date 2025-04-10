@@ -86,7 +86,8 @@ final class FormatterCommandRunner {
                 "\n",
                 "Command terminated with exit value 1",
                 "Command: " + String.join(" ", command),
-                "Working Directory: " + workingDirectory,
+                "Working Directory: "
+                        + workingDirectory.map(Path::toString).orElse("<using default working directory>"),
                 "Stdout:",
                 stdout,
                 "Stderr:",
