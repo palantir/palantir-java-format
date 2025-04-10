@@ -60,7 +60,7 @@ final class FormatterCommandRunner {
                 // In this case, we just want to silently do nothing and not surface an error to e.g. Intellij.
                 return Optional.empty();
             }
-            throw new IOException(getErrorMessage(command, stdout, stderr));
+            throw new IOException(getErrorMessage(command, workingDirectory, stdout, stderr));
         }
 
         return Optional.of(stdout);
@@ -80,11 +80,13 @@ final class FormatterCommandRunner {
         }
     }
 
-    private static String getErrorMessage(List<String> command, String stdout, String stderr) {
+    private static String getErrorMessage(
+            List<String> command, Optional<Path> workingDirectory, String stdout, String stderr) {
         return String.join(
                 "\n",
                 "Command terminated with exit value 1",
                 "Command: " + String.join(" ", command),
+                "Working Directory: " + workingDirectory,
                 "Stdout:",
                 stdout,
                 "Stderr:",
