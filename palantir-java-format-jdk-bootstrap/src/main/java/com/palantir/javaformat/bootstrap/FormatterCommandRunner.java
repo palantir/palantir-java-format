@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -28,7 +29,16 @@ final class FormatterCommandRunner {
     private static final Pattern SYNTAX_ERROR_PATTERN = Pattern.compile(":\\d+:\\d+:\\serror:\\s");
 
     static Optional<String> runWithStdin(List<String> command, String input) throws IOException {
-        Process process = new ProcessBuilder().command(command).start();
+        return runWithStdin(command, input, Optional.empty());
+    }
+
+    static Optional<String> runWithStdin(List<String> command, String input, Optional<Path> workingDirectory)
+            throws IOException {
+        ProcessBuilder processBuilder = new ProcessBuilder().command(command);
+        Process process = workingDirectory
+                .map(dir -> processBuilder.directory(dir.toFile()))
+                .orElse(processBuilder)
+                .start();
 
         try (OutputStream outputStream = process.getOutputStream()) {
             outputStream.write(input.getBytes(StandardCharsets.UTF_8));

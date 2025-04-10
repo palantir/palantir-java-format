@@ -52,7 +52,8 @@ public class NativeImageFormatterService implements FormatterService {
                             ranges.stream().map(RangeUtils::toStringRange).collect(Collectors.toList()))
                     .build();
 
-            Optional<String> output = FormatterCommandRunner.runWithStdin(command.toArgs(), input);
+            Optional<String> output = FormatterCommandRunner.runWithStdin(
+                    command.toArgs(), input, Optional.ofNullable(nativeImagePath.getParent()));
             if (output.isEmpty() || output.get().isEmpty()) {
                 return ImmutableList.of();
             }
@@ -85,7 +86,9 @@ public class NativeImageFormatterService implements FormatterService {
                 .nativeImagePath(nativeImagePath)
                 .outputReplacements(false)
                 .build();
-        return FormatterCommandRunner.runWithStdin(command.toArgs(), input).orElse(input);
+        return FormatterCommandRunner.runWithStdin(
+                        command.toArgs(), input, Optional.ofNullable(nativeImagePath.getParent()))
+                .orElse(input);
     }
 
     @Value.Immutable

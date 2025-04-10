@@ -86,7 +86,6 @@ public final class BootstrappingFormatterService implements FormatterService {
                 .outputReplacements(true)
                 .characterRanges(ranges.stream().map(RangeUtils::toStringRange).collect(Collectors.toList()))
                 .build();
-
         Optional<String> output = FormatterCommandRunner.runWithStdin(command.toArgs(), input);
         if (output.isEmpty() || output.get().isEmpty()) {
             return ImmutableList.of();
