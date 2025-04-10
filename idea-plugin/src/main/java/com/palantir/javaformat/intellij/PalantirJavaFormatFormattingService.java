@@ -114,6 +114,11 @@ class PalantirJavaFormatFormattingService extends AsyncDocumentFormattingService
                 String formattedText = applyReplacements(request.getDocumentText(), replacements);
                 request.onTextReady(formattedText);
             } catch (FormatterException e) {
+                logger.error(
+                        String.format(
+                                "Failed to format file %s",
+                                request.getContext().getContainingFile().getName()),
+                        e);
                 request.onError(
                         Notifications.PARSING_ERROR_TITLE,
                         Notifications.parsingErrorMessage(
