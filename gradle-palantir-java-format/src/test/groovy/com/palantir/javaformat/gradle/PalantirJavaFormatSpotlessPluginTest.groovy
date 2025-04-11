@@ -16,6 +16,8 @@
 package com.palantir.javaformat.gradle
 
 import nebula.test.IntegrationTestKitSpec
+import nebula.test.functional.GradleRunner
+import nebula.test.functional.internal.classpath.ClasspathAddingInitScriptBuilder
 import spock.lang.Unroll
 
 import java.nio.charset.StandardCharsets
@@ -28,10 +30,14 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
     private static final CLASSPATH_FILE = new File("build/impl.classpath").absolutePath
     private static final NATIVE_IMAGE_FILE = new File("build/nativeImage.path")
     private static final NATIVE_CONFIG = String.format("palantirJavaFormatNative files(\"%s\")", NATIVE_IMAGE_FILE.text)
+    private static final String INIT_FILE_NAME = "init.gradle";
 
 
     @Unroll
     def "formats with spotless when spotless is applied"(String extraGradleProperties, String javaVersion, String expectedOutput) {
+        File initScript = new File(projectDir, INIT_FILE_NAME)
+        ClasspathAddingInitScriptBuilder.build(initScript, getBuildPluginClasspathInjector().toList())
+
         def extraDependencies = extraGradleProperties.isEmpty() ? "" : NATIVE_CONFIG
         settingsFile << """
              buildscript {
@@ -56,7 +62,6 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
                      classpath 'com.palantir.baseline:gradle-baseline-java:6.21.0'
                      classpath 'com.palantir.gradle.jdks:gradle-jdks:0.62.0'
                      classpath 'com.palantir.gradle.jdkslatest:gradle-jdks-latest:0.17.0'
-                     classpath files(FILES)
                  }
              }
 
@@ -71,21 +76,19 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
             apply plugin: 'com.palantir.jdks.latest'
             
             dependencies {
-                palantirJavaFormat files(file("${CLASSPATH_FILE}").text.split(':'))
-                EXTRA_CONFIGURATION
+                palantirJavaFormat files(file("${CLASSPATH_FILE}").text.split(':')) 
+                ${extraDependencies}
             }
             
             javaVersions {
-                libraryTarget = JAVA_VERSION
+                libraryTarget = ${javaVersion}
             }
             
             jdks {
-                daemonTarget = JAVA_VERSION
+                daemonTarget = ${javaVersion}
             }
             
-        """.replace("FILES", getBuildPluginClasspathInjector().join(","))
-                .replace("JAVA_VERSION", javaVersion)
-                .replace("EXTRA_CONFIGURATION", extraDependencies).stripIndent()
+        """.stripIndent()
 
         // Add jvm args to allow spotless and formatter gradle plugins to run with Java 16+
         file('gradle.properties') << """
@@ -103,7 +106,7 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
         """.stripIndent()
 
         file('src/main/java/Main.java').text = invalidJavaFile
-        runTasks('wrapper')
+        runTasks('wrapper', '--init-script', INIT_FILE_NAME)
 
         when:
         def result = runGradlewTasks('spotlessApply', '--info')
@@ -131,7 +134,7 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
             properties.load(inputStream)
         }
         String classpath = properties.getProperty('implementation-classpath')
-        return classpath.split(File.pathSeparator).collect { "'" + it + "'" }
+        return classpath.split(File.pathSeparator).collect { new File(it) }
     }
 
     private String runGradlewTasks(String... tasks) {
@@ -149,7 +152,7 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
     }
 
     private ProcessBuilder getProcessBuilder(String... tasks) {
-        List<String> arguments = ["./gradlew"]
+        List<String> arguments = ["./gradlew", "--init-script", String.format("./%s", INIT_FILE_NAME)]
         Arrays.asList(tasks).forEach(arguments::add)
         ProcessBuilder processBuilder = new ProcessBuilder()
                 .command(arguments)
