@@ -74,12 +74,7 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
             apply plugin: 'com.palantir.baseline-java-versions'
             apply plugin: 'com.palantir.jdks'
             apply plugin: 'com.palantir.jdks.latest'
-            
-            dependencies {
-                palantirJavaFormat files(file("${CLASSPATH_FILE}").text.split(':')) 
-                ${extraDependencies}
-            }
-            
+
             javaVersions {
                 libraryTarget = ${javaVersion}
             }
@@ -100,13 +95,19 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
         palantir.jdk.setup.enabled=true
         """.stripIndent()
         file('gradle.properties') << extraGradleProperties
+        runTasks('wrapper')
 
         buildFile << """
             apply plugin: 'com.diffplug.spotless'
+            
+            dependencies {
+                palantirJavaFormat files(file("${CLASSPATH_FILE}").text.split(':'))
+                ${extraDependencies}
+            }
         """.stripIndent()
 
         file('src/main/java/Main.java').text = invalidJavaFile
-        runTasks('wrapper', '--init-script', INIT_FILE_NAME)
+
 
         when:
         def result = runGradlewTasks('spotlessApply', '--info')
