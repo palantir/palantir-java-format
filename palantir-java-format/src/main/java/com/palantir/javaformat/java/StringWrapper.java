@@ -127,6 +127,10 @@ public final class StringWrapper {
                 if (literalTree.getKind() != Kind.STRING_LITERAL) {
                     return null;
                 }
+                int pos = getStartPosition(literalTree);
+                if (input.substring(pos, Math.min(input.length(), pos + 3)).equals("\"\"\"")) {
+                    return null;
+                }
                 Tree parent = getCurrentPath().getParentPath().getLeaf();
                 if (parent instanceof MemberSelectTree
                         && ((MemberSelectTree) parent).getExpression().equals(literalTree)) {
