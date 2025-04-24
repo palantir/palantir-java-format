@@ -80,4 +80,5 @@ jdks {
         jdkVersion = '23.0.1'
     }
 
+    jdkMajorVersionsToUse().add(JavaLanguageVersion.of("23"))
 }
