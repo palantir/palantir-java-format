@@ -16,8 +16,12 @@
 package com.palantir.javaformat.gradle
 
 import nebula.test.IntegrationTestKitSpec
+import nebula.test.functional.ExecutionResult
 import nebula.test.functional.GradleRunner
+import nebula.test.functional.internal.DefaultExecutionResult
+import nebula.test.functional.internal.ExecutedTask
 import nebula.test.functional.internal.classpath.ClasspathAddingInitScriptBuilder
+import org.gradle.api.GradleException
 import spock.lang.Unroll
 
 import java.nio.charset.StandardCharsets
@@ -113,7 +117,7 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
         def result = runGradlewTasks('spotlessApply', '--info')
 
         then:
-        result.contains(expectedOutput)
+        result.standardOutput.contains(expectedOutput)
         file('src/main/java/Main.java').text == validJavaFile
 
         where:
@@ -138,14 +142,37 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
         return classpath.split(File.pathSeparator).collect { new File(it) }
     }
 
-    private String runGradlewTasks(String... tasks) {
+    private GradlewExecutionResult runGradlewTasksAndFail(String... tasks) {
         ProcessBuilder processBuilder = getProcessBuilder(tasks)
         Process process = processBuilder.start()
-        String output = readAllInput(process.getInputStream())
-        return output
+        process.waitFor()
+        GradlewExecutionResult result = new GradlewExecutionResult(process)
+        assert result.failure
     }
 
-    public static String readAllInput(InputStream inputStream) {
+    private GradlewExecutionResult runGradlewTasks(String... tasks) {
+        ProcessBuilder processBuilder = getProcessBuilder(tasks)
+        Process process = processBuilder.start()
+        process.waitFor()
+        GradlewExecutionResult result = new GradlewExecutionResult(process)
+        assert result.success
+        return result
+    }
+
+    final class GradlewExecutionResult {
+
+        private final Boolean success
+        private final String standardOutput
+        private final Throwable failure
+
+        GradlewExecutionResult(Process process) {
+            this.success = process.exitValue() == 0
+            this.standardOutput =  readAllInput(process.getInputStream())
+            this.failure = process.exitValue() != 0 ? new RuntimeException(String.format("Build failed with exitCode %s", process.exitValue())) : null
+        }
+    }
+
+    static String readAllInput(InputStream inputStream) {
         try (Stream<String> lines =
                 new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8)).lines()) {
             return lines.collect(Collectors.joining("\n"));
