@@ -16,12 +16,7 @@
 package com.palantir.javaformat.gradle
 
 import nebula.test.IntegrationTestKitSpec
-import nebula.test.functional.ExecutionResult
-import nebula.test.functional.GradleRunner
-import nebula.test.functional.internal.DefaultExecutionResult
-import nebula.test.functional.internal.ExecutedTask
 import nebula.test.functional.internal.classpath.ClasspathAddingInitScriptBuilder
-import org.gradle.api.GradleException
 import spock.lang.Unroll
 
 import java.nio.charset.StandardCharsets
@@ -34,14 +29,9 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
     private static final CLASSPATH_FILE = new File("build/impl.classpath").absolutePath
     private static final NATIVE_IMAGE_FILE = new File("build/nativeImage.path")
     private static final NATIVE_CONFIG = String.format("palantirJavaFormatNative files(\"%s\")", NATIVE_IMAGE_FILE.text)
-    private static final String INIT_FILE_NAME = "init.gradle";
-
 
     @Unroll
     def "formats with spotless when spotless is applied"(String extraGradleProperties, String javaVersion, String expectedOutput) {
-        File initScript = new File(projectDir, INIT_FILE_NAME)
-        ClasspathAddingInitScriptBuilder.build(initScript, getBuildPluginClasspathInjector().toList())
-
         def extraDependencies = extraGradleProperties.isEmpty() ? "" : NATIVE_CONFIG
         settingsFile << """
              buildscript {
@@ -180,7 +170,9 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
     }
 
     private ProcessBuilder getProcessBuilder(String... tasks) {
-        List<String> arguments = ["./gradlew", "--init-script", String.format("./%s", INIT_FILE_NAME)]
+        File initScript = new File(projectDir, "init.gradle")
+        ClasspathAddingInitScriptBuilder.build(initScript, getBuildPluginClasspathInjector().toList())
+        List<String> arguments = ["./gradlew", "--init-script", initScript.toPath().toString()]
         Arrays.asList(tasks).forEach(arguments::add)
         ProcessBuilder processBuilder = new ProcessBuilder()
                 .command(arguments)
