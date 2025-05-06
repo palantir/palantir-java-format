@@ -73,7 +73,7 @@ javaVersions {
 }
 
 jdks {
-    daemonTarget = 17
+    daemonTarget = 21
 
     jdk(23) {
         distribution = 'graalvm-ce'
