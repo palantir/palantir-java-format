@@ -28,6 +28,7 @@ dependencies {
 
     compileOnly 'org.derive4j:derive4j-annotation'
     annotationProcessor 'org.derive4j:derive4j'
+    implementation 'com.google.code.findbugs:jsr305'
 }
 
 moduleJvmArgs {
