@@ -53,7 +53,7 @@ get_os() {
   case "$( uname )" in                          #(
     Linux* )          os_name="linux"  ;;       #(
     Darwin* )         os_name="macos"  ;;       #(
-    * )               die "ERROR Unsupported OS: $( uname )" ;;
+    * )               os_name="unsupported";;
   esac
 
   if [ "$os_name" = "linux" ]; then
@@ -83,7 +83,7 @@ get_arch() {
     aarch64* )      arch_name="aarch64"  ;;     #(
     x86* )          arch_name="x86"  ;;         #(
     i686* )         arch_name="x86"  ;;         #(
-    * )             die "ERROR Unsupported architecture: $( uname -m )" ;;
+    * )             arch_name="unsupported";;
   esac
 
   echo "$arch_name"
@@ -109,6 +109,13 @@ export OS
 
 ARCH=$(get_arch)
 export ARCH
+
+is_arch_os_supported() {
+  if [ "$OS" = "unsupported" ] || [ "$ARCH" = "unsupported" ]; then
+    echo false
+  fi
+  echo true
+}
 
 install_and_setup_jdks() {
   gradle_dir=$1
