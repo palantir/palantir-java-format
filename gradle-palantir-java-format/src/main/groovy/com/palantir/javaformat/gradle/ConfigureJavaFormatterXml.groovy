@@ -37,11 +37,6 @@ class ConfigureJavaFormatterXml {
         })
     }
 
-    static void configureExternalDependencies(Node rootNode, String minVersion) {
-        def externalDependencies = matchOrCreateChild(rootNode, 'component', [name: 'ExternalDependencies'])
-        matchOrCreateChild(externalDependencies, 'plugin', [id: 'palantir-java-format'], [:], ['min-version' : minVersion])
-    }
-
     static void configureWorkspaceXml(Node rootNode) {
         configureFormatOnSave(rootNode)
         configureOptimizeOnSave(rootNode)

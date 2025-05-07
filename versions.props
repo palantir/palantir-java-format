@@ -1,7 +1,7 @@
 com.diffplug.spotless:spotless-plugin-gradle = 6.25.0
 com.github.ben-manes.caffeine:caffeine = 3.1.8
 com.google.auto.service:auto-service = 1.1.1
-com.google.code.findbugs:jsr305 = 3.0.2
+com.google.code.findbugs:* = 3.0.2
 com.google.errorprone:error_prone_annotations = 2.11.0
 com.google.guava:guava = 33.0.0-jre
 com.google.guava:guava-testlib = 27.0.1-jre
@@ -22,3 +22,4 @@ com.fasterxml.jackson.*:* = 2.18.3
 com.fasterxml.jackson.core:jackson-databind = 2.18.3
 org.openjdk.jmh:* = 1.37
 com.palantir.gradle.utils:* = 0.10.0
+com.palantir.gradle.idea-configuration:gradle-idea-configuration = 0.2.0

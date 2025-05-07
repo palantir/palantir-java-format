@@ -27,6 +27,7 @@ p2deps {
 
 dependencies {
     implementation project(':palantir-java-format')
+    implementation 'com.google.code.findbugs:jsr305'
 }
 
 tasks.named("jar", Jar) {

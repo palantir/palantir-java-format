@@ -19,6 +19,8 @@ package com.palantir.javaformat.gradle;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Files;
+import com.palantir.gradle.ideaconfiguration.IdeaConfigurationExtension;
+import com.palantir.gradle.ideaconfiguration.IdeaConfigurationPlugin;
 import groovy.util.Node;
 import groovy.util.XmlNodePrinter;
 import groovy.util.XmlParser;
@@ -59,6 +61,10 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
             configureLegacyIdea(rootProject, implConfiguration, nativeImplConfiguration);
             configureIntelliJImport(rootProject, implConfiguration, nativeImplConfiguration);
         });
+
+        rootProject.getPluginManager().apply(IdeaConfigurationPlugin.class);
+        IdeaConfigurationExtension extension = rootProject.getExtensions().getByType(IdeaConfigurationExtension.class);
+        extension.externalDependency("palantir-java-format", MIN_IDEA_PLUGIN_VERSION);
     }
 
     private static Optional<Configuration> maybeGetNativeImplConfiguration(Project rootProject) {
@@ -79,7 +85,6 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
             Optional<URI> nativeUri =
                     nativeImplConfiguration.map(conf -> conf.getSingleFile().toURI());
             ConfigureJavaFormatterXml.configureJavaFormat(xmlProvider.asNode(), uris, nativeUri);
-            ConfigureJavaFormatterXml.configureExternalDependencies(xmlProvider.asNode(), MIN_IDEA_PLUGIN_VERSION);
         });
 
         ideaModel.getWorkspace().getIws().withXml(xmlProvider -> {
@@ -107,15 +112,11 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
                     project.file(".idea/palantir-java-format.xml"),
                     node -> ConfigureJavaFormatterXml.configureJavaFormat(node, uris, nativeImageUri));
             createOrUpdateIdeaXmlFile(
-                    project.file(".idea/externalDependencies.xml"),
-                    node -> ConfigureJavaFormatterXml.configureExternalDependencies(node, MIN_IDEA_PLUGIN_VERSION));
-            createOrUpdateIdeaXmlFile(
                     project.file(".idea/workspace.xml"), ConfigureJavaFormatterXml::configureWorkspaceXml);
 
             // Still configure legacy idea if using intellij import
             updateIdeaXmlFileIfExists(project.file(project.getName() + ".ipr"), node -> {
                 ConfigureJavaFormatterXml.configureJavaFormat(node, uris, nativeImageUri);
-                ConfigureJavaFormatterXml.configureExternalDependencies(node, MIN_IDEA_PLUGIN_VERSION);
             });
             updateIdeaXmlFileIfExists(
                     project.file(project.getName() + ".iws"), ConfigureJavaFormatterXml::configureWorkspaceXml);
