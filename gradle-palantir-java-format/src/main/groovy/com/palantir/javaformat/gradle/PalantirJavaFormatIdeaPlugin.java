@@ -63,9 +63,7 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
         });
 
         rootProject.getPluginManager().apply(IdeaConfigurationPlugin.class);
-
         IdeaConfigurationExtension extension = rootProject.getExtensions().getByType(IdeaConfigurationExtension.class);
-
         extension.externalDependency("palantir-java-format", MIN_IDEA_PLUGIN_VERSION);
     }
 
