@@ -62,7 +62,7 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
             configureIntelliJImport(rootProject, implConfiguration, nativeImplConfiguration);
         });
 
-        rootProject.getPlugins().apply(IdeaConfigurationPlugin.class);
+        rootProject.getPluginManager().apply(IdeaConfigurationPlugin.class);
 
         IdeaConfigurationExtension extension = rootProject.getExtensions().getByType(IdeaConfigurationExtension.class);
 
