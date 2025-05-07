@@ -67,6 +67,12 @@ APP_GRADLE_DIR="$APP_HOME"/gradle
 # Loading gradle jdk functions
 . "$APP_GRADLE_DIR"/gradle-jdks-functions.sh
 
+if ! $(is_arch_os_supported); then
+  echo "Skipping Gradle JDKs Setup, Unsupported OS/Arch..."
+  cleanup
+  return
+fi
+
 install_and_setup_jdks "$APP_GRADLE_DIR"
 
 gradle_daemon_jdk_version=$(read_value "$APP_GRADLE_DIR"/gradle-daemon-jdk-version)
