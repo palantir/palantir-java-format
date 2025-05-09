@@ -17,7 +17,6 @@
 package com.palantir.javaformat.intellij;
 
 import com.intellij.openapi.components.PersistentStateComponent;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.project.Project;
@@ -43,7 +42,7 @@ public class PalantirJavaFormatSettings implements PersistentStateComponent<Pala
     private State state = new State();
 
     static PalantirJavaFormatSettings getInstance(Project project) {
-        return ServiceManager.getService(project, PalantirJavaFormatSettings.class);
+        return project.getService(PalantirJavaFormatSettings.class);
     }
 
     @SuppressWarnings("for-rollout:SameNameButDifferent")
