@@ -27,7 +27,7 @@ intellij {
 
 patchPluginXml {
     pluginDescription = "Formats source code using the palantir-java-format tool."
-    sinceBuild = '241' // TODO: test against this version of IntelliJ to ensure no regressions
+    sinceBuild = '241' // TODO: keep the intellij version & sinceBuild in sync
     untilBuild = ''
 }
 
