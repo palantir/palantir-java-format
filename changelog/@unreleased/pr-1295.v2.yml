@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Use recommended project.getService(PalantirJavaFormatSettings.class)
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/1295
