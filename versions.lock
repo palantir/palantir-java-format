@@ -59,7 +59,7 @@ org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10 (2 constraints: 8118c1c5)
 org.jspecify:jspecify:1.0.0 (1 constraints: 130ae0b4)
 org.openjdk.jmh:jmh-core:1.37 (5 constraints: 52476be6)
 org.openjdk.jmh:jmh-generator-annprocess:1.37 (1 constraints: df04fc30)
-org.slf4j:slf4j-api:1.7.36 (2 constraints: 801849c0)
+org.slf4j:slf4j-api:2.0.17 (2 constraints: 801849c0)
 org.tukaani:xz:1.9 (1 constraints: 6b09e995)
 
 [Test dependencies]
