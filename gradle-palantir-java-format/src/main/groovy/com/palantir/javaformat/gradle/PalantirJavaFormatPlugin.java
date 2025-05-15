@@ -46,7 +46,7 @@ public final class PalantirJavaFormatPlugin implements Plugin<Project> {
             // TODO(dfox): in the future we may want to offer a simple 'format' task so people don't need to use
             // spotless to try out our formatter
             project.getTasks().register("formatDiff", FormatDiffTask.class, task -> {
-                if (NativeImageFormatProviderPlugin.shouldUseNativeImage(project)) {
+                if (NativeImageFormatProviderPlugin.isNativeImageConfigured(project)) {
                     task.getNativeImage().fileProvider(getNativeImplConfiguration(project));
                 }
             });
@@ -76,13 +76,13 @@ public final class PalantirJavaFormatPlugin implements Plugin<Project> {
         @TaskAction
         public final void formatDiff() throws IOException, InterruptedException {
             if (getNativeImage().isPresent()) {
-                log.info("Using the native-image to format");
+                log.info("Using the native-image formatter");
                 FormatDiff.formatDiff(
                         getProject().getProjectDir().toPath(),
                         new NativeImageFormatterService(
                                 getNativeImage().get().getAsFile().toPath()));
             } else {
-                log.info("Using legacy java formatter");
+                log.info("Using the Java-based formatter");
                 JavaFormatExtension extension =
                         getProject().getRootProject().getExtensions().getByType(JavaFormatExtension.class);
                 FormatterService formatterService = extension.serviceLoad();

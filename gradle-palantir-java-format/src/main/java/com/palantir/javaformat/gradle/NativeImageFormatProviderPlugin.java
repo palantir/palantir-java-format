@@ -37,7 +37,7 @@ public final class NativeImageFormatProviderPlugin implements Plugin<Project> {
                 rootProject == rootProject.getRootProject(),
                 "May only apply com.palantir.java-format-provider to the root project");
 
-        if (!shouldUseNativeImage(rootProject)) {
+        if (!isNativeImageConfigured(rootProject)) {
             log.info("Skipping native image configuration as it is not supported on this platform");
             return;
         }
@@ -68,7 +68,7 @@ public final class NativeImageFormatProviderPlugin implements Plugin<Project> {
         });
     }
 
-    public static boolean shouldUseNativeImage(Project project) {
+    public static boolean isNativeImageConfigured(Project project) {
         return isNativeImageSupported() && isNativeFlagEnabled(project);
     }
 

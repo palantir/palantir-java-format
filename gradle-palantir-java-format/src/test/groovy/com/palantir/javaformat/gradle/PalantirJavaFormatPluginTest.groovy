@@ -93,8 +93,8 @@ class PalantirJavaFormatPluginTest extends IntegrationTestKitSpec {
         '''.stripIndent()
 
         where:
-        extraGradleProperties    | expectedOutput
-        ""                          | "Using legacy java formatter"
-        "palantir.native.formatter=true"  | "Using the native-image to format"
+        extraGradleProperties | expectedOutput
+        "" | "Using the Java-based formatter"
+        "palantir.native.formatter=true" |  "Using the native-image formatter"
     }
 }
