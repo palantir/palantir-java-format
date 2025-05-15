@@ -135,7 +135,6 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
     private GradlewExecutionResult runGradlewTasks(String... tasks) {
         ProcessBuilder processBuilder = getProcessBuilder(tasks)
         Process process = processBuilder.start()
-        process.waitFor()
         String output = readAllInput(process.getInputStream())
         GradlewExecutionResult result = new GradlewExecutionResult(process.exitValue(), output)
         assert result.success
