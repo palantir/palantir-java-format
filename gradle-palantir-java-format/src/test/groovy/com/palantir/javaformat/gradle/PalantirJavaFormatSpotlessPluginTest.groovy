@@ -132,19 +132,12 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
         return classpath.split(File.pathSeparator).collect { new File(it) }
     }
 
-    private GradlewExecutionResult runGradlewTasksAndFail(String... tasks) {
-        ProcessBuilder processBuilder = getProcessBuilder(tasks)
-        Process process = processBuilder.start()
-        process.waitFor()
-        GradlewExecutionResult result = new GradlewExecutionResult(process)
-        assert result.failure
-    }
-
     private GradlewExecutionResult runGradlewTasks(String... tasks) {
         ProcessBuilder processBuilder = getProcessBuilder(tasks)
         Process process = processBuilder.start()
         process.waitFor()
-        GradlewExecutionResult result = new GradlewExecutionResult(process)
+        String output = readAllInput(process.getInputStream())
+        GradlewExecutionResult result = new GradlewExecutionResult(process.exitValue(), output)
         assert result.success
         return result
     }
@@ -155,10 +148,10 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
         private final String standardOutput
         private final Throwable failure
 
-        GradlewExecutionResult(Process process) {
-            this.success = process.exitValue() == 0
-            this.standardOutput =  readAllInput(process.getInputStream())
-            this.failure = process.exitValue() != 0 ? new RuntimeException(String.format("Build failed with exitCode %s", process.exitValue())) : null
+        GradlewExecutionResult(int exitValue, String output) {
+            this.success = exitValue == 0
+            this.standardOutput =  output
+            this.failure = exitValue != 0 ? new RuntimeException(String.format("Build failed with exitCode %s", exitValue)) : null
         }
     }
 
