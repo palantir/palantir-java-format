@@ -21,6 +21,7 @@ import spock.lang.Unroll
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
+import java.util.concurrent.TimeUnit
 import java.util.stream.Collectors
 import java.util.stream.Stream
 
@@ -136,6 +137,7 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
         ProcessBuilder processBuilder = getProcessBuilder(tasks)
         Process process = processBuilder.start()
         String output = readAllInput(process.getInputStream())
+        process.waitFor(1, TimeUnit.MINUTES)
         GradlewExecutionResult result = new GradlewExecutionResult(process.exitValue(), output)
         assert result.success
         return result
@@ -168,7 +170,8 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
         Arrays.asList(tasks).forEach(arguments::add)
         ProcessBuilder processBuilder = new ProcessBuilder()
                 .command(arguments)
-                .directory(projectDir).redirectErrorStream(true)
+                .directory(projectDir)
+                .redirectErrorStream(true)
         return processBuilder
     }
 
