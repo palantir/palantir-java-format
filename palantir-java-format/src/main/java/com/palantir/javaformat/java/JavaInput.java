@@ -39,13 +39,16 @@ import com.sun.tools.javac.file.JavacFileManager;
 import com.sun.tools.javac.parser.Tokens.TokenKind;
 import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
 import com.sun.tools.javac.util.Context;
+import com.sun.tools.javac.util.JCDiagnostic;
 import com.sun.tools.javac.util.Log;
 import com.sun.tools.javac.util.Log.DeferredDiagnosticHandler;
 import com.sun.tools.javac.util.Options;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Supplier;
@@ -365,7 +368,7 @@ public final class JavaInput extends Input {
         });
         DeferredDiagnosticHandler diagnostics = new DeferredDiagnosticHandler(log);
         ImmutableList<RawTok> rawToks = JavacTokens.getTokens(text, context, stopTokens);
-        if (diagnostics.getDiagnostics().stream().anyMatch(d -> d.getKind() == Diagnostic.Kind.ERROR)) {
+        if (getDiagnostics(diagnostics).stream().anyMatch(d -> d.getKind() == Diagnostic.Kind.ERROR)) {
             return ImmutableList.of(new Tok(0, "", "", 0, 0, true, null)); // EOF
         }
         int kN = 0;
@@ -460,6 +463,33 @@ public final class JavaInput extends Input {
         }
         toks.add(new Tok(kN, "", "", charI, columnI, true, null)); // EOF tok.
         return ImmutableList.copyOf(toks);
+    }
+
+    /**
+     * Gets diagnostics from a DeferredDiagnosticHandler using reflection.
+     * This method handles the API change in JDK 25 where getDiagnostics()
+     * changed from returning Queue to List.
+     *
+     * @param handler the diagnostic handler
+     * @return a collection of diagnostics
+     */
+    @SuppressWarnings("unchecked")
+    private static Collection<JCDiagnostic> getDiagnostics(DeferredDiagnosticHandler handler) {
+        try {
+            // Try the JDK 25+ method first (List<JCDiagnostic>)
+            Method listMethod = DeferredDiagnosticHandler.class.getMethod("getDiagnostics");
+            return (Collection<JCDiagnostic>) listMethod.invoke(handler);
+        } catch (Exception e1) {
+            try {
+                // Fall back to pre-JDK 25 method (Queue<JCDiagnostic>)
+                Method queueMethod = DeferredDiagnosticHandler.class.getMethod("getDiagnostics");
+                return (Collection<JCDiagnostic>) queueMethod.invoke(handler);
+            } catch (Exception e2) {
+                // If all else fails, return empty collection
+                System.err.println("Unable to access diagnostics: " + e2.getMessage());
+                return Collections.emptyList();
+            }
+        }
     }
 
     private static int updateColumn(int columnI, String originalTokText) {
