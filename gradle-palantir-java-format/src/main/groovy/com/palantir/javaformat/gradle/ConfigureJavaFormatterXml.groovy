@@ -16,8 +16,6 @@
 
 package com.palantir.javaformat.gradle
 
-import java.nio.file.Path
-
 class ConfigureJavaFormatterXml {
 
     static void configureJavaFormat(Node rootNode, List<URI> uris, Optional<URI> nativeImageUri) {
