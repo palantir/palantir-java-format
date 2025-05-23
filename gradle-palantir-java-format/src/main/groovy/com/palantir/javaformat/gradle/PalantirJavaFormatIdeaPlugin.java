@@ -84,8 +84,11 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
             // this block is lazy
             List<URI> uris =
                     implConfiguration.getFiles().stream().map(File::toURI).collect(Collectors.toList());
-            Optional<URI> nativeUri =
-                    nativeImplConfiguration.map(conf -> conf.getSingleFile().toURI());
+            // unused artifact transforms are cleaned up by Gradle every 7 days,as a workaround, we are going
+            // to copy the native-imahe to our own cache directory
+            Optional<URI> nativeUri = nativeImplConfiguration
+                    .map(conf -> conf.getSingleFile().toURI())
+                    .map(NativeImageAtomicCopy::copyToCacheDir);
             ConfigureJavaFormatterXml.configureJavaFormat(xmlProvider.asNode(), uris, nativeUri);
         });
 
@@ -107,18 +110,20 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
             List<URI> uris =
                     implConfiguration.getFiles().stream().map(File::toURI).collect(Collectors.toList());
 
-            Optional<URI> nativeImageUri =
-                    nativeImplConfiguration.map(conf -> conf.getSingleFile().toURI());
-
+            // unused artifact transforms are cleaned up by Gradle every 7 days,as a workaround, we are going
+            // to copy the native-imahe to our own cache directory
+            Optional<URI> nativeUri = nativeImplConfiguration
+                    .map(conf -> conf.getSingleFile().toURI())
+                    .map(NativeImageAtomicCopy::copyToCacheDir);
             createOrUpdateIdeaXmlFile(
                     project.file(".idea/palantir-java-format.xml"),
-                    node -> ConfigureJavaFormatterXml.configureJavaFormat(node, uris, nativeImageUri));
+                    node -> ConfigureJavaFormatterXml.configureJavaFormat(node, uris, nativeUri));
             createOrUpdateIdeaXmlFile(
                     project.file(".idea/workspace.xml"), ConfigureJavaFormatterXml::configureWorkspaceXml);
 
             // Still configure legacy idea if using intellij import
             updateIdeaXmlFileIfExists(project.file(project.getName() + ".ipr"), node -> {
-                ConfigureJavaFormatterXml.configureJavaFormat(node, uris, nativeImageUri);
+                ConfigureJavaFormatterXml.configureJavaFormat(node, uris, nativeUri);
             });
             updateIdeaXmlFileIfExists(
                     project.file(project.getName() + ".iws"), ConfigureJavaFormatterXml::configureWorkspaceXml);
