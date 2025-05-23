@@ -37,6 +37,10 @@ public class NativeImageAtomicCopy {
     public static URI copyToCacheDir(URI srcUri) {
         Path src = Paths.get(srcUri);
         Path dst = getGradleCacheNativeImagesDir().resolve(src.getFileName());
+        if (Files.exists(dst)) {
+            logger.info("Native image at path {} already exists", dst);
+            return dst.toUri();
+        }
         Path lockFile = dst.getParent().resolve(dst.getFileName() + ".lock");
         try (FileChannel channel = FileChannel.open(
                 lockFile, StandardOpenOption.READ, StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
@@ -75,7 +79,7 @@ public class NativeImageAtomicCopy {
     }
 
     private static Path getGradleCacheNativeImagesDir() {
-        Path nativeImagesCacheDir = getGradleCacheDir().resolve("native-images");
+        Path nativeImagesCacheDir = getGradleCacheDir().resolve("palantir-java-format-caches");
         nativeImagesCacheDir.toFile().mkdirs();
         return nativeImagesCacheDir;
     }
