@@ -46,6 +46,10 @@ class PalantirJavaFormatIdeaPluginTest extends IntegrationTestKitSpec {
         def ipr = new XmlSlurper().parse(iprFile)
         def settings = ipr.component.findAll { it.@name == "PalantirJavaFormatSettings" }
         !settings.isEmpty()
+        def implementationClassPathOption = ipr.component.option.find { it.@name == 'implementationClassPath' }
+        !implementationClassPathOption.isEmpty()
+        def nativeImageClassPathOption = ipr.component.option.find { it.@name == 'nativeImageClassPath' }
+        extraGradleProperties.contains("palantir.native.formatter=true") ? !nativeImageClassPathOption.isEmpty() : true
 
         where:
         extraGradleProperties | extraDependencies
