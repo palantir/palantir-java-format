@@ -46,12 +46,6 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
                     .register("updatePalantirJavaFormatXml", UpdatePalantirJavaFormatIdeaXmlFile.class, task -> {
                         task.getOutputFile().set(rootProject.file(".idea/palantir-java-format.xml"));
                         task.getShouldCreateOutputIfAbsent().set(true);
-                        task.getImplementationConfig()
-                                .from(rootProject
-                                        .getConfigurations()
-                                        .getByName(PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME));
-                        maybeGetNativeImplConfiguration(rootProject)
-                                .ifPresent(config -> task.getNativeImageConfig().from(config));
                     });
 
             TaskProvider<UpdatePalantirJavaFormatIdeaXmlFile> updatePalantirJavaFormatIpr = rootProject
@@ -59,6 +53,12 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
                     .register("updatePalantirJavaFormatIpr", UpdatePalantirJavaFormatIdeaXmlFile.class, task -> {
                         task.getOutputFile().set(rootProject.file(rootProject.getName() + ".ipr"));
                         task.getShouldCreateOutputIfAbsent().set(false);
+                    });
+
+            rootProject
+                    .getTasks()
+                    .withType(UpdatePalantirJavaFormatIdeaXmlFile.class)
+                    .configureEach(task -> {
                         task.getImplementationConfig()
                                 .from(rootProject
                                         .getConfigurations()
@@ -66,11 +66,6 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
                         maybeGetNativeImplConfiguration(rootProject)
                                 .ifPresent(config -> task.getNativeImageConfig().from(config));
                     });
-
-            rootProject
-                    .getTasks()
-                    .withType(UpdatePalantirJavaFormatIdeaXmlFile.class)
-                    .configureEach(task -> {});
 
             TaskProvider<UpdateWorkspaceXmlFile> updateWorkspaceXml = rootProject
                     .getTasks()
