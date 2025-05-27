@@ -18,8 +18,6 @@ package com.palantir.javaformat.gradle;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.RegularFileProperty;
-import org.gradle.api.provider.Property;
-import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
@@ -30,14 +28,8 @@ public abstract class UpdateWorkspaceXmlFile extends DefaultTask {
     @OutputFile
     public abstract RegularFileProperty getOutputFile();
 
-    @Input
-    public abstract Property<Boolean> getShouldCreateOutputIfAbsent();
-
     @TaskAction
     public final void updateXml() {
-        XmlUtils.updateIdeaXmlFile(
-                getOutputFile().getAsFile().get(),
-                ConfigureJavaFormatterXml::configureWorkspaceXml,
-                getShouldCreateOutputIfAbsent().get());
+        XmlUtils.updateIdeaXmlFile(getOutputFile().getAsFile().get(), ConfigureJavaFormatterXml::configureWorkspaceXml);
     }
 }

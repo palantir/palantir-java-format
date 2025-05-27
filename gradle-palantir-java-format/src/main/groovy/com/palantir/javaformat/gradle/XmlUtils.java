@@ -32,7 +32,7 @@ import org.xml.sax.SAXException;
 
 public class XmlUtils {
 
-    public static void updateIdeaXmlFile(File configurationFile, Consumer<Node> configure, boolean createIfAbsent) {
+    public static void updateIdeaXmlFile(File configurationFile, Consumer<Node> configure) {
         Node rootNode;
         if (configurationFile.isFile()) {
             try {
@@ -41,9 +41,6 @@ public class XmlUtils {
                 throw new RuntimeException("Couldn't parse existing configuration file: " + configurationFile, e);
             }
         } else {
-            if (!createIfAbsent) {
-                return;
-            }
             rootNode = new Node(null, "project", ImmutableMap.of("version", "4"));
         }
 

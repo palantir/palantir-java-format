@@ -45,20 +45,13 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
                     .getTasks()
                     .register("updatePalantirJavaFormatXml", UpdatePalantirJavaFormatIdeaXmlFile.class, task -> {
                         task.getOutputFile().set(rootProject.file(".idea/palantir-java-format.xml"));
-                        task.getShouldCreateOutputIfAbsent().set(true);
-                    });
-
-            TaskProvider<UpdatePalantirJavaFormatIdeaXmlFile> updatePalantirJavaFormatIpr = rootProject
-                    .getTasks()
-                    .register("updatePalantirJavaFormatIpr", UpdatePalantirJavaFormatIdeaXmlFile.class, task -> {
-                        task.getOutputFile().set(rootProject.file(rootProject.getName() + ".ipr"));
-                        task.getShouldCreateOutputIfAbsent().set(false);
-                    });
-
-            rootProject
-                    .getTasks()
-                    .withType(UpdatePalantirJavaFormatIdeaXmlFile.class)
-                    .configureEach(task -> {
+                        task.getCacheDir()
+                                .set(rootProject
+                                        .getGradle()
+                                        .getGradleUserHomeDir()
+                                        .toPath()
+                                        .resolve("palantir-java-format-caches")
+                                        .toFile());
                         task.getImplementationConfig()
                                 .from(rootProject
                                         .getConfigurations()
@@ -71,23 +64,11 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
                     .getTasks()
                     .register("updateWorkspaceXml", UpdateWorkspaceXmlFile.class, task -> {
                         task.getOutputFile().set(rootProject.file(".idea/workspace.xml"));
-                        task.getShouldCreateOutputIfAbsent().set(true);
-                    });
-
-            TaskProvider<UpdateWorkspaceXmlFile> updateWorkspaceIwsXml = rootProject
-                    .getTasks()
-                    .register("updateWorkspaceIwsXml", UpdateWorkspaceXmlFile.class, task -> {
-                        task.getOutputFile().set(rootProject.file(rootProject.getName() + ".iws"));
-                        task.getShouldCreateOutputIfAbsent().set(false);
                     });
 
             // Add the task to the Gradle start parameters so it executes automatically.
             StartParameter startParameter = rootProject.getGradle().getStartParameter();
-            List<String> updateTasks = Stream.of(
-                            updatePalantirJavaFormatXml,
-                            updatePalantirJavaFormatIpr,
-                            updateWorkspaceXml,
-                            updateWorkspaceIwsXml)
+            List<String> updateTasks = Stream.of(updatePalantirJavaFormatXml, updateWorkspaceXml)
                     .map(taskProvider -> String.format(":%s", taskProvider.getName()))
                     .toList();
             List<String> taskNames = ImmutableList.<String>builder()

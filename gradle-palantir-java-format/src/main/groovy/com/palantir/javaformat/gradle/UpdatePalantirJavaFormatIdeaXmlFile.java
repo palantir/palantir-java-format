@@ -23,11 +23,10 @@ import java.util.stream.Collectors;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.RegularFileProperty;
-import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Classpath;
-import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.Optional;
+import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
 
@@ -45,8 +44,8 @@ public abstract class UpdatePalantirJavaFormatIdeaXmlFile extends DefaultTask {
     @OutputFile
     public abstract RegularFileProperty getOutputFile();
 
-    @Input
-    public abstract Property<Boolean> getShouldCreateOutputIfAbsent();
+    @OutputDirectory
+    public abstract RegularFileProperty getCacheDir();
 
     @TaskAction
     public final void updateXml() {
@@ -55,10 +54,10 @@ public abstract class UpdatePalantirJavaFormatIdeaXmlFile extends DefaultTask {
         java.util.Optional<URI> nativeUri = getNativeImageConfig().isEmpty()
                 ? java.util.Optional.empty()
                 : java.util.Optional.of(getNativeImageConfig().getSingleFile().toURI())
-                        .map(NativeImageAtomicCopy::copyToCacheDir);
+                        .map(uri -> NativeImageAtomicCopy.copyToCacheDir(
+                                uri, getCacheDir().getAsFile().get()));
         XmlUtils.updateIdeaXmlFile(
                 getOutputFile().getAsFile().get(),
-                node -> ConfigureJavaFormatterXml.configureJavaFormat(node, uris, nativeUri),
-                getShouldCreateOutputIfAbsent().get());
+                node -> ConfigureJavaFormatterXml.configureJavaFormat(node, uris, nativeUri));
     }
 }

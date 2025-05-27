@@ -16,6 +16,7 @@
 
 package com.palantir.javaformat.gradle;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.channels.FileChannel;
@@ -34,9 +35,9 @@ public class NativeImageAtomicCopy {
 
     private static Logger logger = Logging.getLogger(PalantirJavaFormatIdeaPlugin.class);
 
-    public static URI copyToCacheDir(URI srcUri) {
+    public static URI copyToCacheDir(URI srcUri, File cacheDir) {
         Path src = Paths.get(srcUri);
-        Path dst = getGradleCacheNativeImagesDir().resolve(src.getFileName());
+        Path dst = cacheDir.toPath().resolve(src.getFileName());
         if (Files.exists(dst)) {
             logger.info("Native image at path {} already exists", dst);
             return dst.toUri();
@@ -76,12 +77,6 @@ public class NativeImageAtomicCopy {
         } catch (IOException e) {
             throw new RuntimeException(String.format("Failed to copy the native image to path %s", dst), e);
         }
-    }
-
-    private static Path getGradleCacheNativeImagesDir() {
-        Path nativeImagesCacheDir = getGradleCacheDir().resolve("palantir-java-format-caches");
-        nativeImagesCacheDir.toFile().mkdirs();
-        return nativeImagesCacheDir;
     }
 
     private static Path getGradleCacheDir() {
