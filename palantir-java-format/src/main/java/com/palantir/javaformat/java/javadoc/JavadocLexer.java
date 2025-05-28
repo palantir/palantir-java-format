@@ -261,6 +261,7 @@ final class JavadocLexer {
      *
      * <p>Note that we do <i>not</i> merge a literal token and a whitespace token together.
      */
+    @SuppressWarnings("for-rollout:NullAway")
     private static ImmutableList<Token> joinAdjacentLiteralsAndAdjacentWhitespace(List<Token> input) {
         /*
          * Note: Our final token is always END_JAVADOC. This saves us some trouble:
@@ -275,6 +276,7 @@ final class JavadocLexer {
         boolean lastTagWasInlineTagStart = false;
 
         for (PeekingIterator<Token> tokens = peekingIterator(input.iterator()); tokens.hasNext(); ) {
+            @SuppressWarnings("for-rollout:NullAway")
             Token.Type nextType = tokens.peek().getType();
             if (nextType == INLINE_TAG_OPEN) {
                 inlineTagDepth.increment();
@@ -345,6 +347,7 @@ final class JavadocLexer {
      * <p>This method must be called after {@link #joinAdjacentLiteralsAndAdjacentWhitespace}, as it assumes that
      * adjacent whitespace tokens have already been joined.
      */
+    @SuppressWarnings("for-rollout:NullAway")
     private static ImmutableList<Token> inferParagraphTags(List<Token> input) {
         ImmutableList.Builder<Token> output = ImmutableList.builder();
 
@@ -383,6 +386,7 @@ final class JavadocLexer {
      * <p>This method must be called after {@link #joinAdjacentLiteralsAndAdjacentWhitespace}, as it assumes that
      * adjacent whitespace tokens have already been joined.
      */
+    @SuppressWarnings("for-rollout:NullAway")
     private static ImmutableList<Token> optionalizeSpacesAfterLinks(List<Token> input) {
         ImmutableList.Builder<Token> output = ImmutableList.builder();
 
@@ -412,6 +416,7 @@ final class JavadocLexer {
      *
      * <p>Also trim leading and trailing blank lines, and move the trailing `}` to its own line.
      */
+    @SuppressWarnings("for-rollout:NullAway")
     private static ImmutableList<Token> deindentPreCodeBlocks(List<Token> input) {
         ImmutableList.Builder<Token> output = ImmutableList.builder();
         for (PeekingIterator<Token> tokens = peekingIterator(input.iterator()); tokens.hasNext(); ) {

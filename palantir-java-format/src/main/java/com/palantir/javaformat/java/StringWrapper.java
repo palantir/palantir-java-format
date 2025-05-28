@@ -113,6 +113,7 @@ public final class StringWrapper {
         return outputRanges.build();
     }
 
+    @SuppressWarnings("for-rollout:NullAway")
     private static TreeRangeMap<Integer, String> getReflowReplacements(int columnLimit, final String input)
             throws FormatterException {
         JCTree.JCCompilationUnit unit = parse(input, /* allowStringFolding= */ false);
@@ -173,6 +174,7 @@ public final class StringWrapper {
 
             // Handling leaving trailing non-string tokens at the end of the literal,
             // e.g. the trailing `);` in `foo("...");`.
+            @SuppressWarnings("for-rollout:NullAway")
             int end = getEndPosition(unit, getLast(flat));
             int lineEnd = end;
             while (Newlines.hasNewlineAt(input, lineEnd) == -1) {

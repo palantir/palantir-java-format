@@ -292,6 +292,7 @@ public final class JavaOutput extends Output {
      * @param iRange the {@link Range} of tokens
      * @return the expanded token range
      */
+    @SuppressWarnings("for-rollout:NullAway")
     private Range<Integer> expandToBreakableRegions(Range<Integer> iRange) {
         // The original line range.
         int loTok = iRange.lowerEndpoint();

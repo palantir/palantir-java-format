@@ -334,6 +334,7 @@ public final class JavaInput extends Input {
     }
 
     /** Lex the input and build the list of toks. */
+    @SuppressWarnings("for-rollout:NullAway")
     private ImmutableList<Tok> buildToks(String text) throws FormatterException {
         ImmutableList<Tok> toks = buildToks(text, ImmutableSet.of());
         kN = getLast(toks).getIndex();
@@ -492,6 +493,7 @@ public final class JavaInput extends Input {
         }
     }
 
+    @SuppressWarnings("for-rollout:NullAway")
     private static int updateColumn(int columnI, String originalTokText) {
         Integer last = Iterators.getLast(Newlines.lineOffsetIterator(originalTokText));
         if (last > 0) {
@@ -586,6 +588,7 @@ public final class JavaInput extends Input {
      * @return the {@code 0}-based {@link Range} of tokens
      * @throws FormatterException on formatting errors
      */
+    @SuppressWarnings("for-rollout:NullAway")
     Range<Integer> characterRangeToTokenRange(int offset, int length) throws FormatterException {
         int requiredLength = offset + length;
         if (requiredLength > text.length()) {
