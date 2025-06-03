@@ -20,11 +20,11 @@ import com.diffplug.spotless.FileSignature;
 import com.diffplug.spotless.FormatterFunc;
 import com.diffplug.spotless.FormatterStep;
 import com.diffplug.spotless.ProcessRunner;
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.function.Supplier;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -41,9 +41,17 @@ public final class NativePalantirJavaFormatStep {
         return FormatterStep.createLazy(
                 NAME,
                 () -> {
-                    File execFile = configuration.getSingleFile();
-                    logger.info("Using native-image at {}", configuration.getSingleFile());
-                    return new State(FileSignature.signAsSet(execFile));
+                    Supplier<FileSignature> supplier = () -> {
+                        try {
+
+                            logger.info("Using native-image at {}", configuration.getSingleFile());
+                            return FileSignature.signAsSet(configuration.getSingleFile());
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    };
+
+                    return new State(supplier);
                 },
                 State::createFormat);
     }
@@ -51,15 +59,15 @@ public final class NativePalantirJavaFormatStep {
     static class State implements Serializable {
         private static final long serialVersionUID = 1L;
 
-        final FileSignature pathToExe;
+        final Supplier<FileSignature> supplier;
 
-        State(FileSignature pathToExe) {
-            this.pathToExe = pathToExe;
+        State(Supplier<FileSignature> supplier) {
+            this.supplier = supplier;
         }
 
         String format(ProcessRunner runner, String input) throws IOException, InterruptedException {
             List<String> argumentsWithPathToExe =
-                    List.of(pathToExe.getOnlyFile().getAbsolutePath(), "--palantir", "-");
+                    List.of(supplier.get().getOnlyFile().getAbsolutePath(), "--palantir", "-");
             return runner.exec(input.getBytes(StandardCharsets.UTF_8), argumentsWithPathToExe)
                     .assertExitZero(StandardCharsets.UTF_8);
         }
