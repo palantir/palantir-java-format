@@ -43,7 +43,6 @@ public final class NativePalantirJavaFormatStep {
                 () -> {
                     Supplier<FileSignature> supplier = () -> {
                         try {
-
                             logger.info("Using native-image at {}", configuration.getSingleFile());
                             return FileSignature.signAsSet(configuration.getSingleFile());
                         } catch (IOException e) {
