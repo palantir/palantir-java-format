@@ -23,8 +23,12 @@ import com.sun.source.tree.ConstantCaseLabelTree;
 import com.sun.source.tree.DeconstructionPatternTree;
 import com.sun.source.tree.DefaultCaseLabelTree;
 import com.sun.source.tree.ExpressionTree;
+import com.sun.source.tree.ModifiersTree;
 import com.sun.source.tree.PatternCaseLabelTree;
 import com.sun.source.tree.PatternTree;
+import com.sun.source.tree.Tree;
+import java.util.Optional;
+import javax.lang.model.element.Name;
 
 /**
  * Extends {@link Java14InputAstVisitor} with support for AST nodes that were added or modified in
@@ -77,5 +81,25 @@ public class Java21InputAstVisitor extends Java14InputAstVisitor {
         builder.close();
         token(")");
         return null;
+    }
+
+    @Override
+    protected void visitBindingPattern(ModifiersTree modifiers, Tree type, Name name) {
+        builder.open(plusFour);
+        if (modifiers != null) {
+            builder.addAll(visitModifiers(modifiers, Direction.HORIZONTAL, Optional.empty()));
+        }
+        if (type == null) {
+            token("var");
+        } else {
+            scan(type, null);
+        }
+        builder.breakOp(" ");
+        if (name.isEmpty()) {
+            token("_");
+        } else {
+            visit(name);
+        }
+        builder.close();
     }
 }
