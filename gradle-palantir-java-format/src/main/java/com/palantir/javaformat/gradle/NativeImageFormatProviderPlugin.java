@@ -42,7 +42,11 @@ public final class NativeImageFormatProviderPlugin implements Plugin<Project> {
             return;
         }
         String implementationVersion = JavaFormatExtension.class.getPackage().getImplementationVersion();
-        OperatingSystem operatingSystem = OperatingSystem.get();
+        OperatingSystem operatingSystem = rootProject
+                .getProviders()
+                .of(OperatingSystemValueSource.class, spec -> {})
+                .get();
+
         rootProject.getConfigurations().register(NATIVE_CONFIGURATION_NAME, conf -> {
             conf.setDescription("Internal configuration for resolving the palantir-java-format native image");
             conf.setVisible(false);
@@ -69,11 +73,13 @@ public final class NativeImageFormatProviderPlugin implements Plugin<Project> {
     }
 
     public static boolean isNativeImageConfigured(Project project) {
-        return isNativeImageSupported() && isNativeFlagEnabled(project);
+        return isNativeImageSupported(project) && isNativeFlagEnabled(project);
     }
 
-    private static boolean isNativeImageSupported() {
-        OperatingSystem os = OperatingSystem.get();
+    private static boolean isNativeImageSupported(Project project) {
+        OperatingSystem os = project.getProviders()
+                .of(OperatingSystemValueSource.class, spec -> {})
+                .get();
         return os.equals(OperatingSystem.LINUX_GLIBC)
                 || (os.equals(OperatingSystem.MACOS) && Architecture.get().equals(Architecture.AARCH64));
     }
