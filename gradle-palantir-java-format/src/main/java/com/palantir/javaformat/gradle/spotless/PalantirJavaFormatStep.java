@@ -38,7 +38,6 @@ public final class PalantirJavaFormatStep {
     public static FormatterStep create(Configuration palantirJavaFormat, JavaFormatExtension extension) {
         ensureImplementationNotDirectlyLoadable();
         Supplier<FormatterService> memoizedService = extension::serviceLoad;
-        // Pass a supplier to defer getFiles() until execution time
         return FormatterStep.createLazy(
                 NAME, () -> new State(palantirJavaFormat::getFiles, memoizedService), State::createFormat);
     }
