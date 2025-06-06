@@ -20,6 +20,7 @@ import com.diffplug.spotless.FileSignature;
 import com.diffplug.spotless.FormatterFunc;
 import com.diffplug.spotless.FormatterStep;
 import com.diffplug.spotless.ProcessRunner;
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
@@ -30,7 +31,7 @@ import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
 public final class NativePalantirJavaFormatStep {
-    private static Logger logger = Logging.getLogger(NativePalantirJavaFormatStep.class);
+    private static final Logger logger = Logging.getLogger(NativePalantirJavaFormatStep.class);
 
     private NativePalantirJavaFormatStep() {}
 
@@ -38,35 +39,24 @@ public final class NativePalantirJavaFormatStep {
 
     /** Creates a step which formats everything - code, import order, and unused imports. */
     public static FormatterStep create(Configuration configuration) {
-        return FormatterStep.createLazy(
-                NAME,
-                () -> {
-                    Supplier<FileSignature> supplier = () -> {
-                        try {
-                            logger.info("Using native-image at {}", configuration.getSingleFile());
-                            return FileSignature.signAsSet(configuration.getSingleFile());
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    };
-
-                    return new State(supplier);
-                },
-                State::createFormat);
+        Supplier<File> execSupplier = configuration::getSingleFile;
+        return FormatterStep.createLazy(NAME, () -> new State(execSupplier), State::createFormat);
     }
 
     static class State implements Serializable {
         private static final long serialVersionUID = 1L;
 
-        final Supplier<FileSignature> supplier;
+        private final transient Supplier<File> execSupplier;
 
-        State(Supplier<FileSignature> supplier) {
-            this.supplier = supplier;
+        State(Supplier<File> execSupplier) {
+            this.execSupplier = execSupplier;
         }
 
         String format(ProcessRunner runner, String input) throws IOException, InterruptedException {
-            List<String> argumentsWithPathToExe =
-                    List.of(supplier.get().getOnlyFile().getAbsolutePath(), "--palantir", "-");
+            File execFile = execSupplier.get();
+            FileSignature.signAsSet(execFile);
+            logger.info("Using native-image at {}", execFile);
+            List<String> argumentsWithPathToExe = List.of(execFile.getAbsolutePath(), "--palantir", "-");
             return runner.exec(input.getBytes(StandardCharsets.UTF_8), argumentsWithPathToExe)
                     .assertExitZero(StandardCharsets.UTF_8);
         }
