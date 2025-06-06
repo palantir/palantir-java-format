@@ -54,9 +54,9 @@ public final class NativePalantirJavaFormatStep {
 
         String format(ProcessRunner runner, String input) throws IOException, InterruptedException {
             File execFile = execSupplier.get();
-            FileSignature.signAsSet(execFile);
             logger.info("Using native-image at {}", execFile);
-            List<String> argumentsWithPathToExe = List.of(execFile.getAbsolutePath(), "--palantir", "-");
+            List<String> argumentsWithPathToExe =
+                    List.of(FileSignature.signAsSet(execFile).getOnlyFile().getAbsolutePath(), "--palantir", "-");
             return runner.exec(input.getBytes(StandardCharsets.UTF_8), argumentsWithPathToExe)
                     .assertExitZero(StandardCharsets.UTF_8);
         }
