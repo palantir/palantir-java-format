@@ -52,11 +52,9 @@ public final class PalantirJavaFormatStep {
 
         // Kept for state serialization purposes.
         @SuppressWarnings({"unused", "FieldCanBeLocal"})
-        private final transient Supplier<Iterable<File>> jarsSupplier;
-
-        // Kept for state serialization purposes.
-        @SuppressWarnings({"unused", "FieldCanBeLocal"})
         private FileSignature jarsSignature;
+
+        private final transient Supplier<Iterable<File>> jarsSupplier;
 
         // Transient as this is not serializable.
         private final transient Supplier<FormatterService> memoizedFormatter;
