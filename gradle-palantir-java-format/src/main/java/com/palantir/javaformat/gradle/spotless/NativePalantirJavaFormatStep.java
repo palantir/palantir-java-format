@@ -39,8 +39,7 @@ public final class NativePalantirJavaFormatStep {
 
     /** Creates a step which formats everything - code, import order, and unused imports. */
     public static FormatterStep create(Configuration configuration) {
-        Supplier<File> execSupplier = configuration::getSingleFile;
-        return FormatterStep.createLazy(NAME, () -> new State(execSupplier), State::createFormat);
+        return FormatterStep.createLazy(NAME, () -> new State(configuration::getSingleFile), State::createFormat);
     }
 
     static class State implements Serializable {
@@ -48,15 +47,15 @@ public final class NativePalantirJavaFormatStep {
 
         private final transient Supplier<File> execSupplier;
 
-        State(Supplier<File> execSupplier) {
-            this.execSupplier = execSupplier;
+        State(Supplier<File> supplier) {
+            this.execSupplier = supplier;
         }
 
         String format(ProcessRunner runner, String input) throws IOException, InterruptedException {
             File execFile = execSupplier.get();
             logger.info("Using native-image at {}", execFile);
-            List<String> argumentsWithPathToExe =
-                    List.of(FileSignature.signAsSet(execFile).getOnlyFile().getAbsolutePath(), "--palantir", "-");
+            File signedFile = FileSignature.signAsSet(execFile).getOnlyFile();
+            List<String> argumentsWithPathToExe = List.of(signedFile.getAbsolutePath(), "--palantir", "-");
             return runner.exec(input.getBytes(StandardCharsets.UTF_8), argumentsWithPathToExe)
                     .assertExitZero(StandardCharsets.UTF_8);
         }
