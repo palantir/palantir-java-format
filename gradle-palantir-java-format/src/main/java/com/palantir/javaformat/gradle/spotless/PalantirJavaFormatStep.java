@@ -38,7 +38,6 @@ public final class PalantirJavaFormatStep {
     public static FormatterStep create(Configuration palantirJavaFormat, JavaFormatExtension extension) {
         ensureImplementationNotDirectlyLoadable();
         Supplier<FormatterService> memoizedService = extension::serviceLoad;
-        // Pass a supplier to defer getFiles() until execution time
         return FormatterStep.createLazy(
                 NAME, () -> new State(palantirJavaFormat::getFiles, memoizedService), State::createFormat);
     }
@@ -52,11 +51,9 @@ public final class PalantirJavaFormatStep {
 
         // Kept for state serialization purposes.
         @SuppressWarnings({"unused", "FieldCanBeLocal"})
-        private final transient Supplier<Iterable<File>> jarsSupplier;
-
-        // Kept for state serialization purposes.
-        @SuppressWarnings({"unused", "FieldCanBeLocal"})
         private FileSignature jarsSignature;
+
+        private final transient Supplier<Iterable<File>> jarsSupplier;
 
         // Transient as this is not serializable.
         private final transient Supplier<FormatterService> memoizedFormatter;
