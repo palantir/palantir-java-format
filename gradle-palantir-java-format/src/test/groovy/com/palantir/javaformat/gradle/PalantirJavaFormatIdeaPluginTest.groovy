@@ -23,6 +23,11 @@ class PalantirJavaFormatIdeaPluginTest extends IntegrationTestKitSpec {
     private static final NATIVE_IMAGE_FILE = new File("build/nativeImage.path")
     private static final NATIVE_CONFIG = String.format("palantirJavaFormatNative files(\"%s\")", NATIVE_IMAGE_FILE.text)
 
+    def setup() {
+        definePluginOutsideOfPluginBlock = true
+        keepFiles = true
+    }
+
     def "idea_configuresIpr"() {
         file('gradle.properties') << extraGradleProperties
 
@@ -39,7 +44,7 @@ class PalantirJavaFormatIdeaPluginTest extends IntegrationTestKitSpec {
         """.replace("EXTRA_CONFIGURATION", extraDependencies).stripIndent()
 
         when:
-        runTasks('idea')
+        runTasks('idea --configuration-cache')
 
         then:
         def iprFile = new File(projectDir, "${moduleName}.ipr")

@@ -26,6 +26,11 @@ class PalantirJavaFormatPluginTest extends IntegrationTestKitSpec {
     private static final NATIVE_IMAGE_FILE = new File("build/nativeImage.path").absolutePath
     private static final NATIVE_CONFIG = "palantirJavaFormatNative files(file(\"${NATIVE_IMAGE_FILE}\").text)"
 
+    def setup() {
+        definePluginOutsideOfPluginBlock = true
+        keepFiles = true
+    }
+
     @Unroll
     def 'formatDiff updates only lines changed in git diff'(String extraGradleProperties, String expectedOutput) {
         file('gradle.properties') << extraGradleProperties
@@ -78,7 +83,7 @@ class PalantirJavaFormatPluginTest extends IntegrationTestKitSpec {
         '''.stripIndent()
 
         when:
-        def result = runTasks('formatDiff', '--info')
+        def result = runTasks('formatDiff', '--info', '--configuration-cache')
 
         then:
         result.output.contains(expectedOutput)

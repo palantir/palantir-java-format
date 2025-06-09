@@ -105,7 +105,7 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
 
 
         when:
-        def result = runGradlewTasks('spotlessApply', '--info')
+        def result = runGradlewTasks('spotlessApply', '--info', '--configuration-cache')
 
         then:
         result.standardOutput.contains(expectedOutput)
