@@ -58,6 +58,10 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
                      classpath 'com.palantir.baseline:gradle-baseline-java:6.21.0'
                      classpath 'com.palantir.gradle.jdks:gradle-jdks:0.62.0'
                      classpath 'com.palantir.gradle.jdkslatest:gradle-jdks-latest:0.17.0'
+
+                     constraints {
+                         classpath 'com.diffplug.spotless:6.22.0'
+                     }
                  }
              }
 
