@@ -120,7 +120,11 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
         if (modifiers != null) {
             builder.addAll(visitModifiers(modifiers, Direction.HORIZONTAL, Optional.empty()));
         }
-        scan(type, null);
+        if (type == null) {
+            token("var");
+        } else {
+            scan(type, null);
+        }
         builder.breakOp(" ");
         if (name.isEmpty()) {
             token("_");
