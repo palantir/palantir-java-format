@@ -1,5 +1,5 @@
 type: improvement
 improvement:
-  description: Support configuration cache
+  description: Make palantir-java-format support spotless 6.22.0
   links:
   - https://github.com/palantir/palantir-java-format/pull/1313
