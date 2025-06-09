@@ -115,7 +115,7 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
         return null;
     }
 
-    protected void visitBindingPattern(ModifiersTree modifiers, Tree type, Name name) {
+    private void visitBindingPattern(ModifiersTree modifiers, Tree type, Name name) {
         builder.open(plusFour);
         if (modifiers != null) {
             builder.addAll(visitModifiers(modifiers, Direction.HORIZONTAL, Optional.empty()));
