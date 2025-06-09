@@ -5,9 +5,9 @@ public class I1309 {
             case Record(
                     Nested(var i),
                     var j,
-                    var k,
-                    var l,
-                    var m,
+                    int k,
+                    char l,
+                    java.lang.String m,
                     var n,
                     var o,
                     var p,
