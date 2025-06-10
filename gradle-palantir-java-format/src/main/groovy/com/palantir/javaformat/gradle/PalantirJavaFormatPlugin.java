@@ -17,21 +17,24 @@
 package com.palantir.javaformat.gradle;
 
 import com.palantir.javaformat.bootstrap.NativeImageFormatterService;
-import com.palantir.javaformat.java.FormatterService;
 import java.io.File;
 import java.io.IOException;
+import javax.inject.Inject;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.file.FileCollection;
+import org.gradle.api.file.ProjectLayout;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
+import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
+import org.gradle.api.services.ServiceReference;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.TaskAction;
 
-public final class PalantirJavaFormatPlugin implements Plugin<Project> {
+public abstract class PalantirJavaFormatPlugin implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
@@ -47,9 +50,17 @@ public final class PalantirJavaFormatPlugin implements Plugin<Project> {
             // spotless to try out our formatter
             project.getTasks().register("formatDiff", FormatDiffTask.class, task -> {
                 if (NativeImageFormatProviderPlugin.isNativeImageConfigured(project)) {
+                    System.err.println("Configuring native");
                     task.getNativeImage().fileProvider(getNativeImplConfiguration(project));
                 }
             });
+
+            project.getGradle()
+                    .getSharedServices()
+                    .registerIfAbsent("formatterService", FormatterServiceService.class, spec -> {
+                        spec.getParameters().getExtension().set(project.provider(() -> project.getExtensions()
+                                .getByType(JavaFormatExtension.class)));
+                    });
         });
     }
 
@@ -61,12 +72,17 @@ public final class PalantirJavaFormatPlugin implements Plugin<Project> {
     }
 
     public abstract static class FormatDiffTask extends DefaultTask {
+        @Inject
+        protected abstract ProjectLayout getProjectLayout();
 
         private static Logger log = Logging.getLogger(FormatDiffTask.class);
 
         @org.gradle.api.tasks.Optional
         @InputFile
         abstract RegularFileProperty getNativeImage();
+
+        @ServiceReference("formatterService")
+        abstract Property<FormatterServiceService> getFormatterServiceService();
 
         public FormatDiffTask() {
             setDescription("Format only chunks of files that appear in git diff");
@@ -78,15 +94,14 @@ public final class PalantirJavaFormatPlugin implements Plugin<Project> {
             if (getNativeImage().isPresent()) {
                 log.info("Using the native-image formatter");
                 FormatDiff.formatDiff(
-                        getProject().getProjectDir().toPath(),
+                        getProjectLayout().getProjectDirectory().getAsFile().toPath(),
                         new NativeImageFormatterService(
                                 getNativeImage().get().getAsFile().toPath()));
             } else {
                 log.info("Using the Java-based formatter");
-                JavaFormatExtension extension =
-                        getProject().getRootProject().getExtensions().getByType(JavaFormatExtension.class);
-                FormatterService formatterService = extension.serviceLoad();
-                FormatDiff.formatDiff(getProject().getProjectDir().toPath(), formatterService);
+                FormatDiff.formatDiff(
+                        getProjectLayout().getProjectDirectory().getAsFile().toPath(),
+                        getFormatterServiceService().get().getFormatterService());
             }
         }
     }
