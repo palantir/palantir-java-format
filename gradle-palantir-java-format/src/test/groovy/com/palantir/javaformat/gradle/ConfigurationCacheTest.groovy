@@ -48,7 +48,7 @@ class ConfigurationCacheTest extends IntegrationTestKitSpec {
                 mavenLocal()
             }
              dependencies {
-                 classpath 'com.palantir.baseline:gradle-baseline-java:6.3.2'
+                 classpath 'com.palantir.baseline:gradle-baseline-java:6.34.0'
                  classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:2.34.0'
                  classpath 'com.diffplug.spotless:spotless-plugin-gradle:6.22.0'
              }
