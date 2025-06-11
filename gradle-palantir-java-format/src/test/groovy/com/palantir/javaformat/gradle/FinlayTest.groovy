@@ -19,13 +19,7 @@ package com.palantir.javaformat.gradle
 import nebula.test.IntegrationTestKitSpec
 
 class FinlayTest extends IntegrationTestKitSpec {
-    private static final CLASSPATH_FILE = new File("build/impl.classpath").absolutePath
-    private static final NATIVE_IMAGE_FILE = new File("build/nativeImage.path")
-    private static final NATIVE_CONFIG = String.format("palantirJavaFormatNative files(\"%s\")", NATIVE_IMAGE_FILE.text)
-
     def setup() {
-        def extraDependencies = NATIVE_CONFIG
-
         // language=Gradle
         buildFile << """
          buildscript {
@@ -36,7 +30,7 @@ class FinlayTest extends IntegrationTestKitSpec {
             }
              dependencies {
                  classpath 'com.palantir.baseline:gradle-baseline-java:999-CC7'
-                 classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:999'
+                 classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:2.34.0'
              }
          }
          
@@ -71,7 +65,7 @@ class FinlayTest extends IntegrationTestKitSpec {
         keepFiles = true
     }
 
-    def "can run build on root and subproject"() {
+    def "can run build"() {
         when:
         def result = runTasks('build')
 
