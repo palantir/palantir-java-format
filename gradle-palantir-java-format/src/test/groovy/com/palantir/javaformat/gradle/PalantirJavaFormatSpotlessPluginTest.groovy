@@ -34,6 +34,8 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
     @Unroll
     def "formats with spotless when spotless is applied"(String extraGradleProperties, String javaVersion, String expectedOutput) {
         def extraDependencies = extraGradleProperties.isEmpty() ? "" : NATIVE_CONFIG
+
+        // language=Gradle
         settingsFile << """
              buildscript {
                 repositories {
@@ -47,6 +49,7 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
             apply plugin: 'com.palantir.jdks.settings'
         """.stripIndent(true)
 
+        // language=Gradle
         buildFile << """
              buildscript {
                 repositories {
