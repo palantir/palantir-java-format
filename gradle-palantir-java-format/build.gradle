@@ -28,6 +28,8 @@ dependencies {
     testImplementation 'org.assertj:assertj-core'
 
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine'
+
+    pluginClasspath 'com.diffplug.spotless:spotless-plugin-gradle'
 }
 
 gradlePlugin {

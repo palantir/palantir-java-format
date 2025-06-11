@@ -17,6 +17,7 @@ package com.palantir.javaformat.gradle
 
 import nebula.test.IntegrationTestKitSpec
 import nebula.test.functional.internal.classpath.ClasspathAddingInitScriptBuilder
+import org.gradle.api.invocation.Gradle
 import spock.lang.Unroll
 
 import java.nio.charset.StandardCharsets
@@ -26,9 +27,15 @@ import java.util.stream.Collectors
 import java.util.stream.Stream
 
 class ConfigurationCacheTest extends IntegrationTestKitSpec {
+    GradlewExecutor executor
+
+    private static final CLASSPATH_FILE = new File("build/impl.classpath").absolutePath
+
+
     def setup() {
         definePluginOutsideOfPluginBlock = true
         keepFiles = true
+        executor = new GradlewExecutor(projectDir)
     }
 
     def "can run classes"() {
@@ -38,9 +45,10 @@ class ConfigurationCacheTest extends IntegrationTestKitSpec {
             repositories {
                 mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
                 gradlePluginPortal() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
+                mavenLocal()
             }
              dependencies {
-                 classpath 'com.palantir.baseline:gradle-baseline-java:6.32.0'
+                 classpath 'com.palantir.baseline:gradle-baseline-java:6.3.2'
                  classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:2.34.0'
                  classpath 'com.diffplug.spotless:spotless-plugin-gradle:6.22.0'
              }
@@ -48,10 +56,10 @@ class ConfigurationCacheTest extends IntegrationTestKitSpec {
          
          apply plugin: 'com.palantir.baseline'
          apply plugin: 'com.palantir.consistent-versions'
+         apply plugin: 'com.palantir.baseline-java-versions'
 
         allprojects {
             apply plugin: 'com.palantir.java-format'
-            apply plugin: 'java'
             
             repositories {
                 mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
@@ -64,22 +72,20 @@ class ConfigurationCacheTest extends IntegrationTestKitSpec {
         file("versions.props")
         file("versions.lock")
 
-
-        file('gradle.properties') << """
-        org.gradle.jvmargs=--add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED \
-          --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED \
-          --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED \
-          --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED \
-          --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED
-        palantir.jdk.setup.enabled=true
-        """.stripIndent(true)
         runTasks('wrapper')
 
-        when:
-        def result = runTasks('build')
+        buildFile << """
+            dependencies {
+                palantirJavaFormat files(file("${CLASSPATH_FILE}").text.split(':'))
+            }
+        """.stripIndent()
 
+        when:
+        def result = executor.runGradlewTasks('build', '--configuration-cache', '--info')
 
         then:
-        result.output.contains('BUILD SUCCESSFUL')
+        assert result.success
+        println(result.standardOutput)
+        result.standardOutput.contains('BUILD SUCCESSFUL')
     }
 }
