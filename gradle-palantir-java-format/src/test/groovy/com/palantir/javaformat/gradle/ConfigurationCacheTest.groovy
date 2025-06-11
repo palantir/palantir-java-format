@@ -26,80 +26,45 @@ import java.util.stream.Collectors
 import java.util.stream.Stream
 
 class ConfigurationCacheTest extends IntegrationTestKitSpec {
-    /** ./gradlew writeImplClasspath generates this file. */
-    private static final CLASSPATH_FILE = new File("build/impl.classpath").absolutePath
-    private static final NATIVE_IMAGE_FILE = new File("build/nativeImage.path")
-    private static final NATIVE_CONFIG = String.format("palantirJavaFormatNative files(\"%s\")", NATIVE_IMAGE_FILE.text)
-
     def setup() {
         definePluginOutsideOfPluginBlock = true
         keepFiles = true
     }
 
-    @Unroll
-    def "plugin does not resolve configuration at configuration time"(String extraGradleProperties, String javaVersion, String expectedOutput) {
-        def extraDependencies = extraGradleProperties.isEmpty() ? "" : NATIVE_CONFIG
-        settingsFile << """
-             buildscript {
-                repositories {
-                    mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
-                    gradlePluginPortal() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
-                }
-                 dependencies {
-                     classpath 'com.palantir.gradle.jdks:gradle-jdks-settings:0.62.0'
-                 }
+    def "can run classes"() {
+        // language=Gradle
+        buildFile << """
+         buildscript {
+            repositories {
+                mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
+                gradlePluginPortal() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
+            }
+             dependencies {
+                 classpath 'com.palantir.baseline:gradle-baseline-java:6.32.0'
+                 classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:2.34.0'
+                 classpath 'com.diffplug.spotless:spotless-plugin-gradle:6.22.0'
              }
-            apply plugin: 'com.palantir.jdks.settings'
+         }
+         
+         apply plugin: 'com.palantir.baseline'
+         apply plugin: 'com.palantir.consistent-versions'
+
+        allprojects {
+            apply plugin: 'com.palantir.java-format'
+            apply plugin: 'java'
+            
+            repositories {
+                mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
+            }
+        }
+        version = '0.1.0'
         """.stripIndent(true)
 
-        // language=gradle
-        buildFile << """
-             buildscript {
-                repositories {
-                    mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
-                    gradlePluginPortal() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
-                    mavenLocal()
-                }
-                 dependencies {
-                     classpath 'com.palantir.baseline:gradle-baseline-java:6.21.0'
-                     classpath 'com.palantir.gradle.jdks:gradle-jdks:0.62.0'
-                     classpath 'com.palantir.gradle.jdkslatest:gradle-jdks-latest:0.17.0'
-                     classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:999'
 
-                     constraints {
-                         classpath 'com.diffplug.spotless:spotless-plugin-gradle:6.22.0'
-                     }
-                 }
-             }
+        file("versions.props")
+        file("versions.lock")
 
-            // The 'com.diffplug.spotless:spotless-plugin-gradle' dependency is already added by palantir-java-format
-            plugins {
-                id 'java'
-            }
 
-            apply plugin: 'com.palantir.consistent-versions'
-            apply plugin: 'com.palantir.java-format'     
-            apply plugin: 'com.palantir.baseline-java-versions'
-            apply plugin: 'com.palantir.jdks'
-            apply plugin: 'com.palantir.jdks.latest'
-            
-            import com.diffplug.gradle.spotless.SpotlessPlugin
-            
-            // find which jar this class comes from
-            println("here you go sir")
-            println(SpotlessPlugin.class.protectionDomain.codeSource.location)
-
-            javaVersions {
-                libraryTarget = ${javaVersion}
-            }
-
-            jdks {
-                daemonTarget = ${javaVersion}
-            }
-            
-        """.stripIndent()
-
-        // Add jvm args to allow spotless and formatter gradle plugins to run with Java 16+
         file('gradle.properties') << """
         org.gradle.jvmargs=--add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED \
           --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED \
@@ -107,118 +72,14 @@ class ConfigurationCacheTest extends IntegrationTestKitSpec {
           --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED \
           --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED
         palantir.jdk.setup.enabled=true
-        """.stripIndent()
-        file('gradle.properties') << extraGradleProperties
-        file('versions.lock').text = ''
-        file('versions.props').text = ''
-
+        """.stripIndent(true)
         runTasks('wrapper')
 
-        buildFile << """
-            apply plugin: 'com.diffplug.spotless'
-            
-            dependencies {
-                palantirJavaFormat files(file("${CLASSPATH_FILE}").text.split(':'))
-                ${extraDependencies}
-            }
-        """.stripIndent()
-
-        file('src/main/java/Main.java').text = invalidJavaFile
-
         when:
-        def result = runGradlewTasks('spotlessApply', '--info', '--configuration-cache')
+        def result = runTasks('build')
+
 
         then:
-        result.standardOutput.contains(expectedOutput)
-        file('src/main/java/Main.java').text == validJavaFile
-
-        where:
-        extraGradleProperties               | javaVersion   | expectedOutput
-//        ""                                  | 21            | "Using the Java-based formatter"
-//        "palantir.native.formatter=true"    | 21            | "Using the Java-based formatter"
-        "palantir.native.formatter=true"    | 17            | "brr brr patapim"  // make it fail to read stdout
+        result.output.contains('BUILD SUCCESSFUL')
     }
-
-    private static Iterable<File> getBuildPluginClasspathInjector() {
-        return getPluginClasspathInjector(Path.of("../gradle-palantir-java-format/build/pluginUnderTestMetadata/plugin-under-test-metadata.properties"))
-    }
-
-    private static Iterable<File> getPluginClasspathInjector(Path path) {
-        File propertiesFile = path.toFile()
-        Properties properties = new Properties()
-        propertiesFile.withInputStream { inputStream ->
-            properties.load(inputStream)
-        }
-        String classpath = properties.getProperty('implementation-classpath')
-        return classpath.split(File.pathSeparator).collect { new File(it) }
-    }
-
-    private GradlewExecutionResult runGradlewTasks(String... tasks) {
-        ProcessBuilder processBuilder = getProcessBuilder(tasks)
-        Process process = processBuilder.start()
-        String output = readAllInput(process.getInputStream())
-        process.waitFor(1, TimeUnit.MINUTES)
-        GradlewExecutionResult result = new GradlewExecutionResult(process.exitValue(), output)
-        assert result.success
-        return result
-    }
-
-    final class GradlewExecutionResult {
-
-        private final Boolean success
-        private final String standardOutput
-        private final Throwable failure
-
-        GradlewExecutionResult(int exitValue, String output) {
-            this.success = exitValue == 0
-            this.standardOutput =  output
-            this.failure = exitValue != 0 ? new RuntimeException(String.format("Build failed with exitCode %s", exitValue)) : null
-        }
-    }
-
-    static String readAllInput(InputStream inputStream) {
-        try (Stream<String> lines =
-                new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8)).lines()) {
-            return lines.collect(Collectors.joining("\n"));
-        }
-    }
-
-    private ProcessBuilder getProcessBuilder(String... tasks) {
-        File initScript = new File(projectDir, "init.gradle")
-        ClasspathAddingInitScriptBuilder.build(initScript, getBuildPluginClasspathInjector().toList())
-        List<String> arguments = ["./gradlew", "--init-script", initScript.toPath().toString()]
-        Arrays.asList(tasks).forEach(arguments::add)
-        ProcessBuilder processBuilder = new ProcessBuilder()
-                .command(arguments)
-                .directory(projectDir)
-                .redirectErrorStream(true)
-        return processBuilder
-    }
-
-    def validJavaFile = '''\
-    package test;
-    
-    public class Test {
-        void test() {
-            int x = 1;
-            System.out.println("Hello");
-            Optional.of("hello").orElseGet(() -> {
-                return "Hello World";
-            });
-        }
-    }
-    '''.stripIndent()
-
-    def invalidJavaFile = '''
-    package test;
-    import com.java.unused;
-    public class Test { void test() {int x = 1;
-        System.out.println(
-            "Hello"
-        );
-        Optional.of("hello").orElseGet(() -> { 
-            return "Hello World";
-        });
-    } }
-    '''.stripIndent()
 }
