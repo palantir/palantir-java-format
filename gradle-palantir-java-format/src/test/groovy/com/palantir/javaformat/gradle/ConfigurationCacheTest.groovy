@@ -52,6 +52,7 @@ class ConfigurationCacheTest extends IntegrationTestKitSpec {
             apply plugin: 'com.palantir.jdks.settings'
         """.stripIndent(true)
 
+        // language=gradle
         buildFile << """
              buildscript {
                 repositories {
@@ -66,7 +67,7 @@ class ConfigurationCacheTest extends IntegrationTestKitSpec {
                      classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:999'
 
                      constraints {
-                         classpath 'com.diffplug.spotless:6.22.0'
+                         classpath 'com.diffplug.spotless:spotless-plugin-gradle:6.22.0'
                      }
                  }
              }
@@ -81,6 +82,12 @@ class ConfigurationCacheTest extends IntegrationTestKitSpec {
             apply plugin: 'com.palantir.baseline-java-versions'
             apply plugin: 'com.palantir.jdks'
             apply plugin: 'com.palantir.jdks.latest'
+            
+            import com.diffplug.gradle.spotless.SpotlessPlugin
+            
+            // find which jar this class comes from
+            println("here you go sir")
+            println(SpotlessPlugin.class.protectionDomain.codeSource.location)
 
             javaVersions {
                 libraryTarget = ${javaVersion}

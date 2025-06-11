@@ -43,6 +43,7 @@ public final class NativePalantirJavaFormatStep {
                 () -> {
                     logger.error("NativePalantirJavaFormatStep: Resolving the palantirJavaFormatNative Configuration");
                     File execFile = configuration.getSingleFile();
+                    logger.error("NativePalantirJavaFormatStep: Resolved the palantirJavaFormatNative Configuration");
                     logger.info("Using native-image at {}", configuration.getSingleFile());
                     return new State(FileSignature.signAsSet(execFile));
                 },
