@@ -26,11 +26,11 @@ class FinlayTest extends IntegrationTestKitSpec {
             repositories {
                 mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
                 gradlePluginPortal() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
-                mavenLocal()
             }
              dependencies {
-                 classpath 'com.palantir.baseline:gradle-baseline-java:999-CC7'
+                 classpath 'com.palantir.baseline:gradle-baseline-java:6.32.0'
                  classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:2.34.0'
+                 classpath 'com.diffplug.spotless:spotless-plugin-gradle:6.22.0'
              }
          }
          
