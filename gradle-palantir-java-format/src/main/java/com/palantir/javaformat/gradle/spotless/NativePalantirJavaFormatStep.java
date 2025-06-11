@@ -41,6 +41,7 @@ public final class NativePalantirJavaFormatStep {
         return FormatterStep.createLazy(
                 NAME,
                 () -> {
+                    logger.error("NativePalantirJavaFormatStep: Resolving the palantirJavaFormatNative Configuration");
                     File execFile = configuration.getSingleFile();
                     logger.info("Using native-image at {}", configuration.getSingleFile());
                     return new State(FileSignature.signAsSet(execFile));
