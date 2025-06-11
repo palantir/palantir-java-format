@@ -31,6 +31,8 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
     private static final NATIVE_IMAGE_FILE = new File("build/nativeImage.path")
     private static final NATIVE_CONFIG = String.format("palantirJavaFormatNative files(\"%s\")", NATIVE_IMAGE_FILE.text)
 
+    private final executor = new GradlewExecutor(projectDir)
+
     @Unroll
     def "formats with spotless when spotless is applied"(String extraGradleProperties, String javaVersion, String expectedOutput) {
         def extraDependencies = extraGradleProperties.isEmpty() ? "" : NATIVE_CONFIG
@@ -109,7 +111,7 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
 
 
         when:
-        def result = runGradlewTasks('spotlessApply', '--info')
+        def result = executor.runGradlewTasks('spotlessApply', '--info')
 
         then:
         result.standardOutput.contains(expectedOutput)
@@ -123,61 +125,6 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
 
     }
 
-    private static Iterable<File> getBuildPluginClasspathInjector() {
-        return getPluginClasspathInjector(Path.of("../gradle-palantir-java-format/build/pluginUnderTestMetadata/plugin-under-test-metadata.properties"))
-    }
-
-    private static Iterable<File> getPluginClasspathInjector(Path path) {
-        File propertiesFile = path.toFile()
-        Properties properties = new Properties()
-        propertiesFile.withInputStream { inputStream ->
-            properties.load(inputStream)
-        }
-        String classpath = properties.getProperty('implementation-classpath')
-        return classpath.split(File.pathSeparator).collect { new File(it) }
-    }
-
-    private GradlewExecutionResult runGradlewTasks(String... tasks) {
-        ProcessBuilder processBuilder = getProcessBuilder(tasks)
-        Process process = processBuilder.start()
-        String output = readAllInput(process.getInputStream())
-        process.waitFor(1, TimeUnit.MINUTES)
-        GradlewExecutionResult result = new GradlewExecutionResult(process.exitValue(), output)
-        assert result.success
-        return result
-    }
-
-    final class GradlewExecutionResult {
-
-        private final Boolean success
-        private final String standardOutput
-        private final Throwable failure
-
-        GradlewExecutionResult(int exitValue, String output) {
-            this.success = exitValue == 0
-            this.standardOutput =  output
-            this.failure = exitValue != 0 ? new RuntimeException(String.format("Build failed with exitCode %s", exitValue)) : null
-        }
-    }
-
-    static String readAllInput(InputStream inputStream) {
-        try (Stream<String> lines =
-                new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8)).lines()) {
-            return lines.collect(Collectors.joining("\n"));
-        }
-    }
-
-    private ProcessBuilder getProcessBuilder(String... tasks) {
-        File initScript = new File(projectDir, "init.gradle")
-        ClasspathAddingInitScriptBuilder.build(initScript, getBuildPluginClasspathInjector().toList())
-        List<String> arguments = ["./gradlew", "--init-script", initScript.toPath().toString()]
-        Arrays.asList(tasks).forEach(arguments::add)
-        ProcessBuilder processBuilder = new ProcessBuilder()
-                .command(arguments)
-                .directory(projectDir)
-                .redirectErrorStream(true)
-        return processBuilder
-    }
 
     def validJavaFile = '''\
     package test;
