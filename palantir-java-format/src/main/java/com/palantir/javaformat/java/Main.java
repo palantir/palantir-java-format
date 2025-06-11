@@ -63,7 +63,9 @@ public final class Main {
      */
     public static void main(String[] args) {
         int result;
+        @SuppressWarnings("for-rollout:SystemOut")
         PrintWriter out = new PrintWriter(new OutputStreamWriter(System.out, UTF_8));
+        @SuppressWarnings("for-rollout:SystemOut")
         PrintWriter err = new PrintWriter(new OutputStreamWriter(System.err, UTF_8));
         try {
             Main formatter = new Main(out, err, System.in);
@@ -183,6 +185,7 @@ public final class Main {
         return allOk ? 0 : 1;
     }
 
+    @SuppressWarnings("for-rollout:ThrowSpecificExceptions")
     private int formatStdin(CommandLineOptions parameters, JavaFormatterOptions options) {
         String input;
         try {
@@ -216,6 +219,7 @@ public final class Main {
     }
 
     /** Parses and validates command-line flags. */
+    @SuppressWarnings("for-rollout:SystemOut")
     public static CommandLineOptions processArgs(String... args) throws UsageException {
         CommandLineOptions parameters;
         try {

@@ -44,6 +44,7 @@ import org.junit.platform.commons.util.AnnotationUtils;
 import org.junit.platform.commons.util.ReflectionUtils;
 
 public final class ParameterizedClass implements TestTemplateInvocationContextProvider {
+    @SuppressWarnings("for-rollout:NonFinalStaticField")
     private static ExtensionContext.Namespace namespace = ExtensionContext.Namespace.create(ParameterizedClass.class);
 
     /**
@@ -193,8 +194,8 @@ public final class ParameterizedClass implements TestTemplateInvocationContextPr
                     result.add(entry);
                 }
                 return result;
-            } else if (parameters instanceof Object[]) {
-                return Arrays.asList((Object[]) parameters);
+            } else if (parameters instanceof Object[] array) {
+                return Arrays.asList(array);
             } else {
                 throw new TestInstantiationException("Invalid return type. Must be iterable of arrays");
             }

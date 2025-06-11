@@ -56,6 +56,7 @@ public final class JavadocFormatter {
         return makeSingleLineIfPossible(blockIndent, result);
     }
 
+    @SuppressWarnings("for-rollout:UnnecessaryDefaultInEnumSwitch")
     private String render(List<Token> input, int blockIndent) {
         JavadocWriter output = new JavadocWriter(blockIndent, maxLineLength);
         for (Token token : input) {

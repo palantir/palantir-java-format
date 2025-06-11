@@ -48,7 +48,9 @@ import java.util.stream.Stream;
 /** Wraps string literals that exceed the column limit. */
 public final class StringWrapper {
     /** Reflows string literals in the given Java source code that extend past the given column limit. */
-    static String wrap(final int columnLimit, String input, Formatter formatter) throws FormatterException {
+    static String wrap(
+            @SuppressWarnings("for-rollout:UnnecessaryFinal") final int columnLimit, String input, Formatter formatter)
+            throws FormatterException {
         if (!longLines(columnLimit, input)) {
             // fast path
             return input;
@@ -113,14 +115,16 @@ public final class StringWrapper {
         return outputRanges.build();
     }
 
-    @SuppressWarnings("for-rollout:NullAway")
-    private static TreeRangeMap<Integer, String> getReflowReplacements(int columnLimit, final String input)
+    @SuppressWarnings({"for-rollout:DifferentNameButSame", "for-rollout:NullAway"})
+    private static TreeRangeMap<Integer, String> getReflowReplacements(
+            int columnLimit, @SuppressWarnings("for-rollout:UnnecessaryFinal") final String input)
             throws FormatterException {
         JCTree.JCCompilationUnit unit = parse(input, /* allowStringFolding= */ false);
         String separator = Newlines.guessLineSeparator(input);
 
         // Paths to string literals that extend past the column limit.
         List<TreePath> toFix = new ArrayList<>();
+        @SuppressWarnings({"for-rollout:DifferentNameButSame", "for-rollout:UnnecessaryFinal"})
         final Position.LineMap lineMap = unit.getLineMap();
         new TreePathScanner<Void, Void>() {
             @Override
@@ -326,6 +330,7 @@ public final class StringWrapper {
      * Flattens the given binary expression tree, and extracts the subset that contains the given path and any adjacent
      * nodes that are also string literals.
      */
+    @SuppressWarnings({"for-rollout:DifferentNameButSame", "for-rollout:PreferredInterfaceType"})
     private static List<Tree> flatten(
             String input, JCTree.JCCompilationUnit unit, TreePath path, TreePath parent, AtomicBoolean firstInChain) {
         List<Tree> flat = new ArrayList<>();

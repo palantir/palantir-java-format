@@ -30,6 +30,7 @@ import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
 public final class NativePalantirJavaFormatStep {
+    @SuppressWarnings("for-rollout:NonFinalStaticField")
     private static Logger logger = Logging.getLogger(NativePalantirJavaFormatStep.class);
 
     private NativePalantirJavaFormatStep() {}

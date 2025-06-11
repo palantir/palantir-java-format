@@ -153,6 +153,7 @@ public class SnippetFormatter {
         return replacements;
     }
 
+    @SuppressWarnings({"for-rollout:StatementSwitchToExpressionSwitch", "for-rollout:UnnecessaryDefaultInEnumSwitch"})
     private SnippetWrapper snippetWrapper(SnippetKind kind, String source, int initialIndent) {
         /*
          * Synthesize a dummy class around the code snippet provided by Eclipse. The

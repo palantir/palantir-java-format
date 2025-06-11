@@ -42,6 +42,7 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 @ExtendWith(ParameterizedClass.class)
 public final class PartialFormattingTest {
 
+    @SuppressWarnings("for-rollout:PreferredInterfaceType")
     @ParameterizedClass.Parameters
     public static List<Object[]> parameters() {
         return ImmutableList.copyOf(new Object[][] {{"\n"}, {"\r"}, {"\r\n"}});

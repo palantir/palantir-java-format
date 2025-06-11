@@ -69,6 +69,7 @@ final class FormatDiff {
     }
 
     /** Parses the filenames and edited ranges out of `git diff -U0`. */
+    @SuppressWarnings("for-rollout:SystemOut")
     @VisibleForTesting
     static Stream<SingleFileDiff> parseGitDiffOutput(String gitOutput) {
         return Streams.stream(Splitter.on(SEPARATOR).omitEmptyStrings().split(gitOutput))
@@ -96,6 +97,7 @@ final class FormatDiff {
                 });
     }
 
+    @SuppressWarnings("for-rollout:SystemOut")
     private static void format(FormatterService formatter, SingleFileDiff diff) {
         String input;
         try {
@@ -161,6 +163,7 @@ final class FormatDiff {
         Iterators.addAll(lines, new LineOffsetIterator(input));
         lines.add(input.length() + 1);
 
+        @SuppressWarnings("for-rollout:UnnecessaryFinal")
         final RangeSet<Integer> characterRanges = TreeRangeSet.create();
         for (Range<Integer> lineRange :
                 lineRanges.subRangeSet(Range.closedOpen(0, lines.size() - 1)).asRanges()) {
