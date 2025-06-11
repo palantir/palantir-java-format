@@ -73,6 +73,7 @@ public final class PalantirJavaFormatStep {
         }
     }
 
+    @SuppressWarnings("for-rollout:ThrowSpecificExceptions")
     private static void ensureImplementationNotDirectlyLoadable() {
         try {
             PalantirJavaFormatStep.class.getClassLoader().loadClass(IMPL_CLASS);

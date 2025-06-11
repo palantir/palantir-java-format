@@ -100,6 +100,7 @@ public class MainTest {
         } catch (UnsupportedOperationException e) {
             return;
         }
+        @SuppressWarnings("for-rollout:SystemOut")
         Main main = new Main(
                 new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out, UTF_8)), true),
                 new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.err, UTF_8)), true),
@@ -155,6 +156,7 @@ public class MainTest {
         };
         InputStream in = new ByteArrayInputStream(joiner.join(input).getBytes(UTF_8));
         StringWriter out = new StringWriter();
+        @SuppressWarnings("for-rollout:SystemOut")
         Main main = new Main(
                 new PrintWriter(out, true),
                 new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.err, UTF_8)), true),
@@ -190,6 +192,7 @@ public class MainTest {
         };
         InputStream in = new ByteArrayInputStream(joiner.join(input).getBytes(UTF_8));
         StringWriter out = new StringWriter();
+        @SuppressWarnings("for-rollout:SystemOut")
         Main main = new Main(
                 new PrintWriter(out, true),
                 new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.err, UTF_8)), true),
@@ -230,6 +233,7 @@ public class MainTest {
 
         InputStream in = new ByteArrayInputStream(joiner.join(input).getBytes(UTF_8));
         StringWriter out = new StringWriter();
+        @SuppressWarnings("for-rollout:SystemOut")
         Main main = new Main(
                 new PrintWriter(out, true),
                 new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.err, UTF_8)), true),
@@ -258,6 +262,7 @@ public class MainTest {
             "}",
         };
         StringWriter out = new StringWriter();
+        @SuppressWarnings("for-rollout:SystemOut")
         Main main = new Main(
                 new PrintWriter(out, true),
                 new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.err, UTF_8)), true),
@@ -484,6 +489,7 @@ public class MainTest {
         };
         InputStream in = new ByteArrayInputStream(joiner.join(input).getBytes(UTF_8));
         StringWriter out = new StringWriter();
+        @SuppressWarnings("for-rollout:SystemOut")
         Main main = new Main(
                 new PrintWriter(out, true),
                 new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.err, UTF_8)), true),
@@ -510,6 +516,7 @@ public class MainTest {
         };
         InputStream in = new ByteArrayInputStream(joiner.join(input).getBytes(UTF_8));
         StringWriter out = new StringWriter();
+        @SuppressWarnings("for-rollout:SystemOut")
         Main main = new Main(
                 new PrintWriter(out, true),
                 new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.err, UTF_8)), true),

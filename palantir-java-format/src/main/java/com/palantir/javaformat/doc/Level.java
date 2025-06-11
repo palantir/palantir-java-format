@@ -113,10 +113,15 @@ public final class Level extends Doc {
     }
 
     @Override
-    public State computeBreaks(CommentsHelper commentsHelper, int maxWidth, State state, Obs.ExplorationNode observer) {
+    public State computeBreaks(
+            CommentsHelper commentsHelper,
+            int maxWidth,
+            State state,
+            @SuppressWarnings("for-rollout:DifferentNameButSame") Obs.ExplorationNode observer) {
         return tryToFitOnOneLine(maxWidth, state, docs)
                 .map(newWidth -> state.withColumn(newWidth).withLevelState(this, ImmutableLevelState.of(true)))
                 .orElseGet(() -> {
+                    @SuppressWarnings("for-rollout:DifferentNameButSame")
                     Obs.LevelNode childLevel = observer.newChildNode(this, state);
                     State newState =
                             getBreakBehaviour().match(new BreakImpl(commentsHelper, maxWidth, state, childLevel));
@@ -168,9 +173,15 @@ public final class Level extends Doc {
         private final CommentsHelper commentsHelper;
         private final int maxWidth;
         private final State state;
+
+        @SuppressWarnings("for-rollout:DifferentNameButSame")
         private final Obs.LevelNode levelNode;
 
-        public BreakImpl(CommentsHelper commentsHelper, int maxWidth, State state, Obs.LevelNode levelNode) {
+        public BreakImpl(
+                CommentsHelper commentsHelper,
+                int maxWidth,
+                State state,
+                @SuppressWarnings("for-rollout:DifferentNameButSame") Obs.LevelNode levelNode) {
             this.commentsHelper = commentsHelper;
             this.maxWidth = maxWidth;
             this.state = state;
@@ -192,10 +203,12 @@ public final class Level extends Doc {
             // breaks if the outcome is the same.
             State state = this.state.withNewBranch();
 
+            @SuppressWarnings("for-rollout:DifferentNameButSame")
             Obs.Exploration broken = breakNormally(state);
 
             if (state.branchingCoefficient() < MAX_BRANCHING_COEFFICIENT) {
                 State state1 = state.withNoIndent();
+                @SuppressWarnings("for-rollout:DifferentNameButSame")
                 Optional<Obs.Exploration> lastLevelBroken = levelNode.maybeExplore(
                         "tryBreakLastLevel",
                         state1,
@@ -230,6 +243,7 @@ public final class Level extends Doc {
 
         @Override
         public State inlineSuffix() {
+            @SuppressWarnings("for-rollout:DifferentNameButSame")
             Optional<Obs.Exploration> lastLevelBroken = levelNode.maybeExplore(
                     "inlineSuffix",
                     state,
@@ -265,7 +279,7 @@ public final class Level extends Doc {
             State state,
             State brokenState,
             boolean keepIndent,
-            Obs.ExplorationNode explorationNode) {
+            @SuppressWarnings("for-rollout:DifferentNameButSame") Obs.ExplorationNode explorationNode) {
 
         // Note: we are not checking if the brokenState produced one extra line compared to state, as this can be
         // misleading if there is no level but a single comment that got reflowed onto multiple lines (see palantir-11).
@@ -302,7 +316,7 @@ public final class Level extends Doc {
             int maxWidth,
             State state,
             boolean keepIndent,
-            Obs.ExplorationNode explorationNode) {
+            @SuppressWarnings("for-rollout:DifferentNameButSame") Obs.ExplorationNode explorationNode) {
         // Find the last level, skipping empty levels (that contain nothing, or are made up
         // entirely of other empty levels).
         // Last level because there might be other in-between levels after the initial break like `new
@@ -376,6 +390,7 @@ public final class Level extends Doc {
                 commentsHelper, maxWidth, state, explorationNode, lastLevelBeforeSuffix, isSimpleInliningSoFar);
     }
 
+    @SuppressWarnings("for-rollout:ThrowSpecificExceptions")
     private Optional<State> tryBreakInnerLevel(
             CommentsHelper commentsHelper,
             int maxWidth,
@@ -472,7 +487,11 @@ public final class Level extends Doc {
                 .markAccepted());
     }
 
-    @SuppressWarnings("for-rollout:NullAway")
+    @SuppressWarnings({
+        "for-rollout:NullAway",
+        "for-rollout:ThrowSpecificExceptions",
+        "for-rollout:UnnecessaryDefaultInEnumSwitch"
+    })
     private static Optional<State> tryBreakInnerLevel_checkInner(
             CommentsHelper commentsHelper,
             int maxWidth,
@@ -570,13 +589,14 @@ public final class Level extends Doc {
             int maxWidth,
             State state,
             SplitsBreaks splitsBreaks,
-            Obs.ExplorationNode explorationNode) {
+            @SuppressWarnings("for-rollout:DifferentNameButSame") Obs.ExplorationNode explorationNode) {
 
         for (int i = 0; i < splitsBreaks.splits().size(); ++i) {
             if (i > 0) {
                 state = splitsBreaks.breaks().get(i - 1).computeBreaks(state, false);
             }
 
+            @SuppressWarnings("for-rollout:PreferredInterfaceType")
             List<Doc> split = splitsBreaks.splits().get(i);
             float splitWidth = getWidth(split);
             boolean enoughRoom = state.column() + splitWidth <= maxWidth;
@@ -606,7 +626,10 @@ public final class Level extends Doc {
 
     /** Compute breaks for a {@link Level} that spans multiple lines. */
     private State computeBroken(
-            CommentsHelper commentsHelper, int maxWidth, State state, Obs.ExplorationNode explorationNode) {
+            CommentsHelper commentsHelper,
+            int maxWidth,
+            State state,
+            @SuppressWarnings("for-rollout:DifferentNameButSame") Obs.ExplorationNode explorationNode) {
         SplitsBreaks splitsBreaks = memoizedSplitsBreaks.get();
 
         if (!splitsBreaks.breaks().isEmpty()) {
@@ -637,7 +660,7 @@ public final class Level extends Doc {
             State state,
             Optional<Break> optBreakDoc,
             List<Doc> split,
-            Obs.ExplorationNode explorationNode) {
+            @SuppressWarnings("for-rollout:DifferentNameButSame") Obs.ExplorationNode explorationNode) {
         float breakWidth = optBreakDoc.isPresent() ? optBreakDoc.get().getWidth() : 0.0F;
         float splitWidth = getWidth(split);
 
@@ -663,7 +686,7 @@ public final class Level extends Doc {
             int maxWidth,
             List<Doc> docs,
             State state,
-            Obs.ExplorationNode explorationNode) {
+            @SuppressWarnings("for-rollout:DifferentNameButSame") Obs.ExplorationNode explorationNode) {
         for (Doc doc : docs) {
             state = doc.computeBreaks(commentsHelper, maxWidth, state, explorationNode);
         }

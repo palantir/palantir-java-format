@@ -37,7 +37,7 @@ public class Java21InputAstVisitor extends Java14InputAstVisitor {
     }
 
     @Override
-    protected ExpressionTree getGuard(final CaseTree node) {
+    protected ExpressionTree getGuard(@SuppressWarnings("for-rollout:UnnecessaryFinal") final CaseTree node) {
         return node.getGuard();
     }
 

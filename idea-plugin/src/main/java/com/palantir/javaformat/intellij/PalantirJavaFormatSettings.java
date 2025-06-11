@@ -113,6 +113,7 @@ public class PalantirJavaFormatSettings implements PersistentStateComponent<Pala
         return Optional.ofNullable(FormatterProvider.getPluginDescriptor().getVersion());
     }
 
+    @SuppressWarnings("for-rollout:ThrowSpecificExceptions")
     Optional<String> computeFormatterVersion() {
         return getImplementationClassPath().map(classpath -> classpath.stream()
                 .flatMap(uri -> {
@@ -179,7 +180,7 @@ public class PalantirJavaFormatSettings implements PersistentStateComponent<Pala
             }
         }
 
-        @SuppressWarnings("for-rollout:NullAway")
+        @SuppressWarnings({"for-rollout:NullAway", "for-rollout:StatementSwitchToExpressionSwitch"})
         public String getEnabled() {
             switch (enabled) {
                 case ENABLED:

@@ -96,7 +96,7 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
         }
     }
 
-    @SuppressWarnings("for-rollout:NullAway")
+    @SuppressWarnings({"for-rollout:NullAway", "for-rollout:ThrowSpecificExceptions"})
     @Override
     public Void visitBindingPattern(BindingPatternTree node, Void unused) {
         sync(node);
@@ -221,6 +221,7 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
         if (node.getMembers() == null) {
             token(";");
         } else {
+            @SuppressWarnings("for-rollout:PreferredInterfaceType")
             List<Tree> members = node.getMembers().stream()
                     .filter(t -> (TreeInfo.flags((JCTree) t) & Flags.GENERATED_MEMBER) == 0)
                     .collect(toImmutableList());
@@ -229,6 +230,7 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
         dropEmptyDeclarations();
     }
 
+    @SuppressWarnings("for-rollout:DifferentNameButSame")
     private static ImmutableList<JCTree.JCVariableDecl> recordVariables(ClassTree node) {
         return node.getMembers().stream()
                 .filter(JCTree.JCVariableDecl.class::isInstance)
@@ -256,7 +258,7 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
         return null;
     }
 
-    @SuppressWarnings("for-rollout:NullAway")
+    @SuppressWarnings({"for-rollout:NullAway", "for-rollout:UnnecessaryDefaultInEnumSwitch"})
     @Override
     public Void visitCase(CaseTree node, Void unused) {
         sync(node);
@@ -290,6 +292,7 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
             builder.close();
         }
 
+        @SuppressWarnings("for-rollout:UnnecessaryFinal")
         final ExpressionTree guard = getGuard(node);
         if (guard != null) {
             builder.breakToFill(" ");
@@ -362,6 +365,7 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
         }
     }
 
+    @SuppressWarnings("for-rollout:ThrowSpecificExceptions")
     private static Object invoke(Method m, Object target) {
         try {
             return m.invoke(target);
@@ -371,7 +375,7 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
     }
 
     @SuppressWarnings({"NullableProblems", "for-rollout:NullAway"})
-    protected ExpressionTree getGuard(final CaseTree node) {
+    protected ExpressionTree getGuard(@SuppressWarnings("for-rollout:UnnecessaryFinal") final CaseTree node) {
         return null;
     }
 }
