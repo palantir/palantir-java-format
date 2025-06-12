@@ -27,10 +27,9 @@ import java.util.stream.Collectors
 import java.util.stream.Stream
 
 class ConfigurationCacheTest extends IntegrationTestKitSpec {
-    GradlewExecutor executor
-
     private static final CLASSPATH_FILE = new File("build/impl.classpath").absolutePath
 
+    private GradlewExecutor executor
 
     def setup() {
         definePluginOutsideOfPluginBlock = true
@@ -54,17 +53,13 @@ class ConfigurationCacheTest extends IntegrationTestKitSpec {
              }
          }
          
+
+         apply plugin: 'java'
          apply plugin: 'com.palantir.baseline'
          apply plugin: 'com.palantir.consistent-versions'
          apply plugin: 'com.palantir.baseline-java-versions'
+         apply plugin: 'com.palantir.java-format'
 
-        allprojects {
-            apply plugin: 'com.palantir.java-format'
-            
-            repositories {
-                mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
-            }
-        }
         version = '0.1.0'
         """.stripIndent(true)
 
@@ -81,7 +76,7 @@ class ConfigurationCacheTest extends IntegrationTestKitSpec {
         """.stripIndent()
 
         when:
-        def result = executor.runGradlewTasks('build', '--configuration-cache', '--info')
+        def result = executor.runGradlewTasks('classes', '--configuration-cache', '--info')
 
         then:
         assert result.success
