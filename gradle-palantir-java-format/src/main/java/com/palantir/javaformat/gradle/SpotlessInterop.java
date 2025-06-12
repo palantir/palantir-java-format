@@ -51,12 +51,18 @@ final class SpotlessInterop {
             return NativePalantirJavaFormatStep.create(project.getRootProject()
                     .getConfigurations()
                     .getByName(NativeImageFormatProviderPlugin.NATIVE_CONFIGURATION_NAME));
+        } else {
+            logger.info("Using the Java-based formatter {}", JavaVersion.current());
+            return PalantirJavaFormatStep.create(
+                    project.getRootProject()
+                            .getConfigurations()
+                            .getByName(PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME),
+                    project.getRootProject().getExtensions().getByType(JavaFormatExtension.class));
         }
-        logger.info("Using the Java-based formatter {}", JavaVersion.current());
-        return PalantirJavaFormatStep.create(
-                project.getRootProject()
-                        .getConfigurations()
-                        .getByName(PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME),
-                project.getRootProject().getExtensions().getByType(JavaFormatExtension.class));
+    }
+
+    static void assertFormattersNotOnClasspath() {
+        // TODO(okelvin): is this needed for the native-image formatter as well?
+        PalantirJavaFormatStep.assertClassIsNotLoadable();
     }
 }

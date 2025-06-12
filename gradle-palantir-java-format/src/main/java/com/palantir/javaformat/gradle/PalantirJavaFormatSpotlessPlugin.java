@@ -19,6 +19,10 @@ import com.google.common.collect.ImmutableList;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
+/**
+ * Adds the spotless steps
+ * The formatters are lazily loaded
+ */
 public class PalantirJavaFormatSpotlessPlugin implements Plugin<Project> {
     // The spotless gradle plugin got renamed to 'com.diffplug.spotless' at version 5.0.0
     private static final ImmutableList<String> SPOTLESS_PLUGINS =
@@ -34,5 +38,11 @@ public class PalantirJavaFormatSpotlessPlugin implements Plugin<Project> {
                         SpotlessInterop.addSpotlessJavaStep(project);
                     }));
         });
+
+        //        assertFormattersNotOnClasspath();
+    }
+
+    public void assertFormattersNotOnClasspath() {
+        SpotlessInterop.assertFormattersNotOnClasspath();
     }
 }

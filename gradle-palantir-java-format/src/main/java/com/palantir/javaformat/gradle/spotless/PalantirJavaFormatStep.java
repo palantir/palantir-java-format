@@ -36,10 +36,10 @@ public final class PalantirJavaFormatStep {
 
     /** Creates a step which formats everything - code, import order, and unused imports. */
     public static FormatterStep create(Configuration palantirJavaFormat, JavaFormatExtension extension) {
-        ensureImplementationNotDirectlyLoadable();
+        assertClassIsNotLoadable();
         Supplier<FormatterService> memoizedService = extension::serviceLoad;
         return FormatterStep.createLazy(
-                NAME, () -> new State(palantirJavaFormat.getFiles(), memoizedService), State::createFormat);
+                NAME, () -> new State(palantirJavaFormat::getFiles, memoizedService), State::createFormat);
     }
 
     static final class State implements Serializable {
@@ -51,7 +51,9 @@ public final class PalantirJavaFormatStep {
 
         // Kept for state serialization purposes.
         @SuppressWarnings({"unused", "FieldCanBeLocal"})
-        private final FileSignature jarsSignature;
+        private FileSignature jarsSignature;
+
+        private final transient Supplier<Iterable<File>> jarsSupplier;
 
         // Transient as this is not serializable.
         private final transient Supplier<FormatterService> memoizedFormatter;
@@ -59,22 +61,31 @@ public final class PalantirJavaFormatStep {
         /**
          * Build a cacheable state for spotless from the given jars, that uses the given {@link FormatterService}.
          *
-         * @param jars The jars that contain the palantir-java-format implementation. This is only used for caching and
+         * @param jarsSupplier Supplies the jars that contain the palantir-java-format implementation. This is only used for caching and
          * up-to-dateness purposes.
          */
-        State(Iterable<File> jars, Supplier<FormatterService> memoizedFormatter) throws IOException {
-            this.jarsSignature = FileSignature.signAsSet(jars);
+        State(Supplier<Iterable<File>> jarsSupplier, Supplier<FormatterService> memoizedFormatter) {
+            this.jarsSupplier = jarsSupplier;
             this.memoizedFormatter = memoizedFormatter;
         }
 
         @SuppressWarnings("NullableProblems")
         FormatterFunc createFormat() {
-            return memoizedFormatter.get()::formatSourceReflowStringsAndFixImports;
+            return input -> {
+                try {
+                    // Only resolve the jars and compute the signature at execution time!
+                    Iterable<File> jars = jarsSupplier.get();
+                    this.jarsSignature = FileSignature.signAsSet(jars);
+                    return memoizedFormatter.get().formatSourceReflowStringsAndFixImports(input);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            };
         }
     }
 
     @SuppressWarnings("for-rollout:ThrowSpecificExceptions")
-    private static void ensureImplementationNotDirectlyLoadable() {
+    public static void assertClassIsNotLoadable() {
         try {
             PalantirJavaFormatStep.class.getClassLoader().loadClass(IMPL_CLASS);
         } catch (ClassNotFoundException e) {

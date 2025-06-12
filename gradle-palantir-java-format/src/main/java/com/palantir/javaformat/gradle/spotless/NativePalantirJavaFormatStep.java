@@ -25,13 +25,13 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.function.Supplier;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
 public final class NativePalantirJavaFormatStep {
-    @SuppressWarnings("for-rollout:NonFinalStaticField")
-    private static Logger logger = Logging.getLogger(NativePalantirJavaFormatStep.class);
+    private static final Logger logger = Logging.getLogger(NativePalantirJavaFormatStep.class);
 
     private NativePalantirJavaFormatStep() {}
 
@@ -39,28 +39,23 @@ public final class NativePalantirJavaFormatStep {
 
     /** Creates a step which formats everything - code, import order, and unused imports. */
     public static FormatterStep create(Configuration configuration) {
-        return FormatterStep.createLazy(
-                NAME,
-                () -> {
-                    File execFile = configuration.getSingleFile();
-                    logger.info("Using native-image at {}", configuration.getSingleFile());
-                    return new State(FileSignature.signAsSet(execFile));
-                },
-                State::createFormat);
+        return FormatterStep.createLazy(NAME, () -> new State(configuration::getSingleFile), State::createFormat);
     }
 
     static class State implements Serializable {
         private static final long serialVersionUID = 1L;
 
-        final FileSignature pathToExe;
+        private final transient Supplier<File> execSupplier;
 
-        State(FileSignature pathToExe) {
-            this.pathToExe = pathToExe;
+        State(Supplier<File> supplier) {
+            this.execSupplier = supplier;
         }
 
         String format(ProcessRunner runner, String input) throws IOException, InterruptedException {
-            List<String> argumentsWithPathToExe =
-                    List.of(pathToExe.getOnlyFile().getAbsolutePath(), "--palantir", "-");
+            File execFile = execSupplier.get();
+            logger.info("Using native-image at {}", execFile);
+            File signedFile = FileSignature.signAsSet(execFile).getOnlyFile();
+            List<String> argumentsWithPathToExe = List.of(signedFile.getAbsolutePath(), "--palantir", "-");
             return runner.exec(input.getBytes(StandardCharsets.UTF_8), argumentsWithPathToExe)
                     .assertExitZero(StandardCharsets.UTF_8);
         }
