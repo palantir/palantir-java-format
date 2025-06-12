@@ -54,6 +54,7 @@ public class DiagnosticTest {
 
     @Test
     public void parseError() throws Exception {
+        @SuppressWarnings("for-rollout:StringConcatToTextBlock")
         String input = Joiner.on('\n')
                 .join(
                         "public class InvalidSyntax {",

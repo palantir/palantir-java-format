@@ -101,6 +101,7 @@ class DimensionHelpers {
      *
      * <p>Given {@code int @A @B [][] @C []}, adds {@code [[@A, @B], [@C]]} to dims and returns {@code int}.
      */
+    @SuppressWarnings("for-rollout:InconsistentOverloads")
     private static Tree extractDims(Deque<List<AnnotationTree>> dims, Tree node) {
         switch (node.getKind()) {
             case ARRAY_TYPE:

@@ -30,6 +30,7 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 @Execution(ExecutionMode.CONCURRENT)
 @ExtendWith(ParameterizedClass.class)
 public class ArrayDimensionTest {
+    @SuppressWarnings("for-rollout:PreferredInterfaceType")
     @ParameterizedClass.Parameters
     public static Iterable<Object[]> parameters() {
         String[] inputs = {

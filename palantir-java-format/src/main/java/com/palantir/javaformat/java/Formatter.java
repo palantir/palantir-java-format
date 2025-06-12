@@ -118,7 +118,10 @@ public final class Formatter {
      * @return javaOutput the output produced
      */
     static JavaOutput format(
-            final JavaInput javaInput, JavaFormatterOptions options, CommentsHelper commentsHelper, boolean debugMode)
+            @SuppressWarnings("for-rollout:UnnecessaryFinal") final JavaInput javaInput,
+            JavaFormatterOptions options,
+            CommentsHelper commentsHelper,
+            boolean debugMode)
             throws FormatterException {
 
         Context context = new Context();
@@ -163,10 +166,12 @@ public final class Formatter {
         return javaOutput;
     }
 
+    @SuppressWarnings("for-rollout:ThrowSpecificExceptions")
     static JCCompilationUnit parseJcCompilationUnit(Context context, String sourceText) throws FormatterException {
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
         context.put(DiagnosticListener.class, diagnostics);
         Options.instance(context).put("--enable-preview", "true");
+        @SuppressWarnings("for-rollout:InitializeInline")
         JCCompilationUnit unit;
         JavacFileManager fileManager = new JavacFileManager(context, true, UTF_8);
         try {
@@ -176,6 +181,7 @@ public final class Formatter {
             throw new RuntimeException(e);
         }
         SimpleJavaFileObject source = new SimpleJavaFileObject(URI.create("source"), JavaFileObject.Kind.SOURCE) {
+            @SuppressWarnings({"for-rollout:CheckedExceptionNotThrown", "for-rollout:PreferredInterfaceType"})
             @Override
             public CharSequence getCharContent(boolean ignoreEncodingErrors) throws IOException {
                 return sourceText;
@@ -203,7 +209,9 @@ public final class Formatter {
 
     @SuppressWarnings("for-rollout:ThrowError")
     private static JavaInputAstVisitor createVisitor(
-            final String className, final OpsBuilder builder, final JavaFormatterOptions options) {
+            @SuppressWarnings("for-rollout:UnnecessaryFinal") final String className,
+            @SuppressWarnings("for-rollout:UnnecessaryFinal") final OpsBuilder builder,
+            @SuppressWarnings("for-rollout:UnnecessaryFinal") final JavaFormatterOptions options) {
         try {
             return Class.forName(className)
                     .asSubclass(JavaInputAstVisitor.class)

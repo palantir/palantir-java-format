@@ -63,6 +63,7 @@ public final class ImportOrderer {
     }
 
     private String reorderImports() throws FormatterException {
+        @SuppressWarnings("for-rollout:InitializeInline")
         int firstImportStart;
         Optional<Integer> maybeFirstImport = findIdentifier(0, IMPORT_OR_CLASS_START);
         if (!maybeFirstImport.isPresent() || !tokenAt(maybeFirstImport.get()).equals("import")) {

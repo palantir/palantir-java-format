@@ -100,6 +100,7 @@ final class FormatterProvider {
         // Use "in-process" formatter service
         log.info("Using in-process formatter for jdk version {}", jdkMajorVersion);
         URL[] implementationUrls = toUrlsUnchecked(implementationClasspath);
+        @SuppressWarnings("for-rollout:BanClassLoader")
         ClassLoader classLoader = new URLClassLoader(implementationUrls, FormatterService.class.getClassLoader());
         return ServiceLoader.load(FormatterService.class, classLoader).findFirst();
     }
@@ -195,6 +196,7 @@ final class FormatterProvider {
         return Optional.ofNullable(ProjectRootManager.getInstance(project).getProjectSdk());
     }
 
+    @SuppressWarnings("for-rollout:ThrowSpecificExceptions")
     private static URL[] toUrlsUnchecked(List<Path> paths) {
         return paths.stream()
                 .map(path -> {
@@ -207,6 +209,7 @@ final class FormatterProvider {
                 .toArray(URL[]::new);
     }
 
+    @SuppressWarnings("for-rollout:ThrowSpecificExceptions")
     private static List<Path> listDirAsUrlsUnchecked(Path dir) {
         try (Stream<Path> list = Files.list(dir)) {
             return list.collect(Collectors.toList());

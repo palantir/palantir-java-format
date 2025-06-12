@@ -29,6 +29,7 @@ public final class FormatterDiagnostic {
         return new FormatterDiagnostic(-1, -1, message);
     }
 
+    @SuppressWarnings("for-rollout:InconsistentOverloads")
     public static FormatterDiagnostic create(int lineNumber, int column, String message) {
         checkArgument(lineNumber >= 0);
         checkArgument(column >= 0);

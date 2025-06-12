@@ -41,6 +41,7 @@ public class GoogleImportStyleTest {
         this.reordered = reordered;
     }
 
+    @SuppressWarnings("for-rollout:PreferredInterfaceType")
     @ParameterizedClass.Parameters(name = "{index}: {0}")
     public static List<Object[]> parameters() {
         // Inputs are provided as three-dimensional arrays. Each element of the outer array is a test

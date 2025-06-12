@@ -19,7 +19,8 @@ import static com.google.common.truth.Truth.assertThat;
 import com.google.common.base.Joiner;
 
 public final class ImportOrdererUtils {
-    public static Object[] createRow(String[][] inputAndOutput) {
+    @SuppressWarnings("for-rollout:AvoidObjectArrays")
+    public static Object[] createRow(@SuppressWarnings("for-rollout:AvoidObjectArrays") String[][] inputAndOutput) {
         assertThat(inputAndOutput).hasLength(2);
         String[] input = inputAndOutput[0];
         String[] output = inputAndOutput[1];

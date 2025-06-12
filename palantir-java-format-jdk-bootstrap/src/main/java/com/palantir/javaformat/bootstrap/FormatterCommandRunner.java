@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 final class FormatterCommandRunner {
     private static final Pattern SYNTAX_ERROR_PATTERN = Pattern.compile(":\\d+:\\d+:\\serror:\\s");
 
+    @SuppressWarnings("for-rollout:ThrowSpecificExceptions")
     static Optional<String> runWithStdin(List<String> command, String input, Optional<Path> workingDirectory)
             throws IOException {
         ProcessBuilder processBuilder = new ProcessBuilder().command(command);
