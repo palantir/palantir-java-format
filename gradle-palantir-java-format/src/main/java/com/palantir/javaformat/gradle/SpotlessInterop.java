@@ -29,6 +29,7 @@ import org.gradle.api.logging.Logging;
  * {@link com.palantir.javaformat.gradle.PalantirJavaFormatSpotlessPlugin} even if spotless is not on the classpath.
  */
 final class SpotlessInterop {
+    @SuppressWarnings("for-rollout:NonFinalStaticField")
     private static Logger logger = Logging.getLogger(SpotlessInterop.class);
 
     private SpotlessInterop() {}

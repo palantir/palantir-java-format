@@ -44,12 +44,15 @@ import java.util.stream.Collectors;
 
 public class DebugRenderer {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+    @SuppressWarnings("for-rollout:NonFinalStaticField")
     private static Path publicDir = Paths.get("../debugger/public");
 
     static Path getOutputFile() {
         return publicDir.resolve("output.js");
     }
 
+    @SuppressWarnings("for-rollout:ThrowSpecificExceptions")
     static void render(
             JavaInput javaInput,
             OpsOutput opsOutput,
@@ -83,6 +86,7 @@ public class DebugRenderer {
         return output.toString();
     }
 
+    @SuppressWarnings("for-rollout:ThrowSpecificExceptions")
     private static String opsJson(OpsOutput opsOutput) {
         ArrayNode arrayNode = OBJECT_MAPPER.createArrayNode();
 
@@ -144,6 +148,7 @@ public class DebugRenderer {
         }
     }
 
+    @SuppressWarnings("for-rollout:ThrowSpecificExceptions")
     private static String jsonEscapedString(String javaInput) {
         try {
             return OBJECT_MAPPER.writeValueAsString(javaInput);

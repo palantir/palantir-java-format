@@ -37,6 +37,7 @@ public final class NoopSink implements Sink {
         return acceptedExplorationId -> {};
     }
 
+    @SuppressWarnings("for-rollout:ThrowSpecificExceptions")
     @Override
     public String getOutput() {
         throw new RuntimeException("Not supposed to get the output");

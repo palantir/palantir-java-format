@@ -41,11 +41,13 @@ import org.gradle.api.provider.Provider;
  */
 public abstract class ExecutableTransform implements TransformAction<TransformParameters.None> {
 
+    @SuppressWarnings("for-rollout:NonFinalStaticField")
     private static Logger logger = Logging.getLogger(ExecutableTransform.class);
 
     @InputArtifact
     public abstract Provider<FileSystemLocation> getInputArtifact();
 
+    @SuppressWarnings("for-rollout:ThrowSpecificExceptions")
     @Override
     public void transform(TransformOutputs outputs) {
         File inputFile = getInputArtifact().get().getAsFile();
@@ -58,6 +60,7 @@ public abstract class ExecutableTransform implements TransformAction<TransformPa
         }
     }
 
+    @SuppressWarnings("for-rollout:ThrowSpecificExceptions")
     private static void makeFileExecutable(Path pathToExe) {
         try {
             Set<PosixFilePermission> existingPermissions = Files.getPosixFilePermissions(pathToExe);

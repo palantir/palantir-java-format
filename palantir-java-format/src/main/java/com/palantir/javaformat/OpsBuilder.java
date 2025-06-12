@@ -52,7 +52,7 @@ public final class OpsBuilder {
         Input.Token startToken = input.getPositionTokenMap().get(position);
         @SuppressWarnings("for-rollout:NullAway")
         int start = startToken.getTok().getPosition();
-        for (Input.Tok tok : startToken.getToksBefore()) {
+        for (@SuppressWarnings("for-rollout:DifferentNameButSame") Input.Tok tok : startToken.getToksBefore()) {
             if (tok.isComment()) {
                 start = Math.min(start, tok.getPosition());
             }
@@ -60,7 +60,7 @@ public final class OpsBuilder {
         Input.Token endToken = input.getPositionTokenMap().get(position + length - 1);
         @SuppressWarnings("for-rollout:NullAway")
         int end = endToken.getTok().getPosition() + endToken.getTok().length();
-        for (Input.Tok tok : endToken.getToksAfter()) {
+        for (@SuppressWarnings("for-rollout:DifferentNameButSame") Input.Tok tok : endToken.getToksAfter()) {
             if (tok.isComment()) {
                 end = Math.max(end, tok.getPosition() + tok.length());
             }
@@ -74,7 +74,7 @@ public final class OpsBuilder {
         @SuppressWarnings("for-rollout:NullAway")
         int start = startToken.getTok().getPosition();
         int line0 = input.getLineNumber(start);
-        for (Input.Tok tok : startToken.getToksBefore()) {
+        for (@SuppressWarnings("for-rollout:DifferentNameButSame") Input.Tok tok : startToken.getToksBefore()) {
             if (line0 != input.getLineNumber(tok.getPosition())) {
                 return start;
             }
@@ -214,6 +214,7 @@ public final class OpsBuilder {
      *
      * @throws FormattingError if any ops were unclosed
      */
+    @SuppressWarnings("for-rollout:DefaultLocale")
     public void checkClosed(int previous) {
         if (depth != previous) {
             throw new FormattingError(diagnostic(String.format("saw %d unclosed ops", depth)));
@@ -246,6 +247,7 @@ public final class OpsBuilder {
     }
 
     /** Output any remaining tokens from the input stream (e.g. terminal whitespace). */
+    @SuppressWarnings("for-rollout:DifferentNameButSame")
     public void drain() {
         int inputPosition = input.getText().length() + 1;
         if (inputPosition > this.inputPosition) {
@@ -280,6 +282,7 @@ public final class OpsBuilder {
      * @param debugName a representative name for this lambda
      * @param plusIndent the extra indent for the new level
      */
+    @SuppressWarnings("for-rollout:InconsistentOverloads")
     public void open(String debugName, Indent plusIndent) {
         add(OpenOp.builder().plusIndent(plusIndent).debugName(debugName).build());
     }
@@ -332,13 +335,15 @@ public final class OpsBuilder {
      *
      * @param token the optional token
      */
+    @SuppressWarnings("for-rollout:DifferentNameButSame")
     public void guessToken(String token) {
         token(token, Token.RealOrImaginary.IMAGINARY, ZERO, /* breakAndIndentTrailingComment=  */ Optional.empty());
     }
 
+    @SuppressWarnings("for-rollout:DifferentNameButSame")
     public void token(
             String token,
-            Token.RealOrImaginary realOrImaginary,
+            @SuppressWarnings("for-rollout:DifferentNameButSame") Token.RealOrImaginary realOrImaginary,
             Indent plusIndentCommentsBefore,
             Optional<Indent> breakAndIndentTrailingComment) {
         ImmutableList<? extends Input.Token> tokens = input.getTokens();
@@ -366,6 +371,7 @@ public final class OpsBuilder {
      *
      * @param op the operator to emit
      */
+    @SuppressWarnings("for-rollout:DifferentNameButSame")
     public void op(String op) {
         int opN = op.length();
         for (int i = 0; i < opN; i++) {
@@ -440,6 +446,7 @@ public final class OpsBuilder {
      * @param flat the {@link Break} when not broken
      * @param plusIndent extra indent if taken
      */
+    @SuppressWarnings("for-rollout:InconsistentOverloads")
     public void breakOp(FillMode fillMode, String flat, Indent plusIndent) {
         breakOp(fillMode, flat, plusIndent, /* optionalTag=  */ Optional.empty());
     }
@@ -452,6 +459,7 @@ public final class OpsBuilder {
      * @param plusIndent extra indent if taken
      * @param optionalTag an optional tag for remembering whether the break was taken
      */
+    @SuppressWarnings("for-rollout:InconsistentOverloads")
     public void breakOp(FillMode fillMode, String flat, Indent plusIndent, Optional<BreakTag> optionalTag) {
         add(Break.make(fillMode, flat, plusIndent, optionalTag));
     }
@@ -491,7 +499,7 @@ public final class OpsBuilder {
     }
 
     private static int getI(Input.Token token) {
-        for (Input.Tok tok : token.getToksBefore()) {
+        for (@SuppressWarnings("for-rollout:DifferentNameButSame") Input.Tok tok : token.getToksBefore()) {
             if (tok.getIndex() >= 0) {
                 return tok.getIndex();
             }
@@ -515,9 +523,11 @@ public final class OpsBuilder {
     }
 
     /** Build a list of {@link Op}s from the {@code OpsBuilder}. */
+    @SuppressWarnings("for-rollout:DifferentNameButSame")
     public OpsOutput build() {
         markForPartialFormat();
         // Rewrite the ops to insert comments.
+        @SuppressWarnings("for-rollout:PreferredInterfaceType")
         Multimap<Integer, Op> tokOps = ArrayListMultimap.create();
         int opsN = ops.size();
         for (int i = 0; i < opsN; i++) {
@@ -547,7 +557,8 @@ public final class OpsBuilder {
                     boolean space = false; // Do we need an extra space after a previous "/*" comment?
                     boolean lastWasComment = false; // Was the last thing we output a comment?
                     boolean allowBlankAfterLastComment = false;
-                    for (Input.Tok tokBefore : token.getToksBefore()) {
+                    for (@SuppressWarnings("for-rollout:DifferentNameButSame")
+                    Input.Tok tokBefore : token.getToksBefore()) {
                         if (tokBefore.isNewline()) {
                             newlines++;
                         } else if (tokBefore.isComment()) {
@@ -589,7 +600,8 @@ public final class OpsBuilder {
 
                     int tokAfterPos = nonNlsCommentsAfterPlus ? k - 1 : k + 1;
 
-                    for (Input.Tok tokAfter : token.getToksAfter()) {
+                    for (@SuppressWarnings("for-rollout:DifferentNameButSame")
+                    Input.Tok tokAfter : token.getToksAfter()) {
                         if (tokAfter.isComment()) {
                             boolean breakAfter = tokAfter.isJavadocComment()
                                     || (tokAfter.isSlashStarComment()
@@ -620,7 +632,8 @@ public final class OpsBuilder {
                      */
                     int newlines = 0;
                     boolean lastWasComment = false;
-                    for (Input.Tok tokBefore : token.getToksBefore()) {
+                    for (@SuppressWarnings("for-rollout:DifferentNameButSame")
+                    Input.Tok tokBefore : token.getToksBefore()) {
                         if (tokBefore.isNewline()) {
                             newlines++;
                         } else if (tokBefore.isComment()) {
@@ -632,7 +645,8 @@ public final class OpsBuilder {
                         }
                         tokOps.put(j, Comment.make(tokBefore));
                     }
-                    for (Input.Tok tokAfter : token.getToksAfter()) {
+                    for (@SuppressWarnings("for-rollout:DifferentNameButSame")
+                    Input.Tok tokAfter : token.getToksAfter()) {
                         tokOps.put(k + 1, Comment.make(tokAfter));
                     }
                 }
@@ -676,7 +690,7 @@ public final class OpsBuilder {
                 .build();
     }
 
-    private static boolean isNonNlsComment(Input.Tok tokAfter) {
+    private static boolean isNonNlsComment(@SuppressWarnings("for-rollout:DifferentNameButSame") Input.Tok tokAfter) {
         return tokAfter.isSlashSlashComment() && tokAfter.getText().contains("$NON-NLS");
     }
 
@@ -684,7 +698,7 @@ public final class OpsBuilder {
         return op instanceof Break && ((Break) op).isForced();
     }
 
-    private static List<Op> makeComment(Input.Tok comment) {
+    private static List<Op> makeComment(@SuppressWarnings("for-rollout:DifferentNameButSame") Input.Tok comment) {
         return comment.isSlashStarComment()
                 ? ImmutableList.of(Comment.make(comment))
                 : ImmutableList.of(Comment.make(comment), Break.makeForced());
