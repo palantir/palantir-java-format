@@ -68,7 +68,7 @@ class SupportsSpotless622 extends IntegrationTestKitSpec {
         """.stripIndent()
 
         when:
-        def result = executor.runGradlewTasks('classes', '--configuration-cache', '--info')
+        def result = executor.runGradlewTasks('classes', '--info')
 
         then:
         assert result.success
