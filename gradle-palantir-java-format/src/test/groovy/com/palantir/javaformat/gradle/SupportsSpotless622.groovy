@@ -22,7 +22,9 @@ import nebula.test.IntegrationTestKitSpec
  * which caused issues with the configuration cache.
  *
  * Bumping spotless to 6.22.0 fixed this, but revealed a new error — the palantirJavaFormat configuration was
- * being resolved eagerly: https://github.com/palantir/palantir-java-format/blob/b7b5995df3be690780939c0d0cb2ec49b99c68c8/gradle-palantir-java-format/src/main/java/com/palantir/javaformat/gradle/spotless/NativePalantirJavaFormatStep.java#L45
+ * being resolved eagerly:
+ * https://github.com/palantir/palantir-java-format/blob/b7b5995df3be690780939c0d0cb2ec49b99c68c8/gradle-palantir-java-format/src/main/java/com/palantir/javaformat/gradle/spotless/NativePalantirJavaFormatStep.java#L45
+
  * gradle-consistent-versions enforces against resolving configurations at configuration time, and throws an error.
  *
  * This test forces creation of the spotless steps, which will reveal any eager resolution of configurations.
