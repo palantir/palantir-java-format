@@ -27,10 +27,13 @@ import java.util.stream.Stream
 
 /**
  * IntegrationTestKitSpec currently [loads more than what it needs into the classpath](https://github.com/nebula-plugins/nebula-test/blob/c5d3af9004898276bde5c68da492c6b0b4c5facc/src/main/groovy/nebula/test/IntegrationTestKitBase.groovy#L136)
- * This means the Formatter is loaded onto the classpath eagerly, [erroneously](https://github.com/palantir/palantir-java-format/blob/00b08d2f471d66382d6c4cd2d05f56b6bb546ad3/gradle-palantir-java-format/src/main/java/com/palantir/javaformat/gradle/spotless/PalantirJavaFormatStep.java#L83).
- * As a workaround, let's use the classpath produced by Gradle Test Kit in plugin-under-test-metadata.properties
+ * This means if we run a test with IntegrationTestKitSpec's runner, the Formatter is loaded onto the classpath eagerly.
+ * If the test applies the PalantirJavaFormatPlugin, [it complains that the Formatter is erroneously loadable](https://github.com/palantir/palantir-java-format/blob/00b08d2f471d66382d6c4cd2d05f56b6bb546ad3/gradle-palantir-java-format/src/main/java/com/palantir/javaformat/gradle/spotless/PalantirJavaFormatStep.java#L83).
+ * To be clear, this complaint is entirely a result of the IntegrationTestKitSpec loading too many things onto classpath.
+ * 
+ * As a workaround, this runner uses the classpath produced by Gradle Test Kit in plugin-under-test-metadata.properties.
  * This classpath only contains the dependencies required by the plugin, as well as the plugin itself.
- * This means no more eager loading of Formatters onto the classpath, no more complaints from PalantirJavaFormatStep
+ * This means no more eager loading of Formatters onto the classpath, no more complaints from PalantirJavaFormatStep.
  */
 class GradlewExecutor {
     private File projectDir
