@@ -44,21 +44,19 @@ class ConfigurationCacheTest extends IntegrationTestKitSpec {
             repositories {
                 mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
                 gradlePluginPortal() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
-                mavenLocal()
             }
              dependencies {
-                 classpath 'com.palantir.baseline:gradle-baseline-java:6.34.0'
                  classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:2.34.0'
-                 classpath 'com.diffplug.spotless:spotless-plugin-gradle:6.22.0'
+
+                 constraints {
+                     classpath 'com.diffplug.spotless:6.22.0'
+                 }
              }
          }
-         
 
          apply plugin: 'java'
-         apply plugin: 'com.palantir.baseline'
-         apply plugin: 'com.palantir.consistent-versions'
-         apply plugin: 'com.palantir.baseline-java-versions'
          apply plugin: 'com.palantir.java-format'
+         apply plugin: 'com.palantir.consistent-versions'
 
         version = '0.1.0'
         """.stripIndent(true)
