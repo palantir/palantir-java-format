@@ -16,14 +16,8 @@
 package com.palantir.javaformat.gradle
 
 import nebula.test.IntegrationTestKitSpec
-import nebula.test.functional.internal.classpath.ClasspathAddingInitScriptBuilder
 import spock.lang.Unroll
 
-import java.nio.charset.StandardCharsets
-import java.nio.file.Path
-import java.util.concurrent.TimeUnit
-import java.util.stream.Collectors
-import java.util.stream.Stream
 
 class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
     /** ./gradlew writeImplClasspath generates this file. */
