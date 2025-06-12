@@ -47,7 +47,6 @@ public class BenchmarkMultiFiles {
 
         final List<String> filesToFormat = getFilesToFormat();
 
-        @SuppressWarnings("for-rollout:ThrowSpecificExceptions")
         private static List<String> getFilesToFormat() {
             Path srcJavaFormatFiles = Paths.get(".")
                     .toAbsolutePath()

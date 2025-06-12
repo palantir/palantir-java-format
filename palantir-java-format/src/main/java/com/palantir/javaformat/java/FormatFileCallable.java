@@ -53,7 +53,6 @@ class FormatFileCallable implements Callable<String> {
         return formatFile(formatter);
     }
 
-    @SuppressWarnings("for-rollout:ThrowSpecificExceptions")
     private String formatReplacements(Formatter formatter) throws FormatterException {
         ImmutableList<Replacement> replacements =
                 formatter.getFormatReplacements(input, characterRanges(input).asRanges());
@@ -84,7 +83,6 @@ class FormatFileCallable implements Callable<String> {
     }
 
     private RangeSet<Integer> characterRanges(String input) {
-        @SuppressWarnings("for-rollout:UnnecessaryFinal")
         final RangeSet<Integer> characterRanges = TreeRangeSet.create();
 
         if (parameters.characterRanges().isEmpty()

@@ -52,7 +52,6 @@ public class DebugRenderer {
         return publicDir.resolve("output.js");
     }
 
-    @SuppressWarnings("for-rollout:ThrowSpecificExceptions")
     static void render(
             JavaInput javaInput,
             OpsOutput opsOutput,
@@ -86,7 +85,6 @@ public class DebugRenderer {
         return output.toString();
     }
 
-    @SuppressWarnings("for-rollout:ThrowSpecificExceptions")
     private static String opsJson(OpsOutput opsOutput) {
         ArrayNode arrayNode = OBJECT_MAPPER.createArrayNode();
 
@@ -148,7 +146,6 @@ public class DebugRenderer {
         }
     }
 
-    @SuppressWarnings("for-rollout:ThrowSpecificExceptions")
     private static String jsonEscapedString(String javaInput) {
         try {
             return OBJECT_MAPPER.writeValueAsString(javaInput);

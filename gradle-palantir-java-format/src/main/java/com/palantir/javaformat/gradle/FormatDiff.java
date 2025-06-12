@@ -163,7 +163,6 @@ final class FormatDiff {
         Iterators.addAll(lines, new LineOffsetIterator(input));
         lines.add(input.length() + 1);
 
-        @SuppressWarnings("for-rollout:UnnecessaryFinal")
         final RangeSet<Integer> characterRanges = TreeRangeSet.create();
         for (Range<Integer> lineRange :
                 lineRanges.subRangeSet(Range.closedOpen(0, lines.size() - 1)).asRanges()) {

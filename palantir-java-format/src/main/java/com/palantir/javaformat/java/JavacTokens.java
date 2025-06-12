@@ -34,7 +34,6 @@ class JavacTokens {
 
     /** The lexer eats terminal comments, so feed it one we don't care about. */
     // TODO(b/33103797): fix javac and remove the work-around
-    @SuppressWarnings("for-rollout:PreferredInterfaceType")
     private static final CharSequence EOF_COMMENT = "\n//EOF";
 
     /** An unprocessed input token, including whitespace and comments. */
@@ -131,7 +130,6 @@ class JavacTokens {
             return new CommentWithTextAndPosition(pos, endPos, new AccessibleReader(fac, buf, buf.length), style);
         }
 
-        @SuppressWarnings("for-rollout:ThrowSpecificExceptions")
         private char[] getRawCharactersReflectively(int beginIndex, int endIndex) {
             Object instance;
             try {

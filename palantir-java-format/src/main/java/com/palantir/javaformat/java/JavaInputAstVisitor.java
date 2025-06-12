@@ -1750,7 +1750,6 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         return true;
     }
 
-    @SuppressWarnings("for-rollout:ThrowSpecificExceptions")
     @Override
     public Void visitPrimitiveType(PrimitiveTypeTree node, Void unused) {
         sync(node);
@@ -2224,7 +2223,6 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         return visitModifiers(modifiersTree.getAnnotations(), annotationsDirection, declarationAnnotationBreak);
     }
 
-    @SuppressWarnings("for-rollout:PreferredInterfaceType")
     private List<Op> visitModifiers(
             List<? extends AnnotationTree> annotationTrees,
             Direction annotationsDirection,
@@ -2946,7 +2944,6 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     }
 
     /** Returns the simple names of expressions in a "." chain. */
-    @SuppressWarnings("for-rollout:PreferredInterfaceType")
     private List<String> simpleNames(Deque<ExpressionTree> stack) {
         ImmutableList.Builder<String> simpleNames = ImmutableList.builder();
         OUTER:
@@ -3210,7 +3207,6 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     private static final Pattern FORMAT_SPECIFIER = Pattern.compile("%|\\{[0-9]\\}");
 
     private boolean isStringConcat(ExpressionTree first) {
-        @SuppressWarnings("for-rollout:UnnecessaryFinal")
         final boolean[] stringConcat = {false};
         new TreeScanner() {
             @Override
@@ -3234,9 +3230,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     }
 
     private boolean isFormatString(ExpressionTree first) {
-        @SuppressWarnings("for-rollout:UnnecessaryFinal")
         final boolean[] stringLiteral = {true};
-        @SuppressWarnings("for-rollout:UnnecessaryFinal")
         final boolean[] formatString = {false};
         new TreeScanner() {
             @Override
@@ -3350,7 +3344,6 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
 
     @SuppressWarnings("for-rollout:NullAway")
     private Integer actualColumn(ExpressionTree expression) {
-        @SuppressWarnings("for-rollout:PreferredInterfaceType")
         Map<Integer, Integer> positionToColumnMap = builder.getInput().getPositionToColumnMap();
         return positionToColumnMap.get(builder.actualStartColumn(getStartPosition(expression)));
     }

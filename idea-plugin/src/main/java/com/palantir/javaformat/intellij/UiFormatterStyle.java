@@ -28,12 +28,9 @@ enum UiFormatterStyle {
 
     private final String description;
 
-    @SuppressWarnings("for-rollout:DifferentNameButSame")
     private final JavaFormatterOptions.Style style;
 
-    UiFormatterStyle(
-            String description,
-            @SuppressWarnings("for-rollout:DifferentNameButSame") JavaFormatterOptions.Style style) {
+    UiFormatterStyle(String description, JavaFormatterOptions.Style style) {
         this.description = description;
         this.style = style;
     }
@@ -43,13 +40,11 @@ enum UiFormatterStyle {
         return description;
     }
 
-    @SuppressWarnings("for-rollout:DifferentNameButSame")
     public JavaFormatterOptions.Style convert() {
         return style;
     }
 
-    static UiFormatterStyle convert(
-            @SuppressWarnings("for-rollout:DifferentNameButSame") JavaFormatterOptions.Style style) {
+    static UiFormatterStyle convert(JavaFormatterOptions.Style style) {
         return Arrays.stream(UiFormatterStyle.values())
                 .filter(value -> Objects.equals(value.style, style))
                 .findFirst()

@@ -101,7 +101,6 @@ class PalantirJavaFormatFormattingService extends AsyncDocumentFormattingService
                             request.getDocumentText().length(),
                             request.getFormattingRanges()));
                 }
-                @SuppressWarnings("for-rollout:PreferredInterfaceType")
                 List<Replacement> replacements =
                         formatterService.get().getFormatReplacements(request.getDocumentText(), toRanges(request));
                 if (logger.isDebugEnabled()) {
@@ -141,7 +140,6 @@ class PalantirJavaFormatFormattingService extends AsyncDocumentFormattingService
             return writer.toString();
         }
 
-        @SuppressWarnings("for-rollout:PreferredInterfaceType")
         private static Collection<Range<Integer>> toRanges(AsyncFormattingRequest request) {
             if (isWholeFile(request)) {
                 // The IDE sometimes passes invalid ranges when the file is unsaved before invoking the
