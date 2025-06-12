@@ -83,9 +83,6 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
             
         """.stripIndent()
 
-        file("versions.props")
-        file("versions.lock")
-
         // Add jvm args to allow spotless and formatter gradle plugins to run with Java 16+
         file('gradle.properties') << """
         org.gradle.jvmargs=--add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED \
@@ -101,8 +98,6 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
         buildFile << """
             apply plugin: 'com.diffplug.spotless'
 
-            project.getTasks().getByName("spotlessJava")
-            
             dependencies {
                 palantirJavaFormat files(file("${CLASSPATH_FILE}").text.split(':'))
                 ${extraDependencies}
