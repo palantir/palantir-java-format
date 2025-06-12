@@ -31,7 +31,12 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
     private static final NATIVE_IMAGE_FILE = new File("build/nativeImage.path")
     private static final NATIVE_CONFIG = String.format("palantirJavaFormatNative files(\"%s\")", NATIVE_IMAGE_FILE.text)
 
-    private final executor = new GradlewExecutor(projectDir)
+    private GradlewExecutor executor
+
+    def setup() {
+        executor = new GradlewExecutor(projectDir)
+    }
+
 
     @Unroll
     def "formats with spotless when spotless is applied"(String extraGradleProperties, String javaVersion, String expectedOutput) {

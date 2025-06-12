@@ -17,6 +17,7 @@
 package com.palantir.javaformat.gradle
 
 import nebula.test.functional.internal.classpath.ClasspathAddingInitScriptBuilder
+import org.gradle.internal.impldep.org.eclipse.jgit.annotations.NonNull
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
@@ -32,9 +33,9 @@ import java.util.stream.Stream
  * This means no more eager loading of Formatters onto the classpath, no more complaints from PalantirJavaFormatStep
  */
 class GradlewExecutor {
-    File projectDir
+    private File projectDir
 
-    GradlewExecutor(File projectDir) {
+    GradlewExecutor(@NonNull File projectDir) {
         this.projectDir = projectDir
     }
 
@@ -74,7 +75,7 @@ class GradlewExecutor {
         }
     }
 
-    static String readAllInput(InputStream inputStream) {
+    private static String readAllInput(InputStream inputStream) {
         try (Stream<String> lines =
                 new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8)).lines()) {
             return lines.collect(Collectors.joining("\n"));
@@ -92,5 +93,4 @@ class GradlewExecutor {
                 .redirectErrorStream(true)
         return processBuilder
     }
-
 }
