@@ -118,10 +118,7 @@ public final class Formatter {
      * @return javaOutput the output produced
      */
     static JavaOutput format(
-            @SuppressWarnings("for-rollout:UnnecessaryFinal") final JavaInput javaInput,
-            JavaFormatterOptions options,
-            CommentsHelper commentsHelper,
-            boolean debugMode)
+            final JavaInput javaInput, JavaFormatterOptions options, CommentsHelper commentsHelper, boolean debugMode)
             throws FormatterException {
 
         Context context = new Context();
@@ -166,7 +163,6 @@ public final class Formatter {
         return javaOutput;
     }
 
-    @SuppressWarnings("for-rollout:ThrowSpecificExceptions")
     static JCCompilationUnit parseJcCompilationUnit(Context context, String sourceText) throws FormatterException {
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
         context.put(DiagnosticListener.class, diagnostics);
@@ -181,7 +177,7 @@ public final class Formatter {
             throw new RuntimeException(e);
         }
         SimpleJavaFileObject source = new SimpleJavaFileObject(URI.create("source"), JavaFileObject.Kind.SOURCE) {
-            @SuppressWarnings({"for-rollout:CheckedExceptionNotThrown", "for-rollout:PreferredInterfaceType"})
+            @SuppressWarnings("for-rollout:CheckedExceptionNotThrown")
             @Override
             public CharSequence getCharContent(boolean ignoreEncodingErrors) throws IOException {
                 return sourceText;
@@ -209,9 +205,7 @@ public final class Formatter {
 
     @SuppressWarnings("for-rollout:ThrowError")
     private static JavaInputAstVisitor createVisitor(
-            @SuppressWarnings("for-rollout:UnnecessaryFinal") final String className,
-            @SuppressWarnings("for-rollout:UnnecessaryFinal") final OpsBuilder builder,
-            @SuppressWarnings("for-rollout:UnnecessaryFinal") final JavaFormatterOptions options) {
+            final String className, final OpsBuilder builder, final JavaFormatterOptions options) {
         try {
             return Class.forName(className)
                     .asSubclass(JavaInputAstVisitor.class)

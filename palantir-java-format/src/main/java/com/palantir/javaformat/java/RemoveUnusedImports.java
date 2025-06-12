@@ -77,7 +77,6 @@ public class RemoveUnusedImports {
 
         private final Set<String> usedNames = new LinkedHashSet<>();
 
-        @SuppressWarnings("for-rollout:PreferredInterfaceType")
         private final Multimap<String, Range<Integer>> usedInJavadoc = HashMultimap.create();
 
         final JavacTrees trees;
@@ -105,7 +104,7 @@ public class RemoveUnusedImports {
 
         // TODO(fwindheuser): remove this override when pattern matching in switch is no longer a preview
         // feature, and TreePathScanner visits CaseTree#getLabels instead of CaseTree#getExpressions
-        @SuppressWarnings({"unchecked", "for-rollout:ThrowSpecificExceptions"}) // reflection
+        @SuppressWarnings("unchecked") // reflection
         @Override
         public Void visitCase(CaseTree tree, Void unused) {
             if (CASE_TREE_GET_LABELS != null) {
@@ -203,8 +202,7 @@ public class RemoveUnusedImports {
         }
     }
 
-    public static String removeUnusedImports(@SuppressWarnings("for-rollout:UnnecessaryFinal") final String contents)
-            throws FormatterException {
+    public static String removeUnusedImports(final String contents) throws FormatterException {
         Context context = new Context();
         JCCompilationUnit unit = parse(context, contents);
         if (unit == null) {

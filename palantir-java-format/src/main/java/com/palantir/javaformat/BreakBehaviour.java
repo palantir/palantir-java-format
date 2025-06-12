@@ -73,7 +73,6 @@ public abstract class BreakBehaviour {
      */
     static class Json extends JsonSerializer<BreakBehaviour> {
 
-        @SuppressWarnings("for-rollout:ThrowSpecificExceptions")
         @Override
         public void serialize(BreakBehaviour value, JsonGenerator gen, SerializerProvider serializers)
                 throws IOException {

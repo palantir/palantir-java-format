@@ -17,7 +17,6 @@
 package com.palantir.javaformat.doc;
 
 public interface DocVisitor<T> {
-    @SuppressWarnings("for-rollout:ThrowSpecificExceptions")
     default T visit(Doc doc) {
         if (doc instanceof Level) {
             return visitLevel((Level) doc);

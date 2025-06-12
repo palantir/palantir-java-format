@@ -359,7 +359,7 @@ public final class JavaInput extends Input {
         context.put(DiagnosticListener.class, diagnosticCollector);
         Log log = Log.instance(context);
         log.useSource(new SimpleJavaFileObject(URI.create("Source.java"), Kind.SOURCE) {
-            @SuppressWarnings({"for-rollout:CheckedExceptionNotThrown", "for-rollout:PreferredInterfaceType"})
+            @SuppressWarnings("for-rollout:CheckedExceptionNotThrown")
             @Override
             public CharSequence getCharContent(boolean ignoreEncodingErrors) throws IOException {
                 return text;
@@ -385,9 +385,7 @@ public final class JavaInput extends Input {
                     ? t.stringVal() // Unicode escapes removed.
                     : originalTokText;
             char tokText0 = tokText.charAt(0); // The token's first character.
-            @SuppressWarnings("for-rollout:UnnecessaryFinal")
             final boolean isToken; // Is this tok a token?
-            @SuppressWarnings("for-rollout:UnnecessaryFinal")
             final boolean isNumbered; // Is this tok numbered? (tokens and comments)
             String extraNewline = null; // Extra newline at end?
             List<String> strings = new ArrayList<>();
