@@ -18,6 +18,7 @@ package com.palantir.javaformat.gradle
 
 import nebula.test.functional.internal.classpath.ClasspathAddingInitScriptBuilder
 import org.gradle.internal.impldep.org.eclipse.jgit.annotations.NonNull
+import org.gradle.testkit.runner.internal.PluginUnderTestMetadataReading
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
@@ -26,11 +27,13 @@ import java.util.stream.Collectors
 import java.util.stream.Stream
 
 /**
- * IntegrationTestKitSpec currently [loads more than what it needs into the classpath](https://github.com/nebula-plugins/nebula-test/blob/c5d3af9004898276bde5c68da492c6b0b4c5facc/src/main/groovy/nebula/test/IntegrationTestKitBase.groovy#L136)
+ * IntegrationTestKitSpec currently loads more than what it needs into the classpath
+ * https://github.com/nebula-plugins/nebula-test/blob/c5d3af9004898276bde5c68da492c6b0b4c5facc/src/main/groovy/nebula/test/IntegrationTestKitBase.groovy#L136
  * This means if we run a test with IntegrationTestKitSpec's runner, the Formatter is loaded onto the classpath eagerly.
- * If the test applies the PalantirJavaFormatPlugin, [it complains that the Formatter is erroneously loadable](https://github.com/palantir/palantir-java-format/blob/00b08d2f471d66382d6c4cd2d05f56b6bb546ad3/gradle-palantir-java-format/src/main/java/com/palantir/javaformat/gradle/spotless/PalantirJavaFormatStep.java#L83).
+ * If the test applies the PalantirJavaFormatPlugin, it complains that the Formatter is erroneously loadable
+ * https://github.com/palantir/palantir-java-format/blob/00b08d2f471d66382d6c4cd2d05f56b6bb546ad3/gradle-palantir-java-format/src/main/java/com/palantir/javaformat/gradle/spotless/PalantirJavaFormatStep.java#L83.
  * To be clear, this complaint is entirely a result of the IntegrationTestKitSpec loading too many things onto classpath.
- * 
+ *
  * As a workaround, this runner uses the classpath produced by Gradle Test Kit in plugin-under-test-metadata.properties.
  * This classpath only contains the dependencies required by the plugin, as well as the plugin itself.
  * This means no more eager loading of Formatters onto the classpath, no more complaints from PalantirJavaFormatStep.
@@ -42,8 +45,8 @@ class GradlewExecutor {
         this.projectDir = projectDir
     }
 
-    private static Iterable<File> getBuildPluginClasspathInjector() {
-        return getPluginClasspathInjector(Path.of("../gradle-palantir-java-format/build/pluginUnderTestMetadata/plugin-under-test-metadata.properties"))
+    private static List<File> getBuildPluginClasspathInjector() {
+        return PluginUnderTestMetadataReading.readImplementationClasspath();
     }
 
     private static Iterable<File> getPluginClasspathInjector(Path path) {
@@ -61,8 +64,7 @@ class GradlewExecutor {
         Process process = processBuilder.start()
         String output = readAllInput(process.getInputStream())
         process.waitFor(1, TimeUnit.MINUTES)
-        GradlewExecutionResult result = new GradlewExecutionResult(process.exitValue(), output)
-        return result
+        return new GradlewExecutionResult(process.exitValue(), output)
     }
 
     final class GradlewExecutionResult {
@@ -87,13 +89,12 @@ class GradlewExecutor {
 
     private ProcessBuilder getProcessBuilder(String... tasks) {
         File initScript = new File(projectDir, "init.gradle")
-        ClasspathAddingInitScriptBuilder.build(initScript, getBuildPluginClasspathInjector().toList())
+        ClasspathAddingInitScriptBuilder.build(initScript, getBuildPluginClasspathInjector())
         List<String> arguments = ["./gradlew", "--init-script", initScript.toPath().toString()]
         Arrays.asList(tasks).forEach(arguments::add)
-        ProcessBuilder processBuilder = new ProcessBuilder()
+        return new ProcessBuilder()
                 .command(arguments)
                 .directory(projectDir)
                 .redirectErrorStream(true)
-        return processBuilder
     }
 }
