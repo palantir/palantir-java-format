@@ -31,7 +31,6 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 @ExtendWith(ParameterizedClass.class)
 public class RemoveUnusedImportsTest {
 
-    @SuppressWarnings("for-rollout:PreferredInterfaceType")
     @ParameterizedClass.Parameters(name = "{index}: {0}")
     public static List<Object[]> parameters() {
         String[][][] inputsOutputs = {

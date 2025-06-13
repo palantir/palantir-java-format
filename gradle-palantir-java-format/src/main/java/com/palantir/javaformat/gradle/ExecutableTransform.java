@@ -47,7 +47,6 @@ public abstract class ExecutableTransform implements TransformAction<TransformPa
     @InputArtifact
     public abstract Provider<FileSystemLocation> getInputArtifact();
 
-    @SuppressWarnings("for-rollout:ThrowSpecificExceptions")
     @Override
     public void transform(TransformOutputs outputs) {
         File inputFile = getInputArtifact().get().getAsFile();
@@ -60,7 +59,6 @@ public abstract class ExecutableTransform implements TransformAction<TransformPa
         }
     }
 
-    @SuppressWarnings("for-rollout:ThrowSpecificExceptions")
     private static void makeFileExecutable(Path pathToExe) {
         try {
             Set<PosixFilePermission> existingPermissions = Files.getPosixFilePermissions(pathToExe);

@@ -37,7 +37,6 @@ public final class FormatterException extends Exception {
         this.diagnostics = ImmutableList.copyOf(diagnostics);
     }
 
-    @SuppressWarnings("for-rollout:PreferredInterfaceType")
     public List<FormatterDiagnostic> diagnostics() {
         return diagnostics;
     }

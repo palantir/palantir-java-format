@@ -307,7 +307,6 @@ public final class JavaOutput extends Output {
         return Range.closedOpen(loTok, hiTok + 1);
     }
 
-    @SuppressWarnings("for-rollout:PreferredInterfaceType")
     private RangeSet<Integer> partialFormatRanges() {
         return inputMetadata.partialFormatRanges();
     }

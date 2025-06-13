@@ -113,7 +113,6 @@ public class PalantirJavaFormatSettings implements PersistentStateComponent<Pala
         return Optional.ofNullable(FormatterProvider.getPluginDescriptor().getVersion());
     }
 
-    @SuppressWarnings("for-rollout:ThrowSpecificExceptions")
     Optional<String> computeFormatterVersion() {
         return getImplementationClassPath().map(classpath -> classpath.stream()
                 .flatMap(uri -> {
