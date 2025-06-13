@@ -27,16 +27,13 @@ import java.util.stream.Collectors
 import java.util.stream.Stream
 
 /**
- * IntegrationTestKitSpec currently loads more than what it needs into the classpath
- * https://github.com/nebula-plugins/nebula-test/blob/c5d3af9004898276bde5c68da492c6b0b4c5facc/src/main/groovy/nebula/test/IntegrationTestKitBase.groovy#L136
- * This means if we run a test with IntegrationTestKitSpec's runner, the Formatter is loaded onto the classpath eagerly.
- * If the test applies the PalantirJavaFormatPlugin, it complains that the Formatter is erroneously loadable
- * https://github.com/palantir/palantir-java-format/blob/00b08d2f471d66382d6c4cd2d05f56b6bb546ad3/gradle-palantir-java-format/src/main/java/com/palantir/javaformat/gradle/spotless/PalantirJavaFormatStep.java#L83.
- * To be clear, this complaint is entirely a result of the IntegrationTestKitSpec loading too many things onto classpath.
- *
- * As a workaround, this runner uses the classpath produced by Gradle Test Kit in plugin-under-test-metadata.properties.
+ * {@link IntegrationTestKitSpec} currently loads <a href="https://github.com/nebula-plugins/nebula-test/blob/c5d3af9004898276bde5c68da492c6b0b4c5facc/src/main/groovy/nebula/test/IntegrationTestKitBase.groovy#L136"> more than what it needs into the classpath</a>.
+ * This means if we run a test with {@link IntegrationTestKitSpec}'s runner, the {@link Formatter} is on the build's classpath by virtue of being in the test's classpath.
+ * If the test applies the {@link PalantirJavaFormatPlugin}, it complains that the {@link Formatter} is <a href="https://github.com/palantir/palantir-java-format/blob/00b08d2f471d66382d6c4cd2d05f56b6bb546ad3/gradle-palantir-java-format/src/main/java/com/palantir/javaformat/gradle/spotless/PalantirJavaFormatStep.java#L83">erroneously loadable</a>.
+ * To be clear, this complaint is entirely a result of the {@link IntegrationTestKitSpec} loading too many things onto classpath since it doesn't know what the exact plugin classpath is.
+ * As a workaround, this runner uses the classpath produced by Gradle Test Kit in {@code plugin-under-test-metadata.properties}.
  * This classpath only contains the dependencies required by the plugin, as well as the plugin itself.
- * This means no more eager loading of Formatters onto the classpath, no more complaints from PalantirJavaFormatStep.
+ * This means that even if we put the formatter on the {@code testClassPath}, it won't leak through to the Gradle build under test and subsequently no error from {@link PalantirJavaFormatStep}.
  */
 class GradlewExecutor {
     private File projectDir
