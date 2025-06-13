@@ -68,7 +68,6 @@ public final class BootstrappingFormatterService implements FormatterService {
         }
     }
 
-    @SuppressWarnings("for-rollout:CheckedExceptionNotThrown")
     @Override
     public String fixImports(String input) throws FormatterException {
         try {

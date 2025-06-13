@@ -98,7 +98,6 @@ public abstract class OpenOp extends HasUniqueId implements Op {
      *         ...)); // long arguments
      * </pre>
      */
-    @SuppressWarnings("for-rollout:UnescapedEntity")
     @Default
     public Complexity complexity() {
         return Complexity.SIMPLE;
@@ -141,7 +140,6 @@ public abstract class OpenOp extends HasUniqueId implements Op {
     }
 
     public static class Builder extends ImmutableOpenOp.Builder {
-        @SuppressWarnings("for-rollout:BuilderReturnThis")
         public Builder isSimple(boolean isSimple) {
             return complexity(isSimple ? Complexity.SIMPLE : Complexity.COMPLEX);
         }

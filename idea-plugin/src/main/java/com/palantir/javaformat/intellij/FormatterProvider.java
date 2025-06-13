@@ -100,7 +100,6 @@ final class FormatterProvider {
         // Use "in-process" formatter service
         log.info("Using in-process formatter for jdk version {}", jdkMajorVersion);
         URL[] implementationUrls = toUrlsUnchecked(implementationClasspath);
-        @SuppressWarnings("for-rollout:BanClassLoader")
         ClassLoader classLoader = new URLClassLoader(implementationUrls, FormatterService.class.getClassLoader());
         return ServiceLoader.load(FormatterService.class, classLoader).findFirst();
     }

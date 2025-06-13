@@ -51,7 +51,6 @@ public class JavaFormatExtension {
                 })
                 .toArray(URL[]::new);
 
-        @SuppressWarnings("for-rollout:BanClassLoader")
         ClassLoader classLoader = new URLClassLoader(jarUris, FormatterService.class.getClassLoader());
         return Iterables.getOnlyElement(ServiceLoader.load(FormatterService.class, classLoader));
     }

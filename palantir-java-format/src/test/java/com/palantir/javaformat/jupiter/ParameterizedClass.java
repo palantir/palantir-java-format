@@ -44,7 +44,6 @@ import org.junit.platform.commons.util.AnnotationUtils;
 import org.junit.platform.commons.util.ReflectionUtils;
 
 public final class ParameterizedClass implements TestTemplateInvocationContextProvider {
-    @SuppressWarnings("for-rollout:NonFinalStaticField")
     private static ExtensionContext.Namespace namespace = ExtensionContext.Namespace.create(ParameterizedClass.class);
 
     /**

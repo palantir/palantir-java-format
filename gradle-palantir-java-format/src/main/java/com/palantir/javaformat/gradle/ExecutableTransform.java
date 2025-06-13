@@ -41,7 +41,6 @@ import org.gradle.api.provider.Provider;
  */
 public abstract class ExecutableTransform implements TransformAction<TransformParameters.None> {
 
-    @SuppressWarnings("for-rollout:NonFinalStaticField")
     private static Logger logger = Logging.getLogger(ExecutableTransform.class);
 
     @InputArtifact

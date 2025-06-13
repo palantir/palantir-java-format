@@ -473,7 +473,7 @@ public final class Level extends Doc {
                 .markAccepted());
     }
 
-    @SuppressWarnings({"for-rollout:NullAway", "for-rollout:UnnecessaryDefaultInEnumSwitch"})
+    @SuppressWarnings("for-rollout:NullAway")
     private static Optional<State> tryBreakInnerLevel_checkInner(
             CommentsHelper commentsHelper,
             int maxWidth,
