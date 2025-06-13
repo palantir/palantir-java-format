@@ -58,8 +58,7 @@ class GradlewExecutor {
     }
 
     final class GradlewExecutionResult {
-
-        final Boolean success
+        final boolean success
         final String standardOutput
         final Throwable failure
 
