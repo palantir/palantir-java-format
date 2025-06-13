@@ -554,7 +554,6 @@ final class JavadocLexer {
      */
     private static final Pattern LITERAL_PATTERN = compile("^.[^ \t\n@<{}*]*", DOTALL);
 
-    @SuppressWarnings("for-rollout:ConstantPatternCompile")
     private static Pattern fullCommentPattern() {
         return compile("^<!--.*?-->", DOTALL);
     }

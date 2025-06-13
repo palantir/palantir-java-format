@@ -69,7 +69,6 @@ final class FormatDiff {
     }
 
     /** Parses the filenames and edited ranges out of `git diff -U0`. */
-    @SuppressWarnings("for-rollout:SystemOut")
     @VisibleForTesting
     static Stream<SingleFileDiff> parseGitDiffOutput(String gitOutput) {
         return Streams.stream(Splitter.on(SEPARATOR).omitEmptyStrings().split(gitOutput))
@@ -97,7 +96,6 @@ final class FormatDiff {
                 });
     }
 
-    @SuppressWarnings("for-rollout:SystemOut")
     private static void format(FormatterService formatter, SingleFileDiff diff) {
         String input;
         try {

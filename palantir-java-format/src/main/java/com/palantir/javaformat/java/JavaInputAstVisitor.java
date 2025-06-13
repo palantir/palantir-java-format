@@ -919,7 +919,6 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         return false;
     }
 
-    @SuppressWarnings("for-rollout:UnnecessaryDefaultInEnumSwitch")
     @Override
     public Void visitMemberReference(MemberReferenceTree node, Void unused) {
         sync(node);
@@ -3537,7 +3536,6 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
      * @param annotations an ordered list of type annotations grouped by dimension (e.g. {@code [[@A, @B], [@C]]} for
      * {@code int @A [] @B @C []}
      */
-    @SuppressWarnings("for-rollout:InconsistentOverloads")
     private void maybeAddDims(Deque<ExpressionTree> dimExpressions, Deque<List<? extends AnnotationTree>> annotations) {
         boolean lastWasAnnotation = false;
         while (builder.peekToken().isPresent()) {

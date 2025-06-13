@@ -45,7 +45,6 @@ import java.util.stream.Collectors;
 public class DebugRenderer {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    @SuppressWarnings("for-rollout:NonFinalStaticField")
     private static Path publicDir = Paths.get("../debugger/public");
 
     static Path getOutputFile() {
