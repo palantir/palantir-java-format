@@ -49,16 +49,6 @@ class GradlewExecutor {
         return PluginUnderTestMetadataReading.readImplementationClasspath();
     }
 
-    private static Iterable<File> getPluginClasspathInjector(Path path) {
-        File propertiesFile = path.toFile()
-        Properties properties = new Properties()
-        propertiesFile.withInputStream { inputStream ->
-            properties.load(inputStream)
-        }
-        String classpath = properties.getProperty('implementation-classpath')
-        return classpath.split(File.pathSeparator).collect { new File(it) }
-    }
-
     GradlewExecutionResult runGradlewTasks(String... tasks) {
         ProcessBuilder processBuilder = getProcessBuilder(tasks)
         Process process = processBuilder.start()
