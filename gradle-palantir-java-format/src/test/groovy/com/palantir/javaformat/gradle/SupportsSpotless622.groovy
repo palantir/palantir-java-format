@@ -83,7 +83,5 @@ class SupportsSpotless622 extends IntegrationTestKitSpec {
 
         then:
         assert result.success
-        println(result.standardOutput)
-        result.standardOutput.contains('BUILD SUCCESSFUL')
     }
 }
