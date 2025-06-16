@@ -72,6 +72,7 @@ public abstract class PalantirJavaFormatPlugin implements Plugin<Project> {
     }
 
     public abstract static class FormatDiffTask extends DefaultTask {
+
         @Inject
         protected abstract ProjectLayout getProjectLayout();
 
