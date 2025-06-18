@@ -50,7 +50,14 @@ public final class FileBasedTests {
                     .putAll(15, "I603")
                     .putAll(16, "I588")
                     .putAll(17, "I683", "I684", "I696")
-                    .putAll(21, "SwitchGuardClause", "SwitchRecord", "SwitchDouble", "SwitchUnderscore", "I880")
+                    .putAll(
+                            21,
+                            "SwitchGuardClause",
+                            "SwitchRecord",
+                            "SwitchDouble",
+                            "SwitchUnderscore",
+                            "I880",
+                            "I1309")
                     .build();
 
     private final Class<?> testClass;
@@ -77,6 +84,7 @@ public final class FileBasedTests {
                 Formatter.getRuntimeVersion() >= version, String.format("Not running on jdk %d or later", version)));
     }
 
+    @SuppressWarnings("for-rollout:StatementSwitchToExpressionSwitch")
     public List<Object[]> paramsAsNameInputOutput() throws IOException {
         ClassLoader classLoader = testClass.getClassLoader();
         Map<String, String> inputs = new TreeMap<>();

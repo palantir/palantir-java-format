@@ -76,7 +76,9 @@ public class RemoveUnusedImports {
     private static final class UnusedImportScanner extends TreePathScanner<Void, Void> {
 
         private final Set<String> usedNames = new LinkedHashSet<>();
+
         private final Multimap<String, Range<Integer>> usedInJavadoc = HashMultimap.create();
+
         final JavacTrees trees;
         final DocTreeScanner docTreeSymbolScanner;
 

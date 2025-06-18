@@ -179,7 +179,7 @@ public class PalantirJavaFormatSettings implements PersistentStateComponent<Pala
             }
         }
 
-        @SuppressWarnings("for-rollout:NullAway")
+        @SuppressWarnings({"for-rollout:NullAway", "for-rollout:StatementSwitchToExpressionSwitch"})
         public String getEnabled() {
             switch (enabled) {
                 case ENABLED:
