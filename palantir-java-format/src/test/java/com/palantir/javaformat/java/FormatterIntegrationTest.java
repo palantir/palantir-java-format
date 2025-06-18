@@ -32,7 +32,6 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 @Execution(ExecutionMode.CONCURRENT)
 public class FormatterIntegrationTest {
 
-    @SuppressWarnings("for-rollout:NonFinalStaticField")
     private static FileBasedTests tests = new FileBasedTests(FormatterIntegrationTest.class, "testdata");
 
     @ParameterizedClass.Parameters(name = "{0}")

@@ -214,7 +214,6 @@ public final class OpsBuilder {
      *
      * @throws FormattingError if any ops were unclosed
      */
-    @SuppressWarnings("for-rollout:DefaultLocale")
     public void checkClosed(int previous) {
         if (depth != previous) {
             throw new FormattingError(diagnostic(String.format("saw %d unclosed ops", depth)));
@@ -281,7 +280,6 @@ public final class OpsBuilder {
      * @param debugName a representative name for this lambda
      * @param plusIndent the extra indent for the new level
      */
-    @SuppressWarnings("for-rollout:InconsistentOverloads")
     public void open(String debugName, Indent plusIndent) {
         add(OpenOp.builder().plusIndent(plusIndent).debugName(debugName).build());
     }
@@ -442,7 +440,6 @@ public final class OpsBuilder {
      * @param flat the {@link Break} when not broken
      * @param plusIndent extra indent if taken
      */
-    @SuppressWarnings("for-rollout:InconsistentOverloads")
     public void breakOp(FillMode fillMode, String flat, Indent plusIndent) {
         breakOp(fillMode, flat, plusIndent, /* optionalTag=  */ Optional.empty());
     }
@@ -455,7 +452,6 @@ public final class OpsBuilder {
      * @param plusIndent extra indent if taken
      * @param optionalTag an optional tag for remembering whether the break was taken
      */
-    @SuppressWarnings("for-rollout:InconsistentOverloads")
     public void breakOp(FillMode fillMode, String flat, Indent plusIndent, Optional<BreakTag> optionalTag) {
         add(Break.make(fillMode, flat, plusIndent, optionalTag));
     }

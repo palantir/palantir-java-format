@@ -256,7 +256,7 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
         return null;
     }
 
-    @SuppressWarnings({"for-rollout:NullAway", "for-rollout:UnnecessaryDefaultInEnumSwitch"})
+    @SuppressWarnings("for-rollout:NullAway")
     @Override
     public Void visitCase(CaseTree node, Void unused) {
         sync(node);

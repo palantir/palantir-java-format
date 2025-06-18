@@ -167,7 +167,6 @@ public final class Formatter {
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
         context.put(DiagnosticListener.class, diagnostics);
         Options.instance(context).put("--enable-preview", "true");
-        @SuppressWarnings("for-rollout:InitializeInline")
         JCCompilationUnit unit;
         JavacFileManager fileManager = new JavacFileManager(context, true, UTF_8);
         try {
@@ -177,7 +176,6 @@ public final class Formatter {
             throw new RuntimeException(e);
         }
         SimpleJavaFileObject source = new SimpleJavaFileObject(URI.create("source"), JavaFileObject.Kind.SOURCE) {
-            @SuppressWarnings("for-rollout:CheckedExceptionNotThrown")
             @Override
             public CharSequence getCharContent(boolean ignoreEncodingErrors) throws IOException {
                 return sourceText;

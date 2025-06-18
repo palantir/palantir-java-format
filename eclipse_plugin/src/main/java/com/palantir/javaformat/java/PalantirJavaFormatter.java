@@ -60,7 +60,7 @@ public class PalantirJavaFormatter extends CodeFormatter {
     }
 
     /** Runs the Google Java formatter on the given source, with only the given ranges specified. */
-    @SuppressWarnings({"for-rollout:DefaultLocale", "for-rollout:StatementSwitchToExpressionSwitch"})
+    @SuppressWarnings("for-rollout:StatementSwitchToExpressionSwitch")
     @Nullable
     private TextEdit formatInternal(int kind, String source, IRegion[] regions, int initialIndent) {
         try {

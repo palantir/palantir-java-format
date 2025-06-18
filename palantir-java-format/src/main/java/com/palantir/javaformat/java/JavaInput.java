@@ -359,7 +359,6 @@ public final class JavaInput extends Input {
         context.put(DiagnosticListener.class, diagnosticCollector);
         Log log = Log.instance(context);
         log.useSource(new SimpleJavaFileObject(URI.create("Source.java"), Kind.SOURCE) {
-            @SuppressWarnings("for-rollout:CheckedExceptionNotThrown")
             @Override
             public CharSequence getCharContent(boolean ignoreEncodingErrors) throws IOException {
                 return text;
@@ -559,7 +558,7 @@ public final class JavaInput extends Input {
      * @return the {@code 0}-based {@link Range} of tokens
      * @throws FormatterException on formatting errors
      */
-    @SuppressWarnings({"for-rollout:DefaultLocale", "for-rollout:NullAway"})
+    @SuppressWarnings("for-rollout:NullAway")
     Range<Integer> characterRangeToTokenRange(int offset, int length) throws FormatterException {
         int requiredLength = offset + length;
         if (requiredLength > text.length()) {

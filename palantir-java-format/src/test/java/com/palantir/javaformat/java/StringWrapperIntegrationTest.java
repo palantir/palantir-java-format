@@ -31,7 +31,6 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 @Execution(ExecutionMode.CONCURRENT)
 public class StringWrapperIntegrationTest {
 
-    @SuppressWarnings("for-rollout:NonFinalStaticField")
     private static FileBasedTests tests = new FileBasedTests(StringWrapperIntegrationTest.class);
 
     @ParameterizedClass.Parameters(name = "{0}")
