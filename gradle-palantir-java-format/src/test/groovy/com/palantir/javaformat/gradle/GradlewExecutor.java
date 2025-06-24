@@ -60,7 +60,7 @@ public class GradlewExecutor {
             process.waitFor(1, TimeUnit.MINUTES);
             return new GradlewExecutionResult(process.exitValue(), output);
         } catch (InterruptedException | IOException e) {
-            return new GradlewExecutionResult(-1, e.getMessage());
+            return new GradlewExecutionResult(-1, e);
         }
     }
 
