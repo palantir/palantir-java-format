@@ -41,25 +41,25 @@ class SupportsSpotless622 extends IntegrationTestKitSpec {
 
     def "PalantirJavaFormatPlugin works with spotless 6.22.0"() {
         // language=Gradle
-        buildFile << """
-        buildscript {
-            repositories {
-                mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
-                gradlePluginPortal() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
+        buildFile << '''
+            buildscript {
+                repositories {
+                    mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
+                    gradlePluginPortal() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
+                }
+                 dependencies {
+                     classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:2.34.0'
+                     classpath 'com.diffplug.spotless:spotless-plugin-gradle:6.22.0'
+                 }
             }
-             dependencies {
-                 classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:2.34.0'
-                 classpath 'com.diffplug.spotless:spotless-plugin-gradle:6.22.0'
-             }
-        }
-
-        apply plugin: 'java'
-        apply plugin: 'com.palantir.java-format'
-        apply plugin: 'com.palantir.consistent-versions'
-        apply plugin: 'com.diffplug.spotless'
-
-        version = '0.1.0'
-        """.stripIndent(true)
+    
+            apply plugin: 'java'
+            apply plugin: 'com.palantir.java-format'
+            apply plugin: 'com.palantir.consistent-versions'
+            apply plugin: 'com.diffplug.spotless'
+    
+            version = '0.1.0'
+        '''.stripIndent(true)
 
 
         file("versions.props")
@@ -76,7 +76,7 @@ class SupportsSpotless622 extends IntegrationTestKitSpec {
             // If any configurations are eagerly resolved in the spotless steps, 
             // consistent-versions should catch it and throw here. 
             project.getTasks().getByName("spotlessJava")
-        """.stripIndent()
+        """.stripIndent(true)
 
         when:
         def result = executor.runGradlewTasks('classes', '--info')

@@ -35,7 +35,7 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
     @Unroll
     def "formats with spotless when spotless is applied"(String extraGradleProperties, String javaVersion, String expectedOutput) {
         def extraDependencies = extraGradleProperties.isEmpty() ? "" : NATIVE_CONFIG
-        settingsFile << """
+        settingsFile << '''
              buildscript {
                 repositories {
                     mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
@@ -46,7 +46,7 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
                  }
              }
             apply plugin: 'com.palantir.jdks.settings'
-        """.stripIndent(true)
+        '''.stripIndent(true)
 
         buildFile << """
              buildscript {
@@ -78,18 +78,17 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
             jdks {
                 daemonTarget = ${javaVersion}
             }
-            
-        """.stripIndent()
+        """.stripIndent(true)
 
         // Add jvm args to allow spotless and formatter gradle plugins to run with Java 16+
-        file('gradle.properties') << """
-        org.gradle.jvmargs=--add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED \
-          --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED \
-          --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED \
-          --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED \
-          --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED
-        palantir.jdk.setup.enabled=true
-        """.stripIndent()
+        file('gradle.properties') << '''
+            org.gradle.jvmargs=--add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED \
+              --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED \
+              --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED \
+              --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED \
+              --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED
+            palantir.jdk.setup.enabled=true
+        '''.stripIndent(true)
         file('gradle.properties') << extraGradleProperties
         runTasks('wrapper')
 
@@ -100,17 +99,18 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
                 palantirJavaFormat files(file("${CLASSPATH_FILE}").text.split(':'))
                 ${extraDependencies}
             }
-        """.stripIndent()
+        """.stripIndent(true)
 
         file('src/main/java/Main.java').text = invalidJavaFile
 
-
         when:
         def result = executor.runGradlewTasks('spotlessApply', '--info')
+        def output = result.standardOutput
+        def formattedFile = file('src/main/java/Main.java').text
 
         then:
-        result.standardOutput.contains(expectedOutput)
-        file('src/main/java/Main.java').text == validJavaFile
+        output.contains(expectedOutput)
+        formattedFile == validJavaFile
 
         where:
         extraGradleProperties               | javaVersion   | expectedOutput
@@ -122,29 +122,29 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
 
 
     def validJavaFile = '''\
-    package test;
-    
-    public class Test {
-        void test() {
-            int x = 1;
-            System.out.println("Hello");
-            Optional.of("hello").orElseGet(() -> {
-                return "Hello World";
-            });
+        package test;
+        
+        public class Test {
+            void test() {
+                int x = 1;
+                System.out.println("Hello");
+                Optional.of("hello").orElseGet(() -> {
+                    return "Hello World";
+                });
+            }
         }
-    }
-    '''.stripIndent()
+    '''.stripIndent(true)
 
     def invalidJavaFile = '''
-    package test;
-    import com.java.unused;
-    public class Test { void test() {int x = 1;
-        System.out.println(
-            "Hello"
-        );
-        Optional.of("hello").orElseGet(() -> { 
-            return "Hello World";
-        });
-    } }
-    '''.stripIndent()
+        package test;
+        import com.java.unused;
+        public class Test { void test() {int x = 1;
+            System.out.println(
+                "Hello"
+            );
+            Optional.of("hello").orElseGet(() -> { 
+                return "Hello World";
+            });
+        } }
+    '''.stripIndent(true)
 }

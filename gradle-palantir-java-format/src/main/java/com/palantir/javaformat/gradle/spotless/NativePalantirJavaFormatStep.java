@@ -45,6 +45,10 @@ public final class NativePalantirJavaFormatStep {
     static class State implements Serializable {
         private static final long serialVersionUID = 1L;
 
+        // Kept for state serialization purposes.
+        @SuppressWarnings({"unused", "FieldCanBeLocal"})
+        private FileSignature execSignature;
+
         private final transient Supplier<File> execSupplier;
 
         State(Supplier<File> supplier) {
@@ -54,8 +58,9 @@ public final class NativePalantirJavaFormatStep {
         String format(ProcessRunner runner, String input) throws IOException, InterruptedException {
             File execFile = execSupplier.get();
             logger.info("Using native-image at {}", execFile);
-            File signedFile = FileSignature.signAsSet(execFile).getOnlyFile();
-            List<String> argumentsWithPathToExe = List.of(signedFile.getAbsolutePath(), "--palantir", "-");
+            execSignature = FileSignature.signAsSet(execFile);
+            List<String> argumentsWithPathToExe =
+                    List.of(execSignature.getOnlyFile().getAbsolutePath(), "--palantir", "-");
             return runner.exec(input.getBytes(StandardCharsets.UTF_8), argumentsWithPathToExe)
                     .assertExitZero(StandardCharsets.UTF_8);
         }

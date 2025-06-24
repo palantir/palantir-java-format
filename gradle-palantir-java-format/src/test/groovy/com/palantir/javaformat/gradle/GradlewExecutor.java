@@ -13,18 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.palantir.javaformat.gradle;
 
-package com.palantir.javaformat.gradle
-
-import nebula.test.functional.internal.classpath.ClasspathAddingInitScriptBuilder
-import org.gradle.internal.impldep.org.eclipse.jgit.annotations.NonNull
-import org.gradle.testkit.runner.internal.PluginUnderTestMetadataReading
-
-import java.nio.charset.StandardCharsets
-import java.nio.file.Path
-import java.util.concurrent.TimeUnit
-import java.util.stream.Collectors
-import java.util.stream.Stream
+import com.palantir.javaformat.gradle.spotless.PalantirJavaFormatStep;
+import com.palantir.javaformat.java.Formatter;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import nebula.test.IntegrationTestKitSpec;
+import nebula.test.functional.internal.classpath.ClasspathAddingInitScriptBuilder;
+import org.gradle.testkit.runner.internal.PluginUnderTestMetadataReading;
 
 /**
  * {@link IntegrationTestKitSpec} currently loads <a href="https://github.com/nebula-plugins/nebula-test/blob/c5d3af9004898276bde5c68da492c6b0b4c5facc/src/main/groovy/nebula/test/IntegrationTestKitBase.groovy#L136"> more than what it needs into the classpath</a>.
@@ -35,52 +41,62 @@ import java.util.stream.Stream
  * This classpath only contains the dependencies required by the plugin, as well as the plugin itself.
  * This means that even if we put the formatter on the {@code testClassPath}, it won't leak through to the Gradle build under test and subsequently no error from {@link PalantirJavaFormatStep}.
  */
-class GradlewExecutor {
-    private File projectDir
+public class GradlewExecutor {
+    private File projectDir;
 
-    GradlewExecutor(@NonNull File projectDir) {
-        this.projectDir = projectDir
+    public GradlewExecutor(File projectDir) {
+        this.projectDir = projectDir;
     }
 
     private static List<File> getBuildPluginClasspathInjector() {
         return PluginUnderTestMetadataReading.readImplementationClasspath();
     }
 
-    GradlewExecutionResult runGradlewTasks(String... tasks) {
-        ProcessBuilder processBuilder = getProcessBuilder(tasks)
-        Process process = processBuilder.start()
-        String output = readAllInput(process.getInputStream())
-        process.waitFor(1, TimeUnit.MINUTES)
-        return new GradlewExecutionResult(process.exitValue(), output)
-    }
-
-    final class GradlewExecutionResult {
-        final boolean success
-        final String standardOutput
-        final Throwable failure
-
-        GradlewExecutionResult(int exitValue, String output) {
-            this.success = exitValue == 0
-            this.standardOutput =  output
-            this.failure = exitValue != 0 ? new RuntimeException(String.format("Build failed with exitCode %s", exitValue)) : null
+    public GradlewExecutionResult runGradlewTasks(String... tasks) {
+        try {
+            ProcessBuilder processBuilder = getProcessBuilder(tasks);
+            Process process = processBuilder.start();
+            String output = readAllInput(process.getInputStream());
+            process.waitFor(1, TimeUnit.MINUTES);
+            return new GradlewExecutionResult(process.exitValue(), output);
+        } catch (InterruptedException | IOException e) {
+            return new GradlewExecutionResult(-1, e.getMessage());
         }
     }
 
     private static String readAllInput(InputStream inputStream) {
-        try (Stream<String> lines =
-                new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8)).lines()) {
+        try {
+            Stream<String> lines =
+                    new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8)).lines();
             return lines.collect(Collectors.joining("\n"));
+        } catch (Exception e) {
+            throw new RuntimeException("GradlewExecutor failed to readAllInput", e);
         }
     }
 
     private ProcessBuilder getProcessBuilder(String... tasks) {
-        File initScript = new File(projectDir, "init.gradle")
-        ClasspathAddingInitScriptBuilder.build(initScript, getBuildPluginClasspathInjector())
-        List<String> arguments = ["./gradlew", "--init-script", initScript.toPath().toString()]
-        Arrays.asList(tasks).forEach(arguments::add)
-        return new ProcessBuilder()
-                .command(arguments)
-                .directory(projectDir)
-                .redirectErrorStream(true)
+        File initScript = new File(projectDir, "init.gradle");
+        ClasspathAddingInitScriptBuilder.build(initScript, getBuildPluginClasspathInjector());
+
+        List<String> arguments = Stream.concat(
+                        Stream.of(
+                                "./gradlew",
+                                "--init-script",
+                                initScript.toPath().toString()),
+                        Arrays.stream(tasks))
+                .toList();
+
+        return new ProcessBuilder().command(arguments).directory(projectDir).redirectErrorStream(true);
+    }
+
+    public record GradlewExecutionResult(boolean success, String standardOutput, Throwable failure) {
+        public GradlewExecutionResult(int exitValue, String output) {
+            this(
+                    exitValue == 0,
+                    output,
+                    exitValue != 0
+                            ? new RuntimeException(String.format("Build failed with exitCode %s", exitValue))
+                            : null);
+        }
     }
 }
