@@ -25,6 +25,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -60,7 +61,7 @@ public class GradlewExecutor {
             process.waitFor(1, TimeUnit.MINUTES);
             return new GradlewExecutionResult(process.exitValue(), output);
         } catch (InterruptedException | IOException e) {
-            return new GradlewExecutionResult(-1, e);
+            return new GradlewExecutionResult(-1, "", e);
         }
     }
 
@@ -89,14 +90,13 @@ public class GradlewExecutor {
         return new ProcessBuilder().command(arguments).directory(projectDir).redirectErrorStream(true);
     }
 
-    public record GradlewExecutionResult(boolean success, String standardOutput, Throwable failure) {
+    public record GradlewExecutionResult(boolean success, String standardOutput, Optional<Throwable> failure) {
+        public GradlewExecutionResult(int exitValue, String output, Throwable failure) {
+            this(exitValue == 0, output, Optional.of(failure));
+        }
+
         public GradlewExecutionResult(int exitValue, String output) {
-            this(
-                    exitValue == 0,
-                    output,
-                    exitValue != 0
-                            ? new RuntimeException(String.format("Build failed with exitCode %s", exitValue))
-                            : null);
+            this(exitValue == 0, output, Optional.empty());
         }
     }
 }
