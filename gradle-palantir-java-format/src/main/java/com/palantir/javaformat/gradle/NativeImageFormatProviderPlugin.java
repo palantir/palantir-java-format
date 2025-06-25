@@ -18,6 +18,7 @@ package com.palantir.javaformat.gradle;
 
 import com.google.common.base.Preconditions;
 import com.palantir.platform.Architecture;
+import com.palantir.platform.GradleOperationSystem;
 import com.palantir.platform.OperatingSystem;
 import java.util.Optional;
 import org.gradle.api.Plugin;
@@ -25,8 +26,12 @@ import org.gradle.api.Project;
 import org.gradle.api.artifacts.type.ArtifactTypeDefinition;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
+import org.gradle.api.tasks.Nested;
 
-public final class NativeImageFormatProviderPlugin implements Plugin<Project> {
+public abstract class NativeImageFormatProviderPlugin implements Plugin<Project> {
+
+    @Nested
+    protected abstract GradleOperationSystem getOperationSystem();
 
     private static final Logger log = Logging.getLogger(NativeImageFormatProviderPlugin.class);
     static final String NATIVE_CONFIGURATION_NAME = "palantirJavaFormatNative";
@@ -37,12 +42,12 @@ public final class NativeImageFormatProviderPlugin implements Plugin<Project> {
                 rootProject == rootProject.getRootProject(),
                 "May only apply com.palantir.java-format-provider to the root project");
 
-        if (!isNativeImageConfigured(rootProject)) {
+        if (!isNativeImageConfigured(rootProject, getOperationSystem())) {
             log.info("Skipping native image configuration as it is not supported on this platform");
             return;
         }
         String implementationVersion = JavaFormatExtension.class.getPackage().getImplementationVersion();
-        OperatingSystem operatingSystem = OperatingSystem.get();
+        OperatingSystem operatingSystem = getOperationSystem().get();
         rootProject.getConfigurations().register(NATIVE_CONFIGURATION_NAME, conf -> {
             conf.setDescription("Internal configuration for resolving the palantir-java-format native image");
             conf.setVisible(false);
@@ -68,12 +73,12 @@ public final class NativeImageFormatProviderPlugin implements Plugin<Project> {
         });
     }
 
-    public static boolean isNativeImageConfigured(Project project) {
-        return isNativeImageSupported() && isNativeFlagEnabled(project);
+    public static boolean isNativeImageConfigured(Project project, GradleOperationSystem operationSystem) {
+        return isNativeImageSupported(operationSystem) && isNativeFlagEnabled(project);
     }
 
-    private static boolean isNativeImageSupported() {
-        OperatingSystem os = OperatingSystem.get();
+    private static boolean isNativeImageSupported(GradleOperationSystem operationSystem) {
+        OperatingSystem os = operationSystem.get();
         return os.equals(OperatingSystem.LINUX_GLIBC)
                 || (os.equals(OperatingSystem.MACOS) && Architecture.get().equals(Architecture.AARCH64));
     }

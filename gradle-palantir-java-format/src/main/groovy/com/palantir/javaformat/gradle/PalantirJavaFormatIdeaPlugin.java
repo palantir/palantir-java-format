@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Files;
 import com.palantir.gradle.ideaconfiguration.IdeaConfigurationExtension;
 import com.palantir.gradle.ideaconfiguration.IdeaConfigurationPlugin;
+import com.palantir.platform.GradleOperationSystem;
 import groovy.util.Node;
 import groovy.util.XmlNodePrinter;
 import groovy.util.XmlParser;
@@ -38,10 +39,14 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.tasks.Nested;
 import org.gradle.plugins.ide.idea.model.IdeaModel;
 import org.xml.sax.SAXException;
 
-public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
+public abstract class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
+
+    @Nested
+    protected abstract GradleOperationSystem getOperationSystem();
 
     private static final String MIN_IDEA_PLUGIN_VERSION = "2.57.0";
 
@@ -56,7 +61,8 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
             Configuration implConfiguration =
                     rootProject.getConfigurations().getByName(PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME);
 
-            Optional<Configuration> nativeImplConfiguration = maybeGetNativeImplConfiguration(rootProject);
+            Optional<Configuration> nativeImplConfiguration =
+                    maybeGetNativeImplConfiguration(rootProject, getOperationSystem());
 
             configureLegacyIdea(rootProject, implConfiguration, nativeImplConfiguration);
             configureIntelliJImport(rootProject, implConfiguration, nativeImplConfiguration);
@@ -69,8 +75,9 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
                 .register("palantir-java-format", dep -> dep.atLeastVersion(MIN_IDEA_PLUGIN_VERSION));
     }
 
-    private static Optional<Configuration> maybeGetNativeImplConfiguration(Project rootProject) {
-        return NativeImageFormatProviderPlugin.isNativeImageConfigured(rootProject)
+    private static Optional<Configuration> maybeGetNativeImplConfiguration(
+            Project rootProject, GradleOperationSystem operationSystem) {
+        return NativeImageFormatProviderPlugin.isNativeImageConfigured(rootProject, operationSystem)
                 ? Optional.of(rootProject
                         .getConfigurations()
                         .getByName(NativeImageFormatProviderPlugin.NATIVE_CONFIGURATION_NAME))
