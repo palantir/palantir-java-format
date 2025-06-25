@@ -19,7 +19,7 @@ import com.diffplug.gradle.spotless.SpotlessExtension;
 import com.diffplug.spotless.FormatterStep;
 import com.palantir.javaformat.gradle.spotless.NativePalantirJavaFormatStep;
 import com.palantir.javaformat.gradle.spotless.PalantirJavaFormatStep;
-import com.palantir.platform.GradleOperationSystem;
+import com.palantir.platform.GradleOperatingSystem;
 import org.gradle.api.JavaVersion;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
@@ -34,14 +34,14 @@ final class SpotlessInterop {
 
     private SpotlessInterop() {}
 
-    static void addSpotlessJavaStep(Project project, GradleOperationSystem operationSystem) {
+    static void addSpotlessJavaStep(Project project, GradleOperatingSystem operatingSystem) {
         SpotlessExtension spotlessExtension = project.getExtensions().getByType(SpotlessExtension.class);
-        spotlessExtension.java(java -> java.addStep(addSpotlessJavaFormatStep(project, operationSystem)));
+        spotlessExtension.java(java -> java.addStep(addSpotlessJavaFormatStep(project, operatingSystem)));
     }
 
-    static FormatterStep addSpotlessJavaFormatStep(Project project, GradleOperationSystem operationSystem) {
+    static FormatterStep addSpotlessJavaFormatStep(Project project, GradleOperatingSystem operatingSystem) {
 
-        if (NativeImageFormatProviderPlugin.isNativeImageConfigured(project, operationSystem)
+        if (NativeImageFormatProviderPlugin.isNativeImageConfigured(project, operatingSystem)
                 // Native images have lower throughput than Java implementations. This logic gets called by the
                 // Gradle spotlessApply step, which formats a full project.
                 // If we are already running on java 21, then we can run the spotlessApply logic using the Java

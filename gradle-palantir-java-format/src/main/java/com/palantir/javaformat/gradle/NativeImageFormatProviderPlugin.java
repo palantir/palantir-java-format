@@ -18,7 +18,7 @@ package com.palantir.javaformat.gradle;
 
 import com.google.common.base.Preconditions;
 import com.palantir.platform.Architecture;
-import com.palantir.platform.GradleOperationSystem;
+import com.palantir.platform.GradleOperatingSystem;
 import com.palantir.platform.OperatingSystem;
 import java.util.Optional;
 import org.gradle.api.Plugin;
@@ -26,12 +26,13 @@ import org.gradle.api.Project;
 import org.gradle.api.artifacts.type.ArtifactTypeDefinition;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
+import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.Nested;
 
 public abstract class NativeImageFormatProviderPlugin implements Plugin<Project> {
 
     @Nested
-    protected abstract GradleOperationSystem getOperationSystem();
+    protected abstract GradleOperatingSystem getOperatingSystem();
 
     private static final Logger log = Logging.getLogger(NativeImageFormatProviderPlugin.class);
     static final String NATIVE_CONFIGURATION_NAME = "palantirJavaFormatNative";
@@ -42,12 +43,12 @@ public abstract class NativeImageFormatProviderPlugin implements Plugin<Project>
                 rootProject == rootProject.getRootProject(),
                 "May only apply com.palantir.java-format-provider to the root project");
 
-        if (!isNativeImageConfigured(rootProject, getOperationSystem())) {
+        if (!isNativeImageConfigured(rootProject, getOperatingSystem())) {
             log.info("Skipping native image configuration as it is not supported on this platform");
             return;
         }
         String implementationVersion = JavaFormatExtension.class.getPackage().getImplementationVersion();
-        OperatingSystem operatingSystem = getOperationSystem().get();
+        Provider<OperatingSystem> operatingSystem = getOperatingSystem().getOperatingSystem();
         rootProject.getConfigurations().register(NATIVE_CONFIGURATION_NAME, conf -> {
             conf.setDescription("Internal configuration for resolving the palantir-java-format native image");
             conf.setVisible(false);
@@ -59,26 +60,26 @@ public abstract class NativeImageFormatProviderPlugin implements Plugin<Project>
                         .create(String.format(
                                 "com.palantir.javaformat:palantir-java-format-native:%s:nativeImage-%s_%s@%s",
                                 implementationVersion,
-                                operatingSystem.uiName(),
+                                operatingSystem.get().uiName(),
                                 Architecture.get().uiName(),
-                                getExtension(operatingSystem))));
+                                getExtension(operatingSystem.get()))));
             });
             conf.getAttributes().attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "executable-nativeImage");
         });
         rootProject.getDependencies().registerTransform(ExecutableTransform.class, transformSpec -> {
             transformSpec
                     .getFrom()
-                    .attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, getExtension(operatingSystem));
+                    .attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, getExtension(operatingSystem.get()));
             transformSpec.getTo().attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "executable-nativeImage");
         });
     }
 
-    public static boolean isNativeImageConfigured(Project project, GradleOperationSystem operationSystem) {
-        return isNativeImageSupported(operationSystem) && isNativeFlagEnabled(project);
+    public static boolean isNativeImageConfigured(Project project, GradleOperatingSystem operatingSystem) {
+        return isNativeImageSupported(operatingSystem) && isNativeFlagEnabled(project);
     }
 
-    private static boolean isNativeImageSupported(GradleOperationSystem operationSystem) {
-        OperatingSystem os = operationSystem.get();
+    private static boolean isNativeImageSupported(GradleOperatingSystem operatingSystem) {
+        OperatingSystem os = operatingSystem.getOperatingSystem().get();
         return os.equals(OperatingSystem.LINUX_GLIBC)
                 || (os.equals(OperatingSystem.MACOS) && Architecture.get().equals(Architecture.AARCH64));
     }

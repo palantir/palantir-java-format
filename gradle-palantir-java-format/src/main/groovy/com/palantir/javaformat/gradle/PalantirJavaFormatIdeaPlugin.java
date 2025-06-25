@@ -21,7 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Files;
 import com.palantir.gradle.ideaconfiguration.IdeaConfigurationExtension;
 import com.palantir.gradle.ideaconfiguration.IdeaConfigurationPlugin;
-import com.palantir.platform.GradleOperationSystem;
+import com.palantir.platform.GradleOperatingSystem;
 import groovy.util.Node;
 import groovy.util.XmlNodePrinter;
 import groovy.util.XmlParser;
@@ -46,7 +46,7 @@ import org.xml.sax.SAXException;
 public abstract class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
 
     @Nested
-    protected abstract GradleOperationSystem getOperationSystem();
+    protected abstract GradleOperatingSystem getOperatingSystem();
 
     private static final String MIN_IDEA_PLUGIN_VERSION = "2.57.0";
 
@@ -62,7 +62,7 @@ public abstract class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
                     rootProject.getConfigurations().getByName(PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME);
 
             Optional<Configuration> nativeImplConfiguration =
-                    maybeGetNativeImplConfiguration(rootProject, getOperationSystem());
+                    maybeGetNativeImplConfiguration(rootProject, getOperatingSystem());
 
             configureLegacyIdea(rootProject, implConfiguration, nativeImplConfiguration);
             configureIntelliJImport(rootProject, implConfiguration, nativeImplConfiguration);
@@ -76,8 +76,8 @@ public abstract class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
     }
 
     private static Optional<Configuration> maybeGetNativeImplConfiguration(
-            Project rootProject, GradleOperationSystem operationSystem) {
-        return NativeImageFormatProviderPlugin.isNativeImageConfigured(rootProject, operationSystem)
+            Project rootProject, GradleOperatingSystem operatingSystem) {
+        return NativeImageFormatProviderPlugin.isNativeImageConfigured(rootProject, operatingSystem)
                 ? Optional.of(rootProject
                         .getConfigurations()
                         .getByName(NativeImageFormatProviderPlugin.NATIVE_CONFIGURATION_NAME))
