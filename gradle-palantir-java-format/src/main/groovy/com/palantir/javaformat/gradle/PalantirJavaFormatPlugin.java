@@ -37,7 +37,7 @@ public final class PalantirJavaFormatPlugin implements Plugin<Project> {
     public void apply(Project project) {
         project.getRootProject().getPlugins().apply(PalantirJavaFormatProviderPlugin.class);
         project.getRootProject().getPlugins().apply(NativeImageFormatProviderPlugin.class);
-        // project.getRootProject().getPlugins().apply(PalantirJavaFormatIdeaPlugin.class);
+        project.getRootProject().getPlugins().apply(PalantirJavaFormatIdeaPlugin.class);
 
         project.getPlugins().apply(PalantirJavaFormatSpotlessPlugin.class);
 
