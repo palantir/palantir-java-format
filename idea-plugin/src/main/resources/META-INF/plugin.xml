@@ -20,6 +20,7 @@
     <postStartupActivity implementation="com.palantir.javaformat.intellij.InitialConfigurationStartupActivity"/>
     <notificationGroup displayType="BALLOON" id="palantir-java-format parsing error"
                        isLogByDefault="false"/>
+    <formatOnSaveOptions.defaultsProvider implementation="com.palantir.javaformat.intellij.FormatOnSaveOptionsDefaultsProvider"/>
   </extensions>
 
 </idea-plugin>

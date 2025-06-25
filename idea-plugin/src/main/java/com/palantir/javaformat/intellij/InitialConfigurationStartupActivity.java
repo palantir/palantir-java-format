@@ -16,6 +16,8 @@
 
 package com.palantir.javaformat.intellij;
 
+import com.intellij.codeInsight.actions.onSave.FormatOnSaveOptions;
+import com.intellij.codeInsight.actions.onSave.OptimizeImportsOnSaveOptions;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupActivity;
 import org.jetbrains.annotations.NotNull;
@@ -27,5 +29,9 @@ public final class InitialConfigurationStartupActivity implements StartupActivit
         if (settings.isUninitialized()) {
             settings.setEnabled(false);
         }
+        FormatOnSaveOptions formatOnSaveOptions = FormatOnSaveOptions.getInstance(project);
+        formatOnSaveOptions.setRunOnSaveEnabled(true);
+        OptimizeImportsOnSaveOptions optimizeImportsOptions = OptimizeImportsOnSaveOptions.getInstance(project);
+        optimizeImportsOptions.setRunOnSaveEnabled(true);
     }
 }
