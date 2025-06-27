@@ -52,8 +52,8 @@ public final class NativePalantirJavaFormatStep {
 
         private final transient Supplier<File> execSupplier;
 
-        State(Supplier<File> execSupplier) {
-            this.execSupplier = execSupplier;
+        State(Supplier<File> supplier) {
+            this.execSupplier = supplier;
         }
 
         String format(ProcessRunner runner, String input) throws IOException, InterruptedException {
