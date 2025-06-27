@@ -57,8 +57,10 @@ public final class PalantirJavaFormatStep {
         // Since FormatterStepImpl is an input to `SpotlessTask`[2], anything serialized as part of this `State`
         // is used for up-to-date checking for the `SpotlessTask`
         //
-        // [1] https://github.com/diffplug/spotless/blob/52654ef8c4a6191d983b10a2370d53b1ca023f7d/lib/src/main/java/com/diffplug/spotless/LazyForwardingEquality.java#L68
-        // [2] https://github.com/diffplug/spotless/blob/f32701212bf8d327c67d10c35316cb80dcdf577b/plugin-gradle/src/main/java/com/diffplug/gradle/spotless/SpotlessTask.java#L163
+        // [1]
+        // https://github.com/diffplug/spotless/blob/52654ef8c4a6191d983b10a2370d53b1ca023f7d/lib/src/main/java/com/diffplug/spotless/LazyForwardingEquality.java#L68
+        // [2]
+        // https://github.com/diffplug/spotless/blob/f32701212bf8d327c67d10c35316cb80dcdf577b/plugin-gradle/src/main/java/com/diffplug/gradle/spotless/SpotlessTask.java#L163
         @SuppressWarnings({"unused", "FieldCanBeLocal"})
         private FileSignature jarsSignature;
 
