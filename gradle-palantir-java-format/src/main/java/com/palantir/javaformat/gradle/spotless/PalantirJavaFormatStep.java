@@ -88,7 +88,7 @@ public final class PalantirJavaFormatStep {
                     Iterable<File> jars = jarsSupplier.get();
 
                     // Not a performance issue, as Spotless caches this
-                    // https://github.com/CRogers/spotless/blob/228eb10af382b19e130d8d9479f7a95238cb4358/lib/src/main/java/com/diffplug/spotless/FileSignature.java#L138-L143
+                    // https://github.com/diffplug/spotless/blob/228eb10af382b19e130d8d9479f7a95238cb4358/lib/src/main/java/com/diffplug/spotless/FileSignature.java#L138-L143
                     this.jarsSignature = FileSignature.signAsSet(jars);
 
                     return memoizedFormatter.get().formatSourceReflowStringsAndFixImports(input);
