@@ -49,7 +49,18 @@ public final class PalantirJavaFormatStep {
         @SuppressWarnings("unused")
         private final String stepName = NAME;
 
-        // Kept for state serialization purposes.
+        // Spotless' `FormatterStepImpl` implements Java's `Serializable` interface in a weird way:
+        // It serializes this `State` class[1].
+        //
+        // Gradle understands Java's `Serializable`, and uses it to invalidate `@Input`s to tasks.
+        //
+        // Since FormatterStepImpl is an input to `SpotlessTask`[2], anything serialized as part of this `State`
+        // is used for up-to-date checking for the `SpotlessTask`
+        //
+        // [1]
+        // https://github.com/diffplug/spotless/blob/52654ef8c4a6191d983b10a2370d53b1ca023f7d/lib/src/main/java/com/diffplug/spotless/LazyForwardingEquality.java#L68
+        // [2]
+        // https://github.com/diffplug/spotless/blob/f32701212bf8d327c67d10c35316cb80dcdf577b/plugin-gradle/src/main/java/com/diffplug/gradle/spotless/SpotlessTask.java#L163
         @SuppressWarnings({"unused", "FieldCanBeLocal"})
         private FileSignature jarsSignature;
 
@@ -75,7 +86,11 @@ public final class PalantirJavaFormatStep {
                 try {
                     // Only resolve the jars and compute the signature at execution time!
                     Iterable<File> jars = jarsSupplier.get();
+
+                    // Not a performance issue, as Spotless caches this
+                    // https://github.com/diffplug/spotless/blob/228eb10af382b19e130d8d9479f7a95238cb4358/lib/src/main/java/com/diffplug/spotless/FileSignature.java#L138-L143
                     this.jarsSignature = FileSignature.signAsSet(jars);
+
                     return memoizedFormatter.get().formatSourceReflowStringsAndFixImports(input);
                 } catch (IOException e) {
                     throw new RuntimeException(e);

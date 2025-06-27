@@ -46,6 +46,7 @@ public final class NativePalantirJavaFormatStep {
         private static final long serialVersionUID = 1L;
 
         // Kept for state serialization purposes.
+        // For more details, see PalantirJavaFormatStep.State#jarSignature
         @SuppressWarnings({"unused", "FieldCanBeLocal"})
         private FileSignature execSignature;
 
