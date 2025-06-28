@@ -52,6 +52,7 @@ public final class NativePalantirJavaFormatStep {
 
         private final transient Supplier<File> execSupplier;
 
+        @SuppressWarnings("for-rollout:NullAway")
         State(Supplier<File> supplier) {
             this.execSupplier = supplier;
         }
