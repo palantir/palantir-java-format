@@ -75,6 +75,7 @@ public final class PalantirJavaFormatStep {
          * @param jarsSupplier Supplies the jars that contain the palantir-java-format implementation. This is only used for caching and
          * up-to-dateness purposes.
          */
+        @SuppressWarnings("for-rollout:NullAway")
         State(Supplier<Iterable<File>> jarsSupplier, Supplier<FormatterService> memoizedFormatter) {
             this.jarsSupplier = jarsSupplier;
             this.memoizedFormatter = memoizedFormatter;
