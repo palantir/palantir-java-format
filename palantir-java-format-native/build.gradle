@@ -5,8 +5,8 @@ import org.graalvm.buildtools.gradle.tasks.BuildNativeImageTask
 
 buildscript {
     repositories {
-        mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
-        gradlePluginPortal() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
+        mavenCentral()
+        gradlePluginPortal()
     }
     dependencies {
         classpath 'org.graalvm.buildtools:native-gradle-plugin:0.10.4'
