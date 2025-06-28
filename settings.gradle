@@ -1,7 +1,7 @@
 buildscript {
     repositories {
-        mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
-        gradlePluginPortal() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
+        mavenCentral()
+        gradlePluginPortal()
     }
     dependencies {
         classpath 'com.palantir.gradle.jdks:gradle-jdks-settings:0.67.0'
