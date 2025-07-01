@@ -32,7 +32,7 @@ import org.gradle.api.tasks.Nested;
 public abstract class NativeImageFormatProviderPlugin implements Plugin<Project> {
 
     @Nested
-    protected abstract GradleOperatingSystem getOperatingSystem();
+    protected abstract GradleOperatingSystem getOs();
 
     private static final Logger log = Logging.getLogger(NativeImageFormatProviderPlugin.class);
     static final String NATIVE_CONFIGURATION_NAME = "palantirJavaFormatNative";
@@ -43,12 +43,13 @@ public abstract class NativeImageFormatProviderPlugin implements Plugin<Project>
                 rootProject == rootProject.getRootProject(),
                 "May only apply com.palantir.java-format-provider to the root project");
 
-        if (!isNativeImageConfigured(rootProject, getOperatingSystem())) {
+        Provider<OperatingSystem> operatingSystem = getOs().getOperatingSystem();
+        if (!isNativeImageConfigured(rootProject, operatingSystem)) {
             log.info("Skipping native image configuration as it is not supported on this platform");
             return;
         }
+
         String implementationVersion = JavaFormatExtension.class.getPackage().getImplementationVersion();
-        Provider<OperatingSystem> operatingSystem = getOperatingSystem().getOperatingSystem();
         rootProject.getConfigurations().register(NATIVE_CONFIGURATION_NAME, conf -> {
             conf.setDescription("Internal configuration for resolving the palantir-java-format native image");
             conf.setVisible(false);
@@ -74,12 +75,12 @@ public abstract class NativeImageFormatProviderPlugin implements Plugin<Project>
         });
     }
 
-    public static boolean isNativeImageConfigured(Project project, GradleOperatingSystem operatingSystem) {
-        return isNativeImageSupported(operatingSystem) && isNativeFlagEnabled(project);
+    public static boolean isNativeImageConfigured(Project project, Provider<OperatingSystem> operatingSystem) {
+        return isNativeFlagEnabled(project) && isNativeImageSupported(operatingSystem);
     }
 
-    private static boolean isNativeImageSupported(GradleOperatingSystem operatingSystem) {
-        OperatingSystem os = operatingSystem.getOperatingSystem().get();
+    private static boolean isNativeImageSupported(Provider<OperatingSystem> operatingSystem) {
+        OperatingSystem os = operatingSystem.get();
         return os.equals(OperatingSystem.LINUX_GLIBC)
                 || (os.equals(OperatingSystem.MACOS) && Architecture.get().equals(Architecture.AARCH64));
     }

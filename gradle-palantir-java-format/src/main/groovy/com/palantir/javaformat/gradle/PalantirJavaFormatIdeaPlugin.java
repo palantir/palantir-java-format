@@ -22,6 +22,7 @@ import com.google.common.io.Files;
 import com.palantir.gradle.ideaconfiguration.IdeaConfigurationExtension;
 import com.palantir.gradle.ideaconfiguration.IdeaConfigurationPlugin;
 import com.palantir.platform.GradleOperatingSystem;
+import com.palantir.platform.OperatingSystem;
 import groovy.util.Node;
 import groovy.util.XmlNodePrinter;
 import groovy.util.XmlParser;
@@ -39,6 +40,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.Nested;
 import org.gradle.plugins.ide.idea.model.IdeaModel;
 import org.xml.sax.SAXException;
@@ -46,7 +48,7 @@ import org.xml.sax.SAXException;
 public abstract class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
 
     @Nested
-    protected abstract GradleOperatingSystem getOperatingSystem();
+    protected abstract GradleOperatingSystem getOs();
 
     private static final String MIN_IDEA_PLUGIN_VERSION = "2.57.0";
 
@@ -62,7 +64,7 @@ public abstract class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
                     rootProject.getConfigurations().getByName(PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME);
 
             Optional<Configuration> nativeImplConfiguration =
-                    maybeGetNativeImplConfiguration(rootProject, getOperatingSystem());
+                    maybeGetNativeImplConfiguration(rootProject, getOs().getOperatingSystem());
 
             configureLegacyIdea(rootProject, implConfiguration, nativeImplConfiguration);
             configureIntelliJImport(rootProject, implConfiguration, nativeImplConfiguration);
@@ -76,7 +78,7 @@ public abstract class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
     }
 
     private static Optional<Configuration> maybeGetNativeImplConfiguration(
-            Project rootProject, GradleOperatingSystem operatingSystem) {
+            Project rootProject, Provider<OperatingSystem> operatingSystem) {
         return NativeImageFormatProviderPlugin.isNativeImageConfigured(rootProject, operatingSystem)
                 ? Optional.of(rootProject
                         .getConfigurations()

@@ -19,11 +19,12 @@ import com.diffplug.gradle.spotless.SpotlessExtension;
 import com.diffplug.spotless.FormatterStep;
 import com.palantir.javaformat.gradle.spotless.NativePalantirJavaFormatStep;
 import com.palantir.javaformat.gradle.spotless.PalantirJavaFormatStep;
-import com.palantir.platform.GradleOperatingSystem;
+import com.palantir.platform.OperatingSystem;
 import org.gradle.api.JavaVersion;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
+import org.gradle.api.provider.Provider;
 
 /**
  * Class that exists only to encapsulate accessing spotless classes, so that Gradle can generate a decorated class for
@@ -34,12 +35,12 @@ final class SpotlessInterop {
 
     private SpotlessInterop() {}
 
-    static void addSpotlessJavaStep(Project project, GradleOperatingSystem operatingSystem) {
+    static void addSpotlessJavaStep(Project project, Provider<OperatingSystem> operatingSystem) {
         SpotlessExtension spotlessExtension = project.getExtensions().getByType(SpotlessExtension.class);
         spotlessExtension.java(java -> java.addStep(addSpotlessJavaFormatStep(project, operatingSystem)));
     }
 
-    static FormatterStep addSpotlessJavaFormatStep(Project project, GradleOperatingSystem operatingSystem) {
+    static FormatterStep addSpotlessJavaFormatStep(Project project, Provider<OperatingSystem> operatingSystem) {
 
         if (NativeImageFormatProviderPlugin.isNativeImageConfigured(project, operatingSystem)
                 // Native images have lower throughput than Java implementations. This logic gets called by the

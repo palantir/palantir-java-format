@@ -23,7 +23,7 @@ import org.gradle.api.tasks.Nested;
 
 public abstract class PalantirJavaFormatSpotlessPlugin implements Plugin<Project> {
     @Nested
-    protected abstract GradleOperatingSystem getOperatingSystem();
+    protected abstract GradleOperatingSystem getOs();
 
     // The spotless gradle plugin got renamed to 'com.diffplug.spotless' at version 5.0.0
     private static final ImmutableList<String> SPOTLESS_PLUGINS =
@@ -36,7 +36,7 @@ public abstract class PalantirJavaFormatSpotlessPlugin implements Plugin<Project
         project.getPluginManager().withPlugin("java", _javaPlugin -> {
             SPOTLESS_PLUGINS.forEach(
                     spotlessPluginId -> project.getPluginManager().withPlugin(spotlessPluginId, _spotlessPlugin -> {
-                        SpotlessInterop.addSpotlessJavaStep(project, getOperatingSystem());
+                        SpotlessInterop.addSpotlessJavaStep(project, getOs().getOperatingSystem());
                     }));
         });
     }
