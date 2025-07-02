@@ -48,7 +48,6 @@ import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Supplier;
@@ -477,19 +476,19 @@ public final class JavaInput extends Input {
     @SuppressWarnings("unchecked")
     private static Collection<JCDiagnostic> getDiagnostics(DeferredDiagnosticHandler handler) {
         try {
-            // Try the JDK 25+ method first (List<JCDiagnostic>)
-            Method listMethod = DeferredDiagnosticHandler.class.getMethod("getDiagnostics");
-            return (Collection<JCDiagnostic>) listMethod.invoke(handler);
-        } catch (Exception e1) {
-            try {
-                // Fall back to pre-JDK 25 method (Queue<JCDiagnostic>)
-                Method queueMethod = DeferredDiagnosticHandler.class.getMethod("getDiagnostics");
-                return (Collection<JCDiagnostic>) queueMethod.invoke(handler);
-            } catch (Exception e2) {
-                // If all else fails, return empty collection
-                System.err.println("Unable to access diagnostics: " + e2.getMessage());
-                return Collections.emptyList();
-            }
+            return (Collection<JCDiagnostic>) GET_DIAGNOSTICS.invoke(handler);
+        } catch (ReflectiveOperationException e) {
+            throw new LinkageError(e.getMessage(), e);
+        }
+    }
+
+    private static final Method GET_DIAGNOSTICS;
+
+    static {
+        try {
+            GET_DIAGNOSTICS = DeferredDiagnosticHandler.class.getMethod("getDiagnostics");
+        } catch (NoSuchMethodException e) {
+            throw new LinkageError(e.getMessage(), e);
         }
     }
 
