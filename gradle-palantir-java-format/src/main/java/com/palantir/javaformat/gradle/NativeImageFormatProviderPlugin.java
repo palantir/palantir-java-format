@@ -20,6 +20,7 @@ import com.google.common.base.Preconditions;
 import com.palantir.platform.Architecture;
 import com.palantir.platform.GradleOperatingSystem;
 import com.palantir.platform.OperatingSystem;
+import java.util.Collections;
 import java.util.Optional;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
@@ -44,11 +45,6 @@ public abstract class NativeImageFormatProviderPlugin implements Plugin<Project>
                 "May only apply com.palantir.java-format-provider to the root project");
 
         Provider<OperatingSystem> operatingSystem = getOs().getOperatingSystem();
-        if (!isNativeImageConfigured(rootProject, operatingSystem)) {
-            log.info("Skipping native image configuration as it is not supported on this platform");
-            return;
-        }
-
         String implementationVersion = JavaFormatExtension.class.getPackage().getImplementationVersion();
         rootProject.getConfigurations().register(NATIVE_CONFIGURATION_NAME, conf -> {
             conf.setDescription("Internal configuration for resolving the palantir-java-format native image");
@@ -56,21 +52,23 @@ public abstract class NativeImageFormatProviderPlugin implements Plugin<Project>
             conf.setCanBeConsumed(false);
             conf.setCanBeResolved(true);
             conf.defaultDependencies(deps -> {
-                deps.add(rootProject
+                deps.addAllLater(operatingSystem.map(os -> Collections.singletonList(rootProject
                         .getDependencies()
                         .create(String.format(
                                 "com.palantir.javaformat:palantir-java-format-native:%s:nativeImage-%s_%s@%s",
                                 implementationVersion,
-                                operatingSystem.get().uiName(),
+                                os.uiName(),
                                 Architecture.get().uiName(),
-                                getExtension(operatingSystem.get()))));
+                                getExtension(os))))));
             });
             conf.getAttributes().attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "executable-nativeImage");
         });
         rootProject.getDependencies().registerTransform(ExecutableTransform.class, transformSpec -> {
             transformSpec
                     .getFrom()
-                    .attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, getExtension(operatingSystem.get()));
+                    .attributeProvider(
+                            ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE,
+                            operatingSystem.map(NativeImageFormatProviderPlugin::getExtension));
             transformSpec.getTo().attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "executable-nativeImage");
         });
     }

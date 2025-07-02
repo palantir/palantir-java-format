@@ -15,49 +15,58 @@
  */
 package com.palantir.javaformat.gradle;
 
-import com.diffplug.gradle.spotless.SpotlessExtension;
+import com.diffplug.gradle.spotless.JavaExtension;
 import com.diffplug.spotless.FormatterStep;
 import com.palantir.javaformat.gradle.spotless.NativePalantirJavaFormatStep;
 import com.palantir.javaformat.gradle.spotless.PalantirJavaFormatStep;
+import com.palantir.platform.GradleOperatingSystem;
 import com.palantir.platform.OperatingSystem;
+import javax.inject.Inject;
+import org.gradle.api.Action;
 import org.gradle.api.JavaVersion;
 import org.gradle.api.Project;
+import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.gradle.api.provider.Provider;
+import org.gradle.api.tasks.Nested;
 
 /**
  * Class that exists only to encapsulate accessing spotless classes, so that Gradle can generate a decorated class for
  * {@link com.palantir.javaformat.gradle.PalantirJavaFormatSpotlessPlugin} even if spotless is not on the classpath.
  */
-final class SpotlessInterop {
-    private static Logger logger = Logging.getLogger(SpotlessInterop.class);
+public abstract class SpotlessInterop implements Action<JavaExtension> {
+    private static final Logger logger = Logging.getLogger(SpotlessInterop.class);
 
-    private SpotlessInterop() {}
+    private final Project project;
 
-    static void addSpotlessJavaStep(Project project, Provider<OperatingSystem> operatingSystem) {
-        SpotlessExtension spotlessExtension = project.getExtensions().getByType(SpotlessExtension.class);
-        spotlessExtension.java(java -> java.addStep(addSpotlessJavaFormatStep(project, operatingSystem)));
+    @Nested
+    protected abstract GradleOperatingSystem getOs();
+
+    @Inject
+    protected abstract ConfigurationContainer getConfigurations();
+
+    @Inject
+    public SpotlessInterop(Project project) {
+        this.project = project;
     }
 
-    static FormatterStep addSpotlessJavaFormatStep(Project project, Provider<OperatingSystem> operatingSystem) {
+    @Override
+    public void execute(JavaExtension java) {
+        java.addStep(spotlessJavaFormatStep());
+    }
 
+    private FormatterStep spotlessJavaFormatStep() {
+        Provider<OperatingSystem> operatingSystem = getOs().getOperatingSystem();
         if (NativeImageFormatProviderPlugin.isNativeImageConfigured(project, operatingSystem)
-                // Native images have lower throughput than Java implementations. This logic gets called by the
-                // Gradle spotlessApply step, which formats a full project.
-                // If we are already running on java 21, then we can run the spotlessApply logic using the Java
-                // formatter. Otherwise, we need to run the native-image.
                 && JavaVersion.current().compareTo(JavaVersion.VERSION_21) < 0) {
             logger.info("Using the native-image formatter");
-            return NativePalantirJavaFormatStep.create(project.getRootProject()
-                    .getConfigurations()
-                    .getByName(NativeImageFormatProviderPlugin.NATIVE_CONFIGURATION_NAME));
+            return NativePalantirJavaFormatStep.create(
+                    getConfigurations().getByName(NativeImageFormatProviderPlugin.NATIVE_CONFIGURATION_NAME));
         }
         logger.info("Using the Java-based formatter {}", JavaVersion.current());
         return PalantirJavaFormatStep.create(
-                project.getRootProject()
-                        .getConfigurations()
-                        .getByName(PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME),
+                getConfigurations().getByName(PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME),
                 project.getRootProject().getExtensions().getByType(JavaFormatExtension.class));
     }
 }
