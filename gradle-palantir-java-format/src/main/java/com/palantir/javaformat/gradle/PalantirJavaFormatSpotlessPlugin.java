@@ -17,15 +17,10 @@ package com.palantir.javaformat.gradle;
 
 import com.diffplug.gradle.spotless.SpotlessExtension;
 import com.google.common.collect.ImmutableList;
-import com.palantir.platform.GradleOperatingSystem;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.tasks.Nested;
 
 public abstract class PalantirJavaFormatSpotlessPlugin implements Plugin<Project> {
-    @Nested
-    protected abstract GradleOperatingSystem getOs();
-
     // The spotless gradle plugin got renamed to 'com.diffplug.spotless' at version 5.0.0
     private static final ImmutableList<String> SPOTLESS_PLUGINS =
             ImmutableList.of("com.diffplug.gradle.spotless", "com.diffplug.spotless");
