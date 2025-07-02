@@ -46,6 +46,7 @@ fileeditor
 *.ipr
 *.iws
 .idea/
+!.idea/icon.png
 out/
 
 # Eclipse/IntelliJ APT
