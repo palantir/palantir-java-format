@@ -53,6 +53,7 @@ public abstract class SpotlessInterop implements Action<JavaExtension> {
 
     @Override
     public void execute(JavaExtension java) {
+        // This is configuration cache safe as happening afterEvaluate
         java.addStep(spotlessJavaFormatStep());
     }
 
