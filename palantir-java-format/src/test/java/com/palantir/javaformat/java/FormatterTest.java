@@ -31,6 +31,8 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.parallel.Execution;
@@ -446,10 +448,84 @@ public final class FormatterTest {
     @Test
     void canParse_java9_private_interface_methods() {
         assertThatCode(() -> Formatter.create()
-                        .formatSourceAndFixImports(""
+                        .formatSourceAndFixImportsAndDeclarations(""
                                 + "interface T {\n"
                                 + "    private static void foo() {}\n" //
                                 + "}"))
                 .doesNotThrowAnyException();
+    }
+
+    @Nested
+    class formatSourceAndFixImportsAndDeclarations {
+
+        @Test
+        public void removesRedundantPublicInterfaceModifiers() throws FormatterException {
+            String input =
+                    """
+                    interface TestInterface {
+                      public static final int CONSTANT = 1;
+
+                      public abstract void method();
+
+                      public static class InnerClass {}
+                    }
+                    """;
+            String expected =
+                    """
+                    interface TestInterface {
+                      int CONSTANT = 1;
+
+                      void method();
+
+                      class InnerClass {}
+                    }
+                    """;
+            assertThat(Formatter.create().formatSourceAndFixImportsAndDeclarations(input))
+                    .isEqualTo(expected);
+        }
+
+        @Test
+        @Disabled("fixme")
+        public void reordersModifiers() throws FormatterException {
+            String input =
+                    """
+                    class Test {
+                      public final static String VALUE = "test";
+                      protected final abstract void doSomething();
+                    }
+                    """;
+            String expected =
+                    """
+                    class Test {
+                      public static final String VALUE = "test";
+
+                      protected abstract void doSomething();
+                    }
+                    """;
+            assertThat(Formatter.create().formatSourceAndFixImportsAndDeclarations(input))
+                    .isEqualTo(expected);
+        }
+
+        @Test
+        public void handlesNestedClasses() throws FormatterException {
+            String input =
+                    """
+                    class Outer {
+                      public static interface Inner {
+                        public static final int VAL = 1;
+                      }
+                    }
+                    """;
+            String expected =
+                    """
+                    class Outer {
+                      interface Inner {
+                        int VAL = 1;
+                      }
+                    }
+                    """;
+            assertThat(Formatter.create().formatSourceAndFixImportsAndDeclarations(input))
+                    .isEqualTo(expected);
+        }
     }
 }

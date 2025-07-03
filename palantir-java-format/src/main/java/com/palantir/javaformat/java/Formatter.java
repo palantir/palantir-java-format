@@ -14,6 +14,9 @@
 
 package com.palantir.javaformat.java;
 
+import static com.palantir.javaformat.java.ImportOrderer.reorderImports;
+import static com.palantir.javaformat.java.RemoveUnusedDeclarations.removeUnusedDeclarations;
+import static com.palantir.javaformat.java.RemoveUnusedImports.removeUnusedImports;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -215,18 +218,8 @@ public final class Formatter {
     }
 
     static boolean errorDiagnostic(Diagnostic<?> input) {
-        if (input.getKind() != Diagnostic.Kind.ERROR) {
-            return false;
-        }
-        switch (input.getCode()) {
-            case "compiler.err.invalid.meth.decl.ret.type.req":
-                // accept constructor-like method declarations that don't match the name of their
-                // enclosing class
-                return false;
-            default:
-                break;
-        }
-        return true;
+        return input.getKind() == Diagnostic.Kind.ERROR
+                && !input.getCode().equals("compiler.err.invalid.meth.decl.ret.type.req");
     }
 
     /**
@@ -273,6 +266,21 @@ public final class Formatter {
     }
 
     /**
+     * Formats an input string (a Java compilation unit) and fixes imports and redundant declarations.
+     *
+     * <p>Fixing imports includes ordering, spacing, and removal of unused import statements.
+     *
+     * @param input the input string
+     * @return the output string
+     * @throws FormatterException if the input string cannot be parsed
+     * @see <a href="https://google.github.io/styleguide/javaguide.html#s3.3.3-import-ordering-and-spacing">Google Java
+     * Style Guide - 3.3.3 Import ordering and spacing</a>
+     */
+    public String formatSourceAndFixImportsAndDeclarations(String input) throws FormatterException {
+        return formatSourceAndFixImports(removeUnusedDeclarations(input));
+    }
+
+    /**
      * Fixes imports (e.g. ordering, spacing, and removal of unused import statements).
      *
      * @param input the input string
@@ -282,7 +290,7 @@ public final class Formatter {
      * Style Guide - 3.3.3 Import ordering and spacing</a>
      */
     public String fixImports(String input) throws FormatterException {
-        return ImportOrderer.reorderImports(RemoveUnusedImports.removeUnusedImports(input), options.style());
+        return reorderImports(removeUnusedImports(input), options.style());
     }
 
     /**
