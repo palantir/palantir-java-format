@@ -21,8 +21,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Files;
 import com.palantir.gradle.ideaconfiguration.IdeaConfigurationExtension;
 import com.palantir.gradle.ideaconfiguration.IdeaConfigurationPlugin;
-import com.palantir.platform.GradleOperatingSystem;
-import com.palantir.platform.OperatingSystem;
 import groovy.util.Node;
 import groovy.util.XmlNodePrinter;
 import groovy.util.XmlParser;
@@ -36,11 +34,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import javax.inject.Inject;
 import javax.xml.parsers.ParserConfigurationException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
-import org.gradle.api.provider.Provider;
+import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.tasks.Nested;
 import org.gradle.plugins.ide.idea.model.IdeaModel;
 import org.xml.sax.SAXException;
@@ -48,7 +47,10 @@ import org.xml.sax.SAXException;
 public abstract class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
 
     @Nested
-    protected abstract GradleOperatingSystem getOs();
+    protected abstract NativeImageConfigured getNativeImageConfigured();
+
+    @Inject
+    protected abstract ConfigurationContainer getConfigurations();
 
     private static final String MIN_IDEA_PLUGIN_VERSION = "2.57.0";
 
@@ -63,8 +65,7 @@ public abstract class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
             Configuration implConfiguration =
                     rootProject.getConfigurations().getByName(PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME);
 
-            Optional<Configuration> nativeImplConfiguration =
-                    maybeGetNativeImplConfiguration(rootProject, getOs().getOperatingSystem());
+            Optional<Configuration> nativeImplConfiguration = maybeGetNativeImplConfiguration();
 
             configureLegacyIdea(rootProject, implConfiguration, nativeImplConfiguration);
             configureIntelliJImport(rootProject, implConfiguration, nativeImplConfiguration);
@@ -77,12 +78,9 @@ public abstract class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
                 .register("palantir-java-format", dep -> dep.atLeastVersion(MIN_IDEA_PLUGIN_VERSION));
     }
 
-    private static Optional<Configuration> maybeGetNativeImplConfiguration(
-            Project rootProject, Provider<OperatingSystem> operatingSystem) {
-        return NativeImageFormatProviderPlugin.isNativeImageConfigured(rootProject, operatingSystem)
-                ? Optional.of(rootProject
-                        .getConfigurations()
-                        .getByName(NativeImageFormatProviderPlugin.NATIVE_CONFIGURATION_NAME))
+    private Optional<Configuration> maybeGetNativeImplConfiguration() {
+        return getNativeImageConfigured().isNativeImageConfigured()
+                ? Optional.of(getConfigurations().getByName(NativeImageFormatProviderPlugin.NATIVE_CONFIGURATION_NAME))
                 : Optional.empty();
     }
 

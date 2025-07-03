@@ -19,8 +19,6 @@ import com.diffplug.gradle.spotless.JavaExtension;
 import com.diffplug.spotless.FormatterStep;
 import com.palantir.javaformat.gradle.spotless.NativePalantirJavaFormatStep;
 import com.palantir.javaformat.gradle.spotless.PalantirJavaFormatStep;
-import com.palantir.platform.GradleOperatingSystem;
-import com.palantir.platform.OperatingSystem;
 import javax.inject.Inject;
 import org.gradle.api.Action;
 import org.gradle.api.JavaVersion;
@@ -28,7 +26,6 @@ import org.gradle.api.Project;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
-import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.Nested;
 
 /**
@@ -41,7 +38,7 @@ public abstract class SpotlessInterop implements Action<JavaExtension> {
     private final Project project;
 
     @Nested
-    protected abstract GradleOperatingSystem getOs();
+    protected abstract NativeImageConfigured getNativeImageConfigured();
 
     @Inject
     protected abstract ConfigurationContainer getConfigurations();
@@ -58,8 +55,7 @@ public abstract class SpotlessInterop implements Action<JavaExtension> {
     }
 
     private FormatterStep spotlessJavaFormatStep() {
-        Provider<OperatingSystem> operatingSystem = getOs().getOperatingSystem();
-        if (NativeImageFormatProviderPlugin.isNativeImageConfigured(project, operatingSystem)
+        if (getNativeImageConfigured().isNativeImageConfigured()
                 && JavaVersion.current().compareTo(JavaVersion.VERSION_21) < 0) {
             logger.info("Using the native-image formatter");
             return NativePalantirJavaFormatStep.create(

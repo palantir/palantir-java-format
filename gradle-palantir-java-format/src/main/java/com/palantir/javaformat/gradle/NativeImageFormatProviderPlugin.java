@@ -21,12 +21,9 @@ import com.palantir.platform.Architecture;
 import com.palantir.platform.GradleOperatingSystem;
 import com.palantir.platform.OperatingSystem;
 import java.util.Collections;
-import java.util.Optional;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.type.ArtifactTypeDefinition;
-import org.gradle.api.logging.Logger;
-import org.gradle.api.logging.Logging;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.Nested;
 
@@ -35,7 +32,6 @@ public abstract class NativeImageFormatProviderPlugin implements Plugin<Project>
     @Nested
     protected abstract GradleOperatingSystem getOs();
 
-    private static final Logger log = Logging.getLogger(NativeImageFormatProviderPlugin.class);
     static final String NATIVE_CONFIGURATION_NAME = "palantirJavaFormatNative";
 
     @Override
@@ -71,22 +67,6 @@ public abstract class NativeImageFormatProviderPlugin implements Plugin<Project>
                             operatingSystem.map(NativeImageFormatProviderPlugin::getExtension));
             transformSpec.getTo().attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, "executable-nativeImage");
         });
-    }
-
-    public static boolean isNativeImageConfigured(Project project, Provider<OperatingSystem> operatingSystem) {
-        return isNativeFlagEnabled(project) && isNativeImageSupported(operatingSystem);
-    }
-
-    private static boolean isNativeImageSupported(Provider<OperatingSystem> operatingSystem) {
-        OperatingSystem os = operatingSystem.get();
-        return os.equals(OperatingSystem.LINUX_GLIBC)
-                || (os.equals(OperatingSystem.MACOS) && Architecture.get().equals(Architecture.AARCH64));
-    }
-
-    private static boolean isNativeFlagEnabled(Project project) {
-        return Optional.ofNullable(project.findProperty("palantir.native.formatter"))
-                .map(value -> Boolean.parseBoolean((String) value))
-                .orElse(false);
     }
 
     static String getExtension(OperatingSystem operatingSystem) {
