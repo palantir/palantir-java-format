@@ -38,7 +38,7 @@ public abstract class SpotlessInterop implements Action<JavaExtension> {
     private final Project project;
 
     @Nested
-    protected abstract NativeImageConfigured getNativeImageConfigured();
+    protected abstract NativeImageSupport getNativeImageConfigured();
 
     @Inject
     protected abstract ConfigurationContainer getConfigurations();

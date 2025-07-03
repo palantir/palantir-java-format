@@ -23,7 +23,7 @@ import javax.inject.Inject;
 import org.gradle.api.provider.ProviderFactory;
 import org.gradle.api.tasks.Nested;
 
-public abstract class NativeImageConfigured {
+public abstract class NativeImageSupport {
 
     @Nested
     protected abstract GradleOperatingSystem getOs();

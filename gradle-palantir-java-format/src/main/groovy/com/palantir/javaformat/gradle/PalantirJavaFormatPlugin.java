@@ -35,7 +35,7 @@ import org.gradle.api.tasks.TaskAction;
 public abstract class PalantirJavaFormatPlugin implements Plugin<Project> {
 
     @Nested
-    protected abstract NativeImageConfigured getNativeImageConfigured();
+    protected abstract NativeImageSupport getNativeImageConfigured();
 
     @Override
     public void apply(Project project) {
