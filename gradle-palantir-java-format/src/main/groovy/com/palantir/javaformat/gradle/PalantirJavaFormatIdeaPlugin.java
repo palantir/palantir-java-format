@@ -47,7 +47,7 @@ import org.xml.sax.SAXException;
 public abstract class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
 
     @Nested
-    protected abstract NativeImageSupport getNativeImageConfigured();
+    protected abstract NativeImageSupport getNativeImageSupport();
 
     @Inject
     protected abstract ConfigurationContainer getConfigurations();
@@ -79,7 +79,7 @@ public abstract class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
     }
 
     private Optional<Configuration> maybeGetNativeImplConfiguration() {
-        return getNativeImageConfigured().isNativeImageConfigured()
+        return getNativeImageSupport().isNativeImageConfigured()
                 ? Optional.of(getConfigurations().getByName(NativeImageFormatProviderPlugin.NATIVE_CONFIGURATION_NAME))
                 : Optional.empty();
     }

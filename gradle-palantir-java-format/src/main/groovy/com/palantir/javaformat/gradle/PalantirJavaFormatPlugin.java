@@ -35,7 +35,7 @@ import org.gradle.api.tasks.TaskAction;
 public abstract class PalantirJavaFormatPlugin implements Plugin<Project> {
 
     @Nested
-    protected abstract NativeImageSupport getNativeImageConfigured();
+    protected abstract NativeImageSupport getNativeImageSupport();
 
     @Override
     public void apply(Project project) {
@@ -50,7 +50,7 @@ public abstract class PalantirJavaFormatPlugin implements Plugin<Project> {
             // TODO(dfox): in the future we may want to offer a simple 'format' task so people don't need to use
             // spotless to try out our formatter
             project.getTasks().register("formatDiff", FormatDiffTask.class, task -> {
-                if (getNativeImageConfigured().isNativeImageConfigured()) {
+                if (getNativeImageSupport().isNativeImageConfigured()) {
                     task.getNativeImage().fileProvider(getNativeImplConfiguration(project));
                 }
             });

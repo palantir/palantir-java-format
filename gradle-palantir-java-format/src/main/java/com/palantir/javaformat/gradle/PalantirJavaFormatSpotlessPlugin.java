@@ -17,6 +17,8 @@ package com.palantir.javaformat.gradle;
 
 import com.diffplug.gradle.spotless.SpotlessExtension;
 import com.google.common.collect.ImmutableList;
+import com.palantir.javaformat.java.FormatterService;
+import java.util.function.Supplier;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
@@ -30,7 +32,10 @@ public abstract class PalantirJavaFormatSpotlessPlugin implements Plugin<Project
         Project rootProject = project.getRootProject();
         rootProject.getPluginManager().apply(PalantirJavaFormatProviderPlugin.class);
 
-        SpotlessInterop spotlessInterop = rootProject.getObjects().newInstance(SpotlessInterop.class, rootProject);
+        Supplier<FormatterService> memoizedService =
+                rootProject.getExtensions().getByType(JavaFormatExtension.class)::serviceLoad;
+
+        SpotlessInterop spotlessInterop = rootProject.getObjects().newInstance(SpotlessInterop.class, memoizedService);
         project.getPluginManager().withPlugin("java", _javaPlugin -> {
             SPOTLESS_PLUGINS.forEach(
                     spotlessPluginId -> project.getPluginManager().withPlugin(spotlessPluginId, _spotlessPlugin -> {

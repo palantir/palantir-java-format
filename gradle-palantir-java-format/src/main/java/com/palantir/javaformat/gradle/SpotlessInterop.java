@@ -19,10 +19,11 @@ import com.diffplug.gradle.spotless.JavaExtension;
 import com.diffplug.spotless.FormatterStep;
 import com.palantir.javaformat.gradle.spotless.NativePalantirJavaFormatStep;
 import com.palantir.javaformat.gradle.spotless.PalantirJavaFormatStep;
+import com.palantir.javaformat.java.FormatterService;
+import java.util.function.Supplier;
 import javax.inject.Inject;
 import org.gradle.api.Action;
 import org.gradle.api.JavaVersion;
-import org.gradle.api.Project;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -35,17 +36,17 @@ import org.gradle.api.tasks.Nested;
 public abstract class SpotlessInterop implements Action<JavaExtension> {
     private static final Logger logger = Logging.getLogger(SpotlessInterop.class);
 
-    private final Project project;
+    private final Supplier<FormatterService> formatterService;
 
     @Nested
-    protected abstract NativeImageSupport getNativeImageConfigured();
+    protected abstract NativeImageSupport getNativeImageSupport();
 
     @Inject
     protected abstract ConfigurationContainer getConfigurations();
 
     @Inject
-    public SpotlessInterop(Project project) {
-        this.project = project;
+    public SpotlessInterop(Supplier<FormatterService> formatterService) {
+        this.formatterService = formatterService;
     }
 
     @Override
@@ -55,7 +56,7 @@ public abstract class SpotlessInterop implements Action<JavaExtension> {
     }
 
     private FormatterStep spotlessJavaFormatStep() {
-        if (getNativeImageConfigured().isNativeImageConfigured()
+        if (getNativeImageSupport().isNativeImageConfigured()
                 && JavaVersion.current().compareTo(JavaVersion.VERSION_21) < 0) {
             logger.info("Using the native-image formatter");
             return NativePalantirJavaFormatStep.create(
@@ -63,7 +64,6 @@ public abstract class SpotlessInterop implements Action<JavaExtension> {
         }
         logger.info("Using the Java-based formatter {}", JavaVersion.current());
         return PalantirJavaFormatStep.create(
-                getConfigurations().getByName(PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME),
-                project.getRootProject().getExtensions().getByType(JavaFormatExtension.class));
+                getConfigurations().getByName(PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME), formatterService);
     }
 }
