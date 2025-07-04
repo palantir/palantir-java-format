@@ -115,5 +115,5 @@ tasks.named("test").configure {
 }
 
 gradleTestUtils {
-    gradleVersions = ['8.14.2']
+    gradleVersions = ['8.14.3']
 }
