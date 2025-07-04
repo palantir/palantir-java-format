@@ -15,23 +15,33 @@
  */
 package com.palantir.javaformat.gradle;
 
+import com.diffplug.gradle.spotless.SpotlessExtension;
 import com.google.common.collect.ImmutableList;
+import com.palantir.javaformat.java.FormatterService;
+import java.util.function.Supplier;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
-public class PalantirJavaFormatSpotlessPlugin implements Plugin<Project> {
+public abstract class PalantirJavaFormatSpotlessPlugin implements Plugin<Project> {
     // The spotless gradle plugin got renamed to 'com.diffplug.spotless' at version 5.0.0
     private static final ImmutableList<String> SPOTLESS_PLUGINS =
             ImmutableList.of("com.diffplug.gradle.spotless", "com.diffplug.spotless");
 
     @Override
     public void apply(Project project) {
-        project.getRootProject().getPluginManager().apply(PalantirJavaFormatProviderPlugin.class);
+        Project rootProject = project.getRootProject();
+        rootProject.getPluginManager().apply(PalantirJavaFormatProviderPlugin.class);
 
+        Supplier<FormatterService> memoizedService =
+                rootProject.getExtensions().getByType(JavaFormatExtension.class)::serviceLoad;
+
+        SpotlessInterop spotlessInterop = rootProject.getObjects().newInstance(SpotlessInterop.class, memoizedService);
         project.getPluginManager().withPlugin("java", _javaPlugin -> {
             SPOTLESS_PLUGINS.forEach(
                     spotlessPluginId -> project.getPluginManager().withPlugin(spotlessPluginId, _spotlessPlugin -> {
-                        SpotlessInterop.addSpotlessJavaStep(project);
+                        SpotlessExtension spotlessExtension =
+                                project.getExtensions().getByType(SpotlessExtension.class);
+                        spotlessExtension.java(spotlessInterop);
                     }));
         });
     }

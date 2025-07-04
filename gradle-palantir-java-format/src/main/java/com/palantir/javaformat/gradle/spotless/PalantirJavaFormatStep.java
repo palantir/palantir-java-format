@@ -18,7 +18,6 @@ package com.palantir.javaformat.gradle.spotless;
 import com.diffplug.spotless.FileSignature;
 import com.diffplug.spotless.FormatterFunc;
 import com.diffplug.spotless.FormatterStep;
-import com.palantir.javaformat.gradle.JavaFormatExtension;
 import com.palantir.javaformat.java.FormatterService;
 import java.io.File;
 import java.io.IOException;
@@ -35,9 +34,8 @@ public final class PalantirJavaFormatStep {
     private static final String NAME = "palantir-java-format";
 
     /** Creates a step which formats everything - code, import order, and unused imports. */
-    public static FormatterStep create(Configuration palantirJavaFormat, JavaFormatExtension extension) {
+    public static FormatterStep create(Configuration palantirJavaFormat, Supplier<FormatterService> memoizedService) {
         ensureImplementationNotDirectlyLoadable();
-        Supplier<FormatterService> memoizedService = extension::serviceLoad;
         return FormatterStep.createLazy(
                 NAME, () -> new State(palantirJavaFormat::getFiles, memoizedService), State::createFormat);
     }

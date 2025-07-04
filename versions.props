@@ -21,5 +21,5 @@ org.slf4j:* = 2.0.17
 com.fasterxml.jackson.*:* = 2.18.3
 com.fasterxml.jackson.core:jackson-databind = 2.18.3
 org.openjdk.jmh:* = 1.37
-com.palantir.gradle.utils:* = 0.10.0
+com.palantir.gradle.utils:* = 0.12.0
 com.palantir.gradle.idea-configuration:gradle-idea-configuration = 0.3.0
