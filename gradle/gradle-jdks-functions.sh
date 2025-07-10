@@ -112,9 +112,9 @@ export ARCH
 
 is_arch_os_supported() {
   if [ "$OS" = "unsupported" ] || [ "$ARCH" = "unsupported" ]; then
-    echo false
+    return 1 # false
   fi
-  echo true
+  return 0 # true
 }
 
 install_and_setup_jdks() {
