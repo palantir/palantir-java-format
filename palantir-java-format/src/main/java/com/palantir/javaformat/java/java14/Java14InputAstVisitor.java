@@ -17,7 +17,6 @@
 package com.palantir.javaformat.java.java14;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.sun.source.tree.Tree.Kind.BLOCK;
 
 import com.google.common.base.Verify;
 import com.google.common.collect.ImmutableList;
@@ -38,7 +37,6 @@ import com.sun.source.tree.ModifiersTree;
 import com.sun.source.tree.ModuleTree;
 import com.sun.source.tree.SwitchExpressionTree;
 import com.sun.source.tree.Tree;
-import com.sun.source.tree.Tree.Kind;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.tree.YieldTree;
 import com.sun.tools.javac.code.Flags;
@@ -301,8 +299,8 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
         switch (node.getCaseKind()) {
             case STATEMENT:
                 token(":");
-                boolean isBlock = node.getStatements().size() == 1
-                        && node.getStatements().get(0).getKind() == BLOCK;
+                boolean isBlock =
+                        node.getStatements().size() == 1 && node.getStatements().get(0) instanceof BlockTree;
                 builder.open(isBlock ? ZERO : plusTwo);
                 if (isBlock) {
                     builder.space();
@@ -315,7 +313,7 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
                 builder.space();
                 token("-");
                 token(">");
-                if (node.getBody().getKind() == BLOCK) {
+                if (node.getBody() instanceof BlockTree) {
                     builder.close();
                     builder.space();
                     // Explicit call with {@link CollapseEmptyOrNot.YES} to handle empty case blocks.
@@ -348,7 +346,7 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
         sync(node);
         // Also format switch expressions as statement body instead of inlining them
         boolean statementBody = node.getBodyKind() == LambdaExpressionTree.BodyKind.STATEMENT
-                || node.getBody().getKind() == Kind.SWITCH_EXPRESSION;
+                || node.getBody() instanceof SwitchExpressionTree;
         visitLambdaExpression(node, statementBody);
         return null;
     }
