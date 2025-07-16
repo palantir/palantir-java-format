@@ -1,0 +1,11 @@
+type: fix
+fix:
+  description: |-
+    Fix the following error when running under JDK 25 EA:
+
+    ```
+    'java.util.Queue com.sun.tools.javac.util.Log$DeferredDiagnosticHandler.getDiagnostics()'
+    java.lang.NoSuchMethodError: 'java.util.Queue com.sun.tools.javac.util.Log$DeferredDiagnosticHandler.getDiagnostics()'
+    ```
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/1367
