@@ -168,6 +168,7 @@ public final class Level extends Doc {
         private final CommentsHelper commentsHelper;
         private final int maxWidth;
         private final State state;
+
         private final Obs.LevelNode levelNode;
 
         public BreakImpl(CommentsHelper commentsHelper, int maxWidth, State state, Obs.LevelNode levelNode) {
