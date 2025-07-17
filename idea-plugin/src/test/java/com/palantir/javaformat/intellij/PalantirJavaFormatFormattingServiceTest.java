@@ -103,6 +103,7 @@ public class PalantirJavaFormatFormattingServiceTest {
     @NotNull
     protected LightProjectDescriptor getProjectDescriptor() {
         return new DefaultLightProjectDescriptor() {
+            @SuppressWarnings("for-rollout:PreferUncheckedIoException")
             @Override
             public Sdk getSdk() {
                 try {

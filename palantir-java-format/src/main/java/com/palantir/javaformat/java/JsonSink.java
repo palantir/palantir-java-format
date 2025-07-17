@@ -86,6 +86,7 @@ public final class JsonSink implements Sink {
         return acceptedExplorationId -> json.put("acceptedExplorationId", acceptedExplorationId);
     }
 
+    @SuppressWarnings("for-rollout:PreferUncheckedIoException")
     @Override
     public String getOutput() {
         try {

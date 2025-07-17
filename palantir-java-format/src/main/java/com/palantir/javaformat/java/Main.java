@@ -183,6 +183,7 @@ public final class Main {
         return allOk ? 0 : 1;
     }
 
+    @SuppressWarnings("for-rollout:PreferUncheckedIoException")
     private int formatStdin(CommandLineOptions parameters, JavaFormatterOptions options) {
         String input;
         try {

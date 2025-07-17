@@ -48,6 +48,7 @@ class Trees {
     }
 
     /** Returns the source text for the node. */
+    @SuppressWarnings("for-rollout:PreferUncheckedIoException")
     static String getSourceForNode(Tree node, TreePath path) {
         CharSequence source;
         try {

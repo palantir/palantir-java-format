@@ -207,6 +207,7 @@ final class FormatterProvider {
                 .toArray(URL[]::new);
     }
 
+    @SuppressWarnings("for-rollout:PreferUncheckedIoException")
     private static List<Path> listDirAsUrlsUnchecked(Path dir) {
         try (Stream<Path> list = Files.list(dir)) {
             return list.collect(Collectors.toList());

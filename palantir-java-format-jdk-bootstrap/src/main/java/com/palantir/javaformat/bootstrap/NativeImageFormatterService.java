@@ -42,6 +42,7 @@ public class NativeImageFormatterService implements FormatterService {
         this.nativeImagePath = nativeImagePath;
     }
 
+    @SuppressWarnings("for-rollout:PreferUncheckedIoException")
     @Override
     public ImmutableList<Replacement> getFormatReplacements(String input, Collection<Range<Integer>> ranges) {
         try {
@@ -63,6 +64,7 @@ public class NativeImageFormatterService implements FormatterService {
         }
     }
 
+    @SuppressWarnings("for-rollout:PreferUncheckedIoException")
     @Override
     public String formatSourceReflowStringsAndFixImports(String input) {
         try {
@@ -72,6 +74,7 @@ public class NativeImageFormatterService implements FormatterService {
         }
     }
 
+    @SuppressWarnings("for-rollout:PreferUncheckedIoException")
     @Override
     public String fixImports(String input) {
         try {
