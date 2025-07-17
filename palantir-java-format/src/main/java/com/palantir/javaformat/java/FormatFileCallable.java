@@ -23,6 +23,7 @@ import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
 import com.palantir.javaformat.Utils;
+import java.io.UncheckedIOException;
 import java.util.concurrent.Callable;
 
 /** Encapsulates information about a file to be formatted, including which parts of the file to format. */
@@ -53,14 +54,13 @@ class FormatFileCallable implements Callable<String> {
         return formatFile(formatter);
     }
 
-    @SuppressWarnings("for-rollout:PreferUncheckedIoException")
     private String formatReplacements(Formatter formatter) throws FormatterException {
         ImmutableList<Replacement> replacements =
                 formatter.getFormatReplacements(input, characterRanges(input).asRanges());
         try {
             return MAPPER.writeValueAsString(replacements);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("Error serializing replacement output", e);
+            throw new UncheckedIOException("Error serializing replacement output", e);
         }
     }
 

@@ -45,6 +45,7 @@ import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.Log;
 import com.sun.tools.javac.util.Options;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URI;
 import java.util.Collection;
 import javax.tools.Diagnostic;
@@ -163,7 +164,6 @@ public final class Formatter {
         return javaOutput;
     }
 
-    @SuppressWarnings("for-rollout:PreferUncheckedIoException")
     static JCCompilationUnit parseJcCompilationUnit(Context context, String sourceText) throws FormatterException {
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
         context.put(DiagnosticListener.class, diagnostics);
@@ -174,7 +174,7 @@ public final class Formatter {
             fileManager.setLocation(StandardLocation.PLATFORM_CLASS_PATH, ImmutableList.of());
         } catch (IOException e) {
             // impossible
-            throw new RuntimeException(e);
+            throw new UncheckedIOException(e);
         }
         SimpleJavaFileObject source = new SimpleJavaFileObject(URI.create("source"), JavaFileObject.Kind.SOURCE) {
             @Override

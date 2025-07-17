@@ -22,6 +22,7 @@ import com.palantir.javaformat.java.FormatterService;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.UncheckedIOException;
 import java.util.function.Supplier;
 import org.gradle.api.artifacts.Configuration;
 
@@ -79,7 +80,7 @@ public final class PalantirJavaFormatStep {
             this.memoizedFormatter = memoizedFormatter;
         }
 
-        @SuppressWarnings({"NullableProblems", "for-rollout:PreferUncheckedIoException"})
+        @SuppressWarnings("NullableProblems")
         FormatterFunc createFormat() {
             return input -> {
                 try {
@@ -92,7 +93,7 @@ public final class PalantirJavaFormatStep {
 
                     return memoizedFormatter.get().formatSourceReflowStringsAndFixImports(input);
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    throw new UncheckedIOException(e);
                 }
             };
         }

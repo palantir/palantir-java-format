@@ -29,6 +29,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -142,12 +143,11 @@ public final class FileBasedTests {
         return fullTestPath.resolve(testName + ".output");
     }
 
-    @SuppressWarnings("for-rollout:PreferUncheckedIoException")
     public void writeFormatterOutput(String testName, String output) {
         try (BufferedWriter writer = Files.newBufferedWriter(getOutputTestPath(testName))) {
             writer.append(output);
         } catch (IOException e) {
-            throw new RuntimeException("Couldn't recreate test output for " + testName, e);
+            throw new UncheckedIOException("Couldn't recreate test output for " + testName, e);
         }
     }
 }
