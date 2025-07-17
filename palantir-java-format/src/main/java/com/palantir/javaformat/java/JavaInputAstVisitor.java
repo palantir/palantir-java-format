@@ -3623,6 +3623,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     }
 
     /** Add a list of declarations. */
+    @SuppressWarnings("for-rollout:NullAway")
     protected void addBodyDeclarations(
             List<? extends Tree> bodyDeclarations, BracesOrNot braces, FirstDeclarationsOrNot first0) {
         if (bodyDeclarations.isEmpty()) {
@@ -3648,7 +3649,6 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 Tree bodyDeclaration = it.next();
                 dropEmptyDeclarations();
                 builder.forcedBreak();
-                @SuppressWarnings("for-rollout:NullAway")
                 boolean thisOneGetsBlankLineBefore =
                         !(bodyDeclaration instanceof VariableTree) || hasJavaDoc(bodyDeclaration);
                 if (first) {
@@ -3715,7 +3715,6 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
      *
      * <p>e.g. {@code int x, y;} is parsed as {@code int x; int y;}.
      */
-    @SuppressWarnings("for-rollout:NullAway")
     private List<VariableTree> variableFragments(PeekingIterator<? extends Tree> it, Tree first) {
         List<VariableTree> fragments = new ArrayList<>();
         if (first instanceof VariableTree) {

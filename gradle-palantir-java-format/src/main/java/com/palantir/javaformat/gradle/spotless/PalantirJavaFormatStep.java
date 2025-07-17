@@ -79,7 +79,7 @@ public final class PalantirJavaFormatStep {
             this.memoizedFormatter = memoizedFormatter;
         }
 
-        @SuppressWarnings("NullableProblems")
+        @SuppressWarnings({"NullableProblems", "for-rollout:PreferUncheckedIoException"})
         FormatterFunc createFormat() {
             return input -> {
                 try {

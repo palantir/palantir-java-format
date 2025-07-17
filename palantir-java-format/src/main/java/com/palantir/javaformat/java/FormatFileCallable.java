@@ -53,6 +53,7 @@ class FormatFileCallable implements Callable<String> {
         return formatFile(formatter);
     }
 
+    @SuppressWarnings("for-rollout:PreferUncheckedIoException")
     private String formatReplacements(Formatter formatter) throws FormatterException {
         ImmutableList<Replacement> replacements =
                 formatter.getFormatReplacements(input, characterRanges(input).asRanges());

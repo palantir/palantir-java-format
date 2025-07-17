@@ -163,6 +163,7 @@ public final class Formatter {
         return javaOutput;
     }
 
+    @SuppressWarnings("for-rollout:PreferUncheckedIoException")
     static JCCompilationUnit parseJcCompilationUnit(Context context, String sourceText) throws FormatterException {
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
         context.put(DiagnosticListener.class, diagnostics);

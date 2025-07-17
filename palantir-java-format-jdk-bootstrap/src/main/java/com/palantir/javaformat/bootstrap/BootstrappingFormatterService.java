@@ -50,6 +50,7 @@ public final class BootstrappingFormatterService implements FormatterService {
         this.implementationClassPath = implementationClassPath;
     }
 
+    @SuppressWarnings("for-rollout:PreferUncheckedIoException")
     @Override
     public ImmutableList<Replacement> getFormatReplacements(String input, Collection<Range<Integer>> ranges) {
         try {
@@ -59,6 +60,7 @@ public final class BootstrappingFormatterService implements FormatterService {
         }
     }
 
+    @SuppressWarnings("for-rollout:PreferUncheckedIoException")
     @Override
     public String formatSourceReflowStringsAndFixImports(String input) {
         try {
@@ -68,6 +70,7 @@ public final class BootstrappingFormatterService implements FormatterService {
         }
     }
 
+    @SuppressWarnings("for-rollout:PreferUncheckedIoException")
     @Override
     public String fixImports(String input) throws FormatterException {
         try {

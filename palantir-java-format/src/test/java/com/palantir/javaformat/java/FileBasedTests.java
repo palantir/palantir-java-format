@@ -142,6 +142,7 @@ public final class FileBasedTests {
         return fullTestPath.resolve(testName + ".output");
     }
 
+    @SuppressWarnings("for-rollout:PreferUncheckedIoException")
     public void writeFormatterOutput(String testName, String output) {
         try (BufferedWriter writer = Files.newBufferedWriter(getOutputTestPath(testName))) {
             writer.append(output);

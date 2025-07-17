@@ -59,6 +59,7 @@ import javax.tools.JavaFileObject.Kind;
 import javax.tools.SimpleJavaFileObject;
 
 /** {@code JavaInput} extends {@link Input} to represent a Java input document. */
+@SuppressWarnings("for-rollout:ThrowError")
 public final class JavaInput extends Input {
     /**
      * A {@code JavaInput} is a sequence of {@link Tok}s that cover the Java input. A {@link Tok} is either a token (if
@@ -475,7 +476,7 @@ public final class JavaInput extends Input {
      * @param handler the diagnostic handler
      * @return a collection of diagnostics
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "for-rollout:ThrowError"})
     private static Collection<JCDiagnostic> getDiagnostics(DeferredDiagnosticHandler handler) {
         try {
             return (Collection<JCDiagnostic>) GET_DIAGNOSTICS.invoke(handler);

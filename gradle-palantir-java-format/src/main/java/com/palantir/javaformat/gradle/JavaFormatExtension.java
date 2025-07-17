@@ -41,6 +41,7 @@ public class JavaFormatExtension {
 
     @SuppressWarnings("for-rollout:NullAway")
     private FormatterService serviceLoadInternal() {
+        @SuppressWarnings("for-rollout:PreferUncheckedIoException")
         URL[] jarUris = configuration.getFiles().stream()
                 .map(file -> {
                     try {
