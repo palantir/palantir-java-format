@@ -19,6 +19,7 @@ package com.palantir.javaformat.gradle;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Iterables;
 import com.palantir.javaformat.java.FormatterService;
+import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -41,13 +42,12 @@ public class JavaFormatExtension {
 
     @SuppressWarnings("for-rollout:NullAway")
     private FormatterService serviceLoadInternal() {
-        @SuppressWarnings("for-rollout:PreferUncheckedIoException")
         URL[] jarUris = configuration.getFiles().stream()
                 .map(file -> {
                     try {
                         return file.toURI().toURL();
                     } catch (MalformedURLException e) {
-                        throw new RuntimeException("Unable to convert URI to URL: " + file, e);
+                        throw new UncheckedIOException("Unable to convert URI to URL: " + file, e);
                     }
                 })
                 .toArray(URL[]::new);

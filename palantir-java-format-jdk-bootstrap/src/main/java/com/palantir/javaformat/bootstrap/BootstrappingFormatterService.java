@@ -27,6 +27,7 @@ import com.palantir.javaformat.java.FormatterException;
 import com.palantir.javaformat.java.FormatterService;
 import com.palantir.javaformat.java.Replacement;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
@@ -50,33 +51,30 @@ public final class BootstrappingFormatterService implements FormatterService {
         this.implementationClassPath = implementationClassPath;
     }
 
-    @SuppressWarnings("for-rollout:PreferUncheckedIoException")
     @Override
     public ImmutableList<Replacement> getFormatReplacements(String input, Collection<Range<Integer>> ranges) {
         try {
             return getFormatReplacementsInternal(input, ranges);
         } catch (IOException e) {
-            throw new RuntimeException("Error running formatter command", e);
+            throw new UncheckedIOException("Error running formatter command", e);
         }
     }
 
-    @SuppressWarnings("for-rollout:PreferUncheckedIoException")
     @Override
     public String formatSourceReflowStringsAndFixImports(String input) {
         try {
             return runFormatterCommand(input);
         } catch (IOException e) {
-            throw new RuntimeException("Error running formatter command", e);
+            throw new UncheckedIOException("Error running formatter command", e);
         }
     }
 
-    @SuppressWarnings("for-rollout:PreferUncheckedIoException")
     @Override
     public String fixImports(String input) throws FormatterException {
         try {
             return runFormatterCommand(input);
         } catch (IOException e) {
-            throw new RuntimeException("Error running formatter command", e);
+            throw new UncheckedIOException("Error running formatter command", e);
         }
     }
 

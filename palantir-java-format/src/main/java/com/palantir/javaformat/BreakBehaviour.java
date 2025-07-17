@@ -23,6 +23,7 @@ import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.doc.Doc;
 import com.palantir.javaformat.doc.Level;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import org.derive4j.ArgOption;
 import org.derive4j.Data;
 
@@ -73,7 +74,6 @@ public abstract class BreakBehaviour {
      */
     static class Json extends JsonSerializer<BreakBehaviour> {
 
-        @SuppressWarnings("for-rollout:PreferUncheckedIoException")
         @Override
         public void serialize(BreakBehaviour value, JsonGenerator gen, SerializerProvider serializers)
                 throws IOException {
@@ -83,7 +83,7 @@ public abstract class BreakBehaviour {
                         try {
                             gen.writeObjectField("type", "breakThisLevel");
                         } catch (IOException e) {
-                            throw new RuntimeException(e);
+                            throw new UncheckedIOException(e);
                         }
                         return null;
                     })
@@ -92,7 +92,7 @@ public abstract class BreakBehaviour {
                             gen.writeObjectField("type", "preferBreakingLastInnerLevel");
                             gen.writeObjectField("keepIndentWhenInlined", keepIndentWhenInlined);
                         } catch (IOException e) {
-                            throw new RuntimeException(e);
+                            throw new UncheckedIOException(e);
                         }
                         return null;
                     })
@@ -100,7 +100,7 @@ public abstract class BreakBehaviour {
                         try {
                             gen.writeObjectField("type", "inlineSuffix");
                         } catch (IOException e) {
-                            throw new RuntimeException(e);
+                            throw new UncheckedIOException(e);
                         }
                         return null;
                     })
@@ -109,7 +109,7 @@ public abstract class BreakBehaviour {
                             gen.writeObjectField("type", "breakOnlyIfInnerLevelsThenFitOnOneLine");
                             gen.writeObjectField("keepIndentWhenInlined", keepIndentWhenInlined);
                         } catch (IOException e) {
-                            throw new RuntimeException(e);
+                            throw new UncheckedIOException(e);
                         }
                         return null;
                     });

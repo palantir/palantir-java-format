@@ -36,6 +36,7 @@ import com.palantir.javaformat.doc.NonBreakingSpace;
 import com.palantir.javaformat.doc.State;
 import com.palantir.javaformat.doc.Token;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -51,7 +52,6 @@ public class DebugRenderer {
         return publicDir.resolve("output.js");
     }
 
-    @SuppressWarnings("for-rollout:PreferUncheckedIoException")
     static void render(
             JavaInput javaInput,
             OpsOutput opsOutput,
@@ -72,7 +72,7 @@ public class DebugRenderer {
         try {
             Files.write(getOutputFile(), javascript.getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -85,7 +85,6 @@ public class DebugRenderer {
         return output.toString();
     }
 
-    @SuppressWarnings("for-rollout:PreferUncheckedIoException")
     private static String opsJson(OpsOutput opsOutput) {
         ArrayNode arrayNode = OBJECT_MAPPER.createArrayNode();
 
@@ -143,16 +142,15 @@ public class DebugRenderer {
         try {
             return OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(arrayNode);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
-    @SuppressWarnings("for-rollout:PreferUncheckedIoException")
     private static String jsonEscapedString(String javaInput) {
         try {
             return OBJECT_MAPPER.writeValueAsString(javaInput);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new UncheckedIOException(e);
         }
     }
 

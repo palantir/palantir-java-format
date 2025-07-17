@@ -26,6 +26,7 @@ import com.google.common.collect.Range;
 import com.palantir.javaformat.java.FormatterService;
 import com.palantir.javaformat.java.Replacement;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
@@ -42,7 +43,6 @@ public class NativeImageFormatterService implements FormatterService {
         this.nativeImagePath = nativeImagePath;
     }
 
-    @SuppressWarnings("for-rollout:PreferUncheckedIoException")
     @Override
     public ImmutableList<Replacement> getFormatReplacements(String input, Collection<Range<Integer>> ranges) {
         try {
@@ -60,27 +60,25 @@ public class NativeImageFormatterService implements FormatterService {
             }
             return MAPPER.readValue(output.get(), new TypeReference<>() {});
         } catch (IOException e) {
-            throw new RuntimeException("Error running the native image command", e);
+            throw new UncheckedIOException("Error running the native image command", e);
         }
     }
 
-    @SuppressWarnings("for-rollout:PreferUncheckedIoException")
     @Override
     public String formatSourceReflowStringsAndFixImports(String input) {
         try {
             return runFormatterCommand(input);
         } catch (IOException e) {
-            throw new RuntimeException("Error running the native image command", e);
+            throw new UncheckedIOException("Error running the native image command", e);
         }
     }
 
-    @SuppressWarnings("for-rollout:PreferUncheckedIoException")
     @Override
     public String fixImports(String input) {
         try {
             return runFormatterCommand(input);
         } catch (IOException e) {
-            throw new RuntimeException("Error running the native image command", e);
+            throw new UncheckedIOException("Error running the native image command", e);
         }
     }
 

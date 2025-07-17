@@ -24,6 +24,7 @@ import com.palantir.javaformat.java.FormatterService;
 import com.palantir.javaformat.java.JavaFormatterOptions;
 import com.palantir.sls.versions.OrderableSlsVersion;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -113,7 +114,6 @@ public class PalantirJavaFormatSettings implements PersistentStateComponent<Pala
         return Optional.ofNullable(FormatterProvider.getPluginDescriptor().getVersion());
     }
 
-    @SuppressWarnings("for-rollout:PreferUncheckedIoException")
     Optional<String> computeFormatterVersion() {
         return getImplementationClassPath().map(classpath -> classpath.stream()
                 .flatMap(uri -> {
@@ -127,7 +127,7 @@ public class PalantirJavaFormatSettings implements PersistentStateComponent<Pala
                         }
                         return Stream.empty();
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        throw new UncheckedIOException(e);
                     }
                 })
                 .findFirst()

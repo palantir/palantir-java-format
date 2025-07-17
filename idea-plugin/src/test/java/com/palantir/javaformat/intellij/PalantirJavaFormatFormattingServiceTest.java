@@ -41,6 +41,7 @@ import com.intellij.testFramework.fixtures.TestFixtureBuilder;
 import com.palantir.javaformat.intellij.PalantirJavaFormatSettings.State;
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -103,7 +104,6 @@ public class PalantirJavaFormatFormattingServiceTest {
     @NotNull
     protected LightProjectDescriptor getProjectDescriptor() {
         return new DefaultLightProjectDescriptor() {
-            @SuppressWarnings("for-rollout:PreferUncheckedIoException")
             @Override
             public Sdk getSdk() {
                 try {
@@ -111,7 +111,7 @@ public class PalantirJavaFormatFormattingServiceTest {
                             .createJdk(
                                     "java 1.11", new File(System.getProperty("java.home")).getCanonicalPath(), false);
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    throw new UncheckedIOException(e);
                 }
             }
         };

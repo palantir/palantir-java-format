@@ -34,6 +34,7 @@ import com.palantir.javaformat.bootstrap.BootstrappingFormatterService;
 import com.palantir.javaformat.bootstrap.NativeImageFormatterService;
 import com.palantir.javaformat.java.FormatterService;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -207,12 +208,11 @@ final class FormatterProvider {
                 .toArray(URL[]::new);
     }
 
-    @SuppressWarnings("for-rollout:PreferUncheckedIoException")
     private static List<Path> listDirAsUrlsUnchecked(Path dir) {
         try (Stream<Path> list = Files.list(dir)) {
             return list.collect(Collectors.toList());
         } catch (IOException e) {
-            throw new RuntimeException("Couldn't list dir: " + dir, e);
+            throw new UncheckedIOException("Couldn't list dir: " + dir, e);
         }
     }
 
