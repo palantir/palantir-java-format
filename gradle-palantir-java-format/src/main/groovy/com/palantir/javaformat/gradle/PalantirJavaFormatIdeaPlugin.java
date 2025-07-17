@@ -23,13 +23,22 @@ import com.palantir.gradle.ideaconfiguration.IdeaConfigurationPlugin;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+import javax.inject.Inject;
 import org.gradle.StartParameter;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.artifacts.ConfigurationContainer;
+import org.gradle.api.tasks.Nested;
 import org.gradle.api.tasks.TaskProvider;
 
-public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
+public abstract class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
+
+    @Nested
+    protected abstract NativeImageSupport getNativeImageSupport();
+
+    @Inject
+    protected abstract ConfigurationContainer getConfigurations();
 
     private static final String MIN_IDEA_PLUGIN_VERSION = "2.57.0";
 
@@ -56,7 +65,7 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
                                 .from(rootProject
                                         .getConfigurations()
                                         .getByName(PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME));
-                        maybeGetNativeImplConfiguration(rootProject)
+                        maybeGetNativeImplConfiguration()
                                 .ifPresent(config -> task.getNativeImageConfig().from(config));
                     });
 
@@ -85,11 +94,9 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
                 .register("palantir-java-format", dep -> dep.atLeastVersion(MIN_IDEA_PLUGIN_VERSION));
     }
 
-    private static Optional<Configuration> maybeGetNativeImplConfiguration(Project rootProject) {
-        return NativeImageFormatProviderPlugin.isNativeImageConfigured(rootProject)
-                ? Optional.of(rootProject
-                        .getConfigurations()
-                        .getByName(NativeImageFormatProviderPlugin.NATIVE_CONFIGURATION_NAME))
+    private Optional<Configuration> maybeGetNativeImplConfiguration() {
+        return getNativeImageSupport().isNativeImageConfigured()
+                ? Optional.of(getConfigurations().getByName(NativeImageFormatProviderPlugin.NATIVE_CONFIGURATION_NAME))
                 : Optional.empty();
     }
 }

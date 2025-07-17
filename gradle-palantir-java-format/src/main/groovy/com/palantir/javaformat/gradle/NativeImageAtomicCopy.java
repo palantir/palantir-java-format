@@ -27,7 +27,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
-import java.util.Optional;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
@@ -77,11 +76,6 @@ public class NativeImageAtomicCopy {
         } catch (IOException e) {
             throw new RuntimeException(String.format("Failed to copy the native image to path %s", dst), e);
         }
-    }
-
-    private static Path getGradleCacheDir() {
-        return Path.of(Optional.ofNullable(System.getenv("GRADLE_USER_HOME"))
-                .orElseGet(() -> System.getenv("HOME") + "/.gradle"));
     }
 
     private NativeImageAtomicCopy() {}

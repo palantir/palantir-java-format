@@ -31,7 +31,7 @@ class PalantirJavaFormatIdeaPluginTest extends IntegrationTestKitSpec {
                 id 'com.palantir.java-format-idea'
             }
             apply plugin: 'idea'
-            
+
             dependencies {
                 palantirJavaFormat project.files() // no need to store the real thing in here
                 EXTRA_CONFIGURATION

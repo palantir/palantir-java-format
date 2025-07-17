@@ -1,0 +1,9 @@
+public class I1309 {
+  void x(Object o) {
+    if (o instanceof Record(Nested(var i), var j)) {}
+    switch (o) {
+      case Record(Nested(var i), var j, int k, char l, java.lang.String m, var n, var o, var p, var q, var r, var s, var t, var u, var v, var w, var x, var y, var z):
+      default:
+    }
+  }
+}

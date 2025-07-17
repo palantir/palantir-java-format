@@ -39,6 +39,7 @@ public class JavaFormatExtension {
         return memoizedService.get();
     }
 
+    @SuppressWarnings("for-rollout:NullAway")
     private FormatterService serviceLoadInternal() {
         URL[] jarUris = configuration.getFiles().stream()
                 .map(file -> {
