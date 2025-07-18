@@ -18,15 +18,14 @@ package com.palantir.javaformat.gradle;
 
 import java.io.File;
 import java.net.URI;
+import java.nio.file.Paths;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.tasks.Classpath;
 import org.gradle.api.tasks.InputFiles;
-import org.gradle.api.tasks.Optional;
-import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
 
@@ -36,28 +35,30 @@ public abstract class UpdatePalantirJavaFormatIdeaXmlFile extends DefaultTask {
     @Classpath
     public abstract ConfigurableFileCollection getImplementationConfig();
 
-    @Optional
+    @org.gradle.api.tasks.Optional
     @InputFiles
     public abstract ConfigurableFileCollection getNativeImageConfig();
 
-    @Optional
+    @org.gradle.api.tasks.Optional
     @OutputFile
-    public abstract RegularFileProperty getOutputFile();
+    public abstract RegularFileProperty getXmlOutputFile();
 
-    @OutputDirectory
-    public abstract RegularFileProperty getCacheDir();
+    @org.gradle.api.tasks.Optional
+    @OutputFile
+    public abstract RegularFileProperty getNativeImageOutputFile();
 
     @TaskAction
     public final void updateXml() {
         List<URI> uris =
-                getImplementationConfig().getFiles().stream().map(File::toURI).collect(Collectors.toList());
-        java.util.Optional<URI> nativeUri = getNativeImageConfig().isEmpty()
-                ? java.util.Optional.empty()
-                : java.util.Optional.of(getNativeImageConfig().getSingleFile().toURI())
-                        .map(uri -> NativeImageAtomicCopy.copyToCacheDir(
-                                uri, getCacheDir().getAsFile().get()));
+                getImplementationConfig().getFiles().stream().map(File::toURI).toList();
+        Optional<URI> nativeUri = getNativeImageConfig().getFiles().stream()
+                .findFirst()
+                .map(File::toURI)
+                .map(uri -> NativeImageAtomicCopy.copyToCacheDir(
+                        Paths.get(uri),
+                        getNativeImageOutputFile().getAsFile().get().toPath()));
         XmlUtils.updateIdeaXmlFile(
-                getOutputFile().getAsFile().get(),
+                getXmlOutputFile().getAsFile().get(),
                 node -> ConfigureJavaFormatterXml.configureJavaFormat(node, uris, nativeUri));
     }
 }

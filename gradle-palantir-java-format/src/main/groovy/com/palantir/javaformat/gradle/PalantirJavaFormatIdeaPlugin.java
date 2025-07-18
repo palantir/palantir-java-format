@@ -20,6 +20,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.palantir.gradle.ideaconfiguration.IdeaConfigurationExtension;
 import com.palantir.gradle.ideaconfiguration.IdeaConfigurationPlugin;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -53,20 +54,25 @@ public abstract class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
             TaskProvider<UpdatePalantirJavaFormatIdeaXmlFile> updatePalantirJavaFormatXml = rootProject
                     .getTasks()
                     .register("updatePalantirJavaFormatXml", UpdatePalantirJavaFormatIdeaXmlFile.class, task -> {
-                        task.getOutputFile().set(rootProject.file(".idea/palantir-java-format.xml"));
-                        task.getCacheDir()
-                                .set(rootProject
-                                        .getGradle()
-                                        .getGradleUserHomeDir()
-                                        .toPath()
-                                        .resolve("palantir-java-format-caches")
-                                        .toFile());
+                        task.getXmlOutputFile().set(rootProject.file(".idea/palantir-java-format.xml"));
                         task.getImplementationConfig()
                                 .from(rootProject
                                         .getConfigurations()
                                         .getByName(PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME));
-                        maybeGetNativeImplConfiguration()
-                                .ifPresent(config -> task.getNativeImageConfig().from(config));
+                        maybeGetNativeImplConfiguration().ifPresent(config -> {
+                            task.getNativeImageConfig().from(config);
+                            task.getNativeImageOutputFile().fileProvider(rootProject.provider(() -> rootProject
+                                    .getGradle()
+                                    .getGradleUserHomeDir()
+                                    .toPath()
+                                    .resolve("palantir-java-format-caches/")
+                                    .resolve(Paths.get(task.getNativeImageConfig()
+                                                    .getSingleFile()
+                                                    .toURI())
+                                            .getFileName()
+                                            .toString())
+                                    .toFile()));
+                        });
                     });
 
             TaskProvider<UpdateWorkspaceXmlFile> updateWorkspaceXml = rootProject

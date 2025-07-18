@@ -16,7 +16,6 @@
 
 package com.palantir.javaformat.gradle;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.channels.FileChannel;
@@ -24,7 +23,6 @@ import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import org.gradle.api.logging.Logger;
@@ -34,9 +32,7 @@ public class NativeImageAtomicCopy {
 
     private static Logger logger = Logging.getLogger(PalantirJavaFormatIdeaPlugin.class);
 
-    public static URI copyToCacheDir(URI srcUri, File cacheDir) {
-        Path src = Paths.get(srcUri);
-        Path dst = cacheDir.toPath().resolve(src.getFileName());
+    public static URI copyToCacheDir(Path src, Path dst) {
         if (Files.exists(dst)) {
             logger.info("Native image at path {} already exists", dst);
             return dst.toUri();
