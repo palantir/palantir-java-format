@@ -85,7 +85,6 @@ public final class FileBasedTests {
                 Formatter.getRuntimeVersion() >= version, String.format("Not running on jdk %d or later", version)));
     }
 
-    @SuppressWarnings("for-rollout:StatementSwitchToExpressionSwitch")
     public List<Object[]> paramsAsNameInputOutput() throws IOException {
         ClassLoader classLoader = testClass.getClassLoader();
         Map<String, String> inputs = new TreeMap<>();
@@ -105,13 +104,9 @@ public final class FileBasedTests {
                     contents = CharStreams.toString(new InputStreamReader(stream, UTF_8));
                 }
                 switch (extension) {
-                    case "input":
-                        inputs.put(baseName, contents);
-                        break;
-                    case "output":
-                        outputs.put(baseName, contents);
-                        break;
-                    default:
+                    case "input" -> inputs.put(baseName, contents);
+                    case "output" -> outputs.put(baseName, contents);
+                    default -> {}
                 }
             }
         }

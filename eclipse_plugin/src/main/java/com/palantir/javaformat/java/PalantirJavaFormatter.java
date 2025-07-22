@@ -60,29 +60,20 @@ public class PalantirJavaFormatter extends CodeFormatter {
     }
 
     /** Runs the Google Java formatter on the given source, with only the given ranges specified. */
-    @SuppressWarnings("for-rollout:StatementSwitchToExpressionSwitch")
     @Nullable
     private TextEdit formatInternal(int kind, String source, IRegion[] regions, int initialIndent) {
         try {
             boolean includeComments = (kind & CodeFormatter.F_INCLUDE_COMMENTS) == CodeFormatter.F_INCLUDE_COMMENTS;
             kind &= ~CodeFormatter.F_INCLUDE_COMMENTS;
-            SnippetKind snippetKind;
-            switch (kind) {
-                case ASTParser.K_EXPRESSION:
-                    snippetKind = SnippetKind.EXPRESSION;
-                    break;
-                case ASTParser.K_STATEMENTS:
-                    snippetKind = SnippetKind.STATEMENTS;
-                    break;
-                case ASTParser.K_CLASS_BODY_DECLARATIONS:
-                    snippetKind = SnippetKind.CLASS_BODY_DECLARATIONS;
-                    break;
-                case ASTParser.K_COMPILATION_UNIT:
-                    snippetKind = SnippetKind.COMPILATION_UNIT;
-                    break;
-                default:
-                    throw new IllegalArgumentException(String.format("Unknown snippet kind: %d", kind));
-            }
+
+            SnippetKind snippetKind =
+                    switch (kind) {
+                        case ASTParser.K_EXPRESSION -> SnippetKind.EXPRESSION;
+                        case ASTParser.K_STATEMENTS -> SnippetKind.STATEMENTS;
+                        case ASTParser.K_CLASS_BODY_DECLARATIONS -> SnippetKind.CLASS_BODY_DECLARATIONS;
+                        case ASTParser.K_COMPILATION_UNIT -> SnippetKind.COMPILATION_UNIT;
+                        default -> throw new IllegalArgumentException(String.format("Unknown snippet kind: %d", kind));
+                    };
             List<Replacement> replacements = new SnippetFormatter()
                     .format(snippetKind, source, rangesFromRegions(regions), initialIndent, includeComments);
             if (idempotent(source, regions, replacements)) {
