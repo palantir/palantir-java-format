@@ -153,7 +153,6 @@ public class SnippetFormatter {
         return replacements;
     }
 
-    @SuppressWarnings("for-rollout:StatementSwitchToExpressionSwitch")
     private SnippetWrapper snippetWrapper(SnippetKind kind, String source, int initialIndent) {
         /*
          * Synthesize a dummy class around the code snippet provided by Eclipse. The
@@ -161,7 +160,7 @@ public class SnippetFormatter {
          * etc.
          */
         switch (kind) {
-            case COMPILATION_UNIT: {
+            case COMPILATION_UNIT -> {
                 SnippetWrapper wrapper = new SnippetWrapper();
                 for (int i = 1; i <= initialIndent; i++) {
                     wrapper.append("class Dummy {\n").append(createIndentationString(i));
@@ -170,7 +169,7 @@ public class SnippetFormatter {
                 wrapper.closeBraces(initialIndent);
                 return wrapper;
             }
-            case CLASS_BODY_DECLARATIONS: {
+            case CLASS_BODY_DECLARATIONS -> {
                 SnippetWrapper wrapper = new SnippetWrapper();
                 for (int i = 1; i <= initialIndent; i++) {
                     wrapper.append("class Dummy {\n").append(createIndentationString(i));
@@ -179,7 +178,7 @@ public class SnippetFormatter {
                 wrapper.closeBraces(initialIndent);
                 return wrapper;
             }
-            case STATEMENTS: {
+            case STATEMENTS -> {
                 SnippetWrapper wrapper = new SnippetWrapper();
                 wrapper.append("class Dummy {\n").append(createIndentationString(1));
                 for (int i = 2; i <= initialIndent; i++) {
@@ -189,7 +188,7 @@ public class SnippetFormatter {
                 wrapper.closeBraces(initialIndent);
                 return wrapper;
             }
-            case EXPRESSION: {
+            case EXPRESSION -> {
                 SnippetWrapper wrapper = new SnippetWrapper();
                 wrapper.append("class Dummy {\n").append(createIndentationString(1));
                 for (int i = 2; i <= initialIndent; i++) {
@@ -201,8 +200,7 @@ public class SnippetFormatter {
                 wrapper.closeBraces(initialIndent);
                 return wrapper;
             }
-            default:
-                throw new IllegalArgumentException("Unknown snippet kind: " + kind);
+            default -> throw new IllegalArgumentException("Unknown snippet kind: " + kind);
         }
     }
 }
