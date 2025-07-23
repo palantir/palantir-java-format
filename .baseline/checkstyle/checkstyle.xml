@@ -173,6 +173,7 @@
         </module>
         <module name="IllegalType"> <!-- Java Coding Guide: Limit coupling on concrete classes -->
             <property name="illegalClassNames" value="java.util.ArrayList, java.util.HashSet, java.util.HashMap, java.util.LinkedList, java.util.LinkedHashMap, java.util.LinkedHashSet, java.util.TreeSet, java.util.TreeMap, com.google.common.collect.ArrayListMultimap, com.google.common.collect.ForwardingListMultimap, com.google.common.collect.ForwardingMultimap, com.google.common.collect.ForwardingSetMultimap, com.google.common.collect.ForwardingSortedSetMultimap, com.google.common.collect.HashMultimap, com.google.common.collect.LinkedHashMultimap, com.google.common.collect.LinkedListMultimap, com.google.common.collect.TreeMultimap"/>
+            <message key="illegal.type" value="Usage of type ''{0}'' is not allowed to limit coupling on concrete classes. For example, prefer Multimap over HashMultimap, List over ArrayList, and Set over TreeSet."/>
         </module>
         <module name="IllegalType">
             <property name="id" value="BanGuavaCaches"/>
