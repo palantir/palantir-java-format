@@ -18,6 +18,8 @@ package com.palantir.javaformat.gradle
 
 import spock.lang.Specification
 import spock.lang.Unroll
+import groovy.xml.XmlNodePrinter
+import groovy.xml.XmlParser
 
 class ConfigureJavaFormatterXmlTest extends Specification {
 
