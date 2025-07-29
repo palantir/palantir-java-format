@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: bump spotless to version to `7.2.1`
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/1384
