@@ -293,14 +293,6 @@
             <property name="format" value="ImmutableSet\.Builder.*new ImmutableSet\.Builder"/>
             <property name="message" value="Use ImmutableSet.builder() for variable assignment."/>
         </module>
-        <module name="RegexpSinglelineJava"> <!-- Java Coding Guidelines: Check parameters for validity -->
-            <property name="format" value="Preconditions\.checkNotNull\((?!.*,)([^()]*(\(([^()]*|\(([^()]*|\([^()]*\))*\))*\)[^()]*)*)\)"/>
-            <property name="message" value="Use Preconditions.checkNotNull(Object, String)."/>
-        </module>
-        <module name="RegexpSinglelineJava"> <!-- Java Coding Guidelines: Check parameters for validity -->
-            <property name="format" value="Validate\.notNull\((?!.*,)([^()]*(\(([^()]*|\(([^()]*|\([^()]*\))*\))*\)[^()]*)*)\)"/>
-            <property name="message" value="Use Validate.notNull(Object, String)."/>
-        </module>
         <module name="RegexpSinglelineJava">
             <property name="format" value="^\s*super\(\);"/>
             <property name="message" value="This is unnecessary; please delete."/>
