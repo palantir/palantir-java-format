@@ -75,7 +75,6 @@ final class FormatterProvider {
                 settings.injectedVersionIsOutdated()));
     }
 
-    @SuppressWarnings("for-rollout:Slf4jLogsafeArgs")
     private static Optional<FormatterService> createFormatter(FormatterCacheKey cacheKey) {
         if (cacheKey.nativeImageClassPath.isPresent()) {
             log.info("Using the native formatter with classpath: {}", cacheKey.nativeImageClassPath.get());
@@ -120,7 +119,6 @@ final class FormatterProvider {
         return implementationClasspath.stream().map(Path::of).collect(Collectors.toList());
     }
 
-    @SuppressWarnings("for-rollout:Slf4jLogsafeArgs")
     private static List<Path> getBundledImplementationUrls() {
         // Load from the jars bundled with the plugin.
         IdeaPluginDescriptor ourPlugin = getPluginDescriptor();
@@ -129,7 +127,6 @@ final class FormatterProvider {
         return listDirAsUrlsUnchecked(implDir);
     }
 
-    @SuppressWarnings("for-rollout:Slf4jLogsafeArgs")
     private static List<Path> getImplementationUrls(
             Optional<List<URI>> implementationClassPath, boolean useBundledImplementation) {
         if (useBundledImplementation) {
@@ -177,7 +174,6 @@ final class FormatterProvider {
         return parseSdkJavaVersion(version);
     }
 
-    @SuppressWarnings("for-rollout:Slf4jLogsafeArgs")
     @VisibleForTesting
     static OptionalInt parseSdkJavaVersion(String version) {
         int indexOfVersionDelimiter = version.indexOf('.');
