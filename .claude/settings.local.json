@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew:*)",
+      "Bash(java:*)",
+      "Bash(/usr/libexec/java_home:*)",
+      "Bash(JAVA_HOME=/opt/homebrew/Cellar/openjdk@17/17.0.14/libexec/openjdk.jdk/Contents/Home ./gradlew build)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "Bash(unzip:*)",
+      "Bash(./bin/palantir-java-format:*)",
+      "Bash(./palantir-java-format/build/distributions/palantir-java-format-2.49.0-2-g78818d3.dirty/bin/palantir-java-format:*)",
+      "Bash(/Users/bodo.teichmann/dev/learning/palantir-java-format/palantir-java-format/build/distributions/palantir-java-format-2.49.0-2-g78818d3.dirty/bin/palantir-java-format --help)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

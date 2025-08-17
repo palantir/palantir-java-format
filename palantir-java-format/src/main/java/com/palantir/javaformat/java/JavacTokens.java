@@ -27,6 +27,7 @@ import com.sun.tools.javac.parser.Tokens.Token;
 import com.sun.tools.javac.parser.Tokens.TokenKind;
 import com.sun.tools.javac.parser.UnicodeReader;
 import com.sun.tools.javac.util.Context;
+import com.sun.tools.javac.util.JCDiagnostic;
 import java.util.Set;
 
 /** A wrapper around javac's lexer. */
@@ -198,6 +199,11 @@ class JavacTokens {
         @Override
         public boolean isDeprecated() {
             return false;
+        }
+
+        @Override
+        public JCDiagnostic.DiagnosticPosition getPos() {
+            return new JCDiagnostic.SimpleDiagnosticPosition(pos);
         }
 
         @Override

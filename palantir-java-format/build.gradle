@@ -41,12 +41,13 @@ def exports = [
 ]
 
 def jvmArgList = exports.collect { value -> "--add-exports=${value}=ALL-UNNAMED".toString() }
+def opensArgList = exports.collect { value -> "--add-opens=${value}=ALL-UNNAMED".toString() }
 
 tasks.withType(JavaCompile).configureEach {
     options.errorprone.disable 'StrictUnusedVariable'
 
     // Allow access to internal javac apis
-    options.compilerArgs += jvmArgList
+    options.compilerArgs += jvmArgList + opensArgList
 
     if (JavaVersion.current() < JavaVersion.VERSION_14) {
         excludes = ['**/Java14InputAstVisitor.java']
@@ -54,7 +55,7 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 tasks.withType(Test).configureEach {
-    jvmArgs = jvmArgList
+    jvmArgs = jvmArgList + opensArgList
 }
 
 tasks.withType(Javadoc).configureEach {
