@@ -1,6 +1,6 @@
 apply plugin: 'java-library'
+apply plugin: 'org.revapi.revapi-gradle-plugin'
 apply plugin: 'com.palantir.external-publish-jar'
-apply plugin: 'com.palantir.revapi'
 
 dependencies {
     api 'com.google.guava:guava'
