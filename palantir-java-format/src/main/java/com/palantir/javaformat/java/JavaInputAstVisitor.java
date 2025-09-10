@@ -30,9 +30,7 @@ import static com.palantir.javaformat.java.Trees.operatorName;
 import static com.palantir.javaformat.java.Trees.precedence;
 import static com.palantir.javaformat.java.Trees.skipParen;
 import static com.sun.source.tree.Tree.Kind.ANNOTATION;
-import static com.sun.source.tree.Tree.Kind.BLOCK;
 import static com.sun.source.tree.Tree.Kind.EXTENDS_WILDCARD;
-import static com.sun.source.tree.Tree.Kind.METHOD_INVOCATION;
 import static com.sun.source.tree.Tree.Kind.STRING_LITERAL;
 import static java.util.stream.Collectors.toList;
 
@@ -1632,6 +1630,10 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     public Void visitLiteral(LiteralTree node, Void unused) {
         sync(node);
         String sourceForNode = getSourceForNode(node, getCurrentPath());
+        if (sourceForNode.startsWith("\"\"\"")) {
+            token(sourceForNode);
+            return null;
+        }
         // A negative numeric literal -n is usually represented as unary minus on n,
         // but that doesn't work for integer or long MIN_VALUE. The parser works
         // around that by representing it directly as a signed literal (with no

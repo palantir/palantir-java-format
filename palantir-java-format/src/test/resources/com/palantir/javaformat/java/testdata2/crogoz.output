@@ -1,0 +1,22 @@
+package com.helloworld;
+
+class Foo {
+  void foo() {
+      String x = String.format(
+               """
+               1. when the block looks like a mustache array specification:
+                    maven-coordinates:
+                       %1$s#dependencyList%2$s
+                       - %1$sthis%2$s
+                       %1$s/dependencyList%2$s
+                  %3$s
+               2. when the block looks like a mustache array specification:
+                   maven-coordinates: #%1$sdependencyList%2$s
+                  %3$s
+               3. when the block is a simple template tag:
+                   maven-coordinates: %1$sdependencyList%2$s
+                  %3$s
+               """,
+               "@", "@", "something");
+  }
+}

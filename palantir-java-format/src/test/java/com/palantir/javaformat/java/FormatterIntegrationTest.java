@@ -19,6 +19,7 @@ import static com.palantir.javaformat.java.FileBasedTests.isRecreate;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.palantir.javaformat.Newlines;
+import com.palantir.javaformat.java.JavaFormatterOptions.Style;
 import com.palantir.javaformat.jupiter.ParameterizedClass;
 import java.io.IOException;
 import java.util.List;
@@ -71,7 +72,9 @@ public class FormatterIntegrationTest {
     public void format() {
         assumeJavaVersionForTest(name);
         try {
+            Formatter formatter = createFormatter();
             String output = createFormatter().formatSource(input);
+            output = StringWrapper.wrap(Style.PALANTIR.maxLineLength(), output, formatter);
             if (isRecreate()) {
                 tests.writeFormatterOutput(name, output);
                 return;

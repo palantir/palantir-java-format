@@ -47,9 +47,12 @@ import java.util.stream.Stream;
 
 /** Wraps string literals that exceed the column limit. */
 public final class StringWrapper {
+
+    public static final String TEXT_BLOCK_DELIMITER = "\"\"\"";
+
     /** Reflows string literals in the given Java source code that extend past the given column limit. */
     static String wrap(final int columnLimit, String input, Formatter formatter) throws FormatterException {
-        if (!longLines(columnLimit, input)) {
+        if (!needWrapping(columnLimit, input)) {
             // fast path
             return input;
         }
@@ -121,11 +124,17 @@ public final class StringWrapper {
 
         // Paths to string literals that extend past the column limit.
         List<TreePath> toFix = new ArrayList<>();
+        List<Tree> textBlocks = new ArrayList<>();
         final Position.LineMap lineMap = unit.getLineMap();
         new TreePathScanner<Void, Void>() {
             @Override
             public Void visitLiteral(LiteralTree literalTree, Void aVoid) {
                 if (literalTree.getKind() != Kind.STRING_LITERAL) {
+                    return null;
+                }
+                int pos = getStartPosition(literalTree);
+                if (input.substring(pos, Math.min(input.length(), pos + 3)).equals(TEXT_BLOCK_DELIMITER)) {
+                    textBlocks.add(literalTree);
                     return null;
                 }
                 Tree parent = getCurrentPath().getParentPath().getLeaf();
@@ -147,6 +156,8 @@ public final class StringWrapper {
         }.scan(new TreePath(unit), null);
 
         TreeRangeMap<Integer, String> replacements = TreeRangeMap.create();
+        indentTextBlocks(separator, unit, input, lineMap, replacements, textBlocks);
+
         for (TreePath path : toFix) {
             // Find the outermost contiguous enclosing concatenation expression
             TreePath enclosing = path;
@@ -167,7 +178,6 @@ public final class StringWrapper {
             while (startingPath.getParentPath() != null && onSameLineAsParent(lineMap, startingPath)) {
                 startingPath = startingPath.getParentPath();
             }
-
             // Zero-indexed start column
             int startColumn = lineMap.getColumnNumber(getStartPosition(flat.get(0))) - 1;
             int fistLineCol = lineMap.getColumnNumber(getStartPosition(startingPath.getLeaf())) - 1;
@@ -186,9 +196,68 @@ public final class StringWrapper {
             ImmutableList<String> components = stringComponents(input, unit, flat);
             replacements.put(
                     Range.closedOpen(getStartPosition(flat.get(0)), getEndPosition(unit, getLast(flat))),
-                    reflow(separator, columnLimit, trailing, components, first.get(), startColumn, fistLineCol));
+                    reflow(separator, columnLimit, startColumn, trailing, components, first.get(), fistLineCol));
         }
         return replacements;
+    }
+
+    private static void indentTextBlocks(
+            String separator,
+            JCTree.JCCompilationUnit unit,
+            String input,
+            Position.LineMap lineMap,
+            TreeRangeMap<Integer, String> replacements,
+            List<Tree> textBlocks) {
+        for (Tree tree : textBlocks) {
+            int startPosition =
+                    getStartPosition(tree); // lineMap.getStartPosition(lineMap.getLineNumber(getStartPosition(tree)));
+            int endPosition = getEndPosition(unit, tree);
+            String text = input.substring(startPosition, endPosition);
+            int leadingWhitespace = CharMatcher.whitespace().negate().indexIn(text) + 1;
+
+            // Find the source code of the text block with incidental whitespace removed.
+            // The first line of the text block is always """, and it does not affect incidental
+            // whitespace.
+            ImmutableList<String> initialLines = text.lines().collect(ImmutableList.toImmutableList());
+            String stripped =
+                    initialLines.stream().skip(1).collect(joining(separator)).stripIndent();
+            ImmutableList<String> lines = stripped.lines().collect(ImmutableList.toImmutableList());
+            int deindent = initialLines.get(1).stripTrailing().length()
+                    - lines.get(0).stripTrailing().length();
+
+            int startColumn = lineMap.getColumnNumber(startPosition);
+            String prefix = (deindent == 0 || lines.stream().anyMatch(x -> x.length() + startColumn > 120))
+                    ? ""
+                    : " ".repeat(startColumn - 1);
+
+            StringBuilder output = new StringBuilder(TEXT_BLOCK_DELIMITER);
+            for (int i = 0; i < lines.size(); i++) {
+                String line = lines.get(i);
+                String trimmed = line.stripLeading();
+                output.append(separator);
+                if (!trimmed.isEmpty()) {
+                    // Don't add incidental leading whitespace to empty lines
+                    output.append(prefix);
+                }
+                if (i == lines.size() - 1) {
+                    String withoutDelimiter = trimmed.substring(0, trimmed.length() - TEXT_BLOCK_DELIMITER.length())
+                            .stripTrailing();
+                    if (!withoutDelimiter.stripLeading().isEmpty()) {
+                        output.append(withoutDelimiter)
+                                .append('\\')
+                                .append(separator)
+                                .append(prefix);
+                    }
+                    // If the trailing line is just """, indenting it more than the prefix of incidental
+                    // whitespace has no effect, and results in a javac text-blocks warning that 'trailing
+                    // white space will be removed'.
+                    output.append(TEXT_BLOCK_DELIMITER);
+                } else {
+                    output.append(line);
+                }
+            }
+            replacements.put(Range.closedOpen(startPosition, endPosition), output.toString());
+        }
     }
 
     private static boolean onSameLineAsParent(LineMap lineMap, TreePath path) {
@@ -261,35 +330,38 @@ public final class StringWrapper {
      *
      * @param separator the line separator
      * @param columnLimit the number of columns to wrap at
+     * @param startColumn the column position of the beginning of the original text
      * @param trailing extra space to leave after the last line
      * @param components the text to reflow
      * @param first0 true if the text includes the beginning of its enclosing concat chain, i.e. a
-     * @param textStartColumn the column position of the beginning of the original text
      * @param firstLineStartColumn the column where the very first line starts (can be less than textStartColumn if text
      *     follows variable declaration)
      */
     private static String reflow(
             String separator,
             int columnLimit,
+            int startColumn,
             int trailing,
             ImmutableList<String> components,
             boolean first0,
-            int textStartColumn,
             int firstLineStartColumn) {
         // We have space between the start column and the limit to output the first line.
         // Reserve two spaces for the quotes.
-        int width = columnLimit - textStartColumn - 2;
+        int width = columnLimit - startColumn - 2;
         Deque<String> input = new ArrayDeque<>(components);
         List<String> lines = new ArrayList<>();
         boolean first = first0;
         while (!input.isEmpty()) {
             int length = 0;
             List<String> line = new ArrayList<>();
-            if (input.stream().mapToInt(String::length).sum() <= width) {
+            // If we know this is going to be the last line, then remove a bit of width to account for the
+            // trailing characters.
+            if (totalLengthLessThanOrEqual(input, width)) {
+                // This isn’t quite optimal, but arguably good enough. See b/179561701
                 width -= trailing;
             }
             while (!input.isEmpty()
-                    && (length <= 4 || (length + input.peekFirst().length()) < width)) {
+                    && (length <= 4 || (length + input.peekFirst().length()) <= width)) {
                 String text = input.removeFirst();
                 line.add(text);
                 length += text.length();
@@ -304,22 +376,33 @@ public final class StringWrapper {
             lines.add(String.join("", line));
             if (first) {
                 // Subsequent lines have a four-space continuation indent and a `+ `.
-                width -= 6;
+                // width -= 6;
                 // Also, switch to firstLineStartColumn in order to account for the fact that continuations
                 // should get indented from the beginning of the first line.
                 // This is to handle cases like:
                 // String foo = "first component"
                 //     + "rest";
-                width += textStartColumn - firstLineStartColumn;
+                width += startColumn - firstLineStartColumn;
                 first = false;
             }
         }
 
         return lines.stream()
                 .collect(joining(
-                        "\"" + separator + " ".repeat(first0 ? firstLineStartColumn + 4 : textStartColumn - 2) + "+ \"",
+                        "\"" + separator + " ".repeat(first0 ? firstLineStartColumn + 4 : startColumn - 2) + "+ \"",
                         "\"",
                         "\""));
+    }
+
+    private static boolean totalLengthLessThanOrEqual(Iterable<String> input, int length) {
+        int total = 0;
+        for (String s : input) {
+            total += s.length();
+            if (total > length) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -382,12 +465,12 @@ public final class StringWrapper {
     }
 
     /** Returns true if any lines in the given Java source exceed the column limit. */
-    private static boolean longLines(int columnLimit, String input) {
+    private static boolean needWrapping(int columnLimit, String input) {
         // TODO(cushon): consider adding Newlines.lineIterable?
         Iterator<String> it = Newlines.lineIterator(input);
         while (it.hasNext()) {
             String line = it.next();
-            if (line.length() > columnLimit) {
+            if (line.length() > columnLimit || line.contains(TEXT_BLOCK_DELIMITER)) {
                 return true;
             }
         }
