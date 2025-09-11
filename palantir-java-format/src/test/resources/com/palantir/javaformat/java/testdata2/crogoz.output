@@ -1,11 +1,10 @@
 package com.helloworld;
 
 class Foo {
-  void foo() {
-    String i = """
-        lorem
-
-        ipsum
-        """;
-  }
+    void foo() {
+        String c = """
+            lorem
+            ipsum
+            """;
+    }
 }
