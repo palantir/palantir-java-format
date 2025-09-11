@@ -1,37 +1,37 @@
 class RSLs {
     String a = """
-        lorem
-            ipsum
-        """;
+    lorem
+        ipsum
+    """;
     String b = """
-        lorem
-        ipsum
-        """;
+    lorem
+    ipsum
+    """;
     String c = """
-        lorem
-        ipsum
-        """;
+    lorem
+    ipsum
+    """;
     String d = """
-        ipsum
-        """;
+    ipsum
+    """;
     String e = """
-        """;
+    """;
     String f = """
-        ipsum\
-        """;
+    ipsum\
+    """;
     String g = """
-        lorem\
-        ipsum
-        """;
+    lorem\
+    ipsum
+    """;
     String h = """
-        lorem\
-        ipsum\
-        """;
+    lorem\
+    ipsum\
+    """;
     String i = """
-        lorem
+    lorem
 
-        ipsum
-        """;
+    ipsum
+    """;
     String j =
             """
             lorem
@@ -39,9 +39,9 @@ class RSLs {
             ipsum
             """;
     String k = """
-        lorem
-        ipsum
-        """;
+lorem
+ipsum
+""";
 
     {
         f("""
@@ -66,10 +66,10 @@ class RSLs {
         bar
         """;
         String t = """
-            foo
-            """ + """
-            bar
-            """;
+foo
+""" + """
+bar
+""";
         String u = stringVariableOne
                 + """
                 ...
