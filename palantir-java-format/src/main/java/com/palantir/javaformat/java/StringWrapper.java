@@ -216,16 +216,15 @@ public final class StringWrapper {
                 StringBuilder output = new StringBuilder(initialLines.get(0).stripLeading());
                 for (int i = 0; i < lines.size(); i++) {
                     String line = lines.get(i);
-                    String trimmed = line.stripLeading();
                     output.append(separator);
-                    if (!trimmed.isEmpty()) {
+                    if (!line.isEmpty()) {
                         // Don't add incidental leading whitespace to empty lines
                         output.append(prefix);
                     }
                     if (i == lines.size() - 1) {
-                        String withoutDelimiter = trimmed.substring(0, trimmed.length() - TEXT_BLOCK_DELIMITER.length())
+                        String withoutDelimiter = line.substring(0, line.length() - TEXT_BLOCK_DELIMITER.length())
                                 .stripTrailing();
-                        if (!withoutDelimiter.stripLeading().isEmpty()) {
+                        if (!withoutDelimiter.isEmpty()) {
                             output.append(withoutDelimiter)
                                     .append('\\')
                                     .append(separator)

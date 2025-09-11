@@ -1,7 +1,7 @@
 class RSLs {
     String a = """
     lorem
-        ipsum
+      ipsum
     """;
     String b = """
     lorem
@@ -39,9 +39,14 @@ class RSLs {
             ipsum
             """;
     String k = """
-lorem
-ipsum
-""";
+    lorem
+    ipsum
+    """;
+    String l = """
+      foo
+    bar
+      baz\
+    """;
 
     {
         f("""
@@ -66,10 +71,10 @@ ipsum
         bar
         """;
         String t = """
-foo
-""" + """
-bar
-""";
+        foo
+        """ + """
+    bar
+    """;
         String u = stringVariableOne
                 + """
                 ...
@@ -82,18 +87,7 @@ bar
 
     String x = String.format(
             """
-            1. when the block looks like a mustache array specification:
-                 maven-coordinates:
-                    %1$s#dependencyList%2$s
-                    - %1$sthis%2$s
-                    %1$s/dependencyList%2$s
-               %3$s
-            2. when the block looks like a mustache array specification:
-                maven-coordinates: #%1$sdependencyList%2$s
-               %3$s
-            3. when the block is a simple template tag:
-                maven-coordinates: %1$sdependencyList%2$s
-               %3$s
+            this very long string that does something using arguments %s %s %s
             """,
             "@", "@", "something");
 }
