@@ -40,14 +40,51 @@ class RSLs {
 lorem
 ipsum
 """;
-        String u = stringVariableOne
-                 + """
-                 ...
-                 """
-                + stringVariableTwo
-                 + """
-                 ...
-                 """;
+  {
+    f("""
+    lorem
+    ipsum
+    """, 42);
+
+    """
+    hello %s
+    """
+        .formatted("world");
+            f(
+    /* foo= */ """
+        foo
+        """,
+        /* bar= */ """
+        bar
+        """);
+    """
+    hello
+    """.codePoints().forEach(System.err::println);
+    String s =
+        """
+        foo
+        """
+            + """
+            bar
+            """;
+    String t =
+        """
+foo
+"""
+            + """
+bar
+""";
+    String u =
+        stringVariableOne
+        +
+            """
+            ...
+            """ + stringVariableTwo
+                +
+                    """
+                    ...
+                    """;
+  }
     String x = String.format("""
           1. when the block looks like a mustache array specification:
                maven-coordinates:

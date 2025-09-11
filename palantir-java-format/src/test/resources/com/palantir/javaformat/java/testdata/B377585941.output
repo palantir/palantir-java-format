@@ -1,7 +1,7 @@
 class T {
     {
-         f(/* foo */ """
-         hello
-         """);
+        f(/* foo */ """
+        hello
+        """);
     }
 }

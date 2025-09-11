@@ -55,6 +55,7 @@ import com.palantir.javaformat.FormattingError;
 import com.palantir.javaformat.Indent;
 import com.palantir.javaformat.Input;
 import com.palantir.javaformat.LastLevelBreakability;
+import com.palantir.javaformat.Newlines;
 import com.palantir.javaformat.Op;
 import com.palantir.javaformat.OpenOp;
 import com.palantir.javaformat.OpsBuilder;
@@ -143,6 +144,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import javax.lang.model.element.Name;
@@ -1631,6 +1633,24 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         sync(node);
         String sourceForNode = getSourceForNode(node, getCurrentPath());
         if (sourceForNode.startsWith("\"\"\"")) {
+            String separator = Newlines.guessLineSeparator(sourceForNode);
+            ImmutableList<String> initialLines = sourceForNode.lines().collect(ImmutableList.toImmutableList());
+            String stripped = initialLines.stream()
+                    .skip(1)
+                    .collect(Collectors.joining(separator))
+                    .stripIndent();
+            // Use the last line of the text block to determine if it is deindented to column 0, by
+            // comparing the length of the line in the input source with the length after processing
+            // the text block contents with stripIndent().
+            boolean deindent = getLast(initialLines).stripTrailing().length()
+                    == Streams.findLast(stripped.lines())
+                            .orElseThrow()
+                            .stripTrailing()
+                            .length();
+            if (deindent) {
+                Indent indent = Indent.Const.make(Integer.MIN_VALUE / indentMultiplier, indentMultiplier);
+                builder.breakOp(indent);
+            }
             token(sourceForNode);
             return null;
         }
