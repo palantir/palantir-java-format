@@ -1,4 +1,3 @@
-
 class Unnamed {
   {
     int acc = 0;
