@@ -58,7 +58,8 @@ public final class FileBasedTests {
                             "SwitchDouble",
                             "SwitchUnderscore",
                             "I880",
-                            "I1309")
+                            "I1309",
+                            "Unnamed")
                     .build();
 
     private final Class<?> testClass;

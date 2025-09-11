@@ -30,9 +30,7 @@ import static com.palantir.javaformat.java.Trees.operatorName;
 import static com.palantir.javaformat.java.Trees.precedence;
 import static com.palantir.javaformat.java.Trees.skipParen;
 import static com.sun.source.tree.Tree.Kind.ANNOTATION;
-import static com.sun.source.tree.Tree.Kind.BLOCK;
 import static com.sun.source.tree.Tree.Kind.EXTENDS_WILDCARD;
-import static com.sun.source.tree.Tree.Kind.METHOD_INVOCATION;
 import static com.sun.source.tree.Tree.Kind.STRING_LITERAL;
 import static java.util.stream.Collectors.toList;
 
@@ -3462,7 +3460,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                     if (receiverExpression.isPresent()) {
                         scan(receiverExpression.get(), null);
                     } else {
-                        visit(name);
+                        variableName(name);
                     }
                     builder.op(op);
                 }
@@ -3510,6 +3508,10 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         }
 
         return baseDims;
+    }
+
+    protected void variableName(Name name) {
+        visit(name);
     }
 
     private void maybeAddDims(Deque<List<? extends AnnotationTree>> annotations) {
@@ -3600,7 +3602,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             builder.breakOp(" ");
             builder.open(ZERO);
             maybeAddDims(dims);
-            visit(fragment.getName());
+            variableName(fragment.getName());
             maybeAddDims(dims);
             ExpressionTree initializer = fragment.getInitializer();
             if (initializer != null) {
