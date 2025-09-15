@@ -72,13 +72,21 @@ class RSLs {
             + """
             bar
             """;
-    String t =
+    // TODO(crogoz): fix formatSource rendering of this block
+    String broken =
         """
     foo
     """
     + """
     bar
     """;
+        String working =
+            """
+        foo
+        """
+        + """
+        bar
+        """;
     String u =
         stringVariableOne
         +
@@ -90,6 +98,8 @@ class RSLs {
                     ...
                     """;
     }
+
+
     String x = String.format("""
           this very long string that does something using arguments %s %s %s
           """,

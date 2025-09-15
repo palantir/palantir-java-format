@@ -194,7 +194,7 @@ public final class StringWrapper {
                 String text = input.substring(startPosition, endPosition);
                 int lineStartPosition = lineMap.getStartPosition(lineMap.getLineNumber(startPosition));
                 int startColumn =
-                        CharMatcher.whitespace().negate().indexIn(input.substring(lineStartPosition, endPosition)) + 1;
+                        CharMatcher.whitespace().negate().indexIn(input.substring(lineStartPosition, endPosition));
 
                 // Find the source code of the text block with incidental whitespace removed.
                 // The first line of the text block is always """, and it does not affect incidental
@@ -205,15 +205,11 @@ public final class StringWrapper {
                         .collect(joining(separator))
                         .stripIndent();
                 ImmutableList<String> lines = stripped.lines().collect(ImmutableList.toImmutableList());
-                int deindent = getLast(initialLines).stripTrailing().length()
-                        - getLast(lines).stripTrailing().length();
 
-                String prefix =
-                        (deindent == 0 || lines.stream().anyMatch(x -> x.length() + startColumn - 1 > columnLimit))
-                                ? ""
-                                : " ".repeat(startColumn - 1);
+                String prefix = (lineStartPosition + startColumn + 4 > startPosition ? "" : " ".repeat(4))
+                        + " ".repeat(startColumn);
 
-                StringBuilder output = new StringBuilder(initialLines.get(0).stripLeading());
+                StringBuilder output = new StringBuilder(initialLines.get(0));
                 for (int i = 0; i < lines.size(); i++) {
                     String line = lines.get(i);
                     output.append(separator);
