@@ -1,0 +1,20 @@
+class RSLs {
+    {
+        """
+        No tools or answer found in the message. Please try again, following the instructions:\s
+
+        %s
+        """
+            .someOtherValue(e -> e.getValue().print()).myValue(System.err::println).formatted(toolFormatter.usage()).myOtherValue().someOtherValue().somethingElse();
+
+        myValue.someOtherValue(e -> e.getValue().print()).myValue(System.err::println).formatted(toolFormatter.usage()).myOtherValue().someOtherValue().somethingElse();
+
+        """
+        No tools or answer found in the message. Please try again, following the i
+        """.codePoints();
+        """
+        No tools or answer found in the message. Please try again, following the instructions:
+        """
+            .codePoints().forEach(System.err::println);
+    }
+}

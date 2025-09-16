@@ -2655,6 +2655,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         List<ExpressionTree> items = new ArrayList<>(stack);
 
         boolean needDot = false;
+        boolean isTextBlock = false;
 
         // The dot chain started with a primary expression: output it normally, and indent
         // the rest of the chain +4.
@@ -2666,17 +2667,26 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 scan(getArrayBase(node), null);
                 token(".");
             } else {
+                // Special case for text blocks: if the node is a string literal that ends with """,
+                // don't add a break after it
+                if (node instanceof LiteralTree && node.getKind() == Tree.Kind.STRING_LITERAL) {
+                    String sourceForNode = getSourceForNode(node, getCurrentPath());
+                    isTextBlock = sourceForNode.trim().endsWith("\"\"\"");
+                }
+
                 builder.open(OpenOp.builder()
                         .debugName("visitDot")
                         .plusIndent(plusFour)
                         .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(true))
                         .breakabilityIfLastLevel(
                                 LastLevelBreakability.ACCEPT_INLINE_CHAIN_IF_SIMPLE_OTHERWISE_CHECK_INNER)
-                        .columnLimitBeforeLastBreak(METHOD_CHAIN_COLUMN_LIMIT)
+                        .columnLimitBeforeLastBreak(isTextBlock ? Integer.MAX_VALUE : METHOD_CHAIN_COLUMN_LIMIT)
                         .isSimple(false)
                         .build());
                 scan(getArrayBase(node), null);
-                builder.breakOp();
+                if (!isTextBlock) {
+                    builder.breakOp();
+                }
                 needDot = true;
             }
             formatArrayIndices(getArrayIndices(node));
