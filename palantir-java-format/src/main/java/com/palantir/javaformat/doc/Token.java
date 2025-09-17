@@ -104,8 +104,14 @@ public final class Token extends Doc implements Op {
         builder.add(this);
     }
 
+    // TODO(crogoz): this is where the token gets computed. I need to differentiate between multiLine Strings and single
+    // Strings
     @Override
     protected float computeWidth() {
+        if (token.getTok().getOriginalText().startsWith("\"\"\"")) {
+            // hack hack hack to not consider the size of the textBlock such that we won't break
+            return 0;
+        }
         return token.getTok().length();
     }
 
@@ -123,6 +129,10 @@ public final class Token extends Doc implements Op {
     public State computeBreaks(
             CommentsHelper commentsHelper, int maxWidth, State state, Obs.ExplorationNode observationNode) {
         String text = token.getTok().getOriginalText();
+        if (token.getTok().getOriginalText().startsWith("\"\"\"")) {
+            // hack hack hack to not consider the size of the textBlock such that we won't break
+            return state.withColumn(state.column() + 3);
+        }
         return state.withColumn(state.column() + text.length());
     }
 

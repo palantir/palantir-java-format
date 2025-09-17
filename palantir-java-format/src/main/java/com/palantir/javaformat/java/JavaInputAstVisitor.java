@@ -2677,10 +2677,15 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 builder.open(OpenOp.builder()
                         .debugName("visitDot")
                         .plusIndent(plusFour)
-                        .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(true))
+                        .breakBehaviour(
+                                isTextBlock
+                                        ? BreakBehaviours.breakOnlyIfInnerLevelsThenFitOnOneLine(false)
+                                        : BreakBehaviours.preferBreakingLastInnerLevel(true))
                         .breakabilityIfLastLevel(
-                                LastLevelBreakability.ACCEPT_INLINE_CHAIN_IF_SIMPLE_OTHERWISE_CHECK_INNER)
-                        .columnLimitBeforeLastBreak(isTextBlock ? Integer.MAX_VALUE : METHOD_CHAIN_COLUMN_LIMIT)
+                                isTextBlock
+                                        ? LastLevelBreakability.ACCEPT_INLINE_CHAIN
+                                        : LastLevelBreakability.ACCEPT_INLINE_CHAIN_IF_SIMPLE_OTHERWISE_CHECK_INNER)
+                        .columnLimitBeforeLastBreak(METHOD_CHAIN_COLUMN_LIMIT)
                         .isSimple(false)
                         .build());
                 scan(getArrayBase(node), null);
@@ -2793,6 +2798,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         int length = needDot0 ? minLength : 0;
         for (ExpressionTree e : items) {
             if (needDot) {
+                // Don't add a break after a text block
                 if (length > minLength) {
                     builder.breakOp(Break.builder()
                             .fillMode(FillMode.UNIFIED)

@@ -52,7 +52,9 @@ class RSLs {
     """, 42);
 
     """
-    hello %s
+    hello %s dsadasdsadad  addkadkadakdakda hdsafdaf
+    daskdabs
+    adasd
     """
         .formatted("world");
             f(
@@ -63,7 +65,7 @@ class RSLs {
         bar
         """);
     """
-    hello
+    hello my dasdasdagdafkasfas fsdgaidahdahdafhalsdflas hasdsasadasdsadasdasdasds
     """.codePoints().forEach(System.err::println);
     String s =
         """
@@ -104,4 +106,12 @@ class RSLs {
           this very long string that does something using arguments %s %s %s
           """,
             "@", "@", "something");
+
+    {
+        """
+        No tools or answer found in the message. Please try again, following the instructions:\s
+
+        %s
+        """.someOtherValue(e -> e.getValue().print()).myValue(System.err::println).formatted(toolFormatter.usage()).myOtherValue().someOtherValue().somethingElse();
+    }
 }

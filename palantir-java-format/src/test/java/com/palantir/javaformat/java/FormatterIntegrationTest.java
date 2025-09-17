@@ -33,7 +33,7 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 @Execution(ExecutionMode.CONCURRENT)
 public class FormatterIntegrationTest {
 
-    private static FileBasedTests tests = new FileBasedTests(FormatterIntegrationTest.class, "testdata2");
+    private static FileBasedTests tests = new FileBasedTests(FormatterIntegrationTest.class, "testdata");
 
     @ParameterizedClass.Parameters(name = "{0}")
     public static List<Object[]> data() throws IOException {
@@ -73,7 +73,7 @@ public class FormatterIntegrationTest {
         assumeJavaVersionForTest(name);
         try {
             Formatter formatter = createFormatter();
-            String output = createFormatter().formatSource(input);
+            String output = formatter.formatSource(input);
             output = StringWrapper.wrap(Style.PALANTIR.maxLineLength(), output, formatter);
             if (isRecreate()) {
                 tests.writeFormatterOutput(name, output);
