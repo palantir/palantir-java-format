@@ -17,6 +17,9 @@ package com.palantir.javaformat.java;
 import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Range;
+import com.google.common.collect.RangeSet;
+import com.google.common.collect.TreeRangeSet;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -46,6 +49,54 @@ public class StringWrapperTest {
                 "}");
 
         assertThat(StringWrapper.wrap(100, input, Formatter.create())).isEqualTo(output);
+    }
+
+    @Test
+    public void testLinesNeedWrapping() throws FormatterException {
+        String input =
+                """
+            class Value {
+                String a = \"""
+                hello
+                \""".codePoints();
+
+                String b = getMyValue();
+
+                String c = String.format("This is a String that contains more characters %s", getValue());
+            }
+            """;
+        String output =
+                """
+            class Value {
+              String a = \"""
+                  hello
+                  \""".codePoints();
+
+                String b = getMyValue();
+
+              String c =
+                  String.format("This is a String"
+                      + " that contains more"
+                      + " characters"
+                      + " %s", getValue());
+            }
+            """;
+
+        RangeSet<Integer> fullInput = TreeRangeSet.create();
+        fullInput.add(Range.closedOpen(0, input.length()));
+        assertThat(StringWrapper.linesNeedWrapping(40, input, fullInput)).isTrue();
+        assertThat(StringWrapper.wrap(40, input, Formatter.create())).isEqualTo(output);
+
+        RangeSet<Integer> noStringInput = TreeRangeSet.create();
+        int bAssignment = input.indexOf("String b");
+        int bEndLine = input.indexOf("\n", bAssignment);
+        noStringInput.add(Range.closed(bAssignment, bEndLine));
+        assertThat(StringWrapper.linesNeedWrapping(40, input, noStringInput)).isFalse();
+
+        RangeSet<Integer> onlyStringLiteralInput = TreeRangeSet.create();
+        onlyStringLiteralInput.add(Range.closedOpen(bEndLine + 1, input.length()));
+        assertThat(StringWrapper.linesNeedWrapping(40, input, onlyStringLiteralInput))
+                .isTrue();
     }
 
     private static String lines(String... line) {

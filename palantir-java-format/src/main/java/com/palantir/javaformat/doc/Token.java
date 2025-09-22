@@ -24,11 +24,13 @@ import com.palantir.javaformat.Indent;
 import com.palantir.javaformat.Input;
 import com.palantir.javaformat.Op;
 import com.palantir.javaformat.Output;
+import com.palantir.javaformat.java.StringWrapper;
 import java.util.Optional;
 
 /** A leaf {@link Doc} for a token. */
 @Immutable
 public final class Token extends Doc implements Op {
+
     /** Is a Token a real token, or imaginary (e.g., a token generated incorrectly, or an EOF)? */
     public enum RealOrImaginary {
         REAL,
@@ -104,13 +106,12 @@ public final class Token extends Doc implements Op {
         builder.add(this);
     }
 
-    // TODO(crogoz): this is where the token gets computed. I need to differentiate between multiLine Strings and single
     // Strings
     @Override
     protected float computeWidth() {
-        if (token.getTok().getOriginalText().startsWith("\"\"\"")) {
+        if (token.getTok().getOriginalText().startsWith(StringWrapper.TEXT_BLOCK_DELIMITER)) {
             // hack hack hack to not consider the size of the textBlock such that we won't break
-            return 0;
+            return StringWrapper.TEXT_BLOCK_DELIMITER.length();
         }
         return token.getTok().length();
     }
@@ -129,9 +130,9 @@ public final class Token extends Doc implements Op {
     public State computeBreaks(
             CommentsHelper commentsHelper, int maxWidth, State state, Obs.ExplorationNode observationNode) {
         String text = token.getTok().getOriginalText();
-        if (token.getTok().getOriginalText().startsWith("\"\"\"")) {
+        if (token.getTok().getOriginalText().startsWith(StringWrapper.TEXT_BLOCK_DELIMITER)) {
             // hack hack hack to not consider the size of the textBlock such that we won't break
-            return state.withColumn(state.column() + 3);
+            return state.withColumn(state.column() + StringWrapper.TEXT_BLOCK_DELIMITER.length());
         }
         return state.withColumn(state.column() + text.length());
     }

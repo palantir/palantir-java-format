@@ -51,6 +51,18 @@
       "allDeclaredFields": true
     },
     {
+      "type": "java.util.ImmutableCollections$AbstractImmutableList",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "java.util.ImmutableCollections$AbstractImmutableCollection",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "java.util.ImmutableCollections$List12",
+      "allDeclaredFields": true
+    },
+    {
       "type": "com.google.common.collect.SingletonImmutableList",
       "allDeclaredFields": true
     },

@@ -22,8 +22,11 @@ import com.google.common.base.Verify;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Range;
+import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeMap;
+import com.google.common.collect.TreeRangeSet;
 import com.palantir.javaformat.Newlines;
+import com.palantir.javaformat.Utils;
 import com.sun.source.tree.BinaryTree;
 import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.MemberSelectTree;
@@ -487,6 +490,42 @@ public final class StringWrapper {
         while (it.hasNext()) {
             String line = it.next();
             if (line.length() > columnLimit || line.contains(TEXT_BLOCK_DELIMITER)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Returns true if any lines in the given Java source exceed the column limit. */
+    public static boolean linesNeedWrapping(int columnLimit, String input, RangeSet<Integer> initialRangesToChange) {
+        // TODO(cushon): consider adding Newlines.lineIterable?
+        RangeSet<Integer> linesToChange = TreeRangeSet.create();
+        Iterator<String> it = Newlines.lineIterator(input);
+        int i = 0;
+        boolean insideTextBlock = false;
+        while (it.hasNext()) {
+            String line = it.next();
+            if (line.length() > columnLimit) {
+                linesToChange.add(Range.closedOpen(i, i + 1));
+            }
+            if (!insideTextBlock && line.contains(TEXT_BLOCK_DELIMITER)) {
+                insideTextBlock = true;
+                linesToChange.add(Range.closedOpen(i, i + 1));
+            } else if (insideTextBlock && line.contains(TEXT_BLOCK_DELIMITER)) {
+                insideTextBlock = false;
+                linesToChange.add(Range.closedOpen(i, i + 1));
+            } else if (insideTextBlock) {
+                linesToChange.add(Range.closedOpen(i, i + 1));
+            }
+            ++i;
+        }
+        RangeSet<Integer> charRangeToCheck = Utils.lineRangesToCharRanges(input, linesToChange);
+        return hasOverlap(initialRangesToChange, charRangeToCheck);
+    }
+
+    static boolean hasOverlap(RangeSet<Integer> a, RangeSet<Integer> b) {
+        for (Range<Integer> range : a.asRanges()) {
+            if (!b.subRangeSet(range).isEmpty()) {
                 return true;
             }
         }

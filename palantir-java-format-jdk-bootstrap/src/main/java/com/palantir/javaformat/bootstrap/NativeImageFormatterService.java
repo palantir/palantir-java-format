@@ -61,7 +61,8 @@ public class NativeImageFormatterService implements FormatterService {
             }
             return MAPPER.readValue(output.get(), new TypeReference<>() {});
         } catch (IOException e) {
-            throw new UncheckedIOException(String.format("Error running the native image command %s", output), e);
+            throw new UncheckedIOException(
+                    String.format("Error running the native image command; received output: %s", output), e);
         }
     }
 

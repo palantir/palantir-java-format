@@ -2798,7 +2798,6 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         int length = needDot0 ? minLength : 0;
         for (ExpressionTree e : items) {
             if (needDot) {
-                // Don't add a break after a text block
                 if (length > minLength) {
                     builder.breakOp(Break.builder()
                             .fillMode(FillMode.UNIFIED)

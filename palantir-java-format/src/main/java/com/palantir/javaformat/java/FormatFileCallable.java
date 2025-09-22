@@ -30,13 +30,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.logging.Logger;
 
 /** Encapsulates information about a file to be formatted, including which parts of the file to format. */
 class FormatFileCallable implements Callable<String> {
     private static final ObjectMapper MAPPER =
             JsonMapper.builder().addModule(new GuavaModule()).build();
-    private static final Logger log = Logger.getLogger("FormatFileCallable");
+
     private final String input;
     private final CommandLineOptions parameters;
     private final JavaFormatterOptions options;
@@ -55,12 +54,12 @@ class FormatFileCallable implements Callable<String> {
 
         Formatter formatter = Formatter.createFormatter(options);
         if (parameters.outputReplacements()) {
-            Set<Range<Integer>> rangesToChange = characterRanges(input).asRanges();
+            RangeSet<Integer> characterRanges = characterRanges(input);
+            Set<Range<Integer>> rangesToChange = characterRanges.asRanges();
             List<Replacement> replacements = formatter.getFormatReplacements(input, rangesToChange);
-            // log.severe("rangesToChange: " + rangesToChange);
             if (parameters.reflowLongStrings()) {
                 String formattedText = applyReplacements(input, replacements);
-                if (!StringWrapper.needWrapping(options.maxLineLength(), formattedText)) {
+                if (!StringWrapper.linesNeedWrapping(options.maxLineLength(), formattedText, characterRanges)) {
                     return writeFormatReplacements(replacements);
                 }
                 String formattedSource = StringWrapper.wrap(options.maxLineLength(), formattedText, formatter);
