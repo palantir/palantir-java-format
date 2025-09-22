@@ -14,8 +14,6 @@
 
 package com.palantir.javaformat.java;
 
-import static java.util.Comparator.comparing;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -25,8 +23,6 @@ import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
 import com.palantir.javaformat.Utils;
 import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -58,31 +54,22 @@ class FormatFileCallable implements Callable<String> {
             Set<Range<Integer>> rangesToChange = characterRanges.asRanges();
             List<Replacement> replacements = formatter.getFormatReplacements(input, rangesToChange);
             if (parameters.reflowLongStrings()) {
-                String formattedText = applyReplacements(input, replacements);
+                String formattedText = Utils.applyReplacements(input, replacements);
+                // avoid trying to wrap the input unless the lines needing wrapping are part of the "characterRanges"
                 if (!StringWrapper.linesNeedWrapping(options.maxLineLength(), formattedText, characterRanges)) {
                     return writeFormatReplacements(replacements);
                 }
-                String formattedSource = StringWrapper.wrap(options.maxLineLength(), formattedText, formatter);
-                return writeFormatReplacements(List.of(Replacement.create(0, input.length(), formattedSource)));
+                String wrappedFormattedText = StringWrapper.wrap(options.maxLineLength(), formattedText, formatter);
+                // if no wrapping change happened, return the initial replacements
+                if (wrappedFormattedText.equals(formattedText)) {
+                    return writeFormatReplacements(replacements);
+                }
+                return writeFormatReplacements(List.of(Replacement.create(0, input.length(), wrappedFormattedText)));
             } else {
                 return writeFormatReplacements(replacements);
             }
         }
         return formatFile(formatter);
-    }
-
-    static String applyReplacements(String input, Collection<Replacement> replacementsCollection) {
-        List<Replacement> replacements = new ArrayList<>(replacementsCollection);
-        replacements.sort(comparing((Replacement r) -> r.getReplaceRange().lowerEndpoint())
-                .reversed());
-        StringBuilder writer = new StringBuilder(input);
-        for (Replacement replacement : replacements) {
-            writer.replace(
-                    replacement.getReplaceRange().lowerEndpoint(),
-                    replacement.getReplaceRange().upperEndpoint(),
-                    replacement.getReplacementString());
-        }
-        return writer.toString();
     }
 
     String writeFormatReplacements(List<Replacement> replacements) throws FormatterException {
