@@ -116,7 +116,7 @@ public final class StringWrapper {
     }
 
     @SuppressWarnings("for-rollout:NullAway")
-    private static TreeRangeMap<Integer, String> getReflowReplacements(int columnLimit, final String input)
+    public static TreeRangeMap<Integer, String> getReflowReplacements(int columnLimit, final String input)
             throws FormatterException {
         return new Reflower(columnLimit, input).getReflowReplacements();
     }
@@ -289,6 +289,7 @@ public final class StringWrapper {
                             getStartPosition(path.getParentPath().getLeaf()));
         }
     }
+
     /**
      * Returns the source text of the given string literal trees, excluding the leading and trailing double-quotes and
      * the `+` operator.
@@ -361,7 +362,7 @@ public final class StringWrapper {
      * @param components the text to reflow
      * @param first0 true if the text includes the beginning of its enclosing concat chain, i.e. a
      * @param firstLineStartColumn the column where the very first line starts (can be less than textStartColumn if text
-     *     follows variable declaration)
+     * follows variable declaration)
      */
     private static String reflow(
             String separator,
@@ -418,17 +419,6 @@ public final class StringWrapper {
                         "\"" + separator + " ".repeat(first0 ? firstLineStartColumn + 4 : startColumn - 2) + "+ \"",
                         "\"",
                         "\""));
-    }
-
-    private static boolean totalLengthLessThanOrEqual(Iterable<String> input, int length) {
-        int total = 0;
-        for (String s : input) {
-            total += s.length();
-            if (total > length) {
-                return false;
-            }
-        }
-        return true;
     }
 
     /**
@@ -491,7 +481,7 @@ public final class StringWrapper {
     }
 
     /** Returns true if any lines in the given Java source exceed the column limit. */
-    private static boolean needWrapping(int columnLimit, String input) {
+    public static boolean needWrapping(int columnLimit, String input) {
         // TODO(cushon): consider adding Newlines.lineIterable?
         Iterator<String> it = Newlines.lineIterator(input);
         while (it.hasNext()) {

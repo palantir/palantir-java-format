@@ -32,12 +32,11 @@ class RSLs {
 
         ipsum
         """;
-    String j =
-            """
-            lorem
-            one long incredibly unbroken sentence moving from topic to topic so that no one had a chance to interrupt
-            ipsum
-            """;
+    String j = """
+        lorem
+        one long incredibly unbroken sentence moving from topic to topic so that no one had a chance to interrupt
+        ipsum
+        """;
     String k = """
         lorem
         ipsum
@@ -81,19 +80,27 @@ class RSLs {
             """ + """
             bar
             """;
-        String u = stringVariableOne
-                + """
-                ...
-                """
-                + stringVariableTwo
-                + """
+        String u = stringVariableOne + """
+            ...
+            """ + stringVariableTwo + """
                 ...
                 """;
     }
 
-    String x = String.format(
-            """
-            this very long string that does something using arguments %s %s %s
-            """,
-            "@", "@", "something");
+    String x = String.format("""
+        this very long string that does something using arguments %s %s %s
+        """, "@", "@", "something");
+
+    {
+        """
+        No tools or answer found in the message. Please try again, following the instructions:\s
+
+        %s
+        """.someOtherValue(e -> e.getValue().print())
+                .myValue(System.err::println)
+                .formatted(toolFormatter.usage())
+                .myOtherValue()
+                .someOtherValue()
+                .somethingElse();
+    }
 }

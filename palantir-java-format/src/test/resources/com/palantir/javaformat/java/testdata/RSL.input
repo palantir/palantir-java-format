@@ -52,9 +52,7 @@ class RSLs {
     """, 42);
 
     """
-    hello %s dsadasdsadad  addkadkadakdakda hdsafdaf
-    daskdabs
-    adasd
+    hello %s
     """
         .formatted("world");
             f(
@@ -65,7 +63,7 @@ class RSLs {
         bar
         """);
     """
-    hello my dasdasdagdafkasfas fsdgaidahdahdafhalsdflas hasdsasadasdsadasdasdasds
+    hello
     """.codePoints().forEach(System.err::println);
     String s =
         """

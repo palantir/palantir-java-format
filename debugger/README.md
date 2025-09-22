@@ -1,3 +1,11 @@
+React App that helps Debugging a javaInput's AST.
+
+1. Run only one test from [FormatterIntegrationTest](https://github.com/palantir/palantir-java-format/blob/0ad916e4f27b5aab3870d633a16c50192b6e54cc/palantir-java-format/src/test/java/com/palantir/javaformat/java/FormatterIntegrationTest.java#L66) with ["debugOutput" = true](https://github.com/palantir/palantir-java-format/blob/0ad916e4f27b5aab3870d633a16c50192b6e54cc/palantir-java-format/src/test/java/com/palantir/javaformat/java/FormatterIntegrationTest.java#L66)
+2. Run `cd debugger && NODE_OPTIONS=--openssl-legacy-provider yarn start` that will open the app in the browser (<code>localhost:3000</code>)
+
+
+-----
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

@@ -14,23 +14,29 @@
 
 package com.palantir.javaformat.java;
 
+import static java.util.Comparator.comparing;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
 import com.palantir.javaformat.Utils;
 import java.io.UncheckedIOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.logging.Logger;
 
 /** Encapsulates information about a file to be formatted, including which parts of the file to format. */
 class FormatFileCallable implements Callable<String> {
-    private final ObjectMapper MAPPER =
+    private static final ObjectMapper MAPPER =
             JsonMapper.builder().addModule(new GuavaModule()).build();
-
+    private static final Logger log = Logger.getLogger("FormatFileCallable");
     private final String input;
     private final CommandLineOptions parameters;
     private final JavaFormatterOptions options;
@@ -49,14 +55,38 @@ class FormatFileCallable implements Callable<String> {
 
         Formatter formatter = Formatter.createFormatter(options);
         if (parameters.outputReplacements()) {
-            return formatReplacements(formatter);
+            Set<Range<Integer>> rangesToChange = characterRanges(input).asRanges();
+            List<Replacement> replacements = formatter.getFormatReplacements(input, rangesToChange);
+            // log.severe("rangesToChange: " + rangesToChange);
+            if (parameters.reflowLongStrings()) {
+                String formattedText = applyReplacements(input, replacements);
+                if (!StringWrapper.needWrapping(options.maxLineLength(), formattedText)) {
+                    return writeFormatReplacements(replacements);
+                }
+                String formattedSource = StringWrapper.wrap(options.maxLineLength(), formattedText, formatter);
+                return writeFormatReplacements(List.of(Replacement.create(0, input.length(), formattedSource)));
+            } else {
+                return writeFormatReplacements(replacements);
+            }
         }
         return formatFile(formatter);
     }
 
-    private String formatReplacements(Formatter formatter) throws FormatterException {
-        ImmutableList<Replacement> replacements =
-                formatter.getFormatReplacements(input, characterRanges(input).asRanges());
+    static String applyReplacements(String input, Collection<Replacement> replacementsCollection) {
+        List<Replacement> replacements = new ArrayList<>(replacementsCollection);
+        replacements.sort(comparing((Replacement r) -> r.getReplaceRange().lowerEndpoint())
+                .reversed());
+        StringBuilder writer = new StringBuilder(input);
+        for (Replacement replacement : replacements) {
+            writer.replace(
+                    replacement.getReplaceRange().lowerEndpoint(),
+                    replacement.getReplaceRange().upperEndpoint(),
+                    replacement.getReplacementString());
+        }
+        return writer.toString();
+    }
+
+    String writeFormatReplacements(List<Replacement> replacements) throws FormatterException {
         try {
             return MAPPER.writeValueAsString(replacements);
         } catch (JsonProcessingException e) {
