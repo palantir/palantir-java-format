@@ -360,10 +360,10 @@ public final class StringWrapper {
      *
      * @param separator the line separator
      * @param columnLimit the number of columns to wrap at
-     * @param startColumn the column position of the beginning of the original text
      * @param trailing extra space to leave after the last line
      * @param components the text to reflow
      * @param first0 true if the text includes the beginning of its enclosing concat chain, i.e. a
+     * @param textStartColumn the column position of the beginning of the original text
      * @param firstLineStartColumn the column where the very first line starts (can be less than textStartColumn if text
      * follows variable declaration)
      */
@@ -373,21 +373,18 @@ public final class StringWrapper {
             int trailing,
             ImmutableList<String> components,
             boolean first0,
-            int startColumn,
+            int textStartColumn,
             int firstLineStartColumn) {
         // We have space between the start column and the limit to output the first line.
         // Reserve two spaces for the quotes.
-        int width = columnLimit - startColumn - 2;
+        int width = columnLimit - textStartColumn - 2;
         Deque<String> input = new ArrayDeque<>(components);
         List<String> lines = new ArrayList<>();
         boolean first = first0;
         while (!input.isEmpty()) {
             int length = 0;
             List<String> line = new ArrayList<>();
-            // If we know this is going to be the last line, then remove a bit of width to account for the
-            // trailing characters.
             if (input.stream().mapToInt(String::length).sum() <= width) {
-                // This isn’t quite optimal, but arguably good enough. See b/179561701
                 width -= trailing;
             }
             while (!input.isEmpty()
@@ -412,14 +409,14 @@ public final class StringWrapper {
                 // This is to handle cases like:
                 // String foo = "first component"
                 //     + "rest";
-                width += startColumn - firstLineStartColumn;
+                width += textStartColumn - firstLineStartColumn;
                 first = false;
             }
         }
 
         return lines.stream()
                 .collect(joining(
-                        "\"" + separator + " ".repeat(first0 ? firstLineStartColumn + 4 : startColumn - 2) + "+ \"",
+                        "\"" + separator + " ".repeat(first0 ? firstLineStartColumn + 4 : textStartColumn - 2) + "+ \"",
                         "\"",
                         "\""));
     }
@@ -483,8 +480,11 @@ public final class StringWrapper {
         return ((JCTree) tree).getStartPosition();
     }
 
-    /** Returns true if any lines in the given Java source exceed the column limit. */
-    public static boolean needWrapping(int columnLimit, String input) {
+    /**
+     * Returns true if any lines in the given Java source exceed the column limit or contain text blocks.
+     * Keep this method and {@code linesNeedWrapping} in line.
+     * */
+    private static boolean needWrapping(int columnLimit, String input) {
         // TODO(cushon): consider adding Newlines.lineIterable?
         Iterator<String> it = Newlines.lineIterator(input);
         while (it.hasNext()) {
@@ -496,7 +496,11 @@ public final class StringWrapper {
         return false;
     }
 
-    /** Returns true if any lines in the given Java source exceed the column limit. */
+    /**
+     * Returns true if the lines containing the {@code initialRangesToChange} in the given Java source exceed the
+     * column limit or contain text blocks. Used by the Intellij plugin to check if we need to run StringWrapper.wrap.
+     * Keep this method and {@code needWrapping} in line.
+     * */
     public static boolean linesNeedWrapping(int columnLimit, String input, RangeSet<Integer> initialRangesToChange) {
         // TODO(cushon): consider adding Newlines.lineIterable?
         RangeSet<Integer> linesToChange = TreeRangeSet.create();

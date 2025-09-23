@@ -1638,6 +1638,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             token("-");
             sourceForNode = sourceForNode.substring(1).trim();
         }
+
         token(sourceForNode);
         return null;
     }
@@ -2671,7 +2672,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 // don't add a break after it
                 if (node instanceof LiteralTree && node.getKind() == Tree.Kind.STRING_LITERAL) {
                     String sourceForNode = getSourceForNode(node, getCurrentPath());
-                    isTextBlock = sourceForNode.trim().endsWith("\"\"\"");
+                    isTextBlock = sourceForNode.trim().endsWith(StringWrapper.TEXT_BLOCK_DELIMITER);
                 }
 
                 builder.open(OpenOp.builder()
