@@ -108,7 +108,8 @@ public final class Token extends Doc implements Op {
     @Override
     protected float computeWidth() {
         if (token.getTok().getOriginalText().startsWith(StringWrapper.TEXT_BLOCK_DELIMITER)) {
-            // hack hack hack to not consider the size of the textBlock such that we won't break
+            // Palantir-specific: The size of a text block should not impact line length. This ensures that methods
+            // applied to text blocks remain on the same line and are not split into multiple lines.
             return StringWrapper.TEXT_BLOCK_DELIMITER.length();
         }
         return token.getTok().length();
@@ -129,7 +130,8 @@ public final class Token extends Doc implements Op {
             CommentsHelper commentsHelper, int maxWidth, State state, Obs.ExplorationNode observationNode) {
         String text = token.getTok().getOriginalText();
         if (token.getTok().getOriginalText().startsWith(StringWrapper.TEXT_BLOCK_DELIMITER)) {
-            // hack hack hack to not consider the size of the textBlock such that we won't break
+            // Palantir-specific: The size of a text block should not impact line length. This ensures that methods
+            // applied to text blocks remain on the same line and are not split into multiple lines.
             return state.withColumn(state.column() + StringWrapper.TEXT_BLOCK_DELIMITER.length());
         }
         return state.withColumn(state.column() + text.length());

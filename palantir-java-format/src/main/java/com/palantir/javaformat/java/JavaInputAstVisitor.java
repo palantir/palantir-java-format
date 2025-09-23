@@ -1638,7 +1638,6 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             token("-");
             sourceForNode = sourceForNode.substring(1).trim();
         }
-
         token(sourceForNode);
         return null;
     }
