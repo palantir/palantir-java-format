@@ -1854,6 +1854,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     }
 
     protected void visitSwitch(ExpressionTree expression, List<? extends CaseTree> cases) {
+        builder.open(ZERO);
         token("switch");
         builder.space();
         token("(");
@@ -1874,7 +1875,8 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         builder.close();
         builder.forcedBreak();
         builder.blankLineWanted(BlankLineWanted.NO);
-        token("}", plusFour);
+        token("}", plusTwo);
+        builder.close();
     }
 
     @Override

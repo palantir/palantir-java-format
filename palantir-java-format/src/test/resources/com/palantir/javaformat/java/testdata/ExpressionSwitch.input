@@ -58,4 +58,17 @@ class ExpressionSwitch {
           case 2 -> throw new IllegalArgumentException();
           default -> throw new IllegalStateException();};
   }
+
+
+    public void testWithComments(int y) {
+        int x;
+        x = switch (y) {
+            case 1 -> 1;
+            // after case 1
+            case 2 -> throw new IllegalArgumentException();
+            // after case 2
+            default -> throw new IllegalStateException();
+            // after default case
+        };
+    }
 }
