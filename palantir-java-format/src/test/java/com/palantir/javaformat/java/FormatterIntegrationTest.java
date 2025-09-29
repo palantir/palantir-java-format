@@ -32,7 +32,7 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 @Execution(ExecutionMode.CONCURRENT)
 public class FormatterIntegrationTest {
 
-    private static FileBasedTests tests = new FileBasedTests(FormatterIntegrationTest.class, "testdata2");
+    private static FileBasedTests tests = new FileBasedTests(FormatterIntegrationTest.class, "testdata");
 
     @ParameterizedClass.Parameters(name = "{0}")
     public static List<Object[]> data() throws IOException {
@@ -64,7 +64,7 @@ public class FormatterIntegrationTest {
      * <p>Warning: don't turn this on for all tests. The debugger will always write to the same file.
      */
     private static boolean isDebugMode() {
-        return true; // Boolean.getBoolean("debugOutput");
+        return Boolean.getBoolean("debugOutput");
     }
 
     @TestTemplate

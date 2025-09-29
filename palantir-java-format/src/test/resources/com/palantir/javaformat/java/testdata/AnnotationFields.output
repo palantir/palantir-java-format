@@ -1,0 +1,19 @@
+@Schema(
+        description = "Type of quote being requested",
+        example = "NEW_BUSINESS",
+        somethingElse = "new",
+        other = "my other long string")
+public record QuoteRequest(
+        @Schema(description = "US state of the product being quoted", example = "TX") RegulatoryState regulatoryState,
+
+        @Schema(description = "Reason for a quote", example = "New Business") String amendmentReason,
+
+        @Schema(
+                description = "Type of quote being requested",
+                example = "NEW_BUSINESS",
+                somethingElse = "new",
+                other = "my other long string")
+        QuoteType quoteType,
+
+        @Schema(description = "Date the quoted changes become active", example = "2023-06-25")
+        LocalDate quoteEffectiveDate) {}

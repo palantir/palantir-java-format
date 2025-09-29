@@ -2408,6 +2408,11 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             if (!first) {
                 builder.breakOp(" ");
             }
+            // If this parameter has annotations, add a blank line before it (except for the first one)
+            if (!parameter.getModifiers().getAnnotations().isEmpty() && i > 0) {
+                builder.blankLineWanted(BlankLineWanted.YES);
+                builder.forcedBreak();
+            }
             visitToDeclare(
                     DeclarationKind.PARAMETER,
                     Direction.HORIZONTAL,
@@ -3417,12 +3422,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 new ArrayDeque<>(typeWithDims.isPresent() ? typeWithDims.get().dims : Collections.emptyList());
         int baseDims = 0;
 
-        builder.open(
-                kind == DeclarationKind.PARAMETER
-                                && (modifiers.isPresent()
-                                        && !modifiers.get().getAnnotations().isEmpty())
-                        ? plusFour
-                        : ZERO);
+        builder.open(ZERO);
         {
             if (modifiers.isPresent()) {
                 visitAndBreakModifiers(modifiers.get(), annotationsDirection, Optional.of(verticalAnnotationBreak));
