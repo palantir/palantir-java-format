@@ -2408,11 +2408,6 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             if (!first) {
                 builder.breakOp(" ");
             }
-            // If this parameter has annotations, add a blank line before it (except for the first one)
-            if (!parameter.getModifiers().getAnnotations().isEmpty() && i > 0) {
-                builder.blankLineWanted(BlankLineWanted.YES);
-                builder.forcedBreak();
-            }
             visitToDeclare(
                     DeclarationKind.PARAMETER,
                     Direction.HORIZONTAL,

@@ -6,7 +6,7 @@ class B23804934 {
             ZzzzzzzZzzzzzzz<ZzzzzzZzzzZzzz> zzzzzzZzzzZzzzZzzzzzzz,
             @ZzzzZzzzzZzzzzzz Zzzzzz zzzzzZzzzzzz,
             @ZzzzzzzzzzzZzzzzzz(Zz.ZZZZZZZ_ZZZZZ_ZZZZ_ZZZZZZ_ZZZZ_ZZZZZZZZZZ)
-                    Zzzzzzzz<Zzzzzzz> zzzzzZzzzZzzzzzZzzzZzzzzzzzzz) {
+            Zzzzzzzz<Zzzzzzz> zzzzzZzzzZzzzzzZzzzZzzzzzzzzz) {
         zzzz.zzzzzzzzZzzzzzZzzzzZzzzzzzz = zzzzzzzzZzzzzzZzzzzZzzzzzzz;
         zzzz.zzzzzzZzzzZzzzZzzzzzzz = zzzzzzZzzzZzzzZzzzzzzz;
         zzzz.zzzzzZzzzzzz = zzzzzZzzzzzz;
@@ -16,7 +16,7 @@ class B23804934 {
     zzzz z(
             zzz z,
             @Zzzzzzzz @Zzzzzzzzzz
-                    ZzzzzzzzzZzzz<Zzzzzz> zzzzZzzzZzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz) {}
+            ZzzzzzzzzZzzz<Zzzzzz> zzzzZzzzZzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz) {}
 
     @ZzzZzzzZzzzzzzzzzz
     @Zzzzzzzz(zzzzzzzzz = Zzzzzzzzz.ZZ)
