@@ -2385,6 +2385,12 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         if (!receiver.isPresent() && parameters.isEmpty()) {
             return;
         }
+        boolean isRecordParams = false;
+        if (!parameters.isEmpty() && parameters.get(0) instanceof JCTree.JCVariableDecl) {
+            JCTree.JCVariableDecl param = (JCTree.JCVariableDecl) parameters.get(0);
+            isRecordParams = (param.mods.flags & RECORD) == RECORD;
+        }
+
         builder.open(ZERO);
         boolean first = true;
         if (receiver.isPresent()) {
@@ -2408,13 +2414,25 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             if (!first) {
                 builder.breakOp(" ");
             }
+            BreakTag declarationAnnotationBreak = new BreakTag();
+
+            if (isRecordParams && !first) {
+                builder.blankLineWanted(BlankLineWanted.conditional(declarationAnnotationBreak));
+            }
+
             visitToDeclare(
                     DeclarationKind.PARAMETER,
                     Direction.HORIZONTAL,
                     parameter,
                     /* initializer= */ Optional.empty(),
                     "=",
-                    i < parameters.size() - 1 ? Optional.of(",") : /* a= */ Optional.empty());
+                    i < parameters.size() - 1 ? Optional.of(",") : /* a= */ Optional.empty(),
+                    Optional.of(declarationAnnotationBreak));
+
+            // If this is a record parameter and not the last one, add a conditional blank line after
+            if (isRecordParams && i < parameters.size() - 1) {
+                builder.blankLineWanted(BlankLineWanted.conditional(declarationAnnotationBreak));
+            }
             first = false;
         }
         builder.close();
@@ -2584,6 +2602,17 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             Optional<ExpressionTree> initializer,
             String equals,
             Optional<String> trailing) {
+        visitToDeclare(kind, annotationsDirection, node, initializer, equals, trailing, Optional.empty());
+    }
+
+    private void visitToDeclare(
+            DeclarationKind kind,
+            Direction annotationsDirection,
+            VariableTree node,
+            Optional<ExpressionTree> initializer,
+            String equals,
+            Optional<String> trailing,
+            Optional<BreakTag> annotationBreakForRecords) {
         sync(node);
         declareOne(
                 kind,
@@ -2596,7 +2625,8 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 initializer,
                 trailing,
                 /* receiverExpression= */ Optional.empty(),
-                /* typeWithDims= */ Optional.empty());
+                /* typeWithDims= */ Optional.empty(),
+                annotationBreakForRecords);
     }
 
     /** Does not omit the leading '<', which should be associated with the type name. */
@@ -3400,9 +3430,39 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             Optional<String> trailing,
             Optional<ExpressionTree> receiverExpression,
             Optional<TypeWithDims> typeWithDims) {
+        return declareOne(
+                kind,
+                annotationsDirection,
+                modifiers,
+                type,
+                name,
+                op,
+                equals,
+                initializer,
+                trailing,
+                receiverExpression,
+                typeWithDims,
+                Optional.empty());
+    }
+
+    /** Declare one variable or variable-like thing. */
+    @SuppressWarnings("TooManyArguments")
+    int declareOne(
+            DeclarationKind kind,
+            Direction annotationsDirection,
+            Optional<ModifiersTree> modifiers,
+            Tree type,
+            Name name,
+            String op,
+            String equals,
+            Optional<ExpressionTree> initializer,
+            Optional<String> trailing,
+            Optional<ExpressionTree> receiverExpression,
+            Optional<TypeWithDims> typeWithDims,
+            Optional<BreakTag> verticalAnnotationBreakForRecords) {
 
         BreakTag typeBreak = new BreakTag();
-        BreakTag verticalAnnotationBreak = new BreakTag();
+        BreakTag verticalAnnotationBreak = verticalAnnotationBreakForRecords.orElseGet(BreakTag::new);
 
         // If the node is a field declaration, try to output any declaration
         // annotations in-line. If the entire declaration doesn't fit on a single
