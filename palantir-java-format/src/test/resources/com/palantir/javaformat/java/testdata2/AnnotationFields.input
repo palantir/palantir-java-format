@@ -91,7 +91,7 @@ record ApiEndpoint(@JsonValue("name") String name, HttpMethod method, String url
     }
 }
 
-record ApiEndpoint(@JsonProperty("bonus_buy") @JsonValue(some_other_name_that_is_here="value", name_which_is_super_long_that_goes_beyond_the_limit="name", other="other") String name, HttpMethod method, String url) {
+record ApiEndpoint(@JsonProperty("bonus_buy") @JsonValue(some_other_name_that_is_here="value", name_which_is_super_long_that_goes_beyond_the_limit="name") String name, HttpMethod method, String url) {
     ApiEndpoint {
         name = name.toUpperCase();
     }

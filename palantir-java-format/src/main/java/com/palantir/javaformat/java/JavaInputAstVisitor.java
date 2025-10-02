@@ -2247,20 +2247,28 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             }
             AnnotationTree annotation = annotations.removeFirst();
             if (!annotation.getArguments().isEmpty()) {
-                ExpressionTree firstArg = annotation.getArguments().get(0);
+                // ExpressionTree firstArg = annotation.getArguments().get(0);
                 // If it's an AssignmentTree, it's an explicit argument (name = value)
-                hasExplicitParameterizedAnnotation = firstArg instanceof AssignmentTree;
+                hasExplicitParameterizedAnnotation = true;
             }
             scan(annotation, null);
             first = false;
             lastWasAnnotation = true;
         }
         builder.close();
+
         // pjf specific: enforce breaking operatins for record parameters with annotations with explicit parameters
-        ImmutableList<Op> trailingBreak =
-                annotationsDirection.isVertical() || (hasExplicitParameterizedAnnotation && isRecordParameter)
-                        ? forceBreakList(declarationAnnotationBreak)
-                        : breakList(declarationAnnotationBreak);
+        ImmutableList<Op> trailingBreak = annotationsDirection.isVertical() || isRecordParameter
+                ? (isRecordParameter
+                        ? ImmutableList.of(Break.builder()
+                                .fillMode(UNIFIED)
+                                .flat(" ")
+                                .plusIndent(ZERO)
+                                .hasColumnLimit(true)
+                                .optTag(declarationAnnotationBreak)
+                                .build())
+                        : forceBreakList(declarationAnnotationBreak))
+                : breakList(declarationAnnotationBreak);
         if (annotations.isEmpty() && !nextIsModifier()) {
             return trailingBreak;
         }
@@ -3496,13 +3504,18 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 new ArrayDeque<>(typeWithDims.isPresent() ? typeWithDims.get().dims : Collections.emptyList());
         int baseDims = 0;
 
-        builder.open(
-                kind == DeclarationKind.PARAMETER
-                                && (modifiers.isPresent()
-                                        && !modifiers.get().getAnnotations().isEmpty()
-                                        && !isInRecord(modifiers.get()))
-                        ? plusFour
-                        : ZERO);
+        if (kind == DeclarationKind.PARAMETER
+                && (modifiers.isPresent()
+                        && !modifiers.get().getAnnotations().isEmpty()
+                        && !isInRecord(modifiers.get()))) {
+            builder.open(plusFour);
+        } else {
+            builder.open(OpenOp.builder()
+                    .debugName("visitParam")
+                    .plusIndent(ZERO)
+                    .columnLimitBeforeLastBreak(60)
+                    .build());
+        }
         {
             if (modifiers.isPresent()) {
                 visitAndBreakModifiers(modifiers.get(), annotationsDirection, Optional.of(verticalAnnotationBreak));

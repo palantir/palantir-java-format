@@ -64,7 +64,7 @@ public class FormatterIntegrationTest {
      * <p>Warning: don't turn this on for all tests. The debugger will always write to the same file.
      */
     private static boolean isDebugMode() {
-        return Boolean.getBoolean("debugOutput");
+        return true; // Boolean.getBoolean("debugOutput");
     }
 
     @TestTemplate
