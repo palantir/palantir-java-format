@@ -22,7 +22,7 @@ intellij {
     pluginName = name
     updateSinceUntilBuild = true
     version = "2024.1"
-    plugins = ['java']
+    plugins = [ 'java' ]
 }
 
 patchPluginXml {

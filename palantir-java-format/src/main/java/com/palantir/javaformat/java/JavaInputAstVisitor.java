@@ -2210,13 +2210,26 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             ModifiersTree modifiersTree,
             Direction annotationsDirection,
             Optional<BreakTag> declarationAnnotationBreak) {
-        return visitModifiers(modifiersTree.getAnnotations(), annotationsDirection, declarationAnnotationBreak);
+        boolean isRecordParameter = false;
+        if (modifiersTree instanceof JCTree.JCModifiers) {
+            isRecordParameter = (((JCTree.JCModifiers) modifiersTree).flags & RECORD) == RECORD;
+        }
+        return visitModifiers(
+                modifiersTree.getAnnotations(), annotationsDirection, declarationAnnotationBreak, isRecordParameter);
     }
 
     private List<Op> visitModifiers(
             List<? extends AnnotationTree> annotationTrees,
             Direction annotationsDirection,
             Optional<BreakTag> declarationAnnotationBreak) {
+        return visitModifiers(annotationTrees, annotationsDirection, declarationAnnotationBreak, false);
+    }
+
+    private List<Op> visitModifiers(
+            List<? extends AnnotationTree> annotationTrees,
+            Direction annotationsDirection,
+            Optional<BreakTag> declarationAnnotationBreak,
+            boolean isRecordParameter) {
         if (annotationTrees.isEmpty() && !nextIsModifier()) {
             return EMPTY_LIST;
         }
@@ -2224,6 +2237,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         builder.open(ZERO);
         boolean first = true;
         boolean lastWasAnnotation = false;
+        boolean hasExplicitParameterizedAnnotation = false;
         while (!annotations.isEmpty()) {
             if (nextIsModifier()) {
                 break;
@@ -2234,14 +2248,22 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                                 ? forceBreakList(declarationAnnotationBreak)
                                 : breakList(declarationAnnotationBreak));
             }
-            scan(annotations.removeFirst(), null);
+            AnnotationTree annotation = annotations.removeFirst();
+            if (!annotation.getArguments().isEmpty()) {
+                ExpressionTree firstArg = annotation.getArguments().get(0);
+
+                // If it's an AssignmentTree, it's an explicit argument (name = value)
+                hasExplicitParameterizedAnnotation = firstArg instanceof AssignmentTree;
+            }
+            scan(annotation, null);
             first = false;
             lastWasAnnotation = true;
         }
         builder.close();
-        ImmutableList<Op> trailingBreak = annotationsDirection.isVertical()
-                ? forceBreakList(declarationAnnotationBreak)
-                : breakList(declarationAnnotationBreak);
+        ImmutableList<Op> trailingBreak =
+                annotationsDirection.isVertical() || (hasExplicitParameterizedAnnotation && isRecordParameter)
+                        ? forceBreakList(declarationAnnotationBreak)
+                        : breakList(declarationAnnotationBreak);
         if (annotations.isEmpty() && !nextIsModifier()) {
             return trailingBreak;
         }

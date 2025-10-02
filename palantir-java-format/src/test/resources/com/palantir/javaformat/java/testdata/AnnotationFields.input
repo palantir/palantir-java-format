@@ -22,10 +22,7 @@ public record QuoteRequest(
         @SomeInput
         @NotNull
         @Deprecated
-        @JsonValue(name = "something")
-        @Schema(description = "US state of the product being quoted", example = "TX")
-        RegulatoryState regulatoryState,
-
+        @JsonValue(name = "something") @Schema(description = "US state of the product being quoted", example = "TX") RegulatoryState regulatoryState,
         @Schema(description = "Reason for a quote", example = "New Business") String amendmentReason,
         int x,
         int j) {}
@@ -108,3 +105,26 @@ public record Url(
         @JsonValue("dadsa") String value) {}
 
 public record Url(@New @JsonValue("dadsa") String value) {}
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public record Game(
+    @JsonProperty("accounting_group") @JsonPropertyDescription("The accounting group of the game.")
+        String accountingGroup,
+    @JsonProperty("accumulating")
+        @JsonPropertyDescription("Marks which games with accumulating bonuses.") Boolean accumulating,
+    @JsonProperty("bonus_buy") @JsonPropertyDescription("Games with purchasable bonuses.") Boolean bonusBuy,
+    @JsonProperty("category")
+        @JsonPropertyDescription(
+            "Game's category. Allowed values: slots, roulette, card, "
+                + "casual, lottery, poker, craps, video_poker")
+        String category,
+    @JsonProperty("hd") @JsonPropertyDescription("HD format games.") Boolean hd,
+
+    @JsonProperty("new") @JsonPropertyDescription("New format games.") Boolean assa,
+    @JsonProperty("hit_rate") @JsonPropertyDescription(
+            "Frequency of wins per 100 bets. The higher, the hit rate the lower the volatility "
+                + "rating, and vice versa. Positive value. For slots only. "
+                + "Match pattern: ^\\d{1,18}(\\.\\d{1,12})?$") String hitRate,
+    @JsonProperty("params") @JsonPropertyDescription("Game's custom parameters.")
+        Map<String, String> params) {}
