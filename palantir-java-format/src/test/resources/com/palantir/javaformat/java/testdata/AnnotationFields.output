@@ -32,7 +32,8 @@ public record QuoteRequest(
         @Schema(description = "US state of the product being quoted", example = "TX")
         RegulatoryState regulatoryState,
 
-        @Schema(description = "Reason for a quote", example = "New Business") String amendmentReason,
+        @Schema(description = "Reason for a quote", example = "New Business")
+        String amendmentReason,
 
         int x,
         int j) {}
@@ -79,16 +80,19 @@ public record Game(
         @JsonProperty("accumulating") @JsonPropertyDescription("Marks which games with accumulating bonuses.")
         Boolean accumulating,
 
-        @JsonProperty("bonus_buy") @JsonPropertyDescription("Games with purchasable bonuses.") Boolean bonusBuy,
+        @JsonProperty("bonus_buy") @JsonPropertyDescription("Games with purchasable bonuses.")
+        Boolean bonusBuy,
 
         @JsonProperty("category")
         @JsonPropertyDescription("Game's category. Allowed values: slots, roulette, card, "
                 + "casual, lottery, poker, craps, video_poker")
         String category,
 
-        @JsonProperty("hd") @JsonPropertyDescription("HD format games.") Boolean hd,
+        @JsonProperty("hd") @JsonPropertyDescription("HD format games.")
+        Boolean hd,
 
-        @JsonProperty("new") @JsonPropertyDescription("New format games.") Boolean assa,
+        @JsonProperty("new") @JsonPropertyDescription("New format games.")
+        Boolean assa,
 
         @JsonProperty("hit_rate")
         @JsonPropertyDescription("Frequency of wins per 100 bets. The higher, the hit rate the lower the volatility "
@@ -96,7 +100,8 @@ public record Game(
                 + "Match pattern: ^\\d{1,18}(\\.\\d{1,12})?$")
         String hitRate,
 
-        @JsonProperty("params") @JsonPropertyDescription("Game's custom parameters.") Map<String, String> params) {
+        @JsonProperty("params") @JsonPropertyDescription("Game's custom parameters.")
+        Map<String, String> params) {
 
     private void get(@JsonNode("value") String value) {}
 
@@ -110,11 +115,31 @@ record ApiEndpoint(@JsonValue("name") String name, HttpMethod method, String url
 }
 
 record ApiEndpoint(
-        @JsonValue(name = "name")
+        @JsonProperty("bonus_buy")
+        @JsonValue(
+                some_other_name_that_is_here = "value",
+                name_which_is_super_long_that_goes_beyond_the_limit = "name",
+                other = "other")
         String name,
 
         HttpMethod method,
         String url) {
+    ApiEndpoint {
+        name = name.toUpperCase();
+    }
+}
+
+record ApiEndpoint(@JsonValue(name = "name") String name, HttpMethod method, String url) {
+    ApiEndpoint {
+        name = name.toUpperCase();
+    }
+}
+
+record ApiEndpoint(
+        @JsonValue(name = "name") String name,
+        HttpMethod method,
+        String url,
+        @JsonValue(name = "name") String name) {
     ApiEndpoint {
         name = name.toUpperCase();
     }
