@@ -157,6 +157,12 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
      */
     private static final int METHOD_CHAIN_COLUMN_LIMIT = 80;
 
+    /**
+     * Maximum column at which the annotated parameter of a record should start. This exists in particular to improve
+     * readability when one or multiple annotations are added to the parameters of a record.
+     */
+    private static final int ANNOTATION_RECORD_PARAMETER_COLUMN_LIMIT = 60;
+
     /** Direction for Annotations (usually VERTICAL). */
     protected enum Direction {
         VERTICAL,
@@ -2245,30 +2251,24 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                                 ? forceBreakList(declarationAnnotationBreak)
                                 : breakList(declarationAnnotationBreak));
             }
-            AnnotationTree annotation = annotations.removeFirst();
-            if (!annotation.getArguments().isEmpty()) {
-                // ExpressionTree firstArg = annotation.getArguments().get(0);
-                // If it's an AssignmentTree, it's an explicit argument (name = value)
-                hasExplicitParameterizedAnnotation = true;
-            }
-            scan(annotation, null);
+            scan(annotations.removeFirst(), null);
             first = false;
             lastWasAnnotation = true;
         }
         builder.close();
 
         // pjf specific: enforce breaking operatins for record parameters with annotations with explicit parameters
-        ImmutableList<Op> trailingBreak = annotationsDirection.isVertical() || isRecordParameter
-                ? (isRecordParameter
-                        ? ImmutableList.of(Break.builder()
-                                .fillMode(UNIFIED)
-                                .flat(" ")
-                                .plusIndent(ZERO)
-                                .hasColumnLimit(true)
-                                .optTag(declarationAnnotationBreak)
-                                .build())
-                        : forceBreakList(declarationAnnotationBreak))
-                : breakList(declarationAnnotationBreak);
+        ImmutableList<Op> trailingBreak = isRecordParameter
+                ? ImmutableList.of(Break.builder()
+                        .fillMode(FillMode.UNIFIED)
+                        .flat(" ")
+                        .plusIndent(ZERO)
+                        .hasColumnLimit(true)
+                        .optTag(declarationAnnotationBreak)
+                        .build())
+                : annotationsDirection.isVertical()
+                        ? forceBreakList(declarationAnnotationBreak)
+                        : breakList(declarationAnnotationBreak);
         if (annotations.isEmpty() && !nextIsModifier()) {
             return trailingBreak;
         }
@@ -3505,16 +3505,20 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         int baseDims = 0;
 
         if (kind == DeclarationKind.PARAMETER
-                && (modifiers.isPresent()
-                        && !modifiers.get().getAnnotations().isEmpty()
-                        && !isInRecord(modifiers.get()))) {
-            builder.open(plusFour);
+                && modifiers.isPresent()
+                && !modifiers.get().getAnnotations().isEmpty()) {
+            if (!isInRecord(modifiers.get())) {
+                builder.open(plusFour);
+            } else {
+                // pjf specific: we are enforcing the column limit for annotated parameters of records
+                builder.open(OpenOp.builder()
+                        .debugName("visitParam")
+                        .plusIndent(ZERO)
+                        .columnLimitBeforeLastBreak(ANNOTATION_RECORD_PARAMETER_COLUMN_LIMIT)
+                        .build());
+            }
         } else {
-            builder.open(OpenOp.builder()
-                    .debugName("visitParam")
-                    .plusIndent(ZERO)
-                    .columnLimitBeforeLastBreak(60)
-                    .build());
+            builder.open(ZERO);
         }
         {
             if (modifiers.isPresent()) {
