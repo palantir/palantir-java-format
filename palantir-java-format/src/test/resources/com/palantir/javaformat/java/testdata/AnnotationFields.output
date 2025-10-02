@@ -97,4 +97,26 @@ public record Game(
                 + "Match pattern: ^\\d{1,18}(\\.\\d{1,12})?$")
         String hitRate,
 
-        @JsonProperty("params") @JsonPropertyDescription("Game's custom parameters.") Map<String, String> params) {}
+        @JsonProperty("params") @JsonPropertyDescription("Game's custom parameters.") Map<String, String> params) {
+
+    private void get(@JsonNode("value") String value) {}
+
+    private void get2(@JsonNode(value = "value") String value) {}
+}
+
+record ApiEndpoint(@JsonValue("name") String name, HttpMethod method, String url) {
+    ApiEndpoint {
+        name = name.toUpperCase();
+    }
+}
+
+record ApiEndpoint(
+        @JsonValue(name = "name")
+        String name,
+
+        HttpMethod method,
+        String url) {
+    ApiEndpoint {
+        name = name.toUpperCase();
+    }
+}

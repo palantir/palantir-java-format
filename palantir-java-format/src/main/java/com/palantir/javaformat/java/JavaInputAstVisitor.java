@@ -2210,10 +2210,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             ModifiersTree modifiersTree,
             Direction annotationsDirection,
             Optional<BreakTag> declarationAnnotationBreak) {
-        boolean isRecordParameter = false;
-        if (modifiersTree instanceof JCTree.JCModifiers) {
-            isRecordParameter = (((JCTree.JCModifiers) modifiersTree).flags & RECORD) == RECORD;
-        }
+        boolean isRecordParameter = modifiersTree instanceof JCTree.JCModifiers && isInRecord(modifiersTree);
         return visitModifiers(
                 modifiersTree.getAnnotations(), annotationsDirection, declarationAnnotationBreak, isRecordParameter);
     }
@@ -2251,7 +2248,6 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             AnnotationTree annotation = annotations.removeFirst();
             if (!annotation.getArguments().isEmpty()) {
                 ExpressionTree firstArg = annotation.getArguments().get(0);
-
                 // If it's an AssignmentTree, it's an explicit argument (name = value)
                 hasExplicitParameterizedAnnotation = firstArg instanceof AssignmentTree;
             }
@@ -2260,6 +2256,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             lastWasAnnotation = true;
         }
         builder.close();
+        // pjf specific: enforce breaking operatins for record parameters with annotations with explicit parameters
         ImmutableList<Op> trailingBreak =
                 annotationsDirection.isVertical() || (hasExplicitParameterizedAnnotation && isRecordParameter)
                         ? forceBreakList(declarationAnnotationBreak)
@@ -2437,6 +2434,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             }
             BreakTag declarationAnnotationBreak = new BreakTag();
 
+            // pfj specific: add a conditional blank line if the annotated parameter was broken (only for records)
             if (isRecordParams && !first) {
                 builder.blankLineWanted(BlankLineWanted.conditional(declarationAnnotationBreak));
             }
@@ -2450,7 +2448,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                     i < parameters.size() - 1 ? Optional.of(",") : /* a= */ Optional.empty(),
                     Optional.of(declarationAnnotationBreak));
 
-            // If this is a record parameter and not the last one, add a conditional blank line after
+            // pfj specific: add a conditional blank line if the annotated parameter was broken (only for records)
             if (isRecordParams && i < parameters.size() - 1) {
                 builder.blankLineWanted(BlankLineWanted.conditional(declarationAnnotationBreak));
             }
