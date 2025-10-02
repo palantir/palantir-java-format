@@ -12,7 +12,7 @@ class TryWtihResources {
         }
 
         try (@SuppressWarnings("resource")
-        Scanner inputScanner = new Scanner(inputStream).useDelimiter("\\s+|,")) {
+                Scanner inputScanner = new Scanner(inputStream).useDelimiter("\\s+|,")) {
             while (inputScanner.hasNextLong()) {
                 placementIds.add(inputScanner.nextLong());
             }

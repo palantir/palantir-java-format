@@ -2409,8 +2409,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         }
         boolean isRecordParams = false;
         if (!parameters.isEmpty() && parameters.get(0) instanceof JCTree.JCVariableDecl) {
-            JCTree.JCVariableDecl param = (JCTree.JCVariableDecl) parameters.get(0);
-            isRecordParams = (param.mods.flags & RECORD) == RECORD;
+            isRecordParams = isInRecord(((JCTree.JCVariableDecl) parameters.get(0)).mods);
         }
 
         builder.open(ZERO);
@@ -3499,7 +3498,13 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 new ArrayDeque<>(typeWithDims.isPresent() ? typeWithDims.get().dims : Collections.emptyList());
         int baseDims = 0;
 
-        builder.open(ZERO);
+        builder.open(
+                kind == DeclarationKind.PARAMETER
+                                && (modifiers.isPresent()
+                                        && !modifiers.get().getAnnotations().isEmpty()
+                                        && !isInRecord(modifiers.get()))
+                        ? plusFour
+                        : ZERO);
         {
             if (modifiers.isPresent()) {
                 visitAndBreakModifiers(modifiers.get(), annotationsDirection, Optional.of(verticalAnnotationBreak));
@@ -3867,6 +3872,13 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             }
         }
         return Direction.HORIZONTAL;
+    }
+
+    /**
+     * Checks if the modifiers are parameters of a record definition.
+     */
+    private boolean isInRecord(ModifiersTree modifiers) {
+        return (((JCTree.JCModifiers) modifiers).flags & RECORD) == RECORD;
     }
 
     /**
