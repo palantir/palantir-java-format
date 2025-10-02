@@ -2240,7 +2240,6 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         builder.open(ZERO);
         boolean first = true;
         boolean lastWasAnnotation = false;
-        boolean hasExplicitParameterizedAnnotation = false;
         while (!annotations.isEmpty()) {
             if (nextIsModifier()) {
                 break;
@@ -2257,7 +2256,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         }
         builder.close();
 
-        // pjf specific: enforce breaking operatins for record parameters with annotations with explicit parameters
+        // pjf specific: record params should take into consideration the columnLimit
         ImmutableList<Op> trailingBreak = isRecordParameter
                 ? ImmutableList.of(Break.builder()
                         .fillMode(FillMode.UNIFIED)
