@@ -16,9 +16,6 @@
 
 package com.palantir.javaformat.intellij;
 
-import com.intellij.formatting.service.FormattingNotificationService;
-import com.intellij.openapi.project.Project;
-
 class Notifications {
 
     static final String GENERIC_ERROR_NOTIFICATION_GROUP = "palantir-java-format error";
@@ -27,13 +24,5 @@ class Notifications {
 
     static String parsingErrorMessage(String filename) {
         return "palantir-java-format failed. Does " + filename + " have syntax errors?";
-    }
-
-    static void displayParsingErrorNotification(Project project, String filename) {
-        FormattingNotificationService.getInstance(project)
-                .reportError(
-                        Notifications.PARSING_ERROR_NOTIFICATION_GROUP,
-                        Notifications.PARSING_ERROR_TITLE,
-                        Notifications.parsingErrorMessage(filename));
     }
 }
