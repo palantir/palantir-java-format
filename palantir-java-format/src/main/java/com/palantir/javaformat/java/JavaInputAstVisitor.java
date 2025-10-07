@@ -157,6 +157,12 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
      */
     private static final int METHOD_CHAIN_COLUMN_LIMIT = 80;
 
+    /**
+     * Maximum column at which the annotated parameter of a record should start. This exists in particular to improve
+     * readability when one or multiple annotations are added to the parameters of a record.
+     */
+    private static final int ANNOTATION_RECORD_PARAMETER_COLUMN_LIMIT = 60;
+
     /** Direction for Annotations (usually VERTICAL). */
     protected enum Direction {
         VERTICAL,
@@ -2212,13 +2218,23 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             ModifiersTree modifiersTree,
             Direction annotationsDirection,
             Optional<BreakTag> declarationAnnotationBreak) {
-        return visitModifiers(modifiersTree.getAnnotations(), annotationsDirection, declarationAnnotationBreak);
+        boolean isRecordParameter = modifiersTree instanceof JCTree.JCModifiers && isInRecord(modifiersTree);
+        return visitModifiers(
+                modifiersTree.getAnnotations(), annotationsDirection, declarationAnnotationBreak, isRecordParameter);
     }
 
     private List<Op> visitModifiers(
             List<? extends AnnotationTree> annotationTrees,
             Direction annotationsDirection,
             Optional<BreakTag> declarationAnnotationBreak) {
+        return visitModifiers(annotationTrees, annotationsDirection, declarationAnnotationBreak, false);
+    }
+
+    private List<Op> visitModifiers(
+            List<? extends AnnotationTree> annotationTrees,
+            Direction annotationsDirection,
+            Optional<BreakTag> declarationAnnotationBreak,
+            boolean isRecordParameter) {
         if (annotationTrees.isEmpty() && !nextIsModifier()) {
             return EMPTY_LIST;
         }
@@ -2241,9 +2257,19 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             lastWasAnnotation = true;
         }
         builder.close();
-        ImmutableList<Op> trailingBreak = annotationsDirection.isVertical()
-                ? forceBreakList(declarationAnnotationBreak)
-                : breakList(declarationAnnotationBreak);
+
+        // pjf specific: record params should take into consideration the columnLimit
+        ImmutableList<Op> trailingBreak = isRecordParameter
+                ? ImmutableList.of(Break.builder()
+                        .fillMode(FillMode.UNIFIED)
+                        .flat(" ")
+                        .plusIndent(ZERO)
+                        .hasColumnLimit(true)
+                        .optTag(declarationAnnotationBreak)
+                        .build())
+                : annotationsDirection.isVertical()
+                        ? forceBreakList(declarationAnnotationBreak)
+                        : breakList(declarationAnnotationBreak);
         if (annotations.isEmpty() && !nextIsModifier()) {
             return trailingBreak;
         }
@@ -2387,6 +2413,11 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         if (!receiver.isPresent() && parameters.isEmpty()) {
             return;
         }
+        boolean isRecordParams = false;
+        if (!parameters.isEmpty() && parameters.get(0) instanceof JCTree.JCVariableDecl) {
+            isRecordParams = isInRecord(((JCTree.JCVariableDecl) parameters.get(0)).mods);
+        }
+
         builder.open(ZERO);
         boolean first = true;
         if (receiver.isPresent()) {
@@ -2410,13 +2441,26 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             if (!first) {
                 builder.breakOp(" ");
             }
+            BreakTag declarationAnnotationBreak = new BreakTag();
+
+            // pfj specific: add a conditional blank line if the annotated parameter was broken (only for records)
+            if (isRecordParams && !first) {
+                builder.blankLineWanted(BlankLineWanted.conditional(declarationAnnotationBreak));
+            }
+
             visitToDeclare(
                     DeclarationKind.PARAMETER,
                     Direction.HORIZONTAL,
                     parameter,
                     /* initializer= */ Optional.empty(),
                     "=",
-                    i < parameters.size() - 1 ? Optional.of(",") : /* a= */ Optional.empty());
+                    i < parameters.size() - 1 ? Optional.of(",") : /* a= */ Optional.empty(),
+                    Optional.of(declarationAnnotationBreak));
+
+            // pfj specific: add a conditional blank line if the annotated parameter was broken (only for records)
+            if (isRecordParams && i < parameters.size() - 1) {
+                builder.blankLineWanted(BlankLineWanted.conditional(declarationAnnotationBreak));
+            }
             first = false;
         }
         builder.close();
@@ -2586,6 +2630,17 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             Optional<ExpressionTree> initializer,
             String equals,
             Optional<String> trailing) {
+        visitToDeclare(kind, annotationsDirection, node, initializer, equals, trailing, Optional.empty());
+    }
+
+    private void visitToDeclare(
+            DeclarationKind kind,
+            Direction annotationsDirection,
+            VariableTree node,
+            Optional<ExpressionTree> initializer,
+            String equals,
+            Optional<String> trailing,
+            Optional<BreakTag> annotationBreakForRecords) {
         sync(node);
         declareOne(
                 kind,
@@ -2598,7 +2653,8 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 initializer,
                 trailing,
                 /* receiverExpression= */ Optional.empty(),
-                /* typeWithDims= */ Optional.empty());
+                /* typeWithDims= */ Optional.empty(),
+                annotationBreakForRecords);
     }
 
     /** Does not omit the leading '<', which should be associated with the type name. */
@@ -3402,9 +3458,39 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             Optional<String> trailing,
             Optional<ExpressionTree> receiverExpression,
             Optional<TypeWithDims> typeWithDims) {
+        return declareOne(
+                kind,
+                annotationsDirection,
+                modifiers,
+                type,
+                name,
+                op,
+                equals,
+                initializer,
+                trailing,
+                receiverExpression,
+                typeWithDims,
+                Optional.empty());
+    }
+
+    /** Declare one variable or variable-like thing. */
+    @SuppressWarnings("TooManyArguments")
+    int declareOne(
+            DeclarationKind kind,
+            Direction annotationsDirection,
+            Optional<ModifiersTree> modifiers,
+            Tree type,
+            Name name,
+            String op,
+            String equals,
+            Optional<ExpressionTree> initializer,
+            Optional<String> trailing,
+            Optional<ExpressionTree> receiverExpression,
+            Optional<TypeWithDims> typeWithDims,
+            Optional<BreakTag> verticalAnnotationBreakForRecords) {
 
         BreakTag typeBreak = new BreakTag();
-        BreakTag verticalAnnotationBreak = new BreakTag();
+        BreakTag verticalAnnotationBreak = verticalAnnotationBreakForRecords.orElseGet(BreakTag::new);
 
         // If the node is a field declaration, try to output any declaration
         // annotations in-line. If the entire declaration doesn't fit on a single
@@ -3419,12 +3505,22 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 new ArrayDeque<>(typeWithDims.isPresent() ? typeWithDims.get().dims : Collections.emptyList());
         int baseDims = 0;
 
-        builder.open(
-                kind == DeclarationKind.PARAMETER
-                                && (modifiers.isPresent()
-                                        && !modifiers.get().getAnnotations().isEmpty())
-                        ? plusFour
-                        : ZERO);
+        if (kind == DeclarationKind.PARAMETER
+                && modifiers.isPresent()
+                && !modifiers.get().getAnnotations().isEmpty()) {
+            if (!isInRecord(modifiers.get())) {
+                builder.open(plusFour);
+            } else {
+                // pjf specific: we are enforcing the column limit for annotated parameters of records
+                builder.open(OpenOp.builder()
+                        .debugName("visitParam")
+                        .plusIndent(ZERO)
+                        .columnLimitBeforeLastBreak(ANNOTATION_RECORD_PARAMETER_COLUMN_LIMIT)
+                        .build());
+            }
+        } else {
+            builder.open(ZERO);
+        }
         {
             if (modifiers.isPresent()) {
                 visitAndBreakModifiers(modifiers.get(), annotationsDirection, Optional.of(verticalAnnotationBreak));
@@ -3792,6 +3888,13 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             }
         }
         return Direction.HORIZONTAL;
+    }
+
+    /**
+     * Checks if the modifiers are parameters of a record definition.
+     */
+    private boolean isInRecord(ModifiersTree modifiers) {
+        return (((JCTree.JCModifiers) modifiers).flags & RECORD) == RECORD;
     }
 
     /**
