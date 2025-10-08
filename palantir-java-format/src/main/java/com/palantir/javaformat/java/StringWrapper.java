@@ -30,6 +30,7 @@ import com.palantir.javaformat.Utils;
 import com.sun.source.tree.BinaryTree;
 import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.MemberSelectTree;
+import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.Tree.Kind;
 import com.sun.source.util.TreePath;
@@ -43,11 +44,12 @@ import com.sun.tools.javac.util.Position.LineMap;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 /** Wraps string literals that exceed the column limit. */
 public final class StringWrapper {
@@ -193,6 +195,9 @@ public final class StringWrapper {
         }
 
         private void indentTextBlocks(TreeRangeMap<Integer, String> replacements, List<TreePath> textBlocks) {
+            // pjf specific - compute textBlock's parents & store info about the indentation\
+            Map<TreePath, String> textBlockToIndent = computeCustomTextBlocksIndent(textBlocks);
+
             for (TreePath treePath : textBlocks) {
                 Tree tree = treePath.getLeaf();
                 int startPosition = getStartPosition(tree);
@@ -212,8 +217,9 @@ public final class StringWrapper {
                         .stripIndent();
                 ImmutableList<String> lines = stripped.lines().collect(ImmutableList.toImmutableList());
 
-                String prefix = maybeComputeCustomPrefix(treePath)
-                        .orElseGet(() -> (lineStartPosition + startColumn + 4 > startPosition ? "" : " ".repeat(4))
+                String prefix = textBlockToIndent.getOrDefault(
+                        treePath,
+                        (lineStartPosition + startColumn + 4 > startPosition ? "" : " ".repeat(4))
                                 + " ".repeat(startColumn));
                 StringBuilder output = new StringBuilder(initialLines.get(0));
                 for (int i = 0; i < lines.size(); i++) {
@@ -244,39 +250,42 @@ public final class StringWrapper {
             }
         }
 
-        private Optional<String> maybeComputeCustomPrefix(TreePath treePath) {
-            if (treePath.getParentPath().getLeaf().getKind() == Kind.PLUS) {
-                return Optional.of(computePrefixForForTreeKind(treePath));
-            } else if (treePath.getParentPath().getLeaf().getKind() == Kind.METHOD_INVOCATION) {
-                return Optional.of(computePrefixForForMethod(treePath));
-            }
-            return Optional.empty();
-        }
-
-        private String computePrefixForForMethod(TreePath path) {
-            List<Tree> allArguments =
-                    new ArrayList<>(((JCMethodInvocation) path.getParentPath().getLeaf()).getArguments());
-            return computePrefixIndentation(path.getParentPath().getLeaf(), allArguments);
-        }
-
-        private String computePrefixForForTreeKind(TreePath path) {
-            while (path.getParentPath().getLeaf().getKind() == Kind.PLUS) {
-                path = path.getParentPath();
-            }
-            ArrayDeque<Tree> todo = new ArrayDeque<>();
-            todo.add(path.getLeaf());
-            List<Tree> arguments = new ArrayList<>();
-            while (!todo.isEmpty()) {
-                Tree first = todo.removeFirst();
-                if (first.getKind() == Tree.Kind.PLUS) {
-                    BinaryTree bt = (BinaryTree) first;
-                    todo.addFirst(bt.getRightOperand());
-                    todo.addFirst(bt.getLeftOperand());
-                } else {
-                    arguments.add(first);
+        /**
+         * Pjf specific: When the AST needs to break a concantenation expression ('ONE'+'TWO') or the parameters of a method,
+         * the indentation will be set to 8, in which case we need to align the text blocks to the correct indentation.
+         * In order to compute the indentation value we need to do:
+         * 1. for each textBlock find the enclosing block/parent (only for concat expressions/method invocations)
+         * 2. for each parent, find the arguments/concatenated expressions and find the max indentation level
+         * 3. store the mapping between the textBlock and the indentation level computed before.
+         */
+        private Map<TreePath, String> computeCustomTextBlocksIndent(List<TreePath> textBlocks) {
+            Map<Tree, String> parentToIndent = new HashMap<>();
+            Map<TreePath, Tree> textBlockToParent = new HashMap<>();
+            for (TreePath textBlock : textBlocks) {
+                TreePath parentPath = textBlock.getParentPath();
+                Tree parent = parentPath.getLeaf();
+                if (parent instanceof MethodInvocationTree) {
+                    textBlockToParent.put(textBlock, parent);
+                    if (parentToIndent.containsKey(parent)) {
+                        continue;
+                    }
+                    List<Tree> allArguments = new ArrayList<>(((JCMethodInvocation) parent).getArguments());
+                    parentToIndent.put(parent, computePrefixIndentation(parent, allArguments));
+                } else if (parent.getKind() == Kind.PLUS) {
+                    while (parentPath.getParentPath().getLeaf().getKind() == Kind.PLUS) {
+                        parentPath = parentPath.getParentPath();
+                    }
+                    parent = parentPath.getLeaf();
+                    textBlockToParent.put(textBlock, parent);
+                    if (parentToIndent.containsKey(parent)) {
+                        continue;
+                    }
+                    parentToIndent.put(parent, computePrefixIndentation(parent, flattenExpressionTree(parent)));
                 }
             }
-            return computePrefixIndentation(path.getParentPath().getLeaf(), arguments);
+
+            return textBlockToParent.entrySet().stream()
+                    .collect(Collectors.toMap(Map.Entry::getKey, e -> parentToIndent.get(e.getValue())));
         }
 
         private String computePrefixIndentation(Tree parentPath, List<Tree> childExpressions) {
@@ -499,21 +508,7 @@ public final class StringWrapper {
      */
     private static List<Tree> flatten(
             String input, JCTree.JCCompilationUnit unit, TreePath path, TreePath parent, AtomicBoolean firstInChain) {
-        List<Tree> flat = new ArrayList<>();
-
-        // flatten the expression tree with a pre-order traversal
-        ArrayDeque<Tree> todo = new ArrayDeque<>();
-        todo.add(parent.getLeaf());
-        while (!todo.isEmpty()) {
-            Tree first = todo.removeFirst();
-            if (first.getKind() == Tree.Kind.PLUS) {
-                BinaryTree bt = (BinaryTree) first;
-                todo.addFirst(bt.getRightOperand());
-                todo.addFirst(bt.getLeftOperand());
-            } else {
-                flat.add(first);
-            }
-        }
+        List<Tree> flat = flattenExpressionTree(parent.getLeaf());
 
         int idx = flat.indexOf(path.getLeaf());
         Verify.verify(idx != -1);
@@ -534,6 +529,29 @@ public final class StringWrapper {
 
         firstInChain.set(startIdx == 0);
         return ImmutableList.copyOf(flat.subList(startIdx, endIdx));
+    }
+
+    /**
+     * Returns the flatten expression tree with a pre-order traversal
+     * @param parent a {@link com.sun.tools.javac.tree.JCTree.JCExpression}
+     * @return the list of concatenated parameters in order.
+     */
+    private static List<Tree> flattenExpressionTree(Tree parent) {
+        // flatten the expression tree with a pre-order traversal
+        List<Tree> flat = new ArrayList<>();
+        ArrayDeque<Tree> todo = new ArrayDeque<>();
+        todo.add(parent);
+        while (!todo.isEmpty()) {
+            Tree first = todo.removeFirst();
+            if (first.getKind() == Tree.Kind.PLUS) {
+                BinaryTree bt = (BinaryTree) first;
+                todo.addFirst(bt.getRightOperand());
+                todo.addFirst(bt.getLeftOperand());
+            } else {
+                flat.add(first);
+            }
+        }
+        return flat;
     }
 
     private static boolean noComments(String input, JCTree.JCCompilationUnit unit, Tree one, Tree two) {
