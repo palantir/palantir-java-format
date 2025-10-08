@@ -132,11 +132,24 @@ class RSLs {
         ggg
         """);
 
-    String w = lotsOfStringParams("""
-        aaa
-        """, "sdklfjslfkjsadlkgjsdklfjsadlkfjsaklfjaskdsfkljsaklfjsadflkjsdafkljasdfklsjfklsajflkasjfsf", """
-        bbb
-        """, """
-        ccc
-        """);
+    String w = lotsOfStringParams(
+            """
+            aaa
+            """, "sdklfjslfkjsadlkgjsdklfjsadlkfjsaklfjaskdsfkljsaklfjsadflkjsdafkljasdfklsjfklsajflkasjfsf", """
+            bbb
+            """, """
+            ccc
+            """);
+
+    String w = lotsOfStringParams(
+            """
+            aaa
+            """,
+            "sdklfjslfkjsadlkgjsdklfjsadlkfjsaklfjaskdsfkljsaklfjsadflkjsdafkljasdfklsjfklsajflkasjfsfdasdsadasdsada",
+            """
+            bbb
+            """,
+            """
+            ccc
+            """);
 }
