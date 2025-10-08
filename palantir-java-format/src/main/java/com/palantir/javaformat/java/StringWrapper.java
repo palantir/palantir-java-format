@@ -35,6 +35,8 @@ import com.sun.source.tree.Tree.Kind;
 import com.sun.source.util.TreePath;
 import com.sun.source.util.TreePathScanner;
 import com.sun.tools.javac.tree.JCTree;
+import com.sun.tools.javac.tree.JCTree.JCExpression;
+import com.sun.tools.javac.tree.JCTree.JCMethodInvocation;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.Options;
 import com.sun.tools.javac.util.Position;
@@ -45,6 +47,7 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /** Wraps string literals that exceed the column limit. */
@@ -144,7 +147,7 @@ public final class StringWrapper {
             // Paths to string literals that extend past the column limit.
             List<TreePath> longStringLiterals = new ArrayList<>();
             // Paths to text blocks to be re-indented.
-            List<Tree> textBlocks = new ArrayList<>();
+            List<TreePath> textBlocks = new ArrayList<>();
             new LongStringsAndTextBlockScanner(longStringLiterals, textBlocks).scan(new TreePath(unit), null);
             TreeRangeMap<Integer, String> replacements = TreeRangeMap.create();
             indentTextBlocks(replacements, textBlocks);
@@ -155,9 +158,9 @@ public final class StringWrapper {
         private class LongStringsAndTextBlockScanner extends TreePathScanner<Void, Void> {
 
             private final List<TreePath> longStringLiterals;
-            private final List<Tree> textBlocks;
+            private final List<TreePath> textBlocks;
 
-            LongStringsAndTextBlockScanner(List<TreePath> longStringLiterals, List<Tree> textBlocks) {
+            LongStringsAndTextBlockScanner(List<TreePath> longStringLiterals, List<TreePath> textBlocks) {
                 this.longStringLiterals = longStringLiterals;
                 this.textBlocks = textBlocks;
             }
@@ -169,7 +172,7 @@ public final class StringWrapper {
                 }
                 int pos = getStartPosition(literalTree);
                 if (input.substring(pos, Math.min(input.length(), pos + 3)).equals(TEXT_BLOCK_DELIMITER)) {
-                    textBlocks.add(literalTree);
+                    textBlocks.add(getCurrentPath());
                     return null;
                 }
                 Tree parent = getCurrentPath().getParentPath().getLeaf();
@@ -190,8 +193,9 @@ public final class StringWrapper {
             }
         }
 
-        private void indentTextBlocks(TreeRangeMap<Integer, String> replacements, List<Tree> textBlocks) {
-            for (Tree tree : textBlocks) {
+        private void indentTextBlocks(TreeRangeMap<Integer, String> replacements, List<TreePath> textBlocks) {
+            for (TreePath treePath : textBlocks) {
+                Tree tree = treePath.getLeaf();
                 int startPosition = getStartPosition(tree);
                 int endPosition = getEndPosition(unit, tree);
                 String text = input.substring(startPosition, endPosition);
@@ -209,9 +213,9 @@ public final class StringWrapper {
                         .stripIndent();
                 ImmutableList<String> lines = stripped.lines().collect(ImmutableList.toImmutableList());
 
-                String prefix = (lineStartPosition + startColumn + 4 > startPosition ? "" : " ".repeat(4))
-                        + " ".repeat(startColumn);
-
+                String prefix = maybeComputeCustomPrefix(treePath)
+                        .orElseGet(() -> (lineStartPosition + startColumn + 4 > startPosition ? "" : " ".repeat(4))
+                                + " ".repeat(startColumn));
                 StringBuilder output = new StringBuilder(initialLines.get(0));
                 for (int i = 0; i < lines.size(); i++) {
                     String line = lines.get(i);
@@ -239,6 +243,91 @@ public final class StringWrapper {
                 }
                 replacements.put(Range.closedOpen(startPosition, endPosition), output.toString());
             }
+        }
+
+        private Optional<String> maybeComputeCustomPrefix(TreePath treePath) {
+            TreePath path = treePath;
+            if (path.getParentPath().getLeaf().getKind() == Kind.PLUS) {
+                return Optional.of(" ".repeat(computePrefixForForTreeKind(path, Kind.PLUS)));
+            } else if (path.getParentPath().getLeaf().getKind() == Kind.METHOD_INVOCATION) {
+                return Optional.of(" ".repeat(computePrefixForForMethod(path)));
+            }
+
+            return Optional.empty();
+        }
+
+        private int computePrefixForForMethod(TreePath path) {
+            // 1. get range of lines for each argument
+            // 2. get the maximum line indentation (for all args that are not a text block) if the range of lines.size
+            // == args.size
+            List<JCExpression> allArguments =
+                    ((JCMethodInvocation) path.getParentPath().getLeaf()).getArguments();
+
+            int startParentPosition = getStartPosition(path.getParentPath().getLeaf());
+            int endParentPosition = getEndPosition(unit, path.getParentPath().getLeaf());
+            int lineParentStartPosition = lineMap.getStartPosition(lineMap.getLineNumber(startParentPosition));
+            int startParentColumn = CharMatcher.whitespace()
+                    .negate()
+                    .indexIn(input.substring(lineParentStartPosition, endParentPosition));
+            int extraIndent = 4;
+            RangeSet<Integer> allRanges = TreeRangeSet.create();
+            for (JCExpression argument : allArguments) {
+                int startingPos = getStartPosition(argument);
+                int startLine = lineMap.getLineNumber(startingPos);
+                int lineStartPosition = lineMap.getStartPosition(startLine);
+                int endPos = getEndPosition(unit, argument);
+                int endLine = lineMap.getLineNumber(endPos);
+                allRanges.add(Range.closed(startLine, endLine));
+                // if not textBlock -> get startColumn for line
+                if (argument.getKind() != Kind.STRING_LITERAL || !input.startsWith("\"\"\"", startingPos)) {
+                    int startColumn =
+                            CharMatcher.whitespace().negate().indexIn(input.substring(lineStartPosition, endPos));
+                    extraIndent = Math.max(extraIndent, startColumn - startParentColumn);
+                }
+            }
+            // only care about the extraIndent if all params are on separate lines
+            return (allRanges.asRanges().size() == allArguments.size() ? extraIndent : 4) + startParentColumn;
+        }
+
+        private int computePrefixForForTreeKind(TreePath path, Tree.Kind kind) {
+            while (path.getParentPath().getLeaf().getKind() == kind) {
+                path = path.getParentPath();
+            }
+            int startParentPosition = getStartPosition(path.getParentPath().getLeaf());
+            int endParentPosition = getEndPosition(unit, path.getParentPath().getLeaf());
+            int lineParentStartPosition = lineMap.getStartPosition(lineMap.getLineNumber(startParentPosition));
+            int startParentColumn = CharMatcher.whitespace()
+                    .negate()
+                    .indexIn(input.substring(lineParentStartPosition, endParentPosition));
+            RangeSet<Integer> allRanges = TreeRangeSet.create();
+            int nodes = 0;
+            ArrayDeque<Tree> todo = new ArrayDeque<>();
+            todo.add(path.getLeaf());
+            int extraIndent = 4;
+            while (!todo.isEmpty()) {
+                Tree first = todo.removeFirst();
+                if (first.getKind() == Tree.Kind.PLUS) {
+                    BinaryTree bt = (BinaryTree) first;
+                    todo.addFirst(bt.getRightOperand());
+                    todo.addFirst(bt.getLeftOperand());
+                } else {
+                    int startingPos = getStartPosition(first);
+                    int startLine = lineMap.getLineNumber(startingPos);
+                    int lineStartPosition = lineMap.getStartPosition(startLine);
+                    int endPos = getEndPosition(unit, first);
+                    int endLine = lineMap.getLineNumber(endPos);
+                    allRanges.add(Range.closed(startLine, endLine));
+                    ++nodes;
+                    // if not textBlock -> get startColumn for line
+                    if (first.getKind() != Kind.STRING_LITERAL || !input.startsWith("\"\"\"", startingPos)) {
+                        int startColumn =
+                                CharMatcher.whitespace().negate().indexIn(input.substring(lineStartPosition, endPos));
+                        extraIndent = Math.max(extraIndent, startColumn - startParentColumn);
+                    }
+                }
+            }
+            // only care about the extraIndent if all params are on separate lines
+            return (allRanges.asRanges().size() == nodes ? extraIndent : 4) + startParentColumn;
         }
 
         private void wrapLongStrings(TreeRangeMap<Integer, String> replacements, List<TreePath> longStringLiterals) {

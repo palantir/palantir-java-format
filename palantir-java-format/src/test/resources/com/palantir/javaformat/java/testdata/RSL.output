@@ -49,9 +49,9 @@ class RSLs {
 
     {
         f("""
-        lorem
-        ipsum
-        """, 42);
+            lorem
+            ipsum
+            """, 42);
 
         """
         hello %s
@@ -69,21 +69,27 @@ class RSLs {
             """ + """
             bar
             """;
-        // TODO(crogoz): fix formatSource rendering of this block
-        String broken = """
+        String notBroken = """
             foo
             """ + """
-        bar
-        """;
+            bar
+            """;
         String working = """
             foo
             """ + """
             bar
             """;
-        String u = stringVariableOne + """
-            ...
-            """ + stringVariableTwo + """
+        String u = stringVariableOne
+                + """
                 ...
+                """
+                + stringVariableTwo
+                + """
+                ...
+                """
+                + sdklfjslfkjsadlkgjsdklfjsadlkfjsaklfjaskdsfkljsaklfjsadflkjsdafkljasdfklsjfklsajflkasjfsfaaaaaaa
+                + """
+                 my value
                 """;
     }
 
@@ -103,4 +109,34 @@ class RSLs {
                 .someOtherValue()
                 .somethingElse();
     }
+
+    String y = refactorFromTo("""
+        someCode
+        """, """
+        otherCode
+        """);
+
+    String z = lotsOfStringParams("""
+        aaa
+        """, """
+        bbb
+        """, """
+        ccc
+        """, """
+        ddd
+        """, """
+        eee
+        """, """
+        fff
+        """, """
+        ggg
+        """);
+
+    String w = lotsOfStringParams("""
+        aaa
+        """, "sdklfjslfkjsadlkgjsdklfjsadlkfjsaklfjaskdsfkljsaklfjsadflkjsdafkljasdfklsjfklsajflkasjfsf", """
+        bbb
+        """, """
+        ccc
+        """);
 }

@@ -129,7 +129,7 @@ public final class Token extends Doc implements Op {
     public State computeBreaks(
             CommentsHelper commentsHelper, int maxWidth, State state, Obs.ExplorationNode observationNode) {
         String text = token.getTok().getOriginalText();
-        if (token.getTok().getOriginalText().startsWith(StringWrapper.TEXT_BLOCK_DELIMITER)) {
+        if (text.startsWith(StringWrapper.TEXT_BLOCK_DELIMITER)) {
             // Palantir-specific: The size of a text block should not impact line length. This ensures that methods
             // applied to text blocks remain on the same line and are not split into multiple lines.
             return state.withColumn(state.column() + StringWrapper.TEXT_BLOCK_DELIMITER.length());

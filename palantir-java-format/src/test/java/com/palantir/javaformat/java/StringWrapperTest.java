@@ -55,16 +55,159 @@ public class StringWrapperTest {
     public void testLinesNeedWrapping() throws FormatterException {
         String input =
                 """
-            class Value {
-                String a = \"""
-                hello
-                \""".codePoints();
+            class RSLs {
+                 String a = ""\"
+                 lorem
+                   ipsum
+                 ""\";
+                 String b = ""\"
+                 lorem
+                 ipsum
+                   ""\";
+                 String c = ""\"
+                 lorem
+                 ipsum
+                 ""\";
+                 String d = ""\"
+                 ipsum
+                 ""\";
+                 String e = ""\"
+                 ""\";
+                 String f = ""\"
+                 ipsum""\";
+                 String g = ""\"
+                 lorem\\
+                 ipsum
+                 ""\";
+                 String h = ""\"
+                 lorem\\
+                 ipsum\\
+                 ""\";
+                 String i = ""\"
+                 lorem
 
-                String b = getMyValue();
+                 ipsum
+                 ""\";
+                 String j = ""\"
+                 lorem
+                 one long incredibly unbroken sentence moving from topic to topic so that no one had a chance to interrupt
+                 ipsum
+                 ""\";
+                 String k = ""\"
+                 lorem
+                 ipsum
+                 ""\";
+                 String l = ""\"
+                   foo
+                 bar
+                   baz""\";
 
-                String c = String.format("This is a String that contains more characters %s", getValue());
-            }
-            """;
+                 {
+                     f(""\"
+                 lorem
+                 ipsum
+                 ""\", 42);
+
+                     ""\"
+                 hello %s
+                 ""\".formatted("world");
+                     f(/* foo= */ ""\"
+                     foo
+                     ""\", /* bar= */ ""\"
+                     bar
+                     ""\");
+                     ""\"
+                 hello
+                 ""\".codePoints().forEach(System.err::println);
+                     String s = ""\"
+                     foo
+                     ""\" + ""\"
+                         bar
+                         ""\";
+                     String notBroken = ""\"
+                 foo
+                 ""\" + ""\"
+                 bar
+                 ""\";
+                     String working = ""\"
+                     foo
+                     ""\" + ""\"
+                     bar
+                     ""\";
+                     String u = stringVariableOne
+                             + ""\"
+                         ...
+                         ""\"
+                             + stringVariableTwo
+                             + ""\"
+                                 ...
+                                 ""\"
+                             + sdklfjslfkjsadlkgjsdklfjsadlkfjsaklfjaskdsfkljsaklfjsadflkjsdafkljasdfklsjfklsajflkasjfsfaaaaaaa
+                             + ""\"
+                                  my value
+                                 ""\";
+                 }
+
+                 String x = String.format(""\"
+                       this very long string that does something using arguments %s %s %s
+                       ""\", "@", "@", "something");
+
+                 {
+                     ""\"
+                     No tools or answer found in the message. Please try again, following the instructions:\\s
+
+                     %s
+                     ""\".someOtherValue(e -> e.getValue().print())
+                             .myValue(System.err::println)
+                             .formatted(toolFormatter.usage())
+                             .myOtherValue()
+                             .someOtherValue()
+                             .somethingElse();
+                 }
+
+                 String y = refactorFromTo(""\"
+                     someCode
+                     ""\", ""\"
+                         otherCode
+                         ""\");
+
+                 String z = lotsOfStringParams(""\"
+                     aaa
+                     ""\", ""\"
+                     bbb
+                     ""\", ""\"
+                     ccc
+                     ""\", ""\"
+                     ddd
+                     ""\", ""\"
+                     eee
+                     ""\", ""\"
+                     fff
+                     ""\", ""\"
+                     ggg
+                     ""\");
+
+                 String w = lotsOfStringParams(
+                         ""\"
+                                 aaa
+                                 ""\", "sdklfjslfkjsadlkgjsdklfjsadlkfjsaklfjaskdsfkljsaklfjsadflkjsdafkljasdfklsjfklsajflkasjfsf", ""\"
+                                 bbb
+                                 ""\", ""\"
+                                 ccc
+                                 ""\");
+                 String w = lotsOfStringParams(
+                         ""\"
+                         aaa
+                         ""\",
+                         "sdklfjslfkjsadlkgjsdklfjsadlkfjsaklfjaskdsfkljsaklfjsadflkjsdafkljasdfklsjfklsajflkasjfsfdasdsadasdsada",
+                         ""\"
+                         bbb
+                         ""\",
+                         ""\"
+                         ccc
+                         ""\");
+             }
+             """;
         String output =
                 """
             class Value {

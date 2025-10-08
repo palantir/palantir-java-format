@@ -72,8 +72,7 @@ class RSLs {
             + """
             bar
             """;
-    // TODO(crogoz): fix formatSource rendering of this block
-    String broken =
+    String notBroken =
         """
     foo
     """
@@ -96,6 +95,9 @@ class RSLs {
                 +
                     """
                     ...
+                    """ + sdklfjslfkjsadlkgjsdklfjsadlkfjsaklfjaskdsfkljsaklfjsadflkjsdafkljasdfklsjfklsajflkasjfsfaaaaaaa
+                     + """
+                     my value
                     """;
     }
 
@@ -112,4 +114,44 @@ class RSLs {
         %s
         """.someOtherValue(e -> e.getValue().print()).myValue(System.err::println).formatted(toolFormatter.usage()).myOtherValue().someOtherValue().somethingElse();
     }
+
+    String y = refactorFromTo("""
+        someCode
+        """, """
+            otherCode
+            """);
+
+    String z = lotsOfStringParams("""
+        aaa
+        """, """
+        bbb
+        """, """
+        ccc
+        """, """
+        ddd
+        """, """
+        eee
+        """, """
+        fff
+        """, """
+        ggg
+        """);
+
+        String w = lotsOfStringParams("""
+                    aaa
+                    """, "sdklfjslfkjsadlkgjsdklfjsadlkfjsaklfjaskdsfkljsaklfjsadflkjsdafkljasdfklsjfklsajflkasjfsf",
+                    """
+                    bbb
+                    """,
+                    """
+                    ccc
+                    """);
+
+        String w = lotsOfStringParams("""
+            aaa
+            """, "sdklfjslfkjsadlkgjsdklfjsadlkfjsaklfjaskdsfkljsaklfjsadflkjsdafkljasdfklsjfklsajflkasjfsfdasdsadasdsada", """
+            bbb
+            """, """
+            ccc
+            """);
 }
