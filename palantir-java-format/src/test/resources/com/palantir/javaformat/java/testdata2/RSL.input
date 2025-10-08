@@ -1,12 +1,11 @@
 class RSLs {
-
-    String w = lotsOfStringParams("""
-                aaa
-                """, "sdklfjslfkjsadlkgjsdklfjsadlkfjsaklfjaskdsfkljsaklfjsadflkjsdafkljasdfklsjfklsajflkasjfsf",
-                """
-                bbb
-                """,
-                """
-                ccc
-                """);
+        String w = lotsOfStringParams("""
+                    aaa
+                    """, "sdklfjslfkjsadlkgjsdklfjsadlkfjsaklfjaskdsfkljsaklfjsadflkjsdafkljasdfklsjfklsajflkasjfsf",
+                    """
+                    bbb
+                    """,
+                    """
+                    ccc
+                    """);
 }

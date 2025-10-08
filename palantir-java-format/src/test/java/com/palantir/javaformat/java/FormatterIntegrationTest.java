@@ -33,7 +33,7 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 @Execution(ExecutionMode.CONCURRENT)
 public class FormatterIntegrationTest {
 
-    private static FileBasedTests tests = new FileBasedTests(FormatterIntegrationTest.class, "testdata2");
+    private static FileBasedTests tests = new FileBasedTests(FormatterIntegrationTest.class, "testdata");
 
     @ParameterizedClass.Parameters(name = "{0}")
     public static List<Object[]> data() throws IOException {

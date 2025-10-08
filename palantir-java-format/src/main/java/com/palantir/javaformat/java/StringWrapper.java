@@ -264,8 +264,9 @@ public final class StringWrapper {
                     ((JCMethodInvocation) path.getParentPath().getLeaf()).getArguments();
 
             int startParentPosition = getStartPosition(path.getParentPath().getLeaf());
+            int startParentLine = lineMap.getLineNumber(startParentPosition);
             int endParentPosition = getEndPosition(unit, path.getParentPath().getLeaf());
-            int lineParentStartPosition = lineMap.getStartPosition(lineMap.getLineNumber(startParentPosition));
+            int lineParentStartPosition = lineMap.getStartPosition(startParentLine);
             int startParentColumn = CharMatcher.whitespace()
                     .negate()
                     .indexIn(input.substring(lineParentStartPosition, endParentPosition));
@@ -278,15 +279,22 @@ public final class StringWrapper {
                 int endPos = getEndPosition(unit, argument);
                 int endLine = lineMap.getLineNumber(endPos);
                 allRanges.add(Range.closed(startLine, endLine));
-                // if not textBlock -> get startColumn for line
-                if (argument.getKind() != Kind.STRING_LITERAL || !input.startsWith("\"\"\"", startingPos)) {
-                    int startColumn =
-                            CharMatcher.whitespace().negate().indexIn(input.substring(lineStartPosition, endPos));
-                    extraIndent = Math.max(extraIndent, startColumn - startParentColumn);
+                // ignore indentation if the current argument is on the same line as the parent
+                if (startLine == startParentLine) {
+                    continue;
                 }
+                //  if this is a line that ends with a textBlock (ending with a textBlock if the line starts with
+                // tripple quotes & the current tree starts later on the line)
+                int startColumn = CharMatcher.whitespace().negate().indexIn(input.substring(lineStartPosition, endPos));
+                if (input.startsWith("\"\"\"", lineStartPosition + startColumn)
+                        && startingPos != lineStartPosition + startColumn) {
+                    continue;
+                }
+
+                extraIndent = Math.max(extraIndent, startColumn - startParentColumn);
             }
             // only care about the extraIndent if all params are on separate lines
-            return (allRanges.asRanges().size() == allArguments.size() ? extraIndent : 4) + startParentColumn;
+            return extraIndent + startParentColumn;
         }
 
         private int computePrefixForForTreeKind(TreePath path, Tree.Kind kind) {
@@ -294,8 +302,9 @@ public final class StringWrapper {
                 path = path.getParentPath();
             }
             int startParentPosition = getStartPosition(path.getParentPath().getLeaf());
+            int startParentLine = lineMap.getLineNumber(startParentPosition);
             int endParentPosition = getEndPosition(unit, path.getParentPath().getLeaf());
-            int lineParentStartPosition = lineMap.getStartPosition(lineMap.getLineNumber(startParentPosition));
+            int lineParentStartPosition = lineMap.getStartPosition(startParentLine);
             int startParentColumn = CharMatcher.whitespace()
                     .negate()
                     .indexIn(input.substring(lineParentStartPosition, endParentPosition));
@@ -318,16 +327,24 @@ public final class StringWrapper {
                     int endLine = lineMap.getLineNumber(endPos);
                     allRanges.add(Range.closed(startLine, endLine));
                     ++nodes;
-                    // if not textBlock -> get startColumn for line
-                    if (first.getKind() != Kind.STRING_LITERAL || !input.startsWith("\"\"\"", startingPos)) {
-                        int startColumn =
-                                CharMatcher.whitespace().negate().indexIn(input.substring(lineStartPosition, endPos));
-                        extraIndent = Math.max(extraIndent, startColumn - startParentColumn);
+                    // ignore indentation if the current argument is on the same line as the parent
+                    if (startLine == startParentLine) {
+                        continue;
                     }
+                    //  if this is a line that ends with a textBlock (ending with a textBlock if the line starts with
+                    // tripple quotes & the current tree starts later on the line)
+                    int startColumn =
+                            CharMatcher.whitespace().negate().indexIn(input.substring(lineStartPosition, endPos));
+                    if (input.startsWith("\"\"\"", lineStartPosition + startColumn)
+                            && startingPos != lineStartPosition + startColumn) {
+                        continue;
+                    }
+
+                    extraIndent = Math.max(extraIndent, startColumn - startParentColumn);
                 }
             }
             // only care about the extraIndent if all params are on separate lines
-            return (allRanges.asRanges().size() == nodes ? extraIndent : 4) + startParentColumn;
+            return extraIndent + startParentColumn;
         }
 
         private void wrapLongStrings(TreeRangeMap<Integer, String> replacements, List<TreePath> longStringLiterals) {
