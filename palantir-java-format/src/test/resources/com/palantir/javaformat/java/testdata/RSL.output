@@ -152,4 +152,34 @@ class RSLs {
             """
             ccc
             """);
+
+    String x = String.format("""
+        this very long string that does something using arguments %s %s %s
+        """, "@", "@", "something");
+
+    String x = String.format(someExtraValue("""
+        this very long string that does something using arguments %s %s %s
+        """ + """
+        my other value
+        """), "@", "@", "something");
+
+    CreateABuilder value =
+            CreateABuilder.builder().v("""
+                this is a content that should be indented
+                """).otherValue("my other values").build();
+
+    CreateABuilder value =
+            CreateABuilder.builder().v("""
+                this is a content that should be indented
+                """ + """
+                and this one
+                """).otherValue("my other values").build();
+
+    CreateABuilder value = CreateABuilder.builder()
+            .myValue("this is a value")
+            .someTextBlockContent("""
+                this is a content that should be indented
+                """)
+            .otherValue("my other values")
+            .build();
 }

@@ -269,8 +269,14 @@ public final class StringWrapper {
                     if (parentToIndent.containsKey(parent)) {
                         continue;
                     }
+                    // Tree finalParent = (((JCMethodInvocation) parent).getMethodSelect() instanceof JCFieldAccess ?
+                    // ((JCMethodInvocation) parent).getMethodSelect() : parent;
                     List<Tree> allArguments = new ArrayList<>(((JCMethodInvocation) parent).getArguments());
-                    parentToIndent.put(parent, computePrefixIndentation(parent, allArguments));
+
+                    parentToIndent.put(
+                            parent,
+                            computePrefixIndentation(
+                                    ((JCMethodInvocation) parent).getMethodSelect(), allArguments, false));
                 } else if (parent.getKind() == Kind.PLUS) {
                     while (parentPath.getParentPath().getLeaf().getKind() == Kind.PLUS) {
                         parentPath = parentPath.getParentPath();
@@ -280,7 +286,7 @@ public final class StringWrapper {
                     if (parentToIndent.containsKey(parent)) {
                         continue;
                     }
-                    parentToIndent.put(parent, computePrefixIndentation(parent, flattenExpressionTree(parent)));
+                    parentToIndent.put(parent, computePrefixIndentation(parent, flattenExpressionTree(parent), true));
                 }
             }
 
@@ -288,11 +294,16 @@ public final class StringWrapper {
                     .collect(Collectors.toMap(Map.Entry::getKey, e -> parentToIndent.get(e.getValue())));
         }
 
-        private String computePrefixIndentation(Tree parentPath, List<Tree> childExpressions) {
+        private String computePrefixIndentation(
+                Tree parentPath, List<Tree> childExpressions, boolean shouldUseStartLineParent) {
             int startParentPosition = getStartPosition(parentPath);
             int startParentLine = lineMap.getLineNumber(startParentPosition);
             int endParentPosition = getEndPosition(unit, parentPath);
-            int lineParentStartPosition = lineMap.getStartPosition(startParentLine);
+            int endParentLine = lineMap.getLineNumber(endParentPosition);
+            // the only relevant lineParentEndPosition should be the one that doesn't end with a """
+            // because that one is not valid
+            int lineParentStartPosition =
+                    lineMap.getStartPosition(shouldUseStartLineParent ? startParentLine : endParentLine);
             int startParentColumn = CharMatcher.whitespace()
                     .negate()
                     .indexIn(input.substring(lineParentStartPosition, endParentPosition));
@@ -305,8 +316,9 @@ public final class StringWrapper {
                 int endPos = getEndPosition(unit, expression);
                 int endLine = lineMap.getLineNumber(endPos);
                 allRanges.add(Range.closed(startLine, endLine));
+                int parentLine = shouldUseStartLineParent ? startParentLine : endParentLine;
                 // ignore indentation if the current argument is on the same line as the parent
-                if (startLine == startParentLine) {
+                if (startLine == parentLine) {
                     continue;
                 }
                 //  if this is a line that ends with a textBlock (ending with a textBlock if the line starts with
