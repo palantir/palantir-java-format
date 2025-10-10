@@ -256,6 +256,7 @@ public final class StringWrapper {
          * In order to compute the indentation value we need to do:
          * 1. for each textBlock find the enclosing block/parent (only for concat expressions/method invocations)
          * 2. for each parent, find the arguments/concatenated expressions and find the max indentation level
+         * (ignore the lines that start with a text block ending)
          * 3. store the mapping between the textBlock and the indentation level computed before.
          */
         private Map<TreePath, String> computeCustomTextBlocksIndent(List<TreePath> textBlocks) {
@@ -269,12 +270,16 @@ public final class StringWrapper {
                     if (parentToIndent.containsKey(parent)) {
                         continue;
                     }
-                    // Tree finalParent = (((JCMethodInvocation) parent).getMethodSelect() instanceof JCFieldAccess ?
-                    // ((JCMethodInvocation) parent).getMethodSelect() : parent;
                     List<Tree> allArguments = new ArrayList<>(((JCMethodInvocation) parent).getArguments());
-
                     parentToIndent.put(
                             parent,
+                            // A method can be split in multiple lines (eg. for field access
+                            // Class.builder()
+                            //      .method("arguments")
+                            //      .build()
+                            // In this case the parent of the arguments should be the method ("Class.builder().method")
+                            // the indentation of the arguments will be relative to the indentation of the last line of
+                            // the method name.
                             computePrefixIndentation(
                                     ((JCMethodInvocation) parent).getMethodSelect(), allArguments, false));
                 } else if (parent.getKind() == Kind.PLUS) {
@@ -300,8 +305,6 @@ public final class StringWrapper {
             int startParentLine = lineMap.getLineNumber(startParentPosition);
             int endParentPosition = getEndPosition(unit, parentPath);
             int endParentLine = lineMap.getLineNumber(endParentPosition);
-            // the only relevant lineParentEndPosition should be the one that doesn't end with a """
-            // because that one is not valid
             int lineParentStartPosition =
                     lineMap.getStartPosition(shouldUseStartLineParent ? startParentLine : endParentLine);
             int startParentColumn = CharMatcher.whitespace()
@@ -321,8 +324,8 @@ public final class StringWrapper {
                 if (startLine == parentLine) {
                     continue;
                 }
-                //  if this is a line that ends with a textBlock (ending with a textBlock if the line starts with
-                // triple quotes & the current tree starts later on the line)
+                // if this is a line that ends a textBlock (if the line starts with triple quotes & the current tree
+                // starts after)
                 int startColumn = CharMatcher.whitespace().negate().indexIn(input.substring(lineStartPosition, endPos));
                 if (input.startsWith("\"\"\"", lineStartPosition + startColumn)
                         && startingPos != lineStartPosition + startColumn) {
