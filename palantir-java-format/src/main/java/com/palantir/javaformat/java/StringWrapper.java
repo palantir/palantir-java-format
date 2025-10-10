@@ -251,7 +251,7 @@ public final class StringWrapper {
         }
 
         /**
-         * Pjf specific: When the AST needs to break a concantenation expression ('ONE'+'TWO') or the parameters of a method,
+         * Pjf specific: When the AST needs to break a concatenation expression ('ONE'+'TWO') or the parameters of a method,
          * the indentation will be set to 8, in which case we need to align the text blocks to the correct indentation.
          * In order to compute the indentation value we need to do:
          * 1. for each textBlock find the enclosing block/parent (only for concat expressions/method invocations)
