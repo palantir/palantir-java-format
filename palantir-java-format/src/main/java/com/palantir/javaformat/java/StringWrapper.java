@@ -195,7 +195,7 @@ public final class StringWrapper {
         }
 
         private void indentTextBlocks(TreeRangeMap<Integer, String> replacements, List<TreePath> textBlocks) {
-            // pjf specific - compute textBlock's parents & store info about the indentation\
+            // pjf specific - compute textBlock's parents & store indentation info for each parent
             Map<TreePath, String> textBlockToIndent = computeCustomTextBlocksIndent(textBlocks);
 
             for (TreePath treePath : textBlocks) {
@@ -217,6 +217,8 @@ public final class StringWrapper {
                         .stripIndent();
                 ImmutableList<String> lines = stripped.lines().collect(ImmutableList.toImmutableList());
 
+                // pjf specific: try to indent the text block, unless the text block will be indented more than the
+                // starting quotes
                 String prefix = textBlockToIndent.getOrDefault(
                         treePath,
                         (lineStartPosition + startColumn + 4 > startPosition ? "" : " ".repeat(4))
