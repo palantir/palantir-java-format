@@ -172,7 +172,8 @@ public final class StringWrapper {
                     return null;
                 }
                 int pos = getStartPosition(literalTree);
-                if (input.substring(pos, Math.min(input.length(), pos + 3)).equals(TEXT_BLOCK_DELIMITER)) {
+                if (input.substring(pos, Math.min(input.length(), pos + TEXT_BLOCK_DELIMITER.length()))
+                        .equals(TEXT_BLOCK_DELIMITER)) {
                     textBlocks.add(getCurrentPath());
                     return null;
                 }
@@ -269,11 +270,8 @@ public final class StringWrapper {
                 Tree parent = parentPath.getLeaf();
                 if (parent instanceof MethodInvocationTree) {
                     textBlockToParent.put(textBlock, parent);
-                    if (parentToIndent.containsKey(parent)) {
-                        continue;
-                    }
                     List<Tree> allArguments = new ArrayList<>(((JCMethodInvocation) parent).getArguments());
-                    parentToIndent.put(
+                    parentToIndent.computeIfAbsent(
                             parent,
                             // A method can be split in multiple lines (eg. for field access
                             // Class.builder()
@@ -282,18 +280,18 @@ public final class StringWrapper {
                             // In this case the parent of the arguments should be the method ("Class.builder().method")
                             // the indentation of the arguments will be relative to the indentation of the last line of
                             // the method name.
-                            computePrefixIndentation(
-                                    ((JCMethodInvocation) parent).getMethodSelect(), allArguments, false));
+                            parentTree -> computePrefixIndentation(
+                                    ((JCMethodInvocation) parentTree).getMethodSelect(), allArguments, false));
                 } else if (parent.getKind() == Kind.PLUS) {
                     while (parentPath.getParentPath().getLeaf().getKind() == Kind.PLUS) {
                         parentPath = parentPath.getParentPath();
                     }
-                    parent = parentPath.getLeaf();
-                    textBlockToParent.put(textBlock, parent);
-                    if (parentToIndent.containsKey(parent)) {
-                        continue;
-                    }
-                    parentToIndent.put(parent, computePrefixIndentation(parent, flattenExpressionTree(parent), true));
+                    Tree concatenationRoot = parentPath.getLeaf();
+                    textBlockToParent.put(textBlock, concatenationRoot);
+                    parentToIndent.computeIfAbsent(
+                            concatenationRoot,
+                            concatenationRootTree -> computePrefixIndentation(
+                                    concatenationRootTree, flattenExpressionTree(concatenationRootTree), true));
                 }
             }
 
@@ -313,14 +311,12 @@ public final class StringWrapper {
                     .negate()
                     .indexIn(input.substring(lineParentStartPosition, endParentPosition));
             int extraIndent = 4;
-            RangeSet<Integer> allRanges = TreeRangeSet.create();
             for (Tree expression : childExpressions) {
                 int startingPos = getStartPosition(expression);
                 int startLine = lineMap.getLineNumber(startingPos);
                 int lineStartPosition = lineMap.getStartPosition(startLine);
                 int endPos = getEndPosition(unit, expression);
                 int endLine = lineMap.getLineNumber(endPos);
-                allRanges.add(Range.closed(startLine, endLine));
                 int parentLine = shouldUseStartLineParent ? startParentLine : endParentLine;
                 // ignore indentation if the current argument is on the same line as the parent
                 if (startLine == parentLine) {
@@ -329,7 +325,7 @@ public final class StringWrapper {
                 // if this is a line that ends a textBlock (if the line starts with triple quotes & the current tree
                 // starts after)
                 int startColumn = CharMatcher.whitespace().negate().indexIn(input.substring(lineStartPosition, endPos));
-                if (input.startsWith("\"\"\"", lineStartPosition + startColumn)
+                if (input.startsWith(TEXT_BLOCK_DELIMITER, lineStartPosition + startColumn)
                         && startingPos != lineStartPosition + startColumn) {
                     continue;
                 }
