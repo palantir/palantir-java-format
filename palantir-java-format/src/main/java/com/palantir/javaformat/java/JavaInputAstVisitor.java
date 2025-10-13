@@ -384,6 +384,8 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         handleModule(first, node);
         // set a partial format marker at EOF to make sure we can format the entire file
         markForPartialFormat();
+        // Ensure the file ends with a newline
+        builder.forcedBreak();
         return null;
     }
 
