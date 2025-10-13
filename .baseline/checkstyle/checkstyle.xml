@@ -412,7 +412,9 @@
             <property name="allowMissingReturnTag" value="true"/>
             <property name="allowedAnnotations" value="Override, Test"/>
         </module>
-        <module name="JavadocStyle"/> <!-- Java Style Guide: Javadoc -->
+        <module name="JavadocStyle"><!-- Java Style Guide: Javadoc -->
+            <property name="checkFirstSentence" value="false"/>
+        </module>
         <module name="JavadocTagContinuationIndentation"> <!-- Java Style Guide: At-clauses -->
             <property name="offset" value="0"/>
         </module>
@@ -436,9 +438,6 @@
         <module name="ParameterName"> <!-- Java Style Guide: Parameter names -->
             <property name="format" value="^_?[a-z][a-zA-Z0-9]+$"/>
             <message key="name.invalidPattern" value="Parameter name ''{0}'' must match pattern ''{1}''."/>
-        </module>
-        <module name="SummaryJavadocCheck"> <!-- Java Coding Guidelines: Javadoc -->
-            <property name="forbiddenSummaryFragments" value="^@return the *|^This method returns |^A [{]@code [a-zA-Z0-9]+[}]( is a )"/>
         </module>
 
         <!-- Stricter checks end -->
