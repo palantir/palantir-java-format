@@ -36,7 +36,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 
 class PalantirJavaFormatFormattingService extends AsyncDocumentFormattingService {
@@ -103,7 +102,7 @@ class PalantirJavaFormatFormattingService extends AsyncDocumentFormattingService
                             request.getDocumentText().length(),
                             request.getFormattingRanges()));
                 }
-                
+
                 // Note: I attempted to implement this using getFormatReplacements and elide an update when
                 // there were no replacements. There is a bug in the underlying formatter where it _always_
                 // returns a change. Thus we must perform a content aware diff / branching.

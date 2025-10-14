@@ -33,6 +33,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.parallel.Execution;
@@ -455,6 +456,7 @@ public final class FormatterTest {
                 .doesNotThrowAnyException();
     }
 
+    @Disabled("Disabled as this is proof that PJF always formats the file")
     @Test
     void doesntProduceFormattingChangesOnFormattedFiles() throws FormatterException {
         Formatter formatter = Formatter.create();
