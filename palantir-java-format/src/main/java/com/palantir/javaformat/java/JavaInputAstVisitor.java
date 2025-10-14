@@ -2725,17 +2725,32 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 scan(getArrayBase(node), null);
                 token(".");
             } else {
+                boolean isTextBlock = false;
+                // Special case for text blocks: if the node is a string literal that ends with """,
+                // don't add a break after it
+                if (node instanceof LiteralTree && node.getKind() == Tree.Kind.STRING_LITERAL) {
+                    String sourceForNode = getSourceForNode(node, getCurrentPath());
+                    isTextBlock = sourceForNode.trim().endsWith(StringWrapper.TEXT_BLOCK_DELIMITER);
+                }
+
                 builder.open(OpenOp.builder()
                         .debugName("visitDot")
                         .plusIndent(plusFour)
-                        .breakBehaviour(BreakBehaviours.preferBreakingLastInnerLevel(true))
+                        .breakBehaviour(
+                                isTextBlock
+                                        ? BreakBehaviours.breakOnlyIfInnerLevelsThenFitOnOneLine(false)
+                                        : BreakBehaviours.preferBreakingLastInnerLevel(true))
                         .breakabilityIfLastLevel(
-                                LastLevelBreakability.ACCEPT_INLINE_CHAIN_IF_SIMPLE_OTHERWISE_CHECK_INNER)
+                                isTextBlock
+                                        ? LastLevelBreakability.ACCEPT_INLINE_CHAIN
+                                        : LastLevelBreakability.ACCEPT_INLINE_CHAIN_IF_SIMPLE_OTHERWISE_CHECK_INNER)
                         .columnLimitBeforeLastBreak(METHOD_CHAIN_COLUMN_LIMIT)
                         .isSimple(false)
                         .build());
                 scan(getArrayBase(node), null);
-                builder.breakOp();
+                if (!isTextBlock) {
+                    builder.breakOp();
+                }
                 needDot = true;
             }
             formatArrayIndices(getArrayIndices(node));

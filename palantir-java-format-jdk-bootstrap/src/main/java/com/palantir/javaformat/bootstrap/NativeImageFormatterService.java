@@ -45,6 +45,7 @@ public class NativeImageFormatterService implements FormatterService {
 
     @Override
     public ImmutableList<Replacement> getFormatReplacements(String input, Collection<Range<Integer>> ranges) {
+        Optional<String> output = Optional.empty();
         try {
             FormatterNativeImageArgs command = FormatterNativeImageArgs.builder()
                     .nativeImagePath(nativeImagePath)
@@ -53,14 +54,15 @@ public class NativeImageFormatterService implements FormatterService {
                             ranges.stream().map(RangeUtils::toStringRange).collect(Collectors.toList()))
                     .build();
 
-            Optional<String> output = FormatterCommandRunner.runWithStdin(
+            output = FormatterCommandRunner.runWithStdin(
                     command.toArgs(), input, Optional.ofNullable(nativeImagePath.getParent()));
             if (output.isEmpty() || output.get().isEmpty()) {
                 return ImmutableList.of();
             }
             return MAPPER.readValue(output.get(), new TypeReference<>() {});
         } catch (IOException e) {
-            throw new UncheckedIOException("Error running the native image command", e);
+            throw new UncheckedIOException(
+                    String.format("Error running the native image command; received output: %s", output), e);
         }
     }
 
