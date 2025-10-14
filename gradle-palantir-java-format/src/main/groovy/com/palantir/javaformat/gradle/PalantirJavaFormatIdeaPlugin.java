@@ -17,29 +17,31 @@
 package com.palantir.javaformat.gradle;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.io.Files;
-import groovy.util.Node;
-import groovy.util.XmlNodePrinter;
-import groovy.util.XmlParser;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.URI;
-import java.nio.charset.Charset;
+import com.google.common.collect.ImmutableList;
+import com.palantir.gradle.ideaconfiguration.IdeaConfigurationExtension;
+import com.palantir.gradle.ideaconfiguration.IdeaConfigurationPlugin;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import javax.xml.parsers.ParserConfigurationException;
+import java.util.stream.Stream;
+import javax.inject.Inject;
+import org.gradle.StartParameter;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
-import org.gradle.plugins.ide.idea.model.IdeaModel;
-import org.xml.sax.SAXException;
+import org.gradle.api.artifacts.ConfigurationContainer;
+import org.gradle.api.tasks.Nested;
+import org.gradle.api.tasks.TaskProvider;
 
-public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
+public abstract class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
+
+    @Nested
+    protected abstract NativeImageSupport getNativeImageSupport();
+
+    @Inject
+    protected abstract ConfigurationContainer getConfigurations();
+
+    private static final String MIN_IDEA_PLUGIN_VERSION = "2.57.0";
 
     @Override
     public void apply(Project rootProject) {
@@ -49,110 +51,58 @@ public final class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
 
         rootProject.getPlugins().apply(PalantirJavaFormatProviderPlugin.class);
         rootProject.getPluginManager().withPlugin("idea", ideaPlugin -> {
-            Configuration implConfiguration =
-                    rootProject.getConfigurations().getByName(PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME);
+            TaskProvider<UpdatePalantirJavaFormatIdeaXmlFile> updatePalantirJavaFormatXml = rootProject
+                    .getTasks()
+                    .register("updatePalantirJavaFormatXml", UpdatePalantirJavaFormatIdeaXmlFile.class, task -> {
+                        task.getXmlOutputFile().set(rootProject.file(".idea/palantir-java-format.xml"));
+                        task.getImplementationConfig()
+                                .from(rootProject
+                                        .getConfigurations()
+                                        .getByName(PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME));
+                        maybeGetNativeImplConfiguration().ifPresent(config -> {
+                            task.getNativeImageConfig().from(config);
+                            task.getNativeImageOutputFile().fileProvider(rootProject.provider(() -> rootProject
+                                    .getGradle()
+                                    .getGradleUserHomeDir()
+                                    .toPath()
+                                    .resolve("palantir-java-format-caches/")
+                                    .resolve(Paths.get(task.getNativeImageConfig()
+                                                    .getSingleFile()
+                                                    .toURI())
+                                            .getFileName()
+                                            .toString())
+                                    .toFile()));
+                        });
+                    });
 
-            Optional<Configuration> nativeImplConfiguration = maybeGetNativeImplConfiguration(rootProject);
+            TaskProvider<UpdateWorkspaceXmlFile> updateWorkspaceXml = rootProject
+                    .getTasks()
+                    .register("updateWorkspaceXml", UpdateWorkspaceXmlFile.class, task -> {
+                        task.getOutputFile().set(rootProject.file(".idea/workspace.xml"));
+                    });
 
-            configureLegacyIdea(rootProject, implConfiguration, nativeImplConfiguration);
-            configureIntelliJImport(rootProject, implConfiguration, nativeImplConfiguration);
+            // Add the task to the Gradle start parameters so it executes automatically.
+            StartParameter startParameter = rootProject.getGradle().getStartParameter();
+            List<String> updateTasks = Stream.of(updatePalantirJavaFormatXml, updateWorkspaceXml)
+                    .map(taskProvider -> String.format(":%s", taskProvider.getName()))
+                    .toList();
+            List<String> taskNames = ImmutableList.<String>builder()
+                    .addAll(startParameter.getTaskNames())
+                    .addAll(updateTasks)
+                    .build();
+            startParameter.setTaskNames(taskNames);
         });
+
+        rootProject.getPluginManager().apply(IdeaConfigurationPlugin.class);
+        IdeaConfigurationExtension extension = rootProject.getExtensions().getByType(IdeaConfigurationExtension.class);
+        extension
+                .getExternalDependencies()
+                .register("palantir-java-format", dep -> dep.atLeastVersion(MIN_IDEA_PLUGIN_VERSION));
     }
 
-    private static Optional<Configuration> maybeGetNativeImplConfiguration(Project rootProject) {
-        return NativeImageFormatProviderPlugin.shouldUseNativeImage(rootProject)
-                ? Optional.of(rootProject
-                        .getConfigurations()
-                        .getByName(NativeImageFormatProviderPlugin.NATIVE_CONFIGURATION_NAME))
+    private Optional<Configuration> maybeGetNativeImplConfiguration() {
+        return getNativeImageSupport().isNativeImageConfigured()
+                ? Optional.of(getConfigurations().getByName(NativeImageFormatProviderPlugin.NATIVE_CONFIGURATION_NAME))
                 : Optional.empty();
-    }
-
-    private static void configureLegacyIdea(
-            Project project, Configuration implConfiguration, Optional<Configuration> nativeImplConfiguration) {
-        IdeaModel ideaModel = project.getExtensions().getByType(IdeaModel.class);
-        ideaModel.getProject().getIpr().withXml(xmlProvider -> {
-            // this block is lazy
-            List<URI> uris =
-                    implConfiguration.getFiles().stream().map(File::toURI).collect(Collectors.toList());
-            Optional<URI> nativeUri =
-                    nativeImplConfiguration.map(conf -> conf.getSingleFile().toURI());
-            ConfigureJavaFormatterXml.configureJavaFormat(xmlProvider.asNode(), uris, nativeUri);
-            ConfigureJavaFormatterXml.configureExternalDependencies(xmlProvider.asNode());
-        });
-
-        ideaModel.getWorkspace().getIws().withXml(xmlProvider -> {
-            ConfigureJavaFormatterXml.configureWorkspaceXml(xmlProvider.asNode());
-        });
-    }
-
-    private static void configureIntelliJImport(
-            Project project, Configuration implConfiguration, Optional<Configuration> nativeImplConfiguration) {
-        // Note: we tried using 'org.jetbrains.gradle.plugin.idea-ext' and afterSync triggers, but these are currently
-        // very hard to manage as the tasks feel disconnected from the Sync operation, and you can't remove them once
-        // you've added them. For that reason, we accept that we have to resolve this configuration at
-        // configuration-time, but only do it when part of an IDEA import.
-        if (!Boolean.getBoolean("idea.active")) {
-            return;
-        }
-        project.getGradle().projectsEvaluated(gradle -> {
-            List<URI> uris =
-                    implConfiguration.getFiles().stream().map(File::toURI).collect(Collectors.toList());
-
-            Optional<URI> nativeImageUri =
-                    nativeImplConfiguration.map(conf -> conf.getSingleFile().toURI());
-
-            createOrUpdateIdeaXmlFile(
-                    project.file(".idea/palantir-java-format.xml"),
-                    node -> ConfigureJavaFormatterXml.configureJavaFormat(node, uris, nativeImageUri));
-            createOrUpdateIdeaXmlFile(
-                    project.file(".idea/externalDependencies.xml"),
-                    node -> ConfigureJavaFormatterXml.configureExternalDependencies(node));
-            createOrUpdateIdeaXmlFile(
-                    project.file(".idea/workspace.xml"), node -> ConfigureJavaFormatterXml.configureWorkspaceXml(node));
-
-            // Still configure legacy idea if using intellij import
-            updateIdeaXmlFileIfExists(project.file(project.getName() + ".ipr"), node -> {
-                ConfigureJavaFormatterXml.configureJavaFormat(node, uris, nativeImageUri);
-                ConfigureJavaFormatterXml.configureExternalDependencies(node);
-            });
-            updateIdeaXmlFileIfExists(project.file(project.getName() + ".iws"), node -> {
-                ConfigureJavaFormatterXml.configureWorkspaceXml(node);
-            });
-        });
-    }
-
-    private static void createOrUpdateIdeaXmlFile(File configurationFile, Consumer<Node> configure) {
-        updateIdeaXmlFile(configurationFile, configure, true);
-    }
-
-    private static void updateIdeaXmlFileIfExists(File configurationFile, Consumer<Node> configure) {
-        updateIdeaXmlFile(configurationFile, configure, false);
-    }
-
-    private static void updateIdeaXmlFile(File configurationFile, Consumer<Node> configure, boolean createIfAbsent) {
-        Node rootNode;
-        if (configurationFile.isFile()) {
-            try {
-                rootNode = new XmlParser().parse(configurationFile);
-            } catch (IOException | SAXException | ParserConfigurationException e) {
-                throw new RuntimeException("Couldn't parse existing configuration file: " + configurationFile, e);
-            }
-        } else {
-            if (!createIfAbsent) {
-                return;
-            }
-            rootNode = new Node(null, "project", ImmutableMap.of("version", "4"));
-        }
-
-        configure.accept(rootNode);
-
-        try (BufferedWriter writer = Files.newWriter(configurationFile, Charset.defaultCharset());
-                PrintWriter printWriter = new PrintWriter(writer)) {
-            XmlNodePrinter nodePrinter = new XmlNodePrinter(printWriter);
-            nodePrinter.setPreserveWhitespace(true);
-            nodePrinter.print(rootNode);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to write back to configuration file: " + configurationFile, e);
-        }
     }
 }

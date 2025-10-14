@@ -45,6 +45,7 @@ final class CharStream {
     /*
      * @param pattern the pattern to search for, which must be anchored to match only at position 0
      */
+    @SuppressWarnings("for-rollout:AlmostJavadoc")
     boolean tryConsumeRegex(Pattern pattern) {
         Matcher matcher = pattern.matcher(remaining);
         if (!matcher.find()) {

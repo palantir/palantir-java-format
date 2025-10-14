@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+apply plugin: 'java'
 apply plugin: 'com.palantir.external-publish-intellij'
 
 def name = "palantir-java-format"
@@ -26,7 +27,7 @@ intellij {
 
 patchPluginXml {
     pluginDescription = "Formats source code using the palantir-java-format tool."
-    sinceBuild = '213' // TODO: test against this version of IntelliJ to ensure no regressions
+    sinceBuild = '241' // TODO: keep the intellij version & sinceBuild in sync
     untilBuild = ''
 }
 
@@ -67,14 +68,7 @@ dependencies {
     testImplementation 'org.assertj:assertj-core'
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'org.junit.platform:junit-platform-launcher'
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.errorprone.disable 'StrictUnusedVariable'
-    // opt out of safe-logging checks which don't map correctly to idea plugins
-    options.errorprone.disable 'PreferSafeLogger'
-    options.errorprone.disable 'PreferSafeLoggableExceptions'
-    options.errorprone.disable 'PreferSafeLoggingPreconditions'
+    implementation 'com.google.code.findbugs:jsr305'
 }
 
 // Javadoc fails if there are no public classes to javadoc, so make it stop complaining.

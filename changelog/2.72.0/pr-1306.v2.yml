@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Intellij uses the native image from `.gradle/palantir-java-formatter-caches`
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/1306

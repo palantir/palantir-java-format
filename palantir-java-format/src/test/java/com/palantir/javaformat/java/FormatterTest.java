@@ -49,6 +49,7 @@ public final class FormatterTest {
         // don't forget to misspell "long", or you will be mystified for a while
         String input = "class A{void b(){while(true){weCanBeCertainThatThisWillEndUpGettingWrapped("
                 + "because, it, is, just, so, very, very, very, very, looong);}}}";
+        @SuppressWarnings("for-rollout:StringConcatToTextBlock")
         String expectedOutput = Joiner.on("\n")
                 .join(
                         "class A {",
@@ -90,7 +91,9 @@ public final class FormatterTest {
 
     @Test
     public void testFormatStdinStdoutWithDashFlag() throws Exception {
+        @SuppressWarnings("for-rollout:StringConcatToTextBlock")
         String input = "class Foo{\n" + "void f\n" + "() {\n" + "}\n" + "}\n";
+        @SuppressWarnings("for-rollout:StringConcatToTextBlock")
         String expectedOutput = "class Foo {\n" + "  void f() {}\n" + "}\n";
 
         InputStream in = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8));
@@ -109,7 +112,9 @@ public final class FormatterTest {
 
     @Test
     public void testFormatLengthUpToEOF() throws Exception {
+        @SuppressWarnings("for-rollout:StringConcatToTextBlock")
         String input = "class Foo{\n" + "void f\n" + "() {\n" + "}\n" + "}\n\n\n\n\n\n";
+        @SuppressWarnings("for-rollout:StringConcatToTextBlock")
         String expectedOutput = "class Foo {\n" + "  void f() {}\n" + "}\n";
 
         Path path = testFolder.resolve("Foo.java");
@@ -221,6 +226,7 @@ public final class FormatterTest {
         assertThat(output).isEqualTo(expect);
     }
 
+    @SuppressWarnings("for-rollout:StringConcatToTextBlock")
     private static final String UNORDERED_IMPORTS = Joiner.on('\n')
             .join(
                     "import com.google.common.base.Preconditions;",
@@ -251,6 +257,7 @@ public final class FormatterTest {
                 + "  @Nullable List<?> xs;\n"
                 + "}\n";
         String output = Formatter.create().formatSourceAndFixImports(input);
+        @SuppressWarnings("for-rollout:StringConcatToTextBlock")
         String expect = "package com.google.example;\n\n"
                 + "import java.util.List;\n"
                 + "import javax.annotations.Nullable;\n\n"
@@ -396,6 +403,7 @@ public final class FormatterTest {
 
     @Test
     public void blankLinesImportComment() throws FormatterException {
+        @SuppressWarnings("for-rollout:StringConcatToTextBlock")
         String withBlank = "package p;\n"
                 + "\n"
                 + "/** test */\n"
@@ -405,6 +413,7 @@ public final class FormatterTest {
                 + "class T {\n"
                 + "  A a;\n"
                 + "}\n";
+        @SuppressWarnings("for-rollout:StringConcatToTextBlock")
         String withoutBlank =
                 "package p;\n" + "\n" + "/** test */\n" + "import a.A;\n" + "\n" + "class T {\n" + "  A a;\n" + "}\n";
 

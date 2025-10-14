@@ -26,6 +26,7 @@ import com.google.common.collect.Range;
 import com.palantir.javaformat.java.FormatterService;
 import com.palantir.javaformat.java.Replacement;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
@@ -44,6 +45,7 @@ public class NativeImageFormatterService implements FormatterService {
 
     @Override
     public ImmutableList<Replacement> getFormatReplacements(String input, Collection<Range<Integer>> ranges) {
+        Optional<String> output = Optional.empty();
         try {
             FormatterNativeImageArgs command = FormatterNativeImageArgs.builder()
                     .nativeImagePath(nativeImagePath)
@@ -52,13 +54,15 @@ public class NativeImageFormatterService implements FormatterService {
                             ranges.stream().map(RangeUtils::toStringRange).collect(Collectors.toList()))
                     .build();
 
-            Optional<String> output = FormatterCommandRunner.runWithStdin(command.toArgs(), input);
+            output = FormatterCommandRunner.runWithStdin(
+                    command.toArgs(), input, Optional.ofNullable(nativeImagePath.getParent()));
             if (output.isEmpty() || output.get().isEmpty()) {
                 return ImmutableList.of();
             }
             return MAPPER.readValue(output.get(), new TypeReference<>() {});
         } catch (IOException e) {
-            throw new RuntimeException("Error running the native image command", e);
+            throw new UncheckedIOException(
+                    String.format("Error running the native image command; received output: %s", output), e);
         }
     }
 
@@ -67,7 +71,7 @@ public class NativeImageFormatterService implements FormatterService {
         try {
             return runFormatterCommand(input);
         } catch (IOException e) {
-            throw new RuntimeException("Error running the native image command", e);
+            throw new UncheckedIOException("Error running the native image command", e);
         }
     }
 
@@ -76,7 +80,7 @@ public class NativeImageFormatterService implements FormatterService {
         try {
             return runFormatterCommand(input);
         } catch (IOException e) {
-            throw new RuntimeException("Error running the native image command", e);
+            throw new UncheckedIOException("Error running the native image command", e);
         }
     }
 
@@ -85,7 +89,9 @@ public class NativeImageFormatterService implements FormatterService {
                 .nativeImagePath(nativeImagePath)
                 .outputReplacements(false)
                 .build();
-        return FormatterCommandRunner.runWithStdin(command.toArgs(), input).orElse(input);
+        return FormatterCommandRunner.runWithStdin(
+                        command.toArgs(), input, Optional.ofNullable(nativeImagePath.getParent()))
+                .orElse(input);
     }
 
     @Value.Immutable

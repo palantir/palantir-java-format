@@ -39,10 +39,12 @@ import com.sun.tools.javac.file.JavacFileManager;
 import com.sun.tools.javac.parser.Tokens.TokenKind;
 import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
 import com.sun.tools.javac.util.Context;
+import com.sun.tools.javac.util.JCDiagnostic;
 import com.sun.tools.javac.util.Log;
 import com.sun.tools.javac.util.Log.DeferredDiagnosticHandler;
 import com.sun.tools.javac.util.Options;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -57,6 +59,7 @@ import javax.tools.JavaFileObject.Kind;
 import javax.tools.SimpleJavaFileObject;
 
 /** {@code JavaInput} extends {@link Input} to represent a Java input document. */
+@SuppressWarnings("for-rollout:ThrowError")
 public final class JavaInput extends Input {
     /**
      * A {@code JavaInput} is a sequence of {@link Tok}s that cover the Java input. A {@link Tok} is either a token (if
@@ -253,7 +256,9 @@ public final class JavaInput extends Input {
      * output.
      */
 
+    @SuppressWarnings("for-rollout:AlmostJavadoc")
     private final ImmutableMap<Integer, Integer> positionToColumnMap; // Map Tok position to column.
+
     private final ImmutableList<Token> tokens; // The Tokens for this input.
     private final ImmutableRangeMap<Integer, Token> positionTokenMap; // Map position to Token.
 
@@ -331,6 +336,7 @@ public final class JavaInput extends Input {
     }
 
     /** Lex the input and build the list of toks. */
+    @SuppressWarnings("for-rollout:NullAway")
     private ImmutableList<Tok> buildToks(String text) throws FormatterException {
         ImmutableList<Tok> toks = buildToks(text, ImmutableSet.of());
         kN = getLast(toks).getIndex();
@@ -365,7 +371,7 @@ public final class JavaInput extends Input {
         });
         DeferredDiagnosticHandler diagnostics = new DeferredDiagnosticHandler(log);
         ImmutableList<RawTok> rawToks = JavacTokens.getTokens(text, context, stopTokens);
-        if (diagnostics.getDiagnostics().stream().anyMatch(d -> d.getKind() == Diagnostic.Kind.ERROR)) {
+        if (getDiagnostics(diagnostics).stream().anyMatch(d -> d.getKind() == Diagnostic.Kind.ERROR)) {
             return ImmutableList.of(new Tok(0, "", "", 0, 0, true, null)); // EOF
         }
         int kN = 0;
@@ -462,6 +468,34 @@ public final class JavaInput extends Input {
         return ImmutableList.copyOf(toks);
     }
 
+    /**
+     * Gets diagnostics from a DeferredDiagnosticHandler using reflection.
+     * This method handles the API change in JDK 25 where getDiagnostics()
+     * changed from returning Queue to List.
+     *
+     * @param handler the diagnostic handler
+     * @return a collection of diagnostics
+     */
+    @SuppressWarnings({"unchecked", "for-rollout:ThrowError"})
+    private static Collection<JCDiagnostic> getDiagnostics(DeferredDiagnosticHandler handler) {
+        try {
+            return (Collection<JCDiagnostic>) GET_DIAGNOSTICS.invoke(handler);
+        } catch (ReflectiveOperationException e) {
+            throw new LinkageError(e.getMessage(), e);
+        }
+    }
+
+    private static final Method GET_DIAGNOSTICS;
+
+    static {
+        try {
+            GET_DIAGNOSTICS = DeferredDiagnosticHandler.class.getMethod("getDiagnostics");
+        } catch (NoSuchMethodException e) {
+            throw new LinkageError(e.getMessage(), e);
+        }
+    }
+
+    @SuppressWarnings("for-rollout:NullAway")
     private static int updateColumn(int columnI, String originalTokText) {
         Integer last = Iterators.getLast(Newlines.lineOffsetIterator(originalTokText));
         if (last > 0) {
@@ -556,6 +590,7 @@ public final class JavaInput extends Input {
      * @return the {@code 0}-based {@link Range} of tokens
      * @throws FormatterException on formatting errors
      */
+    @SuppressWarnings("for-rollout:NullAway")
     Range<Integer> characterRangeToTokenRange(int offset, int length) throws FormatterException {
         int requiredLength = offset + length;
         if (requiredLength > text.length()) {

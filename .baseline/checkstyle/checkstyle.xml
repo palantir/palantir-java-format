@@ -45,6 +45,11 @@
         <property name="max" value="120"/>
         <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://|\{@link"/>
     </module>
+    <module name="SuppressWithPlainTextCommentFilter"> <!-- Suppression to prevent LineLength Check from flagging lines in Text-blocks -->
+        <property name="checkFormat" value="LineLength"/>
+        <property name="offCommentFormat" value="^.*&quot;&quot;&quot;\s*$"/>
+        <property name="onCommentFormat" value="^\s*&quot;&quot;&quot;\s*(?:[,;]|.+)$"/>
+    </module>
     <module name="TreeWalker">
         <module name="SuppressionCommentFilter"/> <!-- baseline-gradle: README.md -->
         <module name="SuppressionCommentFilter">
@@ -173,6 +178,7 @@
         </module>
         <module name="IllegalType"> <!-- Java Coding Guide: Limit coupling on concrete classes -->
             <property name="illegalClassNames" value="java.util.ArrayList, java.util.HashSet, java.util.HashMap, java.util.LinkedList, java.util.LinkedHashMap, java.util.LinkedHashSet, java.util.TreeSet, java.util.TreeMap, com.google.common.collect.ArrayListMultimap, com.google.common.collect.ForwardingListMultimap, com.google.common.collect.ForwardingMultimap, com.google.common.collect.ForwardingSetMultimap, com.google.common.collect.ForwardingSortedSetMultimap, com.google.common.collect.HashMultimap, com.google.common.collect.LinkedHashMultimap, com.google.common.collect.LinkedListMultimap, com.google.common.collect.TreeMultimap"/>
+            <message key="illegal.type" value="Usage of type ''{0}'' is not allowed to limit coupling on concrete classes. For example, prefer Multimap over HashMultimap, List over ArrayList, and Set over TreeSet."/>
         </module>
         <module name="IllegalType">
             <property name="id" value="BanGuavaCaches"/>
@@ -292,14 +298,6 @@
             <property name="format" value="ImmutableSet\.Builder.*new ImmutableSet\.Builder"/>
             <property name="message" value="Use ImmutableSet.builder() for variable assignment."/>
         </module>
-        <module name="RegexpSinglelineJava"> <!-- Java Coding Guidelines: Check parameters for validity -->
-            <property name="format" value="Preconditions\.checkNotNull\((?!.*,)([^()]*(\(([^()]*|\(([^()]*|\([^()]*\))*\))*\)[^()]*)*)\)"/>
-            <property name="message" value="Use Preconditions.checkNotNull(Object, String)."/>
-        </module>
-        <module name="RegexpSinglelineJava"> <!-- Java Coding Guidelines: Check parameters for validity -->
-            <property name="format" value="Validate\.notNull\((?!.*,)([^()]*(\(([^()]*|\(([^()]*|\([^()]*\))*\))*\)[^()]*)*)\)"/>
-            <property name="message" value="Use Validate.notNull(Object, String)."/>
-        </module>
         <module name="RegexpSinglelineJava">
             <property name="format" value="^\s*super\(\);"/>
             <property name="message" value="This is unnecessary; please delete."/>
@@ -414,7 +412,9 @@
             <property name="allowMissingReturnTag" value="true"/>
             <property name="allowedAnnotations" value="Override, Test"/>
         </module>
-        <module name="JavadocStyle"/> <!-- Java Style Guide: Javadoc -->
+        <module name="JavadocStyle"><!-- Java Style Guide: Javadoc -->
+            <property name="checkFirstSentence" value="false"/>
+        </module>
         <module name="JavadocTagContinuationIndentation"> <!-- Java Style Guide: At-clauses -->
             <property name="offset" value="0"/>
         </module>
@@ -438,9 +438,6 @@
         <module name="ParameterName"> <!-- Java Style Guide: Parameter names -->
             <property name="format" value="^_?[a-z][a-zA-Z0-9]+$"/>
             <message key="name.invalidPattern" value="Parameter name ''{0}'' must match pattern ''{1}''."/>
-        </module>
-        <module name="SummaryJavadocCheck"> <!-- Java Coding Guidelines: Javadoc -->
-            <property name="forbiddenSummaryFragments" value="^@return the *|^This method returns |^A [{]@code [a-zA-Z0-9]+[}]( is a )"/>
         </module>
 
         <!-- Stricter checks end -->

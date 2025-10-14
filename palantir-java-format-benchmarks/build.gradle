@@ -15,7 +15,7 @@ dependencies {
     jmhImplementation 'org.openjdk.jmh:jmh-core'
     jmhImplementation 'org.openjdk.jmh:jmh-generator-annprocess'
     formatterNativeJars project(':palantir-java-format')
-    formatterNativeImage(project(':palantir-java-format')) {
+    formatterNativeImage(project(':palantir-java-format-native')) {
         attributes {
             attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements, 'nativeImage'))
         }

@@ -1,0 +1,6 @@
+type: improvement
+improvement:
+  description: Allow `palantir-java-format` idea plugin dependency configuration via
+    `idea-configuration` plugin
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/1286

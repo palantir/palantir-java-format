@@ -17,7 +17,6 @@
 package com.palantir.javaformat.java.java14;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.sun.source.tree.Tree.Kind.BLOCK;
 
 import com.google.common.base.Verify;
 import com.google.common.collect.ImmutableList;
@@ -31,13 +30,13 @@ import com.sun.source.tree.BlockTree;
 import com.sun.source.tree.CaseTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.CompilationUnitTree;
+import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.InstanceOfTree;
 import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.ModifiersTree;
 import com.sun.source.tree.ModuleTree;
 import com.sun.source.tree.SwitchExpressionTree;
 import com.sun.source.tree.Tree;
-import com.sun.source.tree.Tree.Kind;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.tree.YieldTree;
 import com.sun.tools.javac.code.Flags;
@@ -52,6 +51,7 @@ import javax.lang.model.element.Name;
 /**
  * Extends {@link JavaInputAstVisitor} with support for AST nodes that were added or modified for Java 14.
  */
+@SuppressWarnings("Since15")
 public class Java14InputAstVisitor extends JavaInputAstVisitor {
     private static final Method COMPILATION_UNIT_TREE_GET_MODULE =
             maybeGetMethod(CompilationUnitTree.class, "getModule");
@@ -114,12 +114,22 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
     }
 
     private void visitBindingPattern(ModifiersTree modifiers, Tree type, Name name) {
+        builder.open(plusFour);
         if (modifiers != null) {
             builder.addAll(visitModifiers(modifiers, Direction.HORIZONTAL, Optional.empty()));
         }
-        scan(type, null);
+        if (type == null) {
+            token("var");
+        } else {
+            scan(type, null);
+        }
         builder.breakOp(" ");
-        visit(name);
+        if (name.isEmpty()) {
+            token("_");
+        } else {
+            visit(name);
+        }
+        builder.close();
     }
 
     @Override
@@ -244,6 +254,7 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
         return null;
     }
 
+    @SuppressWarnings("for-rollout:NullAway")
     @Override
     public Void visitCase(CaseTree node, Void unused) {
         sync(node);
@@ -260,27 +271,36 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
             isDefault = labels.isEmpty();
         }
         if (isDefault) {
-            token("default", plusTwo);
+            token("default", ZERO);
         } else {
-            token("case", plusTwo);
-            builder.space();
+            token("case", ZERO);
             builder.open(labels.size() > 1 ? plusFour : ZERO);
-            boolean first = true;
+            builder.space();
+            boolean afterFirstToken = false;
             for (Tree expression : labels) {
-                if (!first) {
+                if (afterFirstToken) {
                     token(",");
                     builder.breakOp(" ");
                 }
                 scan(expression, null);
-                first = false;
+                afterFirstToken = true;
             }
             builder.close();
         }
+
+        final ExpressionTree guard = getGuard(node);
+        if (guard != null) {
+            builder.breakToFill(" ");
+            token("when");
+            builder.space();
+            scan(guard, null);
+        }
+
         switch (node.getCaseKind()) {
             case STATEMENT:
                 token(":");
-                boolean isBlock = node.getStatements().size() == 1
-                        && node.getStatements().get(0).getKind() == BLOCK;
+                boolean isBlock =
+                        node.getStatements().size() == 1 && node.getStatements().get(0) instanceof BlockTree;
                 builder.open(isBlock ? ZERO : plusTwo);
                 if (isBlock) {
                     builder.space();
@@ -289,11 +309,13 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
                 builder.close();
                 break;
             case RULE:
+                builder.open(plusTwo);
                 builder.space();
                 token("-");
                 token(">");
-                builder.space();
-                if (node.getBody().getKind() == BLOCK) {
+                if (node.getBody() instanceof BlockTree) {
+                    builder.close();
+                    builder.space();
                     // Explicit call with {@link CollapseEmptyOrNot.YES} to handle empty case blocks.
                     visitBlock(
                             (BlockTree) node.getBody(),
@@ -301,7 +323,9 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
                             AllowLeadingBlankLine.NO,
                             AllowTrailingBlankLine.NO);
                 } else {
+                    builder.breakOp(" ");
                     scan(node.getBody(), null);
+                    builder.close();
                 }
                 builder.guessToken(";");
                 builder.forcedBreak(minusTwo);
@@ -322,7 +346,7 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
         sync(node);
         // Also format switch expressions as statement body instead of inlining them
         boolean statementBody = node.getBodyKind() == LambdaExpressionTree.BodyKind.STATEMENT
-                || node.getBody().getKind() == Kind.SWITCH_EXPRESSION;
+                || node.getBody() instanceof SwitchExpressionTree;
         visitLambdaExpression(node, statementBody);
         return null;
     }
@@ -342,5 +366,10 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    @SuppressWarnings({"NullableProblems", "for-rollout:NullAway"})
+    protected ExpressionTree getGuard(final CaseTree node) {
+        return null;
     }
 }

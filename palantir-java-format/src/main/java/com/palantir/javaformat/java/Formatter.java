@@ -45,6 +45,7 @@ import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.Log;
 import com.sun.tools.javac.util.Options;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URI;
 import java.util.Collection;
 import javax.tools.Diagnostic;
@@ -131,15 +132,10 @@ public final class Formatter {
         OpsBuilder opsBuilder = new OpsBuilder(javaInput);
 
         JavaInputAstVisitor visitor;
-        if (getRuntimeVersion() >= 14) {
-            try {
-                visitor = Class.forName("com.palantir.javaformat.java.java14.Java14InputAstVisitor")
-                        .asSubclass(JavaInputAstVisitor.class)
-                        .getConstructor(OpsBuilder.class, int.class)
-                        .newInstance(opsBuilder, options.indentationMultiplier());
-            } catch (ReflectiveOperationException e) {
-                throw new RuntimeException(e.getMessage(), e);
-            }
+        if (getRuntimeVersion() >= 21) {
+            visitor = createVisitor("com.palantir.javaformat.java.java21.Java21InputAstVisitor", opsBuilder, options);
+        } else if (getRuntimeVersion() >= 14) {
+            visitor = createVisitor("com.palantir.javaformat.java.java14.Java14InputAstVisitor", opsBuilder, options);
         } else {
             visitor = new JavaInputAstVisitor(opsBuilder, options.indentationMultiplier());
         }
@@ -178,7 +174,7 @@ public final class Formatter {
             fileManager.setLocation(StandardLocation.PLATFORM_CLASS_PATH, ImmutableList.of());
         } catch (IOException e) {
             // impossible
-            throw new RuntimeException(e);
+            throw new UncheckedIOException(e);
         }
         SimpleJavaFileObject source = new SimpleJavaFileObject(URI.create("source"), JavaFileObject.Kind.SOURCE) {
             @Override
@@ -204,6 +200,19 @@ public final class Formatter {
     @VisibleForTesting
     static int getRuntimeVersion() {
         return Runtime.version().feature();
+    }
+
+    @SuppressWarnings("for-rollout:ThrowError")
+    private static JavaInputAstVisitor createVisitor(
+            final String className, final OpsBuilder builder, final JavaFormatterOptions options) {
+        try {
+            return Class.forName(className)
+                    .asSubclass(JavaInputAstVisitor.class)
+                    .getConstructor(OpsBuilder.class, int.class)
+                    .newInstance(builder, options.indentationMultiplier());
+        } catch (ReflectiveOperationException e) {
+            throw new LinkageError(e.getMessage());
+        }
     }
 
     static boolean errorDiagnostic(Diagnostic<?> input) {
@@ -254,7 +263,7 @@ public final class Formatter {
      * @return the output string
      * @throws FormatterException if the input string cannot be parsed
      * @see <a href="https://google.github.io/styleguide/javaguide.html#s3.3.3-import-ordering-and-spacing">Google Java
-     *     Style Guide - 3.3.3 Import ordering and spacing</a>
+     * Style Guide - 3.3.3 Import ordering and spacing</a>
      */
     public String formatSourceAndFixImports(String input) throws FormatterException {
         input = ImportOrderer.reorderImports(input, options.style());
@@ -271,7 +280,7 @@ public final class Formatter {
      * @return the output string
      * @throws FormatterException if the input string cannot be parsed
      * @see <a href="https://google.github.io/styleguide/javaguide.html#s3.3.3-import-ordering-and-spacing">Google Java
-     *     Style Guide - 3.3.3 Import ordering and spacing</a>
+     * Style Guide - 3.3.3 Import ordering and spacing</a>
      */
     public String fixImports(String input) throws FormatterException {
         return ImportOrderer.reorderImports(RemoveUnusedImports.removeUnusedImports(input), options.style());

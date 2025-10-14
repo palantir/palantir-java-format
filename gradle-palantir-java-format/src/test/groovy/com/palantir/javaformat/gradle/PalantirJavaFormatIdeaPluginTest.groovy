@@ -23,7 +23,7 @@ class PalantirJavaFormatIdeaPluginTest extends IntegrationTestKitSpec {
     private static final NATIVE_IMAGE_FILE = new File("build/nativeImage.path")
     private static final NATIVE_CONFIG = String.format("palantirJavaFormatNative files(\"%s\")", NATIVE_IMAGE_FILE.text)
 
-    def "idea_configuresIpr"() {
+    def "idea_configuresXmlFiles"() {
         file('gradle.properties') << extraGradleProperties
 
         buildFile << """
@@ -31,7 +31,7 @@ class PalantirJavaFormatIdeaPluginTest extends IntegrationTestKitSpec {
                 id 'com.palantir.java-format-idea'
             }
             apply plugin: 'idea'
-            
+
             dependencies {
                 palantirJavaFormat project.files() // no need to store the real thing in here
                 EXTRA_CONFIGURATION
@@ -42,10 +42,23 @@ class PalantirJavaFormatIdeaPluginTest extends IntegrationTestKitSpec {
         runTasks('idea')
 
         then:
-        def iprFile = new File(projectDir, "${moduleName}.ipr")
-        def ipr = new XmlSlurper().parse(iprFile)
-        def settings = ipr.component.findAll { it.@name == "PalantirJavaFormatSettings" }
+        def pjfXmlFile = new File(projectDir, ".idea/palantir-java-format.xml")
+        def xmlContent = new XmlSlurper().parse(pjfXmlFile)
+        def settings = xmlContent.component.findAll { it.@name == "PalantirJavaFormatSettings" }
         !settings.isEmpty()
+        def implementationClassPathOption = xmlContent.component.option.find { it.@name == 'implementationClassPath' }
+        !implementationClassPathOption.isEmpty()
+        def nativeImageClassPathOption = xmlContent.component.option.find { it.@name == 'nativeImageClassPath' }
+        extraGradleProperties.contains("palantir.native.formatter=true") ? !nativeImageClassPathOption.isEmpty() : true
+
+        def workspaceXmlFile = new File(projectDir, ".idea/workspace.xml")
+        def workspaceContent = new XmlSlurper().parse(workspaceXmlFile)
+
+        def formatOnSave = workspaceContent.component.findAll { it.@name == "FormatOnSaveOptions" }
+        !formatOnSave.isEmpty()
+
+        def optimizeOnSave = workspaceContent.component.findAll { it.@name == "OptimizeOnSaveOptions" }
+        !formatOnSave.isEmpty()
 
         where:
         extraGradleProperties | extraDependencies

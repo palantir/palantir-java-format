@@ -27,6 +27,7 @@ import com.palantir.javaformat.java.FormatterException;
 import com.palantir.javaformat.java.FormatterService;
 import com.palantir.javaformat.java.Replacement;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
@@ -55,7 +56,7 @@ public final class BootstrappingFormatterService implements FormatterService {
         try {
             return getFormatReplacementsInternal(input, ranges);
         } catch (IOException e) {
-            throw new RuntimeException("Error running formatter command", e);
+            throw new UncheckedIOException("Error running formatter command", e);
         }
     }
 
@@ -64,7 +65,7 @@ public final class BootstrappingFormatterService implements FormatterService {
         try {
             return runFormatterCommand(input);
         } catch (IOException e) {
-            throw new RuntimeException("Error running formatter command", e);
+            throw new UncheckedIOException("Error running formatter command", e);
         }
     }
 
@@ -73,7 +74,7 @@ public final class BootstrappingFormatterService implements FormatterService {
         try {
             return runFormatterCommand(input);
         } catch (IOException e) {
-            throw new RuntimeException("Error running formatter command", e);
+            throw new UncheckedIOException("Error running formatter command", e);
         }
     }
 
@@ -87,7 +88,9 @@ public final class BootstrappingFormatterService implements FormatterService {
                 .characterRanges(ranges.stream().map(RangeUtils::toStringRange).collect(Collectors.toList()))
                 .build();
 
-        Optional<String> output = FormatterCommandRunner.runWithStdin(command.toArgs(), input);
+        @SuppressWarnings("for-rollout:NullAway")
+        Optional<String> output =
+                FormatterCommandRunner.runWithStdin(command.toArgs(), input, Optional.of(jdkPath.getParent()));
         if (output.isEmpty() || output.get().isEmpty()) {
             return ImmutableList.of();
         }
@@ -101,7 +104,8 @@ public final class BootstrappingFormatterService implements FormatterService {
                 .implementationClasspath(implementationClassPath)
                 .outputReplacements(false)
                 .build();
-        return FormatterCommandRunner.runWithStdin(command.toArgs(), input).orElse(input);
+        return FormatterCommandRunner.runWithStdin(command.toArgs(), input, Optional.ofNullable(jdkPath.getParent()))
+                .orElse(input);
     }
 
     @Value.Immutable

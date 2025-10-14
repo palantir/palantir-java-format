@@ -29,6 +29,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -50,6 +51,15 @@ public final class FileBasedTests {
                     .putAll(15, "I603")
                     .putAll(16, "I588")
                     .putAll(17, "I683", "I684", "I696")
+                    .putAll(
+                            21,
+                            "SwitchGuardClause",
+                            "SwitchRecord",
+                            "SwitchDouble",
+                            "SwitchUnderscore",
+                            "I880",
+                            "I1309",
+                            "Unnamed")
                     .build();
 
     private final Class<?> testClass;
@@ -95,13 +105,9 @@ public final class FileBasedTests {
                     contents = CharStreams.toString(new InputStreamReader(stream, UTF_8));
                 }
                 switch (extension) {
-                    case "input":
-                        inputs.put(baseName, contents);
-                        break;
-                    case "output":
-                        outputs.put(baseName, contents);
-                        break;
-                    default:
+                    case "input" -> inputs.put(baseName, contents);
+                    case "output" -> outputs.put(baseName, contents);
+                    default -> {}
                 }
             }
         }
@@ -137,7 +143,7 @@ public final class FileBasedTests {
         try (BufferedWriter writer = Files.newBufferedWriter(getOutputTestPath(testName))) {
             writer.append(output);
         } catch (IOException e) {
-            throw new RuntimeException("Couldn't recreate test output for " + testName, e);
+            throw new UncheckedIOException("Couldn't recreate test output for " + testName, e);
         }
     }
 }

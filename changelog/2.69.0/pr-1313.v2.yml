@@ -1,0 +1,6 @@
+type: improvement
+improvement:
+  description: Make palantir-java-format support spotless 6.22.0, which is [transitively
+    brought in from baseline to support the configuration cache](https://github.com/palantir/gradle-baseline/pull/3119)
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/1313

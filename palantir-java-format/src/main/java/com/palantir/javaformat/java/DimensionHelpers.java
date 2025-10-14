@@ -107,7 +107,7 @@ class DimensionHelpers {
                 return extractDims(dims, ((ArrayTypeTree) node).getType());
             case ANNOTATED_TYPE:
                 AnnotatedTypeTree annotatedTypeTree = (AnnotatedTypeTree) node;
-                if (annotatedTypeTree.getUnderlyingType().getKind() != Tree.Kind.ARRAY_TYPE) {
+                if (!(annotatedTypeTree.getUnderlyingType() instanceof ArrayTypeTree)) {
                     return node;
                 }
                 node = extractDims(dims, annotatedTypeTree.getUnderlyingType());

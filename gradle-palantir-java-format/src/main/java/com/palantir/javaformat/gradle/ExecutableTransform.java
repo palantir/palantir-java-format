@@ -18,6 +18,7 @@ package com.palantir.javaformat.gradle;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -54,7 +55,8 @@ public abstract class ExecutableTransform implements TransformAction<TransformPa
             Files.copy(inputFile.toPath(), outputFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             makeFileExecutable(outputFile.toPath());
         } catch (IOException e) {
-            throw new RuntimeException(String.format("Failed to create executable file %s", outputFile.toPath()), e);
+            throw new UncheckedIOException(
+                    String.format("Failed to create executable file %s", outputFile.toPath()), e);
         }
     }
 
@@ -71,7 +73,7 @@ public abstract class ExecutableTransform implements TransformAction<TransformPa
                                             PosixFilePermission.OTHERS_EXECUTE))
                             .collect(Collectors.toSet()));
         } catch (IOException e) {
-            throw new RuntimeException("Failed to set execute permissions on native-image", e);
+            throw new UncheckedIOException("Failed to set execute permissions on native-image", e);
         }
     }
 }

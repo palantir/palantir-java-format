@@ -47,11 +47,23 @@
       "allDeclaredFields": true
     },
     {
-      "type": "com.google.common.collect.SingletonImmutableList",
+      "type": "com.google.common.collect.RegularImmutableList",
       "allDeclaredFields": true
     },
     {
-      "type": "com.google.common.collect.RegularImmutableList",
+      "type": "java.util.ImmutableCollections$AbstractImmutableList",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "java.util.ImmutableCollections$AbstractImmutableCollection",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "java.util.ImmutableCollections$List12",
+      "allDeclaredFields": true
+    },
+    {
+      "type": "com.google.common.collect.SingletonImmutableList",
       "allDeclaredFields": true
     },
     {
@@ -73,6 +85,18 @@
     },
     {
       "type": "com.palantir.javaformat.java.java14.Java14InputAstVisitor",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "com.palantir.javaformat.OpsBuilder",
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.palantir.javaformat.java.java21.Java21InputAstVisitor",
       "methods": [
         {
           "name": "<init>",
@@ -152,26 +176,19 @@
       "glob": "META-INF/services/java.lang.System$LoggerFinder"
     },
     {
-      "glob": "com/sun/tools/javac/resources/compiler_en.properties"
-    },
-    {
-      "glob": "com/sun/tools/javac/resources/compiler_en_US.properties"
+      "glob": "com/sun/tools/javac/resources/**"
     },
     {
       "module": "jdk.compiler",
-      "glob": "com/sun/tools/javac/resources/compiler_en.properties"
-    },
-    {
-      "module": "jdk.compiler",
-      "glob": "com/sun/tools/javac/resources/compiler_en_US.properties"
+      "glob": "com/sun/tools/javac/resources/**"
     }
   ],
   "bundles": [
     {
-      "name": "com.sun.tools.javac.resources.compiler",
-      "locales": [
-        "en-US"
-      ]
+      "name": "com.sun.tools.javac.resources.compiler"
+    },
+    {
+      "name": "com.sun.tools.javac.resources.javac"
     }
   ],
   "jni": [

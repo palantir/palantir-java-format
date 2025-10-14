@@ -271,6 +271,7 @@ final class JavadocWriter {
         requestWhitespace(NEWLINE);
     }
 
+    @SuppressWarnings("for-rollout:NullAway")
     private void requestWhitespace(RequestedWhitespace requestedWhitespace) {
         this.requestedWhitespace = Ordering.natural().max(requestedWhitespace, this.requestedWhitespace);
     }

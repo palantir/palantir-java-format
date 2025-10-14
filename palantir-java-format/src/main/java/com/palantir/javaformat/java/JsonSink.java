@@ -26,6 +26,7 @@ import com.palantir.javaformat.doc.Obs.FinishExplorationNode;
 import com.palantir.javaformat.doc.Obs.FinishLevelNode;
 import com.palantir.javaformat.doc.Obs.Sink;
 import com.palantir.javaformat.doc.State;
+import java.io.UncheckedIOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -91,7 +92,7 @@ public final class JsonSink implements Sink {
         try {
             return OBJECT_MAPPER.writeValueAsString(rootNode);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new UncheckedIOException(e);
         }
     }
 

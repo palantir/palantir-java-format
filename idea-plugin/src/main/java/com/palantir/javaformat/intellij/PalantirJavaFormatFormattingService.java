@@ -23,6 +23,7 @@ import com.google.common.collect.Range;
 import com.intellij.formatting.service.AsyncDocumentFormattingService;
 import com.intellij.formatting.service.AsyncFormattingRequest;
 import com.intellij.ide.highlighter.JavaFileType;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.NlsSafe;
 import com.intellij.openapi.util.TextRange;
@@ -35,9 +36,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 
 class PalantirJavaFormatFormattingService extends AsyncDocumentFormattingService {
+    private static final Logger logger = Logger.getInstance(PalantirJavaFormatFormattingService.class);
     private final FormatterProvider formatterProvider = new FormatterProvider();
 
     @Override
@@ -91,6 +94,16 @@ class PalantirJavaFormatFormattingService extends AsyncDocumentFormattingService
             String preFormatText = request.getDocumentText();
 
             try {
+                if (logger.isDebugEnabled()) {
+                    logger.debug(String.format(
+                            "Received request to format file=%s, length=%s with ranges=%s",
+                            Optional.ofNullable(request.getIOFile())
+                                    .map(file -> file.toPath().toString())
+                                    .orElse("null"),
+                            request.getDocumentText().length(),
+                            request.getFormattingRanges()));
+                }
+                
                 // Note: I attempted to implement this using getFormatReplacements and elide an update when
                 // there were no replacements. There is a bug in the underlying formatter where it _always_
                 // returns a change. Thus we must perform a content aware diff / branching.
@@ -105,8 +118,12 @@ class PalantirJavaFormatFormattingService extends AsyncDocumentFormattingService
                 } else {
                     request.onTextReady(formattedText);
                 }
-
             } catch (FormatterException e) {
+                logger.error(
+                        String.format(
+                                "Failed to format file %s",
+                                request.getContext().getContainingFile().getName()),
+                        e);
                 request.onError(
                         Notifications.PARSING_ERROR_TITLE,
                         Notifications.parsingErrorMessage(

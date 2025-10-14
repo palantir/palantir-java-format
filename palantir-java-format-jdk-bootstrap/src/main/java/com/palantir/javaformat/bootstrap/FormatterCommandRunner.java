@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -27,8 +28,13 @@ import java.util.regex.Pattern;
 final class FormatterCommandRunner {
     private static final Pattern SYNTAX_ERROR_PATTERN = Pattern.compile(":\\d+:\\d+:\\serror:\\s");
 
-    static Optional<String> runWithStdin(List<String> command, String input) throws IOException {
-        Process process = new ProcessBuilder().command(command).start();
+    static Optional<String> runWithStdin(List<String> command, String input, Optional<Path> workingDirectory)
+            throws IOException {
+        ProcessBuilder processBuilder = new ProcessBuilder().command(command);
+        Process process = workingDirectory
+                .map(dir -> processBuilder.directory(dir.toFile()))
+                .orElse(processBuilder)
+                .start();
 
         try (OutputStream outputStream = process.getOutputStream()) {
             outputStream.write(input.getBytes(StandardCharsets.UTF_8));
@@ -50,7 +56,7 @@ final class FormatterCommandRunner {
                 // In this case, we just want to silently do nothing and not surface an error to e.g. Intellij.
                 return Optional.empty();
             }
-            throw new IOException(getErrorMessage(command, stdout, stderr));
+            throw new IOException(getErrorMessage(command, workingDirectory, stdout, stderr));
         }
 
         return Optional.of(stdout);
@@ -70,11 +76,14 @@ final class FormatterCommandRunner {
         }
     }
 
-    private static String getErrorMessage(List<String> command, String stdout, String stderr) {
+    private static String getErrorMessage(
+            List<String> command, Optional<Path> workingDirectory, String stdout, String stderr) {
         return String.join(
                 "\n",
                 "Command terminated with exit value 1",
                 "Command: " + String.join(" ", command),
+                "Working Directory: "
+                        + workingDirectory.map(Path::toString).orElse("<using default working directory>"),
                 "Stdout:",
                 stdout,
                 "Stderr:",

@@ -36,6 +36,7 @@ import com.palantir.javaformat.doc.NonBreakingSpace;
 import com.palantir.javaformat.doc.State;
 import com.palantir.javaformat.doc.Token;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -44,6 +45,7 @@ import java.util.stream.Collectors;
 
 public class DebugRenderer {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
     private static Path publicDir = Paths.get("../debugger/public");
 
     static Path getOutputFile() {
@@ -70,7 +72,7 @@ public class DebugRenderer {
         try {
             Files.write(getOutputFile(), javascript.getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -140,7 +142,7 @@ public class DebugRenderer {
         try {
             return OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(arrayNode);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -148,7 +150,7 @@ public class DebugRenderer {
         try {
             return OBJECT_MAPPER.writeValueAsString(javaInput);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new UncheckedIOException(e);
         }
     }
 

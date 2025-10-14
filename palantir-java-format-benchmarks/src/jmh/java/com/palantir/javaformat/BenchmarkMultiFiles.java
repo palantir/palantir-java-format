@@ -19,6 +19,7 @@ package com.palantir.javaformat;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -56,7 +57,7 @@ public class BenchmarkMultiFiles {
                     .map(path -> path.toAbsolutePath().toString())) {
                 return paths.collect(Collectors.toList());
             } catch (IOException e) {
-                throw new RuntimeException("Couldn't list src files: " + srcJavaFormatFiles, e);
+                throw new UncheckedIOException("Couldn't list src files: " + srcJavaFormatFiles, e);
             }
         }
     }

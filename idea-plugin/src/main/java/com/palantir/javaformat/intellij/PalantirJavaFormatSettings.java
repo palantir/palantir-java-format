@@ -16,9 +16,7 @@
 
 package com.palantir.javaformat.intellij;
 
-import com.google.common.base.Strings;
 import com.intellij.openapi.components.PersistentStateComponent;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.project.Project;
@@ -26,6 +24,7 @@ import com.palantir.javaformat.java.FormatterService;
 import com.palantir.javaformat.java.JavaFormatterOptions;
 import com.palantir.sls.versions.OrderableSlsVersion;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -44,7 +43,7 @@ public class PalantirJavaFormatSettings implements PersistentStateComponent<Pala
     private State state = new State();
 
     static PalantirJavaFormatSettings getInstance(Project project) {
-        return ServiceManager.getService(project, PalantirJavaFormatSettings.class);
+        return project.getService(PalantirJavaFormatSettings.class);
     }
 
     @SuppressWarnings("for-rollout:SameNameButDifferent")
@@ -112,8 +111,7 @@ public class PalantirJavaFormatSettings implements PersistentStateComponent<Pala
     }
 
     Optional<String> getImplementationVersion() {
-        return Optional.ofNullable(Strings.emptyToNull(
-                PalantirJavaFormatConfigurable.class.getPackage().getImplementationVersion()));
+        return Optional.ofNullable(FormatterProvider.getPluginDescriptor().getVersion());
     }
 
     Optional<String> computeFormatterVersion() {
@@ -129,7 +127,7 @@ public class PalantirJavaFormatSettings implements PersistentStateComponent<Pala
                         }
                         return Stream.empty();
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        throw new UncheckedIOException(e);
                     }
                 })
                 .findFirst()
@@ -184,14 +182,11 @@ public class PalantirJavaFormatSettings implements PersistentStateComponent<Pala
 
         @SuppressWarnings("for-rollout:NullAway")
         public String getEnabled() {
-            switch (enabled) {
-                case ENABLED:
-                    return "true";
-                case DISABLED:
-                    return "false";
-                default:
-                    return null;
-            }
+            return switch (enabled) {
+                case ENABLED -> "true";
+                case DISABLED -> "false";
+                default -> null;
+            };
         }
 
         @Override

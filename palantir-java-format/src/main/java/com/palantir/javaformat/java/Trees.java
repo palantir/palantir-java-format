@@ -27,6 +27,7 @@ import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.Pretty;
 import com.sun.tools.javac.tree.TreeInfo;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import javax.lang.model.element.Name;
 
 /** Utilities for working with {@link Tree}s. */
@@ -53,7 +54,7 @@ class Trees {
         try {
             source = path.getCompilationUnit().getSourceFile().getCharContent(false);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new UncheckedIOException(e);
         }
         return source.subSequence(getStartPosition(node), getEndPosition(node, path))
                 .toString();

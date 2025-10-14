@@ -27,6 +27,7 @@ enum UiFormatterStyle {
     ;
 
     private final String description;
+
     private final JavaFormatterOptions.Style style;
 
     UiFormatterStyle(String description, JavaFormatterOptions.Style style) {

@@ -1,0 +1,6 @@
+type: fix
+fix:
+  description: Use recommended project.getService & update sinceBuild to match intellij
+    version
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/1295

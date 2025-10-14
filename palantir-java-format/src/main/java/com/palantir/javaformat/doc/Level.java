@@ -168,6 +168,7 @@ public final class Level extends Doc {
         private final CommentsHelper commentsHelper;
         private final int maxWidth;
         private final State state;
+
         private final Obs.LevelNode levelNode;
 
         public BreakImpl(CommentsHelper commentsHelper, int maxWidth, State state, Obs.LevelNode levelNode) {
@@ -337,6 +338,7 @@ public final class Level extends Doc {
                 commentsHelper, maxWidth, newState, memoizedSplitsBreaks.get(), explorationNode));
     }
 
+    @SuppressWarnings("for-rollout:NullAway")
     private Optional<State> tryBreakLastLevel(
             CommentsHelper commentsHelper,
             int maxWidth,
@@ -351,6 +353,7 @@ public final class Level extends Doc {
         return tryBreakInnerLevel(commentsHelper, maxWidth, state, explorationNode, innerLevel, isSimpleInliningSoFar);
     }
 
+    @SuppressWarnings("for-rollout:NullAway")
     private Optional<State> tryInlineSuffix(
             CommentsHelper commentsHelper,
             int maxWidth,
@@ -423,7 +426,7 @@ public final class Level extends Doc {
                             commentsHelper, maxWidth, explorationNode, innerLevel, state1);
                     break;
                 }
-                // Otherwise, fall through to CHECK_INNER.
+            // Otherwise, fall through to CHECK_INNER.
             case CHECK_INNER:
                 state2 = tryBreakInnerLevel_checkInner(
                         commentsHelper, maxWidth, explorationNode, innerLevel, isSimpleInlining, state1);
@@ -470,6 +473,7 @@ public final class Level extends Doc {
                 .markAccepted());
     }
 
+    @SuppressWarnings("for-rollout:NullAway")
     private static Optional<State> tryBreakInnerLevel_checkInner(
             CommentsHelper commentsHelper,
             int maxWidth,

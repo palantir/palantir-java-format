@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -188,7 +189,7 @@ public final class Main {
         try {
             input = new String(ByteStreams.toByteArray(inStream), UTF_8);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new UncheckedIOException(e);
         }
         String stdinFilename = parameters.assumeFilename().orElse(STDIN_FILENAME);
         boolean ok = true;

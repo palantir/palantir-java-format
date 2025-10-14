@@ -1,8 +1,8 @@
 import me.champeau.jmh.JMHTask
 
 apply plugin: 'java-library'
+apply plugin: 'org.revapi.revapi-gradle-plugin'
 apply plugin: 'com.palantir.external-publish-jar'
-apply plugin: 'com.palantir.revapi'
 
 configurations {
     formatterNativeImage
@@ -31,4 +31,3 @@ tasks.named('test', Test.class) {
     inputs.files(configurations.named('formatterNativeImage'))
     environment.put('NATIVE_IMAGE_CLASSPATH', configurations.formatterNativeImage.asPath)
 }
-

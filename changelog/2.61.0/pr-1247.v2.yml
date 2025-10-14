@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Fix pluginVersion discovery
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/1247
