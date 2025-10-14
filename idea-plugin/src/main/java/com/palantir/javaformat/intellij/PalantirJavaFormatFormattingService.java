@@ -88,18 +88,24 @@ class PalantirJavaFormatFormattingService extends AsyncDocumentFormattingService
                 return;
             }
 
-            try {
-                List<Replacement> replacements =
-                        formatterService.get().getFormatReplacements(request.getDocumentText(), toRanges(request));
+            String preFormatText = request.getDocumentText();
 
-                // The Javadoc of onTextReady API says that you should set it to null when the
-                // document is unchanged. But an even better version is to simply not attempt
-                // to format a document that is already formatted
-                if (replacements.isEmpty()) {
-                    return;
+            try {
+                // Note: I attempted to implement this using getFormatReplacements and elide an update when
+                // there were no replacements. There is a bug in the underlying formatter where it _always_
+                // returns a change. Thus we must perform a content aware diff / branching.
+                String formattedText = applyReplacements(
+                        request.getDocumentText(),
+                        formatterService.get().getFormatReplacements(request.getDocumentText(), toRanges(request)));
+
+                // The Javadoc of this API says that you should set it to null when the document is unchanged
+                // We should not be trying to format a document that is already formatted
+                if (preFormatText.equals(formattedText)) {
+                    request.onTextReady(null);
+                } else {
+                    request.onTextReady(formattedText);
                 }
 
-                request.onTextReady(applyReplacements(request.getDocumentText(), replacements));
             } catch (FormatterException e) {
                 request.onError(
                         Notifications.PARSING_ERROR_TITLE,
