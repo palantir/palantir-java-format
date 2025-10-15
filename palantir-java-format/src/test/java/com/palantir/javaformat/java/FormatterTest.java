@@ -33,7 +33,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.parallel.Execution;
@@ -456,9 +455,8 @@ public final class FormatterTest {
                 .doesNotThrowAnyException();
     }
 
-    @Disabled("Disabled as this is proof that PJF always formats the file")
     @Test
-    void doesntProduceFormattingChangesOnFormattedFiles() throws FormatterException {
+    void producesFormattingChangesOnAlreadyFormattedFiles() throws FormatterException {
         Formatter formatter = Formatter.create();
         String simpleClass = "package com.palantir;\n"
                 + "\n"
@@ -476,9 +474,16 @@ public final class FormatterTest {
         // this shows that despite the replacements happening they are superfluous
         assertThat(formattedClass).isEqualTo(reformattedClass);
 
-        // Proof that the replacements are produced when fully formatted
-        assertThat(formatter.getFormatReplacements(
+        assertWithMessage("""
+            If this test is failing and you are reading this message it means that an underlying bug
+            in the formatting service was fixed. Previously, this formatter always produced a "replacement"
+            even when the document was fully formatted. You can see evidence of this in
+            https://github.com/palantir/palantir-java-format/pull/1188. To fix this failing test, consider
+            relying on the new behavior and instead checking that the 'replacements' is empty instead of
+            full string comparison.
+            """)
+                .that(formatter.getFormatReplacements(
                         formattedClass, List.of(Range.closedOpen(0, formattedClass.length()))))
-                .isEmpty();
+                .isNotEmpty();
     }
 }
