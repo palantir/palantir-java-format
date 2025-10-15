@@ -36,7 +36,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 
 class PalantirJavaFormatFormattingService extends AsyncDocumentFormattingService {
@@ -91,6 +90,8 @@ class PalantirJavaFormatFormattingService extends AsyncDocumentFormattingService
                 return;
             }
 
+            String preFormatText = request.getDocumentText();
+
             try {
                 if (logger.isDebugEnabled()) {
                     logger.debug(String.format(
@@ -98,21 +99,23 @@ class PalantirJavaFormatFormattingService extends AsyncDocumentFormattingService
                             Optional.ofNullable(request.getIOFile())
                                     .map(file -> file.toPath().toString())
                                     .orElse("null"),
-                            request.getDocumentText().length(),
+                            preFormatText.length(),
                             request.getFormattingRanges()));
                 }
-                List<Replacement> replacements =
-                        formatterService.get().getFormatReplacements(request.getDocumentText(), toRanges(request));
-                if (logger.isDebugEnabled()) {
-                    logger.debug(String.format(
-                            "Applying %s replacements with ranges=%s",
-                            replacements.size(),
-                            replacements.stream()
-                                    .map(Replacement::getReplaceRange)
-                                    .collect(Collectors.toSet())));
+
+                // Note: I attempted to implement this using getFormatReplacements and elide an update when
+                // there were no replacements. There is a bug in the underlying formatter where it _always_
+                // returns a change. Thus we must perform a content aware diff / branching.
+                String formattedText = applyReplacements(
+                        preFormatText, formatterService.get().getFormatReplacements(preFormatText, toRanges(request)));
+
+                // The Javadoc of this API says that you should set it to null when the document is unchanged
+                // We should not be trying to format a document that is already formatted
+                if (preFormatText.equals(formattedText)) {
+                    request.onTextReady(null);
+                } else {
+                    request.onTextReady(formattedText);
                 }
-                String formattedText = applyReplacements(request.getDocumentText(), replacements);
-                request.onTextReady(formattedText);
             } catch (FormatterException e) {
                 logger.error(
                         String.format(
