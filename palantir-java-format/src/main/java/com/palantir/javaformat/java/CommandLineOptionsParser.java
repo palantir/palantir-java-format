@@ -79,7 +79,7 @@ final class CommandLineOptionsParser {
                 case "-character-ranges":
                 case "--character-range":
                 case "-character-range":
-                    parseRangeSet(optionsBuilder.characterRangesBuilder(), getValue(flag, it, value));
+                    parseCharacterRanges(optionsBuilder.characterRangesBuilder(), getValue(flag, it, value));
                     break;
                 case "--offset":
                 case "-offset":
@@ -161,6 +161,35 @@ final class CommandLineOptionsParser {
             throw new IllegalArgumentException("required value was not provided for: " + flag);
         }
         return it.next();
+    }
+
+    /**
+     * Parse multiple --character-ranges flags, like {"0:12,14,20:36", "0:45,50"}. Multiple ranges can be given with multiple
+     * --character-ranges flags or separated by commas. A single character can be set by a single number.
+     * See more details on how character ranges are set in {@code com.palantir.javaformat.bootstrap.RangeUtils}
+     */
+    private static void parseCharacterRanges(ImmutableRangeSet.Builder<Integer> result, String ranges) {
+        for (String range : COMMA_SPLITTER.split(ranges)) {
+            result.add(parseCharacterRange(range));
+        }
+    }
+
+    /**
+     * Parse a character range, as in "0:45" or "45". Character ranges provided are {@code 0}-based, closed ranges.
+     */
+    private static Range<Integer> parseCharacterRange(String range) {
+        List<String> args = COLON_SPLITTER.splitToList(range);
+        switch (args.size()) {
+            case 1:
+                int lowerUpperRange = Integer.parseInt(args.get(0));
+                return Range.closed(lowerUpperRange, lowerUpperRange);
+            case 2:
+                int lower = Integer.parseInt(args.get(0));
+                int higher = Integer.parseInt(args.get(1));
+                return Range.closed(lower, higher);
+            default:
+                throw new IllegalArgumentException(range);
+        }
     }
 
     /**
