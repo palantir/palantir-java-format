@@ -1,4 +1,5 @@
 com.diffplug.spotless:spotless-plugin-gradle = 7.2.1
+com.fasterxml.jackson.core:jackson-annotations = 2.20
 com.github.ben-manes.caffeine:caffeine = 3.1.8
 com.google.auto.service:auto-service = 1.1.1
 com.google.code.findbugs:* = 3.0.2
@@ -18,7 +19,7 @@ org.junit.jupiter:* = 5.10.2
 org.junit.vintage:* = 5.10.2
 org.junit.platform:* = 1.10.2
 org.slf4j:* = 2.0.17
-com.fasterxml.jackson.*:* = 2.19.2
+com.fasterxml.jackson.*:* = 2.20.0
 org.openjdk.jmh:* = 1.37
 com.palantir.gradle.utils:* = 0.12.0
 com.palantir.gradle.idea-configuration:gradle-idea-configuration = 0.3.0
