@@ -14,17 +14,17 @@ com.diffplug.spotless:spotless-lib-extra:3.3.1 (1 constraints: 1713d42d)
 
 com.diffplug.spotless:spotless-plugin-gradle:7.2.1 (1 constraints: 0c051536)
 
-com.fasterxml.jackson.core:jackson-annotations:2.19.2 (4 constraints: ab3d1ecc)
+com.fasterxml.jackson.core:jackson-annotations:2.20 (4 constraints: 733ca8b9)
 
-com.fasterxml.jackson.core:jackson-core:2.19.2 (5 constraints: 5e5dfca2)
+com.fasterxml.jackson.core:jackson-core:2.20.0 (5 constraints: 2c5d7589)
 
-com.fasterxml.jackson.core:jackson-databind:2.19.2 (4 constraints: d14aed5b)
+com.fasterxml.jackson.core:jackson-databind:2.20.0 (4 constraints: a94a254c)
 
-com.fasterxml.jackson.datatype:jackson-datatype-guava:2.19.2 (1 constraints: 40054c3b)
+com.fasterxml.jackson.datatype:jackson-datatype-guava:2.20.0 (1 constraints: 3605333b)
 
-com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.19.2 (1 constraints: 40054c3b)
+com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.20.0 (1 constraints: 3605333b)
 
-com.fasterxml.jackson.module:jackson-module-parameter-names:2.19.2 (1 constraints: 40054c3b)
+com.fasterxml.jackson.module:jackson-module-parameter-names:2.20.0 (1 constraints: 3605333b)
 
 com.google.auto:auto-common:1.2.1 (2 constraints: b321cc9d)
 
