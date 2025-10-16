@@ -335,6 +335,7 @@ public final class StringWrapper {
             return " ".repeat(extraIndent + startParentColumn);
         }
 
+        @SuppressWarnings("for-rollout:NullAway")
         private void wrapLongStrings(TreeRangeMap<Integer, String> replacements, List<TreePath> longStringLiterals) {
             for (TreePath path : longStringLiterals) {
                 // Find the outermost contiguous enclosing concatenation expression

@@ -458,6 +458,7 @@ public final class FormatterTest {
     @Test
     void producesFormattingChangesOnAlreadyFormattedFiles() throws FormatterException {
         Formatter formatter = Formatter.create();
+        @SuppressWarnings("for-rollout:StringConcatToTextBlock")
         String simpleClass = "package com.palantir;\n"
                 + "\n"
                 + "public final class Formatted {\n"
