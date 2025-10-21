@@ -122,7 +122,6 @@ public final class StringWrapper {
         return outputRanges.build();
     }
 
-    @SuppressWarnings("for-rollout:NullAway")
     public static TreeRangeMap<Integer, String> getReflowReplacements(int columnLimit, final String input)
             throws FormatterException {
         return new Reflower(columnLimit, input).getReflowReplacements();
