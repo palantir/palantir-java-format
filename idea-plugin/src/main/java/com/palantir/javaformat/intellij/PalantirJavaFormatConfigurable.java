@@ -36,6 +36,7 @@ class PalantirJavaFormatConfigurable extends BaseConfigurable implements Searcha
     private final Project project;
     private JPanel panel;
     private JCheckBox enable;
+    private JCheckBox skipReflowingLongStrings;
 
     @SuppressWarnings("for-rollout:RawTypes")
     private JComboBox styleComboBox;
@@ -84,6 +85,7 @@ class PalantirJavaFormatConfigurable extends BaseConfigurable implements Searcha
         PalantirJavaFormatSettings settings = PalantirJavaFormatSettings.getInstance(project);
         settings.setEnabled(enable.isSelected() ? EnabledState.ENABLED : getDisabledState());
         settings.setStyle(((UiFormatterStyle) styleComboBox.getSelectedItem()).convert());
+        settings.setSkipReflowingLongStrings(skipReflowingLongStrings.isSelected());
     }
 
     private EnabledState getDisabledState() {
@@ -98,6 +100,7 @@ class PalantirJavaFormatConfigurable extends BaseConfigurable implements Searcha
         PalantirJavaFormatSettings settings = PalantirJavaFormatSettings.getInstance(project);
         enable.setSelected(settings.isEnabled());
         styleComboBox.setSelectedItem(UiFormatterStyle.convert(settings.getStyle()));
+        skipReflowingLongStrings.setSelected(settings.isSkipReflowingLongStrings());
         pluginVersion.setText(settings.getImplementationVersion().orElse("unknown"));
         formatterVersion.setText(getFormatterVersionText(settings));
         isUsingNativeImage.setText(isUsingNativeImage(settings));
@@ -107,7 +110,8 @@ class PalantirJavaFormatConfigurable extends BaseConfigurable implements Searcha
     public boolean isModified() {
         PalantirJavaFormatSettings settings = PalantirJavaFormatSettings.getInstance(project);
         return enable.isSelected() != settings.isEnabled()
-                || !styleComboBox.getSelectedItem().equals(UiFormatterStyle.convert(settings.getStyle()));
+                || !styleComboBox.getSelectedItem().equals(UiFormatterStyle.convert(settings.getStyle()))
+                || skipReflowingLongStrings.isSelected() != settings.isSkipReflowingLongStrings();
     }
 
     @Override

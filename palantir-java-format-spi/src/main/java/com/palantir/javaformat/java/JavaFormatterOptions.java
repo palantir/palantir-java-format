@@ -59,9 +59,12 @@ public final class JavaFormatterOptions {
 
     private final boolean formatJavadoc;
 
-    private JavaFormatterOptions(Style style, boolean formatJavadoc) {
+    private final boolean skipReflowingLongStrings;
+
+    private JavaFormatterOptions(Style style, boolean formatJavadoc, boolean skipReflowingLongStrings) {
         this.style = style;
         this.formatJavadoc = formatJavadoc;
+        this.skipReflowingLongStrings = skipReflowingLongStrings;
     }
 
     /** Returns the multiplier for the unit of indent. */
@@ -75,6 +78,10 @@ public final class JavaFormatterOptions {
 
     public boolean formatJavadoc() {
         return formatJavadoc;
+    }
+
+    public boolean skipReflowingLongStrings() {
+        return skipReflowingLongStrings;
     }
 
     /** Returns the code style. */
@@ -99,6 +106,8 @@ public final class JavaFormatterOptions {
 
         private boolean formatJavadoc = false;
 
+        private boolean skipReflowingLongStrings = false;
+
         private Builder() {}
 
         public Builder style(Style style) {
@@ -111,8 +120,13 @@ public final class JavaFormatterOptions {
             return this;
         }
 
+        public Builder skipReflowingLongStrings(boolean skipReflowingLongStrings) {
+            this.skipReflowingLongStrings = skipReflowingLongStrings;
+            return this;
+        }
+
         public JavaFormatterOptions build() {
-            return new JavaFormatterOptions(style, formatJavadoc);
+            return new JavaFormatterOptions(style, formatJavadoc, skipReflowingLongStrings);
         }
     }
 }
