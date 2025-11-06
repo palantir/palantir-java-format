@@ -47,6 +47,21 @@ public final class BootstrappingFormatterService implements FormatterService {
     private final List<Path> implementationClassPath;
     private final JavaFormatterOptions formatterOptions;
 
+    /**
+     * Creates a BootstrappingFormatterService with default formatter options.
+     * Provided for backward compatibility with code that does not pass JavaFormatterOptions.
+     *
+     * @deprecated Use {@link #BootstrappingFormatterService(Path, Integer, List, JavaFormatterOptions)} instead
+     */
+    @Deprecated
+    public BootstrappingFormatterService(Path jdkPath, Integer jdkMajorVersion, List<Path> implementationClassPath) {
+        this(
+                jdkPath,
+                jdkMajorVersion,
+                implementationClassPath,
+                JavaFormatterOptions.builder().build());
+    }
+
     public BootstrappingFormatterService(
             Path jdkPath,
             Integer jdkMajorVersion,

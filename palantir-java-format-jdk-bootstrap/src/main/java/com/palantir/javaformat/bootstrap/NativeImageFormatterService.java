@@ -41,6 +41,17 @@ public class NativeImageFormatterService implements FormatterService {
     private final Path nativeImagePath;
     private final JavaFormatterOptions formatterOptions;
 
+    /**
+     * Creates a NativeImageFormatterService with default formatter options.
+     * Provided for backward compatibility with code that does not pass JavaFormatterOptions.
+     *
+     * @deprecated Use {@link #NativeImageFormatterService(Path, JavaFormatterOptions)} instead
+     */
+    @Deprecated
+    public NativeImageFormatterService(Path nativeImagePath) {
+        this(nativeImagePath, JavaFormatterOptions.builder().build());
+    }
+
     public NativeImageFormatterService(Path nativeImagePath, JavaFormatterOptions formatterOptions) {
         this.nativeImagePath = nativeImagePath;
         this.formatterOptions = formatterOptions;
