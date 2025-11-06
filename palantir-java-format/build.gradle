@@ -1,5 +1,6 @@
 apply plugin: 'application'
 apply plugin: 'com.palantir.external-publish-jar'
+apply plugin: 'com.github.johnrengelman.shadow'
 
 mainClassName = 'com.palantir.javaformat.java.Main'
 
@@ -64,4 +65,20 @@ tasks.named("test") {
 
 javaVersion {
     target = 21
+}
+
+shadowJar {
+    manifest {
+        attributes 'Main-Class': 'com.palantir.javaformat.java.Main'
+    }
+}
+
+publishing {
+    publications {
+        maven {
+            artifact(shadowJar) {
+                classifier = 'executable'
+            }
+        }
+    }
 }
