@@ -19,8 +19,8 @@ package com.palantir.javaformat.gradle;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Files;
 import groovy.util.Node;
-import groovy.util.XmlNodePrinter;
-import groovy.util.XmlParser;
+import groovy.xml.XmlNodePrinter;
+import groovy.xml.XmlParser;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -47,7 +47,7 @@ public class XmlUtils {
         configure.accept(rootNode);
 
         try (BufferedWriter writer = Files.newWriter(configurationFile, Charset.defaultCharset());
-                PrintWriter printWriter = new PrintWriter(writer)) {
+             PrintWriter printWriter = new PrintWriter(writer)) {
             XmlNodePrinter nodePrinter = new XmlNodePrinter(printWriter);
             nodePrinter.setPreserveWhitespace(true);
             nodePrinter.print(rootNode);
@@ -56,5 +56,6 @@ public class XmlUtils {
         }
     }
 
-    private XmlUtils() {}
+    private XmlUtils() {
+    }
 }
