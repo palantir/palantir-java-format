@@ -47,7 +47,7 @@ public class XmlUtils {
         configure.accept(rootNode);
 
         try (BufferedWriter writer = Files.newWriter(configurationFile, Charset.defaultCharset());
-             PrintWriter printWriter = new PrintWriter(writer)) {
+                PrintWriter printWriter = new PrintWriter(writer)) {
             XmlNodePrinter nodePrinter = new XmlNodePrinter(printWriter);
             nodePrinter.setPreserveWhitespace(true);
             nodePrinter.print(rootNode);
@@ -56,6 +56,5 @@ public class XmlUtils {
         }
     }
 
-    private XmlUtils() {
-    }
+    private XmlUtils() {}
 }
