@@ -14,9 +14,8 @@
 
 package com.palantir.javaformat.java;
 
-import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth8.assertThat;
 import static com.palantir.javaformat.java.TypeNameClassifier.JavaCaseFormat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.base.Splitter;
 import java.util.Optional;
