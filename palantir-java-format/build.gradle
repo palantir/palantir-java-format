@@ -15,7 +15,6 @@ dependencies {
     implementation 'com.fasterxml.jackson.module:jackson-module-parameter-names'
 
     testImplementation 'com.google.guava:guava-testlib'
-    testImplementation 'com.google.truth:truth'
     testImplementation 'com.google.testing.compile:compile-testing'
     testImplementation 'org.assertj:assertj-core'
     testImplementation 'org.junit.jupiter:junit-jupiter-migrationsupport'
