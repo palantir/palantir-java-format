@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package com.palantir.javaformat.gradle.spotless;
+package com.palantir.javaformat.gradle;
 
-import com.palantir.javaformat.gradle.FormatterWorkParameters;
-import org.gradle.api.file.RegularFileProperty;
+import org.gradle.api.file.ConfigurableFileCollection;
+import org.gradle.workers.WorkParameters;
 
-public interface FormatJavaParameters extends FormatterWorkParameters {
+/**
+ * Common interface for all formatter work parameters that need access to the formatter classpath.
+ */
+public interface FormatterWorkParameters extends WorkParameters {
 
-    RegularFileProperty getInputFile();
-
-    RegularFileProperty getOutputFile();
+    ConfigurableFileCollection getFormatterClasspath();
 }

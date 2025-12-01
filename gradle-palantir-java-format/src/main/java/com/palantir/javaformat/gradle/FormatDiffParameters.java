@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-package com.palantir.javaformat.gradle.spotless;
+package com.palantir.javaformat.gradle;
 
-import com.palantir.javaformat.gradle.FormatterWorkParameters;
-import org.gradle.api.file.RegularFileProperty;
+import org.gradle.api.file.DirectoryProperty;
 
-public interface FormatJavaParameters extends FormatterWorkParameters {
+public interface FormatDiffParameters extends FormatterWorkParameters {
 
-    RegularFileProperty getInputFile();
-
-    RegularFileProperty getOutputFile();
+    DirectoryProperty getProjectDirectory();
 }

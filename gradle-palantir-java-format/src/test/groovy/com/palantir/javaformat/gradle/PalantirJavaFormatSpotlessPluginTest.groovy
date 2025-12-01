@@ -84,13 +84,8 @@ class PalantirJavaFormatSpotlessPluginTest extends IntegrationTestKitSpec {
             }
         """.stripIndent(true)
 
-        // Add jvm args to allow spotless and formatter gradle plugins to run with Java 16+
+        // Worker API now handles JVM args directly, no need to set them in gradle.properties
         file('gradle.properties') << '''
-            org.gradle.jvmargs=--add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED \
-              --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED \
-              --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED \
-              --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED \
-              --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED
             palantir.jdk.setup.enabled=true
         '''.stripIndent(true)
         file('gradle.properties') << extraGradleProperties

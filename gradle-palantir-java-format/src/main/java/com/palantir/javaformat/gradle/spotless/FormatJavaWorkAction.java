@@ -16,16 +16,16 @@
 
 package com.palantir.javaformat.gradle.spotless;
 
+import com.palantir.javaformat.gradle.AbstractFormatterWorkAction;
 import com.palantir.javaformat.java.FormatterService;
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
-import java.util.ServiceLoader;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
-import org.gradle.workers.WorkAction;
 
-public abstract class FormatJavaWorkAction implements WorkAction<FormatJavaParameters> {
+public abstract class FormatJavaWorkAction extends AbstractFormatterWorkAction<FormatJavaParameters> {
 
     private static final Logger logger = Logging.getLogger(FormatJavaWorkAction.class);
 
@@ -39,13 +39,7 @@ public abstract class FormatJavaWorkAction implements WorkAction<FormatJavaParam
 
             String input = Files.readString(inputFile.toPath());
 
-            // Load FormatterService via ServiceLoader (classpath is isolated to the worker)
-            ServiceLoader<FormatterService> serviceLoader = ServiceLoader.load(
-                    FormatterService.class, FormatJavaWorkAction.class.getClassLoader());
-
-            FormatterService formatter = serviceLoader.findFirst()
-                    .orElseThrow(() -> new IllegalStateException(
-                            "No FormatterService found. Ensure palantir-java-format is on the worker classpath."));
+            FormatterService formatter = loadFormatterService();
 
             logger.debug("Formatting file with worker process: {}", inputFile.getName());
 
@@ -54,9 +48,8 @@ public abstract class FormatJavaWorkAction implements WorkAction<FormatJavaParam
             Files.writeString(outputFile.toPath(), output);
 
         } catch (IOException e) {
-            throw new java.io.UncheckedIOException("Failed to format Java file", e);
+            throw new UncheckedIOException("Failed to format Java file", e);
         } catch (Exception e) {
-            // Provide better error messages when the worker daemon crashes
             throw new RuntimeException(
                     "Formatting failed in worker daemon. This may indicate a bug in palantir-java-format "
                             + "or insufficient resources. Original error: " + e.getMessage(),

@@ -18,7 +18,6 @@ package com.palantir.javaformat.gradle.spotless;
 import com.diffplug.spotless.FileSignature;
 import com.diffplug.spotless.FormatterFunc;
 import com.diffplug.spotless.FormatterStep;
-import com.palantir.javaformat.java.FormatterService;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -41,8 +40,7 @@ public final class PalantirJavaFormatStep {
      * Creates a step which formats everything - code, import order, and unused imports, using the Worker API for
      * process isolation.
      */
-    public static FormatterStep create(
-            Configuration palantirJavaFormat, WorkerExecutor workerExecutor) {
+    public static FormatterStep create(Configuration palantirJavaFormat, WorkerExecutor workerExecutor) {
         ensureImplementationNotDirectlyLoadable();
         return FormatterStep.createLazy(
                 NAME, () -> new State(palantirJavaFormat::getFiles, workerExecutor), State::createFormat);
@@ -114,35 +112,35 @@ public final class PalantirJavaFormatStep {
                     .toFile();
 
             try {
-                // Write input to temp file
                 Files.writeString(inputFile.toPath(), input);
 
-                // Create work queue with process isolation
                 WorkQueue workQueue = workerExecutor.processIsolation(workerSpec -> {
                     workerSpec.getClasspath().from(jars);
                     workerSpec.forkOptions(options -> {
-                        // Configure JVM options for the worker daemon
-                        options.setMaxHeapSize("512m");
-                        // Add any additional JVM args if needed for the formatter
+                        options.jvmArgs(
+                                "--add-exports",
+                                "jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
+                                "--add-exports",
+                                "jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED",
+                                "--add-exports",
+                                "jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED",
+                                "--add-exports",
+                                "jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
+                                "--add-exports",
+                                "jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED");
                     });
                 });
 
-                // Submit formatting work
                 workQueue.submit(FormatJavaWorkAction.class, parameters -> {
                     parameters.getInputFile().set(inputFile);
                     parameters.getOutputFile().set(outputFile);
                     parameters.getFormatterClasspath().from(jars);
                 });
 
-                // Wait for work to complete (blocking)
-                workQueue.await();
-
-                // Read formatted output
                 return Files.readString(outputFile.toPath());
             } catch (Exception e) {
                 throw new RuntimeException("Formatting failed using Worker API", e);
             } finally {
-                // Clean up temp files
                 inputFile.delete();
                 outputFile.delete();
             }

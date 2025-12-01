@@ -43,15 +43,6 @@ class PalantirJavaFormatPluginTest extends IntegrationTestKitSpec {
             apply plugin: 'idea'
         """.replace("EXTRA_CONFIGURATION", extraDependencies).stripIndent()
 
-        // Add jvm args to allow spotless and formatter gradle plugins to run with Java 16+
-        file('gradle.properties') << """
-            org.gradle.jvmargs=--add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED \
-              --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED \
-              --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED \
-              --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED \
-              --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED
-        """.stripIndent()
-
         "git init".execute(Collections.emptyList(), projectDir).waitFor()
         "git config user.name Foo".execute(Collections.emptyList(), projectDir).waitFor()
         "git config user.email foo@bar.com".execute(Collections.emptyList(), projectDir).waitFor()
