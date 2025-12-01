@@ -17,24 +17,20 @@
 package com.palantir.javaformat.gradle;
 
 import com.palantir.javaformat.bootstrap.NativeImageFormatterService;
+import com.palantir.javaformat.java.FormatterService;
 import java.io.File;
 import java.io.IOException;
-import javax.inject.Inject;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.gradle.api.provider.Provider;
-import org.gradle.api.tasks.Classpath;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.Nested;
 import org.gradle.api.tasks.TaskAction;
-import org.gradle.workers.WorkQueue;
-import org.gradle.workers.WorkerExecutor;
 
 public abstract class PalantirJavaFormatPlugin implements Plugin<Project> {
 
@@ -56,12 +52,6 @@ public abstract class PalantirJavaFormatPlugin implements Plugin<Project> {
             project.getTasks().register("formatDiff", FormatDiffTask.class, task -> {
                 if (getNativeImageSupport().isNativeImageConfigured()) {
                     task.getNativeImage().fileProvider(getNativeImplConfiguration(project));
-                } else {
-                    // Use Worker API with Java-based formatter
-                    task.getFormatterClasspath()
-                            .from(project.getRootProject()
-                                    .getConfigurations()
-                                    .named(PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME));
                 }
             });
         });
@@ -82,13 +72,6 @@ public abstract class PalantirJavaFormatPlugin implements Plugin<Project> {
         @InputFile
         abstract RegularFileProperty getNativeImage();
 
-        @org.gradle.api.tasks.Optional
-        @Classpath
-        abstract ConfigurableFileCollection getFormatterClasspath();
-
-        @Inject
-        protected abstract WorkerExecutor getWorkerExecutor();
-
         public FormatDiffTask() {
             setDescription("Format only chunks of files that appear in git diff");
             setGroup("Formatting");
@@ -102,34 +85,12 @@ public abstract class PalantirJavaFormatPlugin implements Plugin<Project> {
                         getProject().getProjectDir().toPath(),
                         new NativeImageFormatterService(
                                 getNativeImage().get().getAsFile().toPath()));
-            } else if (!getFormatterClasspath().isEmpty()) {
-                log.info("Using the Java-based formatter");
-                WorkQueue workQueue = getWorkerExecutor().processIsolation(workerSpec -> {
-                    workerSpec.getClasspath().from(getFormatterClasspath());
-                    workerSpec.forkOptions(options -> {
-                        options.jvmArgs(
-                                "--add-exports",
-                                "jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
-                                "--add-exports",
-                                "jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED",
-                                "--add-exports",
-                                "jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED",
-                                "--add-exports",
-                                "jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
-                                "--add-exports",
-                                "jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED");
-                    });
-                });
-
-                workQueue.submit(FormatDiffWorkAction.class, parameters -> {
-                    parameters.getProjectDirectory().set(getProject().getProjectDir());
-                    parameters.getFormatterClasspath().from(getFormatterClasspath());
-                });
-
-                workQueue.await();
             } else {
-                throw new IllegalStateException(
-                        "Neither native image nor formatter classpath is configured. This should not happen.");
+                log.info("Using the Java-based formatter");
+                JavaFormatExtension extension =
+                        getProject().getRootProject().getExtensions().getByType(JavaFormatExtension.class);
+                FormatterService formatterService = extension.serviceLoad();
+                FormatDiff.formatDiff(getProject().getProjectDir().toPath(), formatterService);
             }
         }
     }

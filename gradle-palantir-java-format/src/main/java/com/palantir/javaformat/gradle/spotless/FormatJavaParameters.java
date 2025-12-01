@@ -16,12 +16,15 @@
 
 package com.palantir.javaformat.gradle.spotless;
 
-import com.palantir.javaformat.gradle.FormatterWorkParameters;
+import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.RegularFileProperty;
+import org.gradle.workers.WorkParameters;
 
-public interface FormatJavaParameters extends FormatterWorkParameters {
+public interface FormatJavaParameters extends WorkParameters {
 
     RegularFileProperty getInputFile();
 
     RegularFileProperty getOutputFile();
+
+    ConfigurableFileCollection getFormatterClasspath();
 }
