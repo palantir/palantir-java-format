@@ -67,7 +67,6 @@ public final class PalantirJavaFormatStep {
 
         private final transient Supplier<Iterable<File>> jarsSupplier;
 
-        // Transient as this is not serializable.
         private final transient WorkerExecutor workerExecutor;
 
         /**
