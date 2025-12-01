@@ -135,7 +135,7 @@ final class FormatDiff {
 
         Preconditions.checkState(process.waitFor(30, TimeUnit.SECONDS), "git diff took too long to terminate");
         if (process.exitValue() != 0) {
-            throw new IllegalStateException("Expected return code of 0 but got " + process.exitValue()
+            throw new RuntimeException("Expected return code of 0 but got " + process.exitValue()
                     + "\n stdout: " + new String(process.getInputStream().readAllBytes())
                     + "\n stderr: " + new String(process.getErrorStream().readAllBytes()));
         }
