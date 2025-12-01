@@ -22,3 +22,34 @@ acceptedBreaks:
       new: "method java.lang.String com.palantir.javaformat.java.FormatterService::fixImports(java.lang.String)\
         \ throws com.palantir.javaformat.java.FormatterException"
       justification: "new fixImports only method added to spi"
+  "2.83.0":
+    com.palantir.javaformat:gradle-palantir-java-format:
+    - code: "java.annotation.removed"
+      old: "method void com.palantir.javaformat.gradle.SpotlessInterop::<init>(java.util.function.Supplier<com.palantir.javaformat.java.FormatterService>)"
+      new: "method void com.palantir.javaformat.gradle.SpotlessInterop::<init>()"
+      justification: "Changed method signatures PalantirJavaFormatStep::create and\
+        \ SpotlessInterop::<init> are not used outside of this project, SpotlessInterop::getWorkerExecutor()\
+        \ is additive and so should not cause issues and SpotlessInterop is not used\
+        \ outside of this project"
+    - code: "java.method.abstractMethodAdded"
+      new: "method org.gradle.workers.WorkerExecutor com.palantir.javaformat.gradle.SpotlessInterop::getWorkerExecutor()"
+      justification: "Changed method signatures PalantirJavaFormatStep::create and\
+        \ SpotlessInterop::<init> are not used outside of this project, SpotlessInterop::getWorkerExecutor()\
+        \ is additive and so should not cause issues and SpotlessInterop is not used\
+        \ outside of this project"
+    - code: "java.method.numberOfParametersChanged"
+      old: "method void com.palantir.javaformat.gradle.SpotlessInterop::<init>(java.util.function.Supplier<com.palantir.javaformat.java.FormatterService>)"
+      new: "method void com.palantir.javaformat.gradle.SpotlessInterop::<init>()"
+      justification: "Changed method signatures PalantirJavaFormatStep::create and\
+        \ SpotlessInterop::<init> are not used outside of this project, SpotlessInterop::getWorkerExecutor()\
+        \ is additive and so should not cause issues and SpotlessInterop is not used\
+        \ outside of this project"
+    - code: "java.method.parameterTypeChanged"
+      old: "parameter com.diffplug.spotless.FormatterStep com.palantir.javaformat.gradle.spotless.PalantirJavaFormatStep::create(org.gradle.api.artifacts.Configuration,\
+        \ ===java.util.function.Supplier<com.palantir.javaformat.java.FormatterService>===)"
+      new: "parameter com.diffplug.spotless.FormatterStep com.palantir.javaformat.gradle.spotless.PalantirJavaFormatStep::create(org.gradle.api.artifacts.Configuration,\
+        \ ===org.gradle.workers.WorkerExecutor===)"
+      justification: "Changed method signatures PalantirJavaFormatStep::create and\
+        \ SpotlessInterop::<init> are not used outside of this project, SpotlessInterop::getWorkerExecutor()\
+        \ is additive and so should not cause issues and SpotlessInterop is not used\
+        \ outside of this project"
