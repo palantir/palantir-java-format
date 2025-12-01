@@ -36,10 +36,7 @@ public final class PalantirJavaFormatStep {
 
     private static final String NAME = "palantir-java-format";
 
-    /**
-     * Creates a step which formats everything - code, import order, and unused imports, using the Worker API for
-     * process isolation.
-     */
+    /** Creates a step which formats everything - code, import order, and unused imports. */
     public static FormatterStep create(Configuration palantirJavaFormat, WorkerExecutor workerExecutor) {
         ensureImplementationNotDirectlyLoadable();
         return FormatterStep.createLazy(
