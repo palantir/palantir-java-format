@@ -105,7 +105,6 @@ public final class PalantirJavaFormatStep {
         }
 
         private String formatWithWorker(String input, Iterable<File> jars) throws IOException {
-            // Create temp files for input/output communication with worker
             File inputFile =
                     Files.createTempFile("palantir-java-format-input-", ".java").toFile();
             File outputFile = Files.createTempFile("palantir-java-format-output-", ".java")
