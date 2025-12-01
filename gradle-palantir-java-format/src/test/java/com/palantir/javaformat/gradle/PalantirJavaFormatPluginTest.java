@@ -50,7 +50,7 @@ class PalantirJavaFormatPluginTest {
             String extraGradleProperties, String expectedOutput, GradleInvoker gradle, RootProject project)
             throws IOException, InterruptedException {
         if (extraGradleProperties != null && !extraGradleProperties.isBlank()) {
-            project.gradlePropertiesFile().append("%s", extraGradleProperties);
+            project.gradlePropertiesFile().append("%s\n", extraGradleProperties);
         }
 
         String extraDependencies =
