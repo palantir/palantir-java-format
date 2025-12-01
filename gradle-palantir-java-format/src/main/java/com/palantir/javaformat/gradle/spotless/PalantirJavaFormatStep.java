@@ -137,6 +137,8 @@ public final class PalantirJavaFormatStep {
                     parameters.getFormatterClasspath().from(jars);
                 });
 
+                workQueue.await();
+
                 return Files.readString(outputFile.toPath());
             } catch (Exception e) {
                 throw new RuntimeException("Formatting failed using Worker API", e);

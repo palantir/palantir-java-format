@@ -125,6 +125,8 @@ public abstract class PalantirJavaFormatPlugin implements Plugin<Project> {
                     parameters.getProjectDirectory().set(getProject().getProjectDir());
                     parameters.getFormatterClasspath().from(getFormatterClasspath());
                 });
+
+                workQueue.await();
             } else {
                 throw new IllegalStateException(
                         "Neither native image nor formatter classpath is configured. This should not happen.");
