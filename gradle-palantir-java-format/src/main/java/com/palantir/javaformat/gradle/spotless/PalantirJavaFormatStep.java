@@ -23,8 +23,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.util.function.Supplier;
 import org.gradle.api.artifacts.Configuration;
+import org.gradle.workers.WorkQueue;
+import org.gradle.workers.WorkerExecutor;
 
 public final class PalantirJavaFormatStep {
 
@@ -34,11 +37,15 @@ public final class PalantirJavaFormatStep {
 
     private static final String NAME = "palantir-java-format";
 
-    /** Creates a step which formats everything - code, import order, and unused imports. */
-    public static FormatterStep create(Configuration palantirJavaFormat, Supplier<FormatterService> memoizedService) {
+    /**
+     * Creates a step which formats everything - code, import order, and unused imports, using the Worker API for
+     * process isolation.
+     */
+    public static FormatterStep create(
+            Configuration palantirJavaFormat, WorkerExecutor workerExecutor) {
         ensureImplementationNotDirectlyLoadable();
         return FormatterStep.createLazy(
-                NAME, () -> new State(palantirJavaFormat::getFiles, memoizedService), State::createFormat);
+                NAME, () -> new State(palantirJavaFormat::getFiles, workerExecutor), State::createFormat);
     }
 
     static final class State implements Serializable {
@@ -66,18 +73,19 @@ public final class PalantirJavaFormatStep {
         private final transient Supplier<Iterable<File>> jarsSupplier;
 
         // Transient as this is not serializable.
-        private final transient Supplier<FormatterService> memoizedFormatter;
+        private final transient WorkerExecutor workerExecutor;
 
         /**
-         * Build a cacheable state for spotless from the given jars, that uses the given {@link FormatterService}.
+         * Build a cacheable state for spotless from the given jars, using the Worker API for process isolation.
          *
          * @param jarsSupplier Supplies the jars that contain the palantir-java-format implementation. This is only used for caching and
          * up-to-dateness purposes.
+         * @param workerExecutor WorkerExecutor for process isolation.
          */
         @SuppressWarnings("for-rollout:NullAway")
-        State(Supplier<Iterable<File>> jarsSupplier, Supplier<FormatterService> memoizedFormatter) {
+        State(Supplier<Iterable<File>> jarsSupplier, WorkerExecutor workerExecutor) {
             this.jarsSupplier = jarsSupplier;
-            this.memoizedFormatter = memoizedFormatter;
+            this.workerExecutor = workerExecutor;
         }
 
         @SuppressWarnings("NullableProblems")
@@ -91,11 +99,53 @@ public final class PalantirJavaFormatStep {
                     // https://github.com/diffplug/spotless/blob/228eb10af382b19e130d8d9479f7a95238cb4358/lib/src/main/java/com/diffplug/spotless/FileSignature.java#L138-L143
                     this.jarsSignature = FileSignature.signAsSet(jars);
 
-                    return memoizedFormatter.get().formatSourceReflowStringsAndFixImports(input);
+                    return formatWithWorker(input, jars);
                 } catch (IOException e) {
                     throw new UncheckedIOException(e);
                 }
             };
+        }
+
+        private String formatWithWorker(String input, Iterable<File> jars) throws IOException {
+            // Create temp files for input/output communication with worker
+            File inputFile =
+                    Files.createTempFile("palantir-java-format-input-", ".java").toFile();
+            File outputFile = Files.createTempFile("palantir-java-format-output-", ".java")
+                    .toFile();
+
+            try {
+                // Write input to temp file
+                Files.writeString(inputFile.toPath(), input);
+
+                // Create work queue with process isolation
+                WorkQueue workQueue = workerExecutor.processIsolation(workerSpec -> {
+                    workerSpec.getClasspath().from(jars);
+                    workerSpec.forkOptions(options -> {
+                        // Configure JVM options for the worker daemon
+                        options.setMaxHeapSize("512m");
+                        // Add any additional JVM args if needed for the formatter
+                    });
+                });
+
+                // Submit formatting work
+                workQueue.submit(FormatJavaWorkAction.class, parameters -> {
+                    parameters.getInputFile().set(inputFile);
+                    parameters.getOutputFile().set(outputFile);
+                    parameters.getFormatterClasspath().from(jars);
+                });
+
+                // Wait for work to complete (blocking)
+                workQueue.await();
+
+                // Read formatted output
+                return Files.readString(outputFile.toPath());
+            } catch (Exception e) {
+                throw new RuntimeException("Formatting failed using Worker API", e);
+            } finally {
+                // Clean up temp files
+                inputFile.delete();
+                outputFile.delete();
+            }
         }
     }
 
