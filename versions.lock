@@ -148,7 +148,7 @@ com.palantir.gradle.plugintesting:configuration-cache-spec:0.41.0 (1 constraints
 
 com.palantir.gradle.plugintesting:discover-tests-cli:0.41.0 (1 constraints: 3705323b)
 
-com.palantir.gradle.plugintesting:gradle-plugin-testing-junit:0.41.0 (1 constraints: 3705323b)
+com.palantir.gradle.plugintesting:gradle-plugin-testing-junit:0.41.0 (1 constraints: a307597e)
 
 com.palantir.gradle.plugintesting:plugin-testing-core:0.41.0 (1 constraints: 3705323b)
 
