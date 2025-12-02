@@ -33,7 +33,7 @@ public abstract class FormatJavaWorkAction implements WorkAction<FormatJavaParam
     private static final Logger logger = Logging.getLogger(FormatJavaWorkAction.class);
 
     private static final Supplier<FormatterService> formatterService = Suppliers.memoize(() -> {
-        logger.info("Loading FormatterService in worker daemon (will be cached for subsequent files)");
+        logger.info("Loading FormatterService in worker daemon");
         return ServiceLoader.load(FormatterService.class, FormatJavaWorkAction.class.getClassLoader())
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException(
