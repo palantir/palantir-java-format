@@ -26,6 +26,7 @@ import com.palantir.gradle.testing.junit.GradlePluginTests;
 import com.palantir.gradle.testing.project.RootProject;
 import java.io.File;
 import java.io.IOException;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -141,5 +142,14 @@ class PalantirJavaFormatPluginTest {
         if (exitCode != 0) {
             throw new RuntimeException("Git command failed with exit code " + exitCode);
         }
+    }
+
+    @Test
+    void no_java_no_repos_works(GradleInvoker gradle, RootProject rootProject) {
+        // rootProject.buildGradle().plugins().add("com.palantir.baseline").add("com.palantir.java-format");
+        // rootProject.buildGradle().plugins().add("com.palantir.baseline-idea").add("com.palantir.java-format");
+        rootProject.buildGradle().plugins().add("idea").add("com.palantir.java-format");
+
+        gradle.withArgs("help").buildsSuccessfully();
     }
 }

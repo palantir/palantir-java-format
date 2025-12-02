@@ -17,6 +17,7 @@
 package com.palantir.javaformat.gradle
 
 import nebula.test.IntegrationTestKitSpec
+import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 class PalantirJavaFormatIdeaPluginTest extends IntegrationTestKitSpec {
 
@@ -64,5 +65,25 @@ class PalantirJavaFormatIdeaPluginTest extends IntegrationTestKitSpec {
         extraGradleProperties | extraDependencies
         "" | ""
         "palantir.native.formatter=true" | NATIVE_CONFIG
+    }
+
+    def "can apply when no repositories defined"() {
+        buildFile << """
+            plugins {
+                id 'idea'
+                id 'com.palantir.java-format-idea'
+            }
+            dependencies {
+//                palantirJavaFormat project.files()
+            }
+
+        """.stripIndent()
+
+        when:
+        def result = runTasks('help')
+
+        then:
+        result.task(':help').outcome == SUCCESS
+        //println result.output
     }
 }
