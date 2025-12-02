@@ -16,12 +16,14 @@
 
 package com.palantir.javaformat.gradle.spotless;
 
+import com.google.common.base.Suppliers;
 import com.palantir.javaformat.java.FormatterService;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.util.ServiceLoader;
+import java.util.function.Supplier;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.gradle.workers.WorkAction;
@@ -29,6 +31,14 @@ import org.gradle.workers.WorkAction;
 public abstract class FormatJavaWorkAction implements WorkAction<FormatJavaParameters> {
 
     private static final Logger logger = Logging.getLogger(FormatJavaWorkAction.class);
+
+    private static final Supplier<FormatterService> formatterService = Suppliers.memoize(() -> {
+        logger.info("Loading FormatterService in worker daemon (will be cached for subsequent files)");
+        return ServiceLoader.load(FormatterService.class, FormatJavaWorkAction.class.getClassLoader())
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException(
+                        "No FormatterService found. Ensure palantir-java-format is on the worker classpath."));
+    });
 
     @Override
     public void execute() {
@@ -40,11 +50,9 @@ public abstract class FormatJavaWorkAction implements WorkAction<FormatJavaParam
 
             String input = Files.readString(inputFile.toPath());
 
-            FormatterService formatter = loadFormatterService();
-
             logger.debug("Formatting file with worker process: {}", inputFile.getName());
 
-            String output = formatter.formatSourceReflowStringsAndFixImports(input);
+            String output = formatterService.get().formatSourceReflowStringsAndFixImports(input);
 
             Files.writeString(outputFile.toPath(), output);
 
@@ -56,15 +64,5 @@ public abstract class FormatJavaWorkAction implements WorkAction<FormatJavaParam
                             + "or insufficient resources. Original error: " + e.getMessage(),
                     e);
         }
-    }
-
-    private FormatterService loadFormatterService() {
-        ServiceLoader<FormatterService> serviceLoader =
-                ServiceLoader.load(FormatterService.class, getClass().getClassLoader());
-
-        return serviceLoader
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException(
-                        "No FormatterService found. Ensure palantir-java-format is on the worker classpath."));
     }
 }
