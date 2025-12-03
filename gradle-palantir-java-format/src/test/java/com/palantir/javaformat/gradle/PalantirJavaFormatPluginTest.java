@@ -145,11 +145,25 @@ class PalantirJavaFormatPluginTest {
     }
 
     @Test
-    void no_java_no_repos_works(GradleInvoker gradle, RootProject rootProject) {
+    void works_when_no_repos_defined(GradleInvoker gradle, RootProject rootProject) {
+        // this is the combination of plugins that actually happens in the wild - com.palantir.baseline applies
+        // com.palantir.baseline-idea which applies idea.  Then com.palantir.java-format applies
+        // com.palantir.java-format-idea
+        // which triggers the issue
         // rootProject.buildGradle().plugins().add("com.palantir.baseline").add("com.palantir.java-format");
-        // rootProject.buildGradle().plugins().add("com.palantir.baseline-idea").add("com.palantir.java-format");
-        rootProject.buildGradle().plugins().add("idea").add("com.palantir.java-format");
 
-        gradle.withArgs("help").buildsSuccessfully();
+        // this is the minimal application which reproduces the error
+        rootProject.buildGradle().plugins().add("idea").add("com.palantir.java-format-idea");
+
+        // if I add this (as is done in the test cases in the groovy test), it works, because defined
+        // dependencies replace the default for the configuration defined in PalantirJavaFormatProviderPlugin
+        //        rootProject.buildGradle().append("""
+        //                dependencies {
+        //                    palantirJavaFormat project.files()
+        //                }
+        //            """);
+        InvocationResult result = gradle.withArgs("help").buildsSuccessfully();
+
+        // assertThat(result).task(":updatePalantirJavaFormatXml").notOnTaskGraph();
     }
 }
