@@ -106,7 +106,7 @@ org.eclipse.platform:org.eclipse.text:3.10.300 (1 constraints: 99053a46)
 
 org.functionaljava:functionaljava:4.8 (1 constraints: b0042b2c)
 
-org.immutables:value:2.11.7 (1 constraints: 3d05393b)
+org.immutables:value:2.12.0 (1 constraints: 3705353b)
 
 org.jetbrains:annotations:26.0.2 (2 constraints: b7284379)
 
