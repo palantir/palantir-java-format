@@ -13,9 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.palantir.javaformat.gradle
+package com.palantir.javaformat.gradle;
 
-import nebula.test.IntegrationTestKitSpec
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.palantir.gradle.testing.junit.DisabledConfigurationCache;
+import com.palantir.gradle.testing.junit.GradlePluginTests;
+import com.palantir.gradle.testing.project.RootProject;
+import java.io.File;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * When we were getting gradle-baseline to support the configuration cache, spotless had some poorly written tasks
@@ -28,20 +35,23 @@ import nebula.test.IntegrationTestKitSpec
  *
  * This test forces creation of the spotless steps, which will reveal any eager resolution of configurations.
  */
-class SupportsSpotless622 extends IntegrationTestKitSpec {
-    private static final CLASSPATH_FILE = new File("build/impl.classpath").absolutePath
+@GradlePluginTests
+@DisabledConfigurationCache
+class SupportsSpotless622 {
+    private static final String CLASSPATH_FILE = new File("build/impl.classpath").getAbsolutePath();
 
-    private GradlewExecutor executor
+    private GradlewExecutor executor;
 
-    def setup() {
-        definePluginOutsideOfPluginBlock = true
-        keepFiles = true
-        executor = new GradlewExecutor(projectDir)
+    @BeforeEach
+    void setup(RootProject rootProject) {
+        executor = new GradlewExecutor(rootProject.path().toFile());
     }
 
-    def "PalantirJavaFormatPlugin works with spotless 6.22.0"() {
+    @Test
+    @SuppressWarnings("GradleTestPluginsBlock") // Using buildscript block with apply plugin syntax
+    void palantirjavaformatplugin_works_with_spotless_6_22_0(RootProject rootProject) {
         // language=Gradle
-        buildFile << '''
+        rootProject.buildGradle().append("""
             buildscript {
                 repositories {
                     mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
@@ -52,36 +62,33 @@ class SupportsSpotless622 extends IntegrationTestKitSpec {
                      classpath 'com.diffplug.spotless:spotless-plugin-gradle:6.22.0'
                  }
             }
-    
+
             apply plugin: 'java'
             apply plugin: 'com.palantir.java-format'
             apply plugin: 'com.palantir.consistent-versions'
             apply plugin: 'com.diffplug.spotless'
-    
+
             version = '0.1.0'
-        '''.stripIndent(true)
+            """);
 
+        rootProject.file("versions.props").createEmpty();
+        rootProject.file("versions.lock").createEmpty();
 
-        file("versions.props")
-        file("versions.lock")
+        executor.runGradlewTasks("wrapper");
 
-        runTasks('wrapper')
-
-        buildFile << """
+        rootProject.buildGradle().append("""
             dependencies {
-                palantirJavaFormat files(file("${CLASSPATH_FILE}").text.split(':'))
+                palantirJavaFormat files(file("%s").text.split(':'))
             }
 
-            // This forces the realization of the spotlessJava task, creating the spotless steps. 
-            // If any configurations are eagerly resolved in the spotless steps, 
-            // consistent-versions should catch it and throw here. 
+            // This forces the realization of the spotlessJava task, creating the spotless steps.
+            // If any configurations are eagerly resolved in the spotless steps,
+            // consistent-versions should catch it and throw here.
             project.getTasks().getByName("spotlessJava")
-        """.stripIndent(true)
+            """, CLASSPATH_FILE);
 
-        when:
-        def result = executor.runGradlewTasks('classes', '--info')
+        GradlewExecutor.GradlewExecutionResult result = executor.runGradlewTasks("classes", "--info");
 
-        then:
-        assert result.success
+        assertThat(result.success()).isTrue();
     }
 }
