@@ -17,7 +17,7 @@ buildscript {
         classpath 'com.palantir.gradle.idea-language-injector:gradle-idea-language-injector:0.2.0'
         classpath 'com.palantir.gradle.jdks:gradle-jdks:0.70.0'
         classpath 'com.palantir.gradle.jdkslatest:gradle-jdks-latest:0.24.0'
-        classpath 'com.palantir.gradle.plugintesting:gradle-plugin-testing:0.43.0'
+        classpath 'com.palantir.gradle.plugintesting:gradle-plugin-testing:0.44.0'
         classpath 'com.palantir.javaformat:gradle-palantir-java-format:2.83.0'
         classpath 'com.palantir.suppressible-error-prone:gradle-suppressible-error-prone:2.26.0'
         classpath 'me.champeau.jmh:jmh-gradle-plugin:0.7.3'
@@ -49,6 +49,11 @@ allprojects {
     repositories {
         mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
     }
+}
+
+repositories {
+    // Needed for `net.ltgt.gradle:gradle-errorprone-plugin` which is brought in from `com.palantir.baseline:gradle-baseline-java` see: https://mvnrepository.com/artifact/net.ltgt.gradle/gradle-errorprone-plugin/4.3.0
+    maven {url "https://repository.liferay.com/nexus/content/repositories/public/"}
 }
 
 subprojects {

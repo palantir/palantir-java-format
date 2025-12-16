@@ -15,18 +15,18 @@
  */
 package com.palantir.javaformat.gradle;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
+import com.palantir.gradle.testing.execution.GradleInvoker;
+import com.palantir.gradle.testing.execution.InvocationResult;
 import com.palantir.gradle.testing.junit.DisabledConfigurationCache;
 import com.palantir.gradle.testing.junit.GradlePluginTests;
 import com.palantir.gradle.testing.project.RootProject;
 import java.io.File;
-import org.junit.jupiter.api.BeforeEach;
+import java.util.Optional;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 @GradlePluginTests
-@DisabledConfigurationCache(reason = "Test uses custom GradlewExecutor and wrapper generation")
+@DisabledConfigurationCache
 class PalantirJavaFormatSpotlessPluginTest {
 
     /** ./gradlew writeImplClasspath generates this file. */
@@ -37,60 +37,28 @@ class PalantirJavaFormatSpotlessPluginTest {
     private static final String NATIVE_CONFIG =
             "palantirJavaFormatNative files(file(\"" + NATIVE_IMAGE_FILE + "\").text)";
 
-    private GradlewExecutor executor;
-
-    @BeforeEach
-    void setup(RootProject project) {
-        executor = new GradlewExecutor(project.path().toFile());
-    }
-
     @ParameterizedTest
     @CsvSource(
             delimiter = '|',
             value = {
-                " | 21 | Using the Java-based formatter",
-                "palantir.native.formatter=true | 21 | Using the Java-based formatter",
-                "palantir.native.formatter=true | 17 | Using the native-image formatter"
+                    "                               | 21 | Using the Java-based formatter",
+                    "palantir.native.formatter=true | 21 | Using the Java-based formatter",
+                    "palantir.native.formatter=true | 17 | Using the native-image formatter"
             })
     void formats_with_spotless_when_spotless_is_applied(
-            String extraGradleProperties, String javaVersion, String expectedOutput, RootProject project) {
-        String extraDependencies =
-                (extraGradleProperties == null || extraGradleProperties.isBlank()) ? "" : NATIVE_CONFIG;
+            String extraGradleProperties,
+            String javaVersion,
+            String expectedOutput,
+            GradleInvoker gradle,
+            RootProject project) {
 
-        project.settingsGradle().overwrite("""
-                 buildscript {
-                    repositories {
-                        mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
-                        gradlePluginPortal() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
-                    }
-                     dependencies {
-                         classpath 'com.palantir.gradle.jdks:gradle-jdks-settings:0.62.0'
-                     }
-                 }
-            """);
+        String extraDependencies = Optional.ofNullable(extraGradleProperties)
+                .map(props -> NATIVE_CONFIG)
+                .orElse("");
 
         project.settingsGradle().plugins().add("com.palantir.jdks.settings");
 
-        project.buildGradle().overwrite("""
-                 buildscript {
-                    repositories {
-                        mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
-                        gradlePluginPortal() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
-                    }
-                     dependencies {
-                         classpath 'com.palantir.baseline:gradle-baseline-java:6.21.0'
-                         classpath 'com.palantir.gradle.jdks:gradle-jdks:0.62.0'
-                         classpath 'com.palantir.gradle.jdkslatest:gradle-jdks-latest:0.17.0'
-
-                         constraints {
-                             classpath 'com.diffplug.spotless:6.22.0'
-                         }
-                     }
-                 }
-
-                // The 'com.diffplug.spotless:spotless-plugin-gradle' dependency is already added by palantir-java-format
-            """);
-
+        // The 'com.diffplug.spotless:spotless-plugin-gradle' dependency is already added by palantir-java-format
         project.buildGradle()
                 .plugins()
                 .add("java")
@@ -100,14 +68,14 @@ class PalantirJavaFormatSpotlessPluginTest {
                 .add("com.palantir.jdks.latest");
 
         project.buildGradle().append("""
-                javaVersions {
-                    libraryTarget = %s
-                }
-
-                jdks {
-                    daemonTarget = %s
-                }
-            """, javaVersion, javaVersion);
+                    javaVersions {
+                        libraryTarget = %s
+                    }
+                
+                    jdks {
+                        daemonTarget = %s
+                    }
+                """, javaVersion, javaVersion);
 
         // Add jvm args to allow spotless and formatter gradle plugins to run with Java 16+
         project.gradlePropertiesFile()
@@ -120,60 +88,55 @@ class PalantirJavaFormatSpotlessPluginTest {
                                 + "--add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED")
                 .appendProperty("palantir.jdk.setup.enabled", "true");
 
-        if (extraGradleProperties != null && !extraGradleProperties.isBlank()) {
-            String[] parts = extraGradleProperties.split("=", 2);
-            project.gradlePropertiesFile().appendProperty(parts[0], parts.length > 1 ? parts[1] : "true");
-        }
+        project.gradlePropertiesFile().appendLine(extraGradleProperties);
 
-        executor.runGradlewTasks("wrapper");
+        gradle.withArgs("wrapper").buildsSuccessfully();
 
         project.buildGradle().plugins().add("com.diffplug.spotless");
 
         project.buildGradle().append("""
-                dependencies {
-                    palantirJavaFormat files(file("%s").text.split(':'))
-                    %s
-                }
-            """, CLASSPATH_FILE, extraDependencies);
+                    dependencies {
+                        palantirJavaFormat files(file("%s").text.split(':'))
+                        %s
+                    }
+                """, CLASSPATH_FILE, extraDependencies);
 
         project.file("src/main/java/Main.java").overwrite(invalidJavaFile());
 
-        GradlewExecutor.GradlewExecutionResult result = executor.runGradlewTasks("spotlessApply", "--info");
-        String output = result.standardOutput();
-        String formattedFile = project.file("src/main/java/Main.java").text();
+        InvocationResult result = gradle.withArgs("spotlessApply", "--info").buildsSuccessfully();
 
-        assertThat(output).contains(expectedOutput);
-        assertThat(formattedFile).isEqualTo(validJavaFile());
+        project.file("src/main/java/Main.java").assertThat().hasContent(validJavaFile());
+        result.assertThat().output().contains(expectedOutput);
     }
 
     private String validJavaFile() {
         return """
-            package test;
-
-            public class Test {
-                void test() {
-                    int x = 1;
-                    System.out.println("Hello");
-                    Optional.of("hello").orElseGet(() -> {
-                        return "Hello World";
-                    });
+                package test;
+                
+                public class Test {
+                    void test() {
+                        int x = 1;
+                        System.out.println("Hello");
+                        Optional.of("hello").orElseGet(() -> {
+                            return "Hello World";
+                        });
+                    }
                 }
-            }
-            """;
+                """;
     }
 
     private String invalidJavaFile() {
         return """
-            package test;
-            import com.java.unused;
-            public class Test { void test() {int x = 1;
-                System.out.println(
-                    "Hello"
-                );
-                Optional.of("hello").orElseGet(() -> {
-                    return "Hello World";
-                });
-            } }
-            """;
+                package test;
+                import com.java.unused;
+                public class Test { void test() {int x = 1;
+                    System.out.println(
+                        "Hello"
+                    );
+                    Optional.of("hello").orElseGet(() -> {
+                        return "Hello World";
+                    });
+                } }
+                """;
     }
 }
