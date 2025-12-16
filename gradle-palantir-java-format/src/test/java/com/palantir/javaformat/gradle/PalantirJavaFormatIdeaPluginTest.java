@@ -20,13 +20,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.palantir.gradle.testing.execution.GradleInvoker;
 import com.palantir.gradle.testing.files.arbitrary.ArbitraryFile;
-import com.palantir.gradle.testing.files.gradle.GradleFile;
 import com.palantir.gradle.testing.junit.DisabledConfigurationCache;
 import com.palantir.gradle.testing.junit.GradlePluginTests;
 import com.palantir.gradle.testing.project.RootProject;
 import java.io.File;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -38,9 +37,15 @@ class PalantirJavaFormatIdeaPluginTest {
     private static final File NATIVE_IMAGE_FILE = new File("build/nativeImage.path");
 
     private static final String NATIVE_CONFIG =
-            String.format("palantirJavaFormatNative files(\"%s\")", NATIVE_IMAGE_FILE.toString());
+            String.format("palantirJavaFormatNative files(\"%s\")", NATIVE_IMAGE_FILE);
 
-    private static GradleFile buildFile(RootProject rootProject, String extraConfiguration) {
+    @ParameterizedTest(name = "extraGradleProperties={0}")
+    @ValueSource(strings = {"", "palantir.native.formatter=true"})
+    void idea_configures_xml_files(String extraGradleProperties, GradleInvoker gradle, RootProject rootProject)
+            throws Exception {
+
+        rootProject.gradlePropertiesFile().appendLine(extraGradleProperties);
+
         rootProject.buildGradle().plugins().add("com.palantir.java-format-idea").add("idea");
 
         rootProject.buildGradle().append("""
@@ -48,30 +53,7 @@ class PalantirJavaFormatIdeaPluginTest {
                 palantirJavaFormat project.files() // no need to store the real thing in here
                 %s
             }
-            """, extraConfiguration);
-
-        return rootProject.buildGradle();
-    }
-
-    @ParameterizedTest(name = "extraGradleProperties={0}, extraDependencies={1}")
-    @CsvSource(delimiterString = "|", textBlock = """
-        ''                             | ''
-        palantir.native.formatter=true | NATIVE_CONFIG_PLACEHOLDER
-        """)
-    void idea_configures_xml_files(
-            String extraGradleProperties, String extraDependencies, GradleInvoker gradle, RootProject rootProject)
-            throws Exception {
-        if (!extraGradleProperties.isEmpty()) {
-            int equalsIndex = extraGradleProperties.indexOf('=');
-            String key = extraGradleProperties.substring(0, equalsIndex);
-            String value = extraGradleProperties.substring(equalsIndex + 1);
-            rootProject.gradlePropertiesFile().appendProperty(key, value);
-        }
-
-        String actualExtraDependencies =
-                extraDependencies.equals("NATIVE_CONFIG_PLACEHOLDER") ? NATIVE_CONFIG : extraDependencies;
-
-        buildFile(rootProject, actualExtraDependencies);
+            """, extraGradleProperties.isBlank() ? "" : NATIVE_CONFIG);
 
         gradle.withArgs("idea").buildsSuccessfully();
 
