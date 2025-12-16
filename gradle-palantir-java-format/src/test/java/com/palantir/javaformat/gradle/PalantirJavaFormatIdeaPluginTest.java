@@ -18,17 +18,22 @@ package com.palantir.javaformat.gradle;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.palantir.gradle.testing.execution.GradleInvoker;
 import com.palantir.gradle.testing.files.arbitrary.ArbitraryFile;
 import com.palantir.gradle.testing.junit.DisabledConfigurationCache;
 import com.palantir.gradle.testing.junit.GradlePluginTests;
 import com.palantir.gradle.testing.project.RootProject;
 import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 @GradlePluginTests
 @DisabledConfigurationCache
@@ -39,10 +44,12 @@ class PalantirJavaFormatIdeaPluginTest {
     private static final String NATIVE_CONFIG =
             String.format("palantirJavaFormatNative files(\"%s\")", NATIVE_IMAGE_FILE);
 
+    private static final ObjectMapper XML_MAPPER = new XmlMapper();
+
     @ParameterizedTest(name = "extraGradleProperties={0}")
     @ValueSource(strings = {"", "palantir.native.formatter=true"})
     void idea_configures_xml_files(String extraGradleProperties, GradleInvoker gradle, RootProject rootProject)
-            throws Exception {
+            throws IOException {
 
         rootProject.gradlePropertiesFile().appendLine(extraGradleProperties);
 
@@ -60,69 +67,42 @@ class PalantirJavaFormatIdeaPluginTest {
         ArbitraryFile pjfXmlFile = rootProject.file(".idea/palantir-java-format.xml");
         pjfXmlFile.assertThat().exists();
 
-        Document xmlContent = parseXml(pjfXmlFile.path().toFile());
-        NodeList settings = xmlContent.getElementsByTagName("component");
-        boolean foundSettings = false;
-        for (int i = 0; i < settings.getLength(); i++) {
-            Element element = (Element) settings.item(i);
-            if ("PalantirJavaFormatSettings".equals(element.getAttribute("name"))) {
-                foundSettings = true;
-                break;
-            }
-        }
-        assertThat(foundSettings)
-                .describedAs("Should find PalantirJavaFormatSettings component")
-                .isTrue();
+        Project xmlContent = XML_MAPPER.readValue(pjfXmlFile.path().toFile(), Project.class);
 
-        NodeList options = xmlContent.getElementsByTagName("option");
-        boolean foundImplementationClassPath = false;
-        boolean foundNativeImageClassPath = false;
-        for (int i = 0; i < options.getLength(); i++) {
-            Element element = (Element) options.item(i);
-            if ("implementationClassPath".equals(element.getAttribute("name"))) {
-                foundImplementationClassPath = true;
-            }
-            if ("nativeImageClassPath".equals(element.getAttribute("name"))) {
-                foundNativeImageClassPath = true;
-            }
-        }
-        assertThat(foundImplementationClassPath)
-                .describedAs("Should find implementationClassPath option")
-                .isTrue();
+        assertThat(xmlContent.components()).anyMatch(c -> "PalantirJavaFormatSettings".equals(c.name()));
+
+        List<Option> allOptions = xmlContent.components().stream()
+                .flatMap(c -> Optional.ofNullable(c.options()).stream().flatMap(List::stream))
+                .toList();
+
+        assertThat(allOptions).anyMatch(o -> "implementationClassPath".equals(o.name()));
+
         if (extraGradleProperties.contains("palantir.native.formatter=true")) {
-            assertThat(foundNativeImageClassPath)
-                    .describedAs("Should find nativeImageClassPath option when native formatter is enabled")
-                    .isTrue();
+            assertThat(allOptions).anyMatch(o -> "nativeImageClassPath".equals(o.name()));
         }
 
         ArbitraryFile workspaceXmlFile = rootProject.file(".idea/workspace.xml");
         workspaceXmlFile.assertThat().exists();
 
-        Document workspaceContent = parseXml(workspaceXmlFile.path().toFile());
-        NodeList workspaceComponents = workspaceContent.getElementsByTagName("component");
+        Project workspaceContent = XML_MAPPER.readValue(workspaceXmlFile.path().toFile(), Project.class);
 
-        boolean foundFormatOnSave = false;
-        boolean foundOptimizeOnSave = false;
-        for (int i = 0; i < workspaceComponents.getLength(); i++) {
-            Element element = (Element) workspaceComponents.item(i);
-            if ("FormatOnSaveOptions".equals(element.getAttribute("name"))) {
-                foundFormatOnSave = true;
-            }
-            if ("OptimizeOnSaveOptions".equals(element.getAttribute("name"))) {
-                foundOptimizeOnSave = true;
-            }
-        }
-        assertThat(foundFormatOnSave)
-                .describedAs("Should find FormatOnSaveOptions component in workspace.xml")
-                .isTrue();
-        assertThat(foundOptimizeOnSave)
-                .describedAs("Should find OptimizeOnSaveOptions component in workspace.xml")
-                .isTrue();
+        assertThat(workspaceContent.components()).anyMatch(c -> "FormatOnSaveOptions".equals(c.name()));
+        assertThat(workspaceContent.components()).anyMatch(c -> "OptimizeOnSaveOptions".equals(c.name()));
     }
 
-    private static Document parseXml(File file) throws Exception {
-        javax.xml.parsers.DocumentBuilderFactory factory = javax.xml.parsers.DocumentBuilderFactory.newInstance();
-        javax.xml.parsers.DocumentBuilder builder = factory.newDocumentBuilder();
-        return builder.parse(file);
-    }
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private record Project(
+            @JacksonXmlProperty(localName = "component") @JacksonXmlElementWrapper(useWrapping = false)
+            List<Component> components) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private record Component(
+            @JacksonXmlProperty(isAttribute = true) String name,
+
+            @JacksonXmlProperty(localName = "option") @JacksonXmlElementWrapper(useWrapping = false)
+            List<Option> options) {}
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private record Option(
+            @JacksonXmlProperty(isAttribute = true) String name) {}
 }
