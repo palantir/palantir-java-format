@@ -30,6 +30,11 @@ dependencies {
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine'
 
     pluginClasspath 'com.diffplug.spotless:spotless-plugin-gradle'
+
+    gradlePluginForTesting 'com.palantir.gradle.jdks:gradle-jdks-settings'
+    gradlePluginForTesting 'com.palantir.baseline:gradle-baseline-java'
+    gradlePluginForTesting 'com.palantir.gradle.jdkslatest:gradle-jdks-latest'
+    gradlePluginForTesting 'com.palantir.gradle.jdks:gradle-jdks'
 }
 
 gradlePlugin {
