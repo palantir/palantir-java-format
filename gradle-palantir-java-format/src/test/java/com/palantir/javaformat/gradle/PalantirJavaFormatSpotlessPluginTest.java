@@ -96,7 +96,8 @@ class PalantirJavaFormatSpotlessPluginTest {
                                 + "--add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED")
                 .appendProperty("palantir.jdk.setup.enabled", "true");
 
-        project.gradlePropertiesFile().appendLine(extraGradleProperties);
+        project.gradlePropertiesFile()
+                .appendLine(Optional.ofNullable(extraGradleProperties).orElse(""));
 
         gradle.withArgs("wrapper").buildsSuccessfully();
 
