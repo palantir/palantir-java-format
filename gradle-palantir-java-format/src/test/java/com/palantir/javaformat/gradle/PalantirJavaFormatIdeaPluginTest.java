@@ -39,10 +39,10 @@ import org.junit.jupiter.params.provider.ValueSource;
 @DisabledConfigurationCache
 class PalantirJavaFormatIdeaPluginTest {
 
-    private static final File NATIVE_IMAGE_FILE = new File("build/nativeImage.path");
+    private static final String NATIVE_IMAGE_FILE = new File("build/nativeImage.path").getAbsolutePath();
 
     private static final String NATIVE_CONFIG =
-            String.format("palantirJavaFormatNative files(\"%s\")", NATIVE_IMAGE_FILE);
+            "palantirJavaFormatNative files(file(\"" + NATIVE_IMAGE_FILE + "\").text)";
 
     private static final ObjectMapper XML_MAPPER = new XmlMapper();
 
