@@ -48,12 +48,7 @@ allprojects {
 
     repositories {
         mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
-
-        // Needed for `net.ltgt.gradle:gradle-errorprone-plugin` which is brought in from `com.palantir.baseline:gradle-baseline-java` see: https://mvnrepository.com/artifact/net.ltgt.gradle/gradle-errorprone-plugin/4.3.0
-        maven {
-            url "https://repository.liferay.com/nexus/content/repositories/public/"
-            metadataSources { mavenPom(); ignoreGradleMetadataRedirection() }
-        }
+        gradlePluginPortal()
     }
 }
 
