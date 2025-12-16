@@ -15,24 +15,22 @@
  */
 package com.palantir.javaformat.gradle;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
+import com.palantir.gradle.testing.execution.GradleInvoker;
 import com.palantir.gradle.testing.junit.DisabledConfigurationCache;
 import com.palantir.gradle.testing.junit.GradlePluginTests;
 import com.palantir.gradle.testing.project.RootProject;
 import java.io.File;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
  * When we were getting gradle-baseline to support the configuration cache, spotless had some poorly written tasks
  * which caused issues with the configuration cache.
- *
+ * <p>
  * Bumping spotless to 6.22.0 fixed this, but revealed a new error — the {@code palantirJavaFormat} configuration was
  * being <a href="https://github.com/palantir/palantir-java-format/blob/b7b5995df3be690780939c0d0cb2ec49b99c68c8/gradle-palantir-java-format/src/main/java/com/palantir/javaformat/gradle/spotless/NativePalantirJavaFormatStep.java#L45"> resolved eagerly</a>.
- *
+ * <p>s
  * gradle-consistent-versions enforces against resolving configurations at configuration time, and throws an error.
- *
+ * <p>
  * This test forces creation of the spotless steps, which will reveal any eager resolution of configurations.
  */
 @GradlePluginTests
@@ -40,41 +38,20 @@ import org.junit.jupiter.api.Test;
 class SupportsSpotless622 {
     private static final String CLASSPATH_FILE = new File("build/impl.classpath").getAbsolutePath();
 
-    private GradlewExecutor executor;
-
-    @BeforeEach
-    void setup(RootProject rootProject) {
-        executor = new GradlewExecutor(rootProject.path().toFile());
-    }
-
     @Test
-    @SuppressWarnings("GradleTestPluginsBlock") // Using buildscript block with apply plugin syntax
-    void palantirjavaformatplugin_works_with_spotless_6_22_0(RootProject rootProject) {
-        // language=Gradle
-        rootProject.buildGradle().append("""
-            buildscript {
-                repositories {
-                    mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
-                    gradlePluginPortal() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
-                }
-                 dependencies {
-                     classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:2.34.0'
-                     classpath 'com.diffplug.spotless:spotless-plugin-gradle:6.22.0'
-                 }
-            }
-
-            apply plugin: 'java'
-            apply plugin: 'com.palantir.java-format'
-            apply plugin: 'com.palantir.consistent-versions'
-            apply plugin: 'com.diffplug.spotless'
-
-            version = '0.1.0'
-            """);
+    void palantirjavaformatplugin_works_with_spotless_6_22_0(GradleInvoker gradle, RootProject rootProject) {
+        rootProject
+                .buildGradle()
+                .plugins()
+                .add("java")
+                .add("com.palantir.java-format")
+                .add("com.palantir.consistent-versions")
+                .add("com.diffplug.spotless");
 
         rootProject.file("versions.props").createEmpty();
         rootProject.file("versions.lock").createEmpty();
 
-        executor.runGradlewTasks("wrapper");
+        gradle.withArgs("wrapper").buildsSuccessfully();
 
         rootProject.buildGradle().append("""
             dependencies {
@@ -87,8 +64,6 @@ class SupportsSpotless622 {
             project.getTasks().getByName("spotlessJava")
             """, CLASSPATH_FILE);
 
-        GradlewExecutor.GradlewExecutionResult result = executor.runGradlewTasks("classes", "--info");
-
-        assertThat(result.success()).isTrue();
+        gradle.withArgs("classes", "--info").buildsSuccessfully();
     }
 }

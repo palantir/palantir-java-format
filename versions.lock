@@ -14,17 +14,21 @@ com.diffplug.spotless:spotless-lib-extra:4.1.0 (1 constraints: 1513d22d)
 
 com.diffplug.spotless:spotless-plugin-gradle:8.1.0 (1 constraints: 0b051636)
 
-com.fasterxml.jackson.core:jackson-annotations:2.20 (4 constraints: 0b3cef40)
+com.fasterxml.jackson.core:jackson-annotations:2.20 (5 constraints: 14536f3d)
 
-com.fasterxml.jackson.core:jackson-core:2.20.1 (5 constraints: 315dfb8b)
+com.fasterxml.jackson.core:jackson-core:2.20.1 (6 constraints: 99740a8e)
 
-com.fasterxml.jackson.core:jackson-databind:2.20.1 (4 constraints: ad4ab34d)
+com.fasterxml.jackson.core:jackson-databind:2.20.1 (5 constraints: 1562f39b)
 
-com.fasterxml.jackson.datatype:jackson-datatype-guava:2.20.1 (1 constraints: 3705343b)
+com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.20.1 (2 constraints: 8c36d494)
 
-com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.20.1 (1 constraints: 3705343b)
+com.fasterxml.jackson.datatype:jackson-datatype-guava:2.20.1 (3 constraints: c23ba3d8)
+
+com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.20.1 (2 constraints: db1f6ade)
 
 com.fasterxml.jackson.module:jackson-module-parameter-names:2.20.1 (1 constraints: 3705343b)
+
+com.fasterxml.woodstox:woodstox-core:7.1.1 (1 constraints: 3d174926)
 
 com.google.auto:auto-common:1.2.2 (2 constraints: b421cd9d)
 
@@ -38,7 +42,7 @@ com.google.errorprone:error_prone_annotations:2.41.0 (4 constraints: 4527967a)
 
 com.google.guava:failureaccess:1.0.3 (1 constraints: 160ae3b4)
 
-com.google.guava:guava:33.5.0-jre (10 constraints: 1ebdf40e)
+com.google.guava:guava:33.5.0-jre (10 constraints: 5abe4271)
 
 com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava (1 constraints: bd17c918)
 
@@ -48,7 +52,7 @@ com.googlecode.concurrent-trees:concurrent-trees:2.6.1 (1 constraints: 761166da)
 
 com.googlecode.javaewah:JavaEWAH:1.2.3 (1 constraints: 460e7e50)
 
-com.palantir.gradle.idea-configuration:gradle-idea-configuration:0.3.0 (1 constraints: 0505f435)
+com.palantir.gradle.idea-configuration:gradle-idea-configuration:0.7.0 (2 constraints: bf2051ef)
 
 com.palantir.gradle.utils:exec:0.21.0 (1 constraints: 2e0f5e76)
 
@@ -69,6 +73,8 @@ dev.equo.ide:solstice:1.8.1 (1 constraints: 771167da)
 net.sf.jopt-simple:jopt-simple:5.0.4 (1 constraints: be0ad6cc)
 
 org.apache.commons:commons-math3:3.6.1 (1 constraints: bf0adbcc)
+
+org.codehaus.woodstox:stax2-api:4.2.2 (2 constraints: 6a278bd2)
 
 org.derive4j:derive4j-annotation:1.1.1 (1 constraints: 0505f435)
 
@@ -144,6 +150,10 @@ com.google.truth:truth:1.4.5 (1 constraints: 1d1219fb)
 
 com.netflix.nebula:nebula-test:10.6.2 (2 constraints: ce1db32b)
 
+com.palantir.gradle.consistentversions:gradle-consistent-versions:3.7.0 (1 constraints: 0c050f36)
+
+com.palantir.gradle.failure-reports:gradle-failure-reports-exceptions:1.2.0 (1 constraints: b71b1c46)
+
 com.palantir.gradle.plugintesting:configuration-cache-spec:0.43.0 (1 constraints: 3905383b)
 
 com.palantir.gradle.plugintesting:discover-tests-cli:0.43.0 (1 constraints: 3905383b)
@@ -159,6 +169,8 @@ info.picocli:picocli:4.7.7 (1 constraints: 2816dcdd)
 junit:junit:4.13.2 (7 constraints: 3a63fd07)
 
 net.bytebuddy:byte-buddy:1.17.7 (1 constraints: 560b56df)
+
+one.util:streamex:0.8.4 (1 constraints: c01b2d46)
 
 org.apiguardian:apiguardian-api:1.1.2 (11 constraints: 3ac82b62)
 
