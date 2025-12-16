@@ -41,9 +41,9 @@ class PalantirJavaFormatSpotlessPluginTest {
     @CsvSource(
             delimiter = '|',
             value = {
-                    "                               | 21 | Using the Java-based formatter",
-                    "palantir.native.formatter=true | 21 | Using the Java-based formatter",
-                    "palantir.native.formatter=true | 17 | Using the native-image formatter"
+                "                               | 21 | Using the Java-based formatter",
+                "palantir.native.formatter=true | 21 | Using the Java-based formatter",
+                "palantir.native.formatter=true | 17 | Using the native-image formatter"
             })
     void formats_with_spotless_when_spotless_is_applied(
             String extraGradleProperties,
@@ -68,22 +68,22 @@ class PalantirJavaFormatSpotlessPluginTest {
                 .add("com.palantir.jdks.latest");
 
         project.buildGradle().append("""
-                buildscript {
-                    dependencies {
-                        constraints {
-                            classpath 'com.diffplug.spotless:6.22.0'
-                        }
+            buildscript {
+                dependencies {
+                    constraints {
+                        classpath 'com.diffplug.spotless:6.22.0'
                     }
                 }
-                
-                javaVersions {
-                    libraryTarget = %s
-                }
-                
-                jdks {
-                    daemonTarget = %s
-                }
-                """, javaVersion, javaVersion);
+            }
+
+            javaVersions {
+                libraryTarget = %s
+            }
+
+            jdks {
+                daemonTarget = %s
+            }
+            """, javaVersion, javaVersion);
 
         // Add jvm args to allow spotless and formatter gradle plugins to run with Java 16+
         project.gradlePropertiesFile()
@@ -103,11 +103,11 @@ class PalantirJavaFormatSpotlessPluginTest {
         project.buildGradle().plugins().add("com.diffplug.spotless");
 
         project.buildGradle().append("""
-                dependencies {
-                    palantirJavaFormat files(file("%s").text.split(':'))
-                    %s
-                }
-                """, CLASSPATH_FILE, extraDependencies);
+            dependencies {
+                palantirJavaFormat files(file("%s").text.split(':'))
+                %s
+            }
+            """, CLASSPATH_FILE, extraDependencies);
 
         project.file("src/main/java/Main.java").overwrite(invalidJavaFile());
 
@@ -119,32 +119,32 @@ class PalantirJavaFormatSpotlessPluginTest {
 
     private String validJavaFile() {
         return """
-                package test;
-                
-                public class Test {
-                    void test() {
-                        int x = 1;
-                        System.out.println("Hello");
-                        Optional.of("hello").orElseGet(() -> {
-                            return "Hello World";
-                        });
-                    }
+            package test;
+
+            public class Test {
+                void test() {
+                    int x = 1;
+                    System.out.println("Hello");
+                    Optional.of("hello").orElseGet(() -> {
+                        return "Hello World";
+                    });
                 }
-                """;
+            }
+            """;
     }
 
     private String invalidJavaFile() {
         return """
-                package test;
-                import com.java.unused;
-                public class Test { void test() {int x = 1;
-                    System.out.println(
-                        "Hello"
-                    );
-                    Optional.of("hello").orElseGet(() -> {
-                        return "Hello World";
-                    });
-                } }
-                """;
+            package test;
+            import com.java.unused;
+            public class Test { void test() {int x = 1;
+                System.out.println(
+                    "Hello"
+                );
+                Optional.of("hello").orElseGet(() -> {
+                    return "Hello World";
+                });
+            } }
+            """;
     }
 }
