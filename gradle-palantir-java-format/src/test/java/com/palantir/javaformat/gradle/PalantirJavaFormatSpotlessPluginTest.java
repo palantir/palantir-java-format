@@ -68,13 +68,13 @@ class PalantirJavaFormatSpotlessPluginTest {
                 .add("com.palantir.jdks.latest");
 
         project.buildGradle().append("""
-                    javaVersions {
-                        libraryTarget = %s
-                    }
+                javaVersions {
+                    libraryTarget = %s
+                }
                 
-                    jdks {
-                        daemonTarget = %s
-                    }
+                jdks {
+                    daemonTarget = %s
+                }
                 """, javaVersion, javaVersion);
 
         // Add jvm args to allow spotless and formatter gradle plugins to run with Java 16+
@@ -95,10 +95,10 @@ class PalantirJavaFormatSpotlessPluginTest {
         project.buildGradle().plugins().add("com.diffplug.spotless");
 
         project.buildGradle().append("""
-                    dependencies {
-                        palantirJavaFormat files(file("%s").text.split(':'))
-                        %s
-                    }
+                dependencies {
+                    palantirJavaFormat files(file("%s").text.split(':'))
+                    %s
+                }
                 """, CLASSPATH_FILE, extraDependencies);
 
         project.file("src/main/java/Main.java").overwrite(invalidJavaFile());
