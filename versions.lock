@@ -14,11 +14,11 @@ com.diffplug.spotless:spotless-lib-extra:4.1.0 (1 constraints: 1513d22d)
 
 com.diffplug.spotless:spotless-plugin-gradle:8.1.0 (1 constraints: 0b051636)
 
-com.fasterxml.jackson.core:jackson-annotations:2.20 (4 constraints: 0b3cef40)
+com.fasterxml.jackson.core:jackson-annotations:2.20 (5 constraints: 14536f3d)
 
-com.fasterxml.jackson.core:jackson-core:2.20.0 (5 constraints: 2c5d7589)
+com.fasterxml.jackson.core:jackson-core:2.20.0 (6 constraints: 93743f8a)
 
-com.fasterxml.jackson.core:jackson-databind:2.20.0 (4 constraints: a94a254c)
+com.fasterxml.jackson.core:jackson-databind:2.20.0 (5 constraints: 10626199)
 
 com.fasterxml.jackson.datatype:jackson-datatype-guava:2.20.0 (1 constraints: 3605333b)
 
@@ -134,6 +134,10 @@ org.tukaani:xz:1.9 (1 constraints: 6b09e995)
 
 cglib:cglib-nodep:3.2.2 (1 constraints: 490ded24)
 
+com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.20.0 (1 constraints: 3605333b)
+
+com.fasterxml.woodstox:woodstox-core:7.1.1 (1 constraints: 3d174926)
+
 com.google.auto.value:auto-value-annotations:1.11.0 (2 constraints: d01cd319)
 
 com.google.guava:guava-testlib:27.0.1-jre (1 constraints: aa067c53)
@@ -167,6 +171,8 @@ org.assertj:assertj-core:3.27.6 (2 constraints: 211f1a90)
 org.checkerframework:checker-qual:2.5.2 (1 constraints: 3f0d9a22)
 
 org.codehaus.groovy:groovy:3.0.24 (3 constraints: 133429dd)
+
+org.codehaus.woodstox:stax2-api:4.2.2 (2 constraints: 6a278bd2)
 
 org.graalvm.buildtools:junit-platform-native:0.10.4 (1 constraints: 3705273b)
 
