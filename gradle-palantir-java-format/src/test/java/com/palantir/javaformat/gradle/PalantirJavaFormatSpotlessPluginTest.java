@@ -68,14 +68,6 @@ class PalantirJavaFormatSpotlessPluginTest {
                 .add("com.palantir.jdks.latest");
 
         project.buildGradle().append("""
-            buildscript {
-                dependencies {
-                    constraints {
-                        classpath 'com.diffplug.spotless:6.22.0'
-                    }
-                }
-            }
-
             javaVersions {
                 libraryTarget = %s
             }
