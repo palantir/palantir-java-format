@@ -34,3 +34,11 @@ tasks.named('jmh', JMHTask.class) {
 jmhCompileGeneratedClasses {
     options.errorprone.enabled = false
 }
+
+
+spotless {
+    java {
+        // symlink to an input test, we shouldn't format it
+        targetExclude 'src/test/jmh/resources/*.java'
+    }
+}
