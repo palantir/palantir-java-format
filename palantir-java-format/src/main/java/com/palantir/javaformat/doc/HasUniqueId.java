@@ -29,7 +29,7 @@ public abstract class HasUniqueId {
     private final int uniqueId = UNIQUE_ID_GENERATOR.incrementAndGet();
 
     @JsonProperty("id")
-    public final Integer id() {
+    public final int id() {
         return uniqueId;
     }
 
