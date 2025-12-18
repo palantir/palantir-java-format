@@ -62,6 +62,12 @@ public class BenchmarkMultiFiles {
         }
     }
 
+    @State(Scope.Benchmark)
+    public static class BenchmarkMultiLevelState {
+
+        final Path multiLevelInput = Paths.get(".").toAbsolutePath().resolve("src/jmh/resources/MultiInnerLevels.java");
+    }
+
     @Benchmark
     @BenchmarkMode(Mode.All)
     @OutputTimeUnit(TimeUnit.SECONDS)
@@ -96,6 +102,28 @@ public class BenchmarkMultiFiles {
                                 "--palantir"),
                         state.filesToFormat.stream())
                 .collect(Collectors.toList()));
+        Process process = p.inheritIO().start();
+        assertThat(process.waitFor()).isEqualTo(0);
+    }
+
+    @Benchmark
+    @BenchmarkMode(Mode.AverageTime)
+    @OutputTimeUnit(TimeUnit.SECONDS)
+    public final void runInnerLevelBenchmark(BenchmarkMultiLevelState state) throws InterruptedException, IOException {
+        ProcessBuilder p = new ProcessBuilder();
+        p.command(List.of(
+                "java",
+                "-cp",
+                System.getenv("JARS_CLASSPATH"),
+                "--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
+                "--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED",
+                "--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED",
+                "--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
+                "--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
+                "com.palantir.javaformat.java.Main",
+                "-i",
+                "--palantir",
+                state.multiLevelInput.toString()));
         Process process = p.inheritIO().start();
         assertThat(process.waitFor()).isEqualTo(0);
     }

@@ -1,0 +1,1 @@
+/Volumes/git/palantir-java-format/palantir-java-format/src/test/resources/com/palantir/javaformat/java/testdata2/B24909927.input

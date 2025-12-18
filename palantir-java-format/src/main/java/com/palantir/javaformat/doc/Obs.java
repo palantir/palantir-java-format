@@ -41,7 +41,7 @@ public final class Obs {
     public interface ExplorationNode {
         LevelNode newChildNode(Level level, State state);
 
-        int id();
+        Integer id();
     }
 
     public interface Sink {
@@ -74,7 +74,7 @@ public final class Obs {
 
         Exploration explore(String humanDescription, State incomingState, Function<ExplorationNode, State> supplier);
 
-        int id();
+        Integer id();
 
         Optional<Exploration> maybeExplore(
                 String humanDescription, State incomingState, Function<ExplorationNode, Optional<State>> supplier);

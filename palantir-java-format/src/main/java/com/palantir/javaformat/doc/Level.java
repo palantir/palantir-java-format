@@ -55,7 +55,7 @@ public final class Level extends Doc {
      * How many branches we are allowed to take (i.e how many times we can consider breaking vs not breaking the current
      * level) before we stop branching and always break, which is the google-java-format default behaviour.
      */
-    private static final int MAX_BRANCHING_COEFFICIENT = 20;
+    private static final int MAX_BRANCHING_COEFFICIENT = 15;
 
     private static final Collector<Level, ?, Optional<Level>> GET_LAST_COLLECTOR = Collectors.reducing((u, v) -> v);
 
