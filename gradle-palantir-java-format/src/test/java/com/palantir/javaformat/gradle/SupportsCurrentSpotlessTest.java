@@ -39,7 +39,7 @@ class SupportsCurrentSpotlessTest {
     private static final String CLASSPATH_FILE = new File("build/impl.classpath").getAbsolutePath();
 
     @Test
-    void palantirjavaformatplugin_works_with_spotless_6_22_0(GradleInvoker gradle, RootProject rootProject) {
+    void palantirjavaformatplugin_works_with_current_spotless(GradleInvoker gradle, RootProject rootProject) {
         rootProject
                 .buildGradle()
                 .plugins()
