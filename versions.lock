@@ -18,7 +18,7 @@ com.fasterxml.jackson.core:jackson-annotations:2.20 (7 constraints: 447c2451)
 
 com.fasterxml.jackson.core:jackson-core:2.20.1 (6 constraints: 99740a8e)
 
-com.fasterxml.jackson.core:jackson-databind:2.20.1 (7 constraints: 5b88435a)
+com.fasterxml.jackson.core:jackson-databind:2.20.1 (7 constraints: 5c887f5a)
 
 com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.20.1 (2 constraints: 8c36d494)
 
@@ -42,7 +42,7 @@ com.google.errorprone:error_prone_annotations:2.41.0 (5 constraints: 7037dea5)
 
 com.google.guava:failureaccess:1.0.3 (2 constraints: f3154f13)
 
-com.google.guava:guava:33.5.0-jre (15 constraints: 7129631e)
+com.google.guava:guava:33.5.0-jre (15 constraints: 6a290a17)
 
 com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava (1 constraints: bd17c918)
 
@@ -158,37 +158,37 @@ com.googlecode.java-diff-utils:diffutils:1.3.0 (1 constraints: bd11fef4)
 
 com.netflix.nebula:nebula-test:10.6.2 (2 constraints: ce1db32b)
 
-com.palantir.baseline:gradle-baseline-java:6.85.0 (2 constraints: da1424c0)
+com.palantir.baseline:gradle-baseline-java:6.87.0 (2 constraints: dc1486c0)
 
-com.palantir.baseline-error-prone:gradle-baseline-error-prone:0.4.0 (1 constraints: bd11fcf4)
+com.palantir.baseline-error-prone:gradle-baseline-error-prone:0.5.0 (1 constraints: be11fff4)
 
 com.palantir.gradle.consistentversions:gradle-consistent-versions:3.7.0 (1 constraints: 0c050f36)
 
 com.palantir.gradle.failure-reports:gradle-failure-reports-exceptions:1.9.0 (3 constraints: db3cefde)
 
-com.palantir.gradle.jdks:gradle-jdks:0.70.0 (2 constraints: 161a8211)
+com.palantir.gradle.jdks:gradle-jdks:0.71.0 (2 constraints: 171ac011)
 
-com.palantir.gradle.jdks:gradle-jdks-distributions:0.70.0 (2 constraints: 06214f9b)
+com.palantir.gradle.jdks:gradle-jdks-distributions:0.71.0 (2 constraints: 0821889b)
 
-com.palantir.gradle.jdks:gradle-jdks-enablement:0.70.0 (1 constraints: 900f4c92)
+com.palantir.gradle.jdks:gradle-jdks-enablement:0.71.0 (1 constraints: 910f4f92)
 
-com.palantir.gradle.jdks:gradle-jdks-json:0.70.0 (1 constraints: 900f4c92)
+com.palantir.gradle.jdks:gradle-jdks-json:0.71.0 (1 constraints: 910f4f92)
 
-com.palantir.gradle.jdks:gradle-jdks-settings:0.70.0 (1 constraints: 39053b3b)
+com.palantir.gradle.jdks:gradle-jdks-settings:0.71.0 (1 constraints: 3a053e3b)
 
-com.palantir.gradle.jdks:gradle-jdks-setup:0.70.0 (1 constraints: 900f4c92)
+com.palantir.gradle.jdks:gradle-jdks-setup:0.71.0 (1 constraints: 910f4f92)
 
-com.palantir.gradle.jdks:gradle-jdks-setup-common:0.70.0 (3 constraints: 143b9541)
+com.palantir.gradle.jdks:gradle-jdks-setup-common:0.71.0 (3 constraints: 173b3f42)
 
 com.palantir.gradle.jdkslatest:gradle-jdks-latest:0.24.0 (1 constraints: 3805333b)
 
-com.palantir.gradle.plugintesting:configuration-cache-spec:0.44.0 (1 constraints: 3a053b3b)
+com.palantir.gradle.plugintesting:configuration-cache-spec:0.46.0 (1 constraints: 3c05413b)
 
-com.palantir.gradle.plugintesting:discover-tests-cli:0.44.0 (1 constraints: 3a053b3b)
+com.palantir.gradle.plugintesting:discover-tests-cli:0.46.0 (1 constraints: 3c05413b)
 
-com.palantir.gradle.plugintesting:gradle-plugin-testing-junit:0.44.0 (1 constraints: 3a053b3b)
+com.palantir.gradle.plugintesting:gradle-plugin-testing-junit:0.46.0 (1 constraints: 3c05413b)
 
-com.palantir.gradle.plugintesting:plugin-testing-core:0.44.0 (1 constraints: 3a053b3b)
+com.palantir.gradle.plugintesting:plugin-testing-core:0.46.0 (1 constraints: 3c05413b)
 
 com.palantir.gradle.utils:environment-variables:0.21.0 (2 constraints: 142f0f67)
 
@@ -196,7 +196,7 @@ com.palantir.gradle.utils:lazily-configured-mapping:0.21.0 (2 constraints: 7a219
 
 com.palantir.suppressible-error-prone:gradle-suppressible-error-prone:2.26.0 (1 constraints: 7419b3d0)
 
-commons-io:commons-io:2.19.0 (3 constraints: 10399b93)
+commons-io:commons-io:2.19.0 (3 constraints: 11391294)
 
 info.picocli:picocli:4.7.7 (1 constraints: 2816dcdd)
 
@@ -316,7 +316,7 @@ org.opentest4j:opentest4j:1.3.0 (2 constraints: cf209249)
 
 org.opentest4j.reporting:open-test-reporting-tooling-spi:0.2.4 (1 constraints: ce12e218)
 
-org.ow2.asm:asm:9.9 (6 constraints: b069cc83)
+org.ow2.asm:asm:9.9.1 (6 constraints: 0f6add0b)
 
 org.spockframework:spock-core:2.3-groovy-3.0 (3 constraints: 2c3deb38)
 
