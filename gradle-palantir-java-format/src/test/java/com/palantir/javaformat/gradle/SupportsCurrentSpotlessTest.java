@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
  * When we were getting gradle-baseline to support the configuration cache, spotless had some poorly written tasks
  * which caused issues with the configuration cache.
  * <p>
- * Bumping spotless to 6.22.0 fixed this, but revealed a new error — the {@code palantirJavaFormat} configuration was
+ * Bumping spotless to 6.22.0 or newer fixed this, but revealed a new error — the {@code palantirJavaFormat} configuration was
  * being <a href="https://github.com/palantir/palantir-java-format/blob/b7b5995df3be690780939c0d0cb2ec49b99c68c8/gradle-palantir-java-format/src/main/java/com/palantir/javaformat/gradle/spotless/NativePalantirJavaFormatStep.java#L45"> resolved eagerly</a>.
  * <p>
  * gradle-consistent-versions enforces against resolving configurations at configuration time, and throws an error.
@@ -35,7 +35,7 @@ import org.junit.jupiter.api.Test;
  */
 @GradlePluginTests
 @DisabledConfigurationCache
-class SupportsSpotless622 {
+class SupportsCurrentSpotlessTest {
     private static final String CLASSPATH_FILE = new File("build/impl.classpath").getAbsolutePath();
 
     @Test

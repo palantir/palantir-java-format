@@ -7,7 +7,6 @@ com.google.errorprone:error_prone_annotations = 2.11.0
 com.google.guava:guava = 33.5.0-jre
 com.google.guava:guava-testlib = 27.0.1-jre
 com.google.testing.compile:compile-testing = 0.23.0
-com.palantir.gradle.plugintesting:gradle-plugin-testing-junit = 0.39.0
 com.palantir.sls.versions:sls-versions = 1.8.0
 com.netflix.nebula:nebula-test = 10.0.0
 junit:junit = 4.13.2
