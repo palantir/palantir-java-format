@@ -16,6 +16,7 @@
 
 package com.palantir.javaformat.gradle
 
+import groovy.xml.XmlSlurper
 import nebula.test.IntegrationTestKitSpec
 
 class PalantirJavaFormatIdeaPluginTest extends IntegrationTestKitSpec {
