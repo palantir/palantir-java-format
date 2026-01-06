@@ -166,19 +166,19 @@ com.palantir.gradle.consistentversions:gradle-consistent-versions:3.7.0 (1 const
 
 com.palantir.gradle.failure-reports:gradle-failure-reports-exceptions:1.9.0 (3 constraints: db3cefde)
 
-com.palantir.gradle.jdks:gradle-jdks:0.71.0 (2 constraints: 171ac011)
+com.palantir.gradle.jdks:gradle-jdks:0.73.0 (2 constraints: 191a3c12)
 
-com.palantir.gradle.jdks:gradle-jdks-distributions:0.71.0 (2 constraints: 0821889b)
+com.palantir.gradle.jdks:gradle-jdks-distributions:0.73.0 (2 constraints: 0c21fa9b)
 
-com.palantir.gradle.jdks:gradle-jdks-enablement:0.71.0 (1 constraints: 910f4f92)
+com.palantir.gradle.jdks:gradle-jdks-enablement:0.73.0 (1 constraints: 930f5592)
 
-com.palantir.gradle.jdks:gradle-jdks-json:0.71.0 (1 constraints: 910f4f92)
+com.palantir.gradle.jdks:gradle-jdks-json:0.73.0 (1 constraints: 930f5592)
 
-com.palantir.gradle.jdks:gradle-jdks-settings:0.71.0 (1 constraints: 3a053e3b)
+com.palantir.gradle.jdks:gradle-jdks-settings:0.73.0 (1 constraints: 3c05443b)
 
-com.palantir.gradle.jdks:gradle-jdks-setup:0.71.0 (1 constraints: 910f4f92)
+com.palantir.gradle.jdks:gradle-jdks-setup:0.73.0 (1 constraints: 930f5592)
 
-com.palantir.gradle.jdks:gradle-jdks-setup-common:0.71.0 (3 constraints: 173b3f42)
+com.palantir.gradle.jdks:gradle-jdks-setup-common:0.73.0 (3 constraints: 1d3b9343)
 
 com.palantir.gradle.jdkslatest:gradle-jdks-latest:0.24.0 (1 constraints: 3805333b)
 
@@ -282,27 +282,27 @@ org.hamcrest:hamcrest-core:1.3 (1 constraints: cc05fe3f)
 
 org.immutables:serial:2.10.1 (1 constraints: 74113fef)
 
-org.junit.jupiter:junit-jupiter:6.0.1 (2 constraints: 8e1a8d38)
+org.junit.jupiter:junit-jupiter:6.0.2 (2 constraints: 8f1ac538)
 
-org.junit.jupiter:junit-jupiter-api:6.0.1 (6 constraints: 0e75a5a5)
+org.junit.jupiter:junit-jupiter-api:6.0.2 (6 constraints: 1275d7a6)
 
-org.junit.jupiter:junit-jupiter-engine:6.0.1 (1 constraints: 040ecb3b)
+org.junit.jupiter:junit-jupiter-engine:6.0.2 (1 constraints: 050ecc3b)
 
-org.junit.jupiter:junit-jupiter-migrationsupport:6.0.1 (1 constraints: 09050a36)
+org.junit.jupiter:junit-jupiter-migrationsupport:6.0.2 (1 constraints: 0a050b36)
 
-org.junit.jupiter:junit-jupiter-params:6.0.1 (2 constraints: c22426d7)
+org.junit.jupiter:junit-jupiter-params:6.0.2 (2 constraints: c32427d7)
 
-org.junit.platform:junit-platform-commons:6.0.1 (2 constraints: d520474a)
+org.junit.platform:junit-platform-commons:6.0.2 (2 constraints: d7207a4a)
 
-org.junit.platform:junit-platform-console:6.0.1 (1 constraints: 4313543f)
+org.junit.platform:junit-platform-console:6.0.2 (1 constraints: 4313543f)
 
-org.junit.platform:junit-platform-engine:6.0.1 (4 constraints: 9e40c7e2)
+org.junit.platform:junit-platform-engine:6.0.2 (4 constraints: a140cde3)
 
-org.junit.platform:junit-platform-launcher:6.0.1 (4 constraints: 674153f6)
+org.junit.platform:junit-platform-launcher:6.0.2 (4 constraints: 6941fdf6)
 
-org.junit.platform:junit-platform-reporting:6.0.1 (1 constraints: e8118aee)
+org.junit.platform:junit-platform-reporting:6.0.2 (1 constraints: e9118bee)
 
-org.junit.vintage:junit-vintage-engine:6.0.1 (1 constraints: 09050a36)
+org.junit.vintage:junit-vintage-engine:6.0.2 (1 constraints: 0a050b36)
 
 org.objenesis:objenesis:2.4 (1 constraints: ea0c8c0a)
 
