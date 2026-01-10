@@ -25,7 +25,7 @@ dependencies {
     testImplementation project(':palantir-java-format')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'org.assertj:assertj-core'
-    testImplementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
+    testImplementation 'tools.jackson.dataformat:jackson-dataformat-xml'
 
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine'
 

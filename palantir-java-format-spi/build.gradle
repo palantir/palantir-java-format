@@ -5,11 +5,11 @@ apply plugin: 'com.palantir.external-publish-jar'
 dependencies {
     api 'com.google.guava:guava'
     api 'com.fasterxml.jackson.core:jackson-annotations'
-    api 'com.fasterxml.jackson.datatype:jackson-datatype-guava'
+    api 'tools.jackson.datatype:jackson-datatype-guava'
 
     testImplementation 'org.assertj:assertj-core'
     testImplementation 'org.junit.jupiter:junit-jupiter'
-    testImplementation 'com.fasterxml.jackson.core:jackson-databind'
+    testImplementation 'tools.jackson.core:jackson-databind'
 }
 
 tasks.withType(JavaCompile).named('compileJava') {

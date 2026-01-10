@@ -16,10 +16,6 @@
 
 package com.palantir.javaformat.bootstrap;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
@@ -33,6 +29,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.immutables.value.Value;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.datatype.guava.GuavaModule;
 
 public class NativeImageFormatterService implements FormatterService {
     private static final ObjectMapper MAPPER =

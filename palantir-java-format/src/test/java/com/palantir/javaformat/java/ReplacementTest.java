@@ -18,11 +18,11 @@ package com.palantir.javaformat.java;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import java.io.IOException;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.datatype.guava.GuavaModule;
 
 final class ReplacementTest {
     private static final ObjectMapper MAPPER =
