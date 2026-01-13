@@ -51,6 +51,7 @@ public abstract class SpotlessInterop implements Action<JavaExtension> {
 
     @Override
     public void execute(JavaExtension java) {
+        java.targetExclude("**/build/**/*");
         // This is configuration cache safe as happening afterEvaluate
         java.addStep(spotlessJavaFormatStep());
     }
