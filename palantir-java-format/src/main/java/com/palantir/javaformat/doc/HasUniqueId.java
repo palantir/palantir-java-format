@@ -17,6 +17,7 @@ package com.palantir.javaformat.doc;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fj.Ord;
+import fj.Ordering;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -34,6 +35,7 @@ public abstract class HasUniqueId {
     }
 
     static <D extends HasUniqueId> Ord<D> ord() {
-        return Ord.on((D obj) -> obj.id(), Ord.intOrd).ord();
+        // Use primitive int comparison directly to avoid Integer boxing overhead.
+        return Ord.ord((D a, D b) -> Ordering.fromInt(Integer.compare(a.id(), b.id())));
     }
 }
