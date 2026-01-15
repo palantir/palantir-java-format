@@ -52,10 +52,9 @@ import org.immutables.value.Value;
 /** A {@code Level} inside a {@link Doc}. */
 public final class Level extends Doc {
     /**
-     * How many branches we are allowed to take (i.e how many times we can consider breaking vs not breaking the current
-     * level) before we stop branching and always break, which is the google-java-format default behaviour.
+     * The depth of nested levels in the current level tree from which we explore both breaking vs not breaking the current level.
      */
-    private static final int MAX_BRANCHING_COEFFICIENT = 20;
+    private static final int LAST_LEVELS_TO_EXPLORE = 7;
 
     private static final Collector<Level, ?, Optional<Level>> GET_LAST_COLLECTOR = Collectors.reducing((u, v) -> v);
 
@@ -64,6 +63,10 @@ public final class Level extends Doc {
     @SuppressWarnings("Immutable") // Effectively immutable
     private final ImmutableSupplier<SplitsBreaks> memoizedSplitsBreaks =
             Suppliers.memoize(() -> splitByBreaks(docs))::get;
+
+    @SuppressWarnings("Immutable") // Effectively immutable
+    private final ImmutableSupplier<Integer> memoizedMaxDepth = Suppliers.memoize(() -> computeMaxDepth(docs))::get;
+
     /** The immutable characteristics of this level determined before the level contents are available. */
     private final OpenOp openOp;
 
@@ -130,7 +133,7 @@ public final class Level extends Doc {
      * into account the level's {@link #getColumnLimitBeforeLastBreak()}.
      *
      * @return the width after fitting it onto one line, if it was possible. This is guaranteed to be less than
-     *     {@code maxWidth}
+     * {@code maxWidth}
      */
     private Optional<Integer> tryToFitOnOneLine(int maxWidth, State state, Iterable<Doc> docs) {
         int column = state.column();
@@ -189,16 +192,15 @@ public final class Level extends Doc {
 
         @Override
         public State preferBreakingLastInnerLevel(boolean _keepIndentWhenInlined) {
-            // Try both breaking and not breaking. Choose the better one based on LOC, preferring
-            // breaks if the outcome is the same.
-            State state = this.state.withNewBranch();
-
-            Obs.Exploration broken = breakNormally(state);
-
-            if (state.branchingCoefficient() < MAX_BRANCHING_COEFFICIENT) {
+            int maxDepth = getMaxDepth();
+            // Explore both breaking and not breaking if we're in the last LAST_LEVELS_TO_EXPLORE levels. Choose the
+            // better one based on LOC, preferring breaks if the outcome is the same.
+            if (maxDepth <= LAST_LEVELS_TO_EXPLORE) {
+                State state = this.state.withNewBranch();
+                Obs.Exploration broken = breakNormally(state);
                 State state1 = state.withNoIndent();
                 Optional<Obs.Exploration> lastLevelBroken = levelNode.maybeExplore(
-                        "tryBreakLastLevel",
+                        "tryBreakLastLevel" + maxDepth,
                         state1,
                         explorationNode -> tryBreakLastLevel(commentsHelper, maxWidth, state1, explorationNode, true));
 
@@ -208,8 +210,20 @@ public final class Level extends Doc {
                         return lastLevelBroken.get().markAccepted();
                     }
                 }
+                return broken.markAccepted();
+            } else {
+                State state1 = state.withNoIndent();
+                Optional<Obs.Exploration> lastLevelBroken = levelNode.maybeExplore(
+                        "tryBreakLastLevel only" + maxDepth,
+                        state1,
+                        explorationNode -> tryBreakLastLevel(commentsHelper, maxWidth, state1, explorationNode, true));
+
+                if (lastLevelBroken.isPresent()) {
+                    return lastLevelBroken.get().markAccepted();
+                }
+                // falling back to breaking normally
             }
-            return broken.markAccepted();
+            return breakNormally(state).markAccepted();
         }
 
         @Override
@@ -242,7 +256,7 @@ public final class Level extends Doc {
     private Exploration breakNormally(State state, LevelNode levelNode, CommentsHelper commentsHelper, int maxWidth) {
         State stateForBroken = state.withIndentIncrementedBy(getPlusIndent());
         return levelNode.explore(
-                "breaking normally",
+                "breaking normally " + getMaxDepth(),
                 stateForBroken,
                 explorationNode -> computeBroken(commentsHelper, maxWidth, stateForBroken, explorationNode));
     }
@@ -258,7 +272,7 @@ public final class Level extends Doc {
      * </ul>
      *
      * @param brokenState is expected to be the state resulting from {@link Level#breakNormally}, but is passed in
-     *                    for efficiency reasons
+     * for efficiency reasons
      */
     private Optional<State> handle_breakOnlyIfInnerLevelsThenFitOnOneLine(
             CommentsHelper commentsHelper,
@@ -737,6 +751,44 @@ public final class Level extends Doc {
     }
 
     /**
+     * Get the approximation of the maximum depth of nested levels in this level tree (memoized).
+     */
+    private int getMaxDepth() {
+        return memoizedMaxDepth.get();
+    }
+
+    /**
+     * Calculate an approximation of the maximum depth of nested levels in this level tree, counting method call nesting.
+     * This counts levels that represent method invocations (including lambdas and other callable constructs),
+     * which provides a better measure of structural complexity than counting all levels.
+     * This computation is expensive, so it's memoized via {@link #getMaxDepth()}.
+     */
+    private int computeMaxDepth(Iterable<Doc> docs) {
+        int maxChildDepth = 0;
+        for (Doc doc : docs) {
+            if (doc instanceof Level) {
+                Level childLevel = (Level) doc;
+                maxChildDepth = Math.max(maxChildDepth, childLevel.getMaxDepth());
+            }
+        }
+
+        // Count this level if it represents a method call or similar construct
+        // A level is considered a "method call level" if it has breaks (can span multiple lines)
+        // and is not just a simple wrapper. We use the presence of breaks as a proxy for
+        // meaningful structural nesting.
+        boolean hasBreaks = false;
+        for (Doc doc : docs) {
+            if (doc instanceof Break) {
+                hasBreaks = true;
+                break;
+            }
+        }
+
+        // Only count levels that have breaks (i.e., can actually be formatted across multiple lines)
+        return hasBreaks ? 1 + maxChildDepth : maxChildDepth;
+    }
+
+    /**
      * Get the width of a sequence of {@link Doc}s.
      *
      * @param docs the {@link Doc}s
@@ -774,6 +826,7 @@ public final class Level extends Doc {
     interface SplitsBreaks {
         /** Groups of {@link Doc}s that are children of the current {@link Level}, separated by {@link Break}s. */
         ImmutableList<ImmutableList<Doc>> splits();
+
         /** {@link Break}s between {@link Doc}s in the current {@link Level}. */
         ImmutableList<Break> breaks();
     }

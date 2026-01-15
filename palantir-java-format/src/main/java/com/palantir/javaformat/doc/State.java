@@ -39,12 +39,14 @@ import org.immutables.value.Value.Parameter;
 public abstract class State {
     /** Last indent that was actually taken. */
     public abstract int lastIndent();
+
     /** Next indent, if the level is about to be broken. */
     public abstract int indent();
 
     public abstract int column();
 
     public abstract boolean mustBreak();
+
     /** Counts how many lines a particular formatting took. */
     public abstract int numLines();
 
