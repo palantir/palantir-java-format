@@ -31,6 +31,12 @@ tasks.named('jmh', JMHTask.class) {
     environment.put('JARS_CLASSPATH', configurations.named('formatterNativeJars').map { conf -> conf.collect { it.absolutePath }.join(":") })
 }
 
+spotless {
+    java {
+        targetExclude 'src/test/resources/*'
+    }
+}
+
 jmhCompileGeneratedClasses {
     options.errorprone.enabled = false
 }

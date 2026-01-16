@@ -62,6 +62,23 @@ public class BenchmarkMultiFiles {
         }
     }
 
+    @State(Scope.Benchmark)
+    public static class MultiLevelStates {
+
+        final String fileToFormat = getFileToFormat();
+
+        private static String getFileToFormat() {
+            try {
+                return Paths.get(".")
+                        .resolve("src/test/resources/PalantirDeeplyNestedCalls.java")
+                        .toAbsolutePath()
+                        .toString();
+            } catch (Exception e) {
+                throw new RuntimeException("Error reading resource ", e);
+            }
+        }
+    }
+
     @Benchmark
     @BenchmarkMode(Mode.All)
     @OutputTimeUnit(TimeUnit.SECONDS)
@@ -72,6 +89,17 @@ public class BenchmarkMultiFiles {
                                 Path.of(System.getenv("NATIVE_IMAGE_CLASSPATH")).toString(), "-i", "--palantir"),
                         state.filesToFormat.stream())
                 .collect(Collectors.toList()));
+        Process process = p.inheritIO().start();
+        assertThat(process.waitFor()).isEqualTo(0);
+    }
+
+    @Benchmark
+    @BenchmarkMode(Mode.AverageTime)
+    @OutputTimeUnit(TimeUnit.SECONDS)
+    public final void runNestedLevel(MultiLevelStates state) throws InterruptedException, IOException {
+        ProcessBuilder p = new ProcessBuilder();
+        p.command(List.of(
+                Path.of(System.getenv("NATIVE_IMAGE_CLASSPATH")).toString(), "-i", "--palantir", state.fileToFormat));
         Process process = p.inheritIO().start();
         assertThat(process.waitFor()).isEqualTo(0);
     }
@@ -102,8 +130,8 @@ public class BenchmarkMultiFiles {
 
     public static void main(String[] _args) throws RunnerException {
         new Runner(new OptionsBuilder()
-                        .include(BenchmarkMultiFiles.class.getSimpleName())
-                        .build())
+                .include(BenchmarkMultiFiles.class.getSimpleName())
+                .build())
                 .run();
     }
 }
