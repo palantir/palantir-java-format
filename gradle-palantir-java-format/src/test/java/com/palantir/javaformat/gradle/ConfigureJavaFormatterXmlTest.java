@@ -289,15 +289,15 @@ class ConfigureJavaFormatterXmlTest {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private static String xmlSubcomponentToString(Node node, String name) {
-        return ((List<Node>) node.children())
-                .stream()
-                        .filter(child -> name.equals(child.attribute("name")))
-                        .findFirst()
-                        .map(ConfigureJavaFormatterXmlTest::xmlToString)
-                        .map(String::strip)
-                        .orElseThrow(() -> new IllegalArgumentException("Component not found: " + name));
+        List<?> children = node.children();
+        return children.stream()
+                .map(Node.class::cast)
+                .filter(child -> name.equals(child.attribute("name")))
+                .findFirst()
+                .map(ConfigureJavaFormatterXmlTest::xmlToString)
+                .map(String::strip)
+                .orElseThrow(() -> new IllegalArgumentException("Component not found: " + name));
     }
 
     private static String xmlToString(Node node) {
