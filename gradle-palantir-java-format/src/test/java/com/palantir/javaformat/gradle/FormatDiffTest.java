@@ -108,8 +108,10 @@ class FormatDiffTest {
 
     private static Stream<FormatterService> getFormatters() throws IOException {
         return Stream.of(
-                new BootstrappingFormatterService(javaBinPath(), Runtime.version().feature(), getClasspath()),
-                new NativeImageFormatterService(Path.of(Files.readString(NATIVE_IMAGE_FILE.toPath()).trim())));
+                new BootstrappingFormatterService(
+                        javaBinPath(), Runtime.version().feature(), getClasspath()),
+                new NativeImageFormatterService(
+                        Path.of(Files.readString(NATIVE_IMAGE_FILE.toPath()).trim())));
     }
 
     private static List<Path> getClasspath() throws IOException {
