@@ -27,14 +27,14 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-import javax.xml.parsers.ParserConfigurationException;
+import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.xml.sax.SAXException;
 
 class ConfigureJavaFormatterXmlTest {
 
+    @Language("xml")
     private static final String EXISTING_CLASS_PATH = """
         <root>
             <component name="PalantirJavaFormatSettings">
@@ -50,6 +50,7 @@ class ConfigureJavaFormatterXmlTest {
         </root>
         """;
 
+    @Language("xml")
     private static final String MISSING_CLASS_PATH = """
         <root>
             <component name="PalantirJavaFormatSettings">
@@ -58,11 +59,13 @@ class ConfigureJavaFormatterXmlTest {
         </root>
         """;
 
+    @Language("xml")
     private static final String MISSING_ENTIRE_BLOCK = """
         <root>
         </root>
         """;
 
+    @Language("xml")
     private static final String EXPECTED = """
         <root>
           <component name="PalantirJavaFormatSettings">
@@ -78,6 +81,7 @@ class ConfigureJavaFormatterXmlTest {
         </root>
         """;
 
+    @Language("xml")
     private static final String EXPECTED_WITHOUT_NATIVE = """
         <root>
           <component name="PalantirJavaFormatSettings">
@@ -97,7 +101,7 @@ class ConfigureJavaFormatterXmlTest {
     }
 
     @Test
-    void configure_missingEntireBlock_added() throws Exception {
+    void configure_missingEntireBlock_added() {
         Node node = parseXml(MISSING_ENTIRE_BLOCK);
 
         ConfigureJavaFormatterXml.configureJavaFormat(
@@ -107,7 +111,7 @@ class ConfigureJavaFormatterXmlTest {
     }
 
     @Test
-    void configure_missingClassPath_added() throws Exception {
+    void configure_missingClassPath_added() {
         Node node = parseXml(MISSING_CLASS_PATH);
 
         ConfigureJavaFormatterXml.configureJavaFormat(
@@ -133,7 +137,7 @@ class ConfigureJavaFormatterXmlTest {
     }
 
     @Test
-    void configure_existingClassPath_modified() throws Exception {
+    void configure_existingClassPath_modified() {
         Node node = parseXml(EXISTING_CLASS_PATH);
 
         ConfigureJavaFormatterXml.configureJavaFormat(
@@ -143,7 +147,7 @@ class ConfigureJavaFormatterXmlTest {
     }
 
     @Test
-    void configure_noNativeImageClassPath_removal() throws Exception {
+    void configure_noNativeImageClassPath_removal() {
         Node node = parseXml(EXISTING_CLASS_PATH);
 
         ConfigureJavaFormatterXml.configureJavaFormat(
@@ -154,7 +158,7 @@ class ConfigureJavaFormatterXmlTest {
 
     @ParameterizedTest
     @MethodSource("actionsOnSave")
-    void adds_action_OnSave_block_where_none_exists(String action) throws Exception {
+    void adds_action_OnSave_block_where_none_exists(String action) {
         Node node = parseXml("""
             <root>
             </root>
@@ -181,7 +185,7 @@ class ConfigureJavaFormatterXmlTest {
 
     @ParameterizedTest
     @MethodSource("actionsOnSave")
-    void adds_Java_to_existing_action_OnSave_block(String action) throws Exception {
+    void adds_Java_to_existing_action_OnSave_block(String action) {
         Node node = parseXml("""
             <root>
               <component name="%sOnSaveOptions">
@@ -215,8 +219,7 @@ class ConfigureJavaFormatterXmlTest {
 
     @ParameterizedTest
     @MethodSource("actionsOnSave")
-    void if_all_file_types_are_already_configured_to_action_on_save_dont_change_anything(String action)
-            throws Exception {
+    void if_all_file_types_are_already_configured_to_action_on_save_dont_change_anything(String action) {
         Node node = parseXml("""
             <root>
               <component name="%sOnSaveOptions">
@@ -245,7 +248,7 @@ class ConfigureJavaFormatterXmlTest {
 
     @ParameterizedTest
     @MethodSource("actionsOnSave")
-    void if_the_myRunOnSave_for_action_on_save_is_explicitly_disabled_turn_it_on(String action) throws Exception {
+    void if_the_myRunOnSave_for_action_on_save_is_explicitly_disabled_turn_it_on(String action) {
         Node node = parseXml("""
             <root>
               <component name="%sOnSaveOptions">
@@ -278,7 +281,7 @@ class ConfigureJavaFormatterXmlTest {
         assertThat(newXml).isEqualTo(expected);
     }
 
-    private static Node parseXml(String xml) throws ParserConfigurationException, SAXException {
+    private static Node parseXml(@Language("xml") String xml) {
         try {
             return new XmlParser().parseText(xml);
         } catch (Exception e) {
