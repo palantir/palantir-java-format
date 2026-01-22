@@ -8,11 +8,11 @@ com.diffplug.durian:durian-io:1.2.0 (1 constraints: 1313c62d)
 
 com.diffplug.durian:durian-swt.os:4.3.0 (1 constraints: c60948a9)
 
-com.diffplug.spotless:spotless-lib:4.1.0 (2 constraints: 8624d3a4)
+com.diffplug.spotless:spotless-lib:4.2.0 (2 constraints: 88240ea5)
 
-com.diffplug.spotless:spotless-lib-extra:4.1.0 (1 constraints: 1513d22d)
+com.diffplug.spotless:spotless-lib-extra:4.2.0 (1 constraints: 1613d52d)
 
-com.diffplug.spotless:spotless-plugin-gradle:8.1.0 (2 constraints: cd164c2c)
+com.diffplug.spotless:spotless-plugin-gradle:8.2.0 (2 constraints: ce16822c)
 
 com.fasterxml.jackson.core:jackson-annotations:2.20 (7 constraints: 447c2451)
 
@@ -66,7 +66,7 @@ com.squareup.okio:okio:3.6.0 (1 constraints: 530c38fd)
 
 com.squareup.okio:okio-jvm:3.6.0 (1 constraints: 500ad3b9)
 
-commons-codec:commons-codec:1.19.0 (2 constraints: 1d1eed86)
+commons-codec:commons-codec:1.20.0 (2 constraints: 151ed686)
 
 dev.equo.ide:solstice:1.8.1 (1 constraints: 771167da)
 
@@ -80,7 +80,7 @@ org.derive4j:derive4j-annotation:1.1.1 (1 constraints: 0505f435)
 
 org.eclipse.jdt:org.eclipse.jdt.core:3.23.0 (1 constraints: 3a05423b)
 
-org.eclipse.jgit:org.eclipse.jgit:7.4.0.202509020913-r (2 constraints: ee2a8fd8)
+org.eclipse.jgit:org.eclipse.jgit:7.5.0.202512021534-r (2 constraints: e42aefd6)
 
 org.eclipse.platform:org.eclipse.core.commands:3.9.700 (1 constraints: 7505d640)
 
@@ -106,7 +106,7 @@ org.eclipse.platform:org.eclipse.equinox.registry:3.9.0 (1 constraints: 0e051536
 
 org.eclipse.platform:org.eclipse.equinox.supplement:1.10.0 (1 constraints: 3405293b)
 
-org.eclipse.platform:org.eclipse.osgi:3.23.200 (3 constraints: 9f21c222)
+org.eclipse.platform:org.eclipse.osgi:3.24.0 (3 constraints: 3e21dfe7)
 
 org.eclipse.platform:org.eclipse.text:3.10.300 (1 constraints: 99053a46)
 
@@ -130,7 +130,7 @@ org.openjdk.jmh:jmh-core:1.37 (5 constraints: 52476be6)
 
 org.openjdk.jmh:jmh-generator-annprocess:1.37 (1 constraints: df04fc30)
 
-org.slf4j:slf4j-api:2.0.17 (5 constraints: 004e4b2b)
+org.slf4j:slf4j-api:2.0.17 (5 constraints: f94d322b)
 
 org.tukaani:xz:1.9 (1 constraints: 6b09e995)
 
