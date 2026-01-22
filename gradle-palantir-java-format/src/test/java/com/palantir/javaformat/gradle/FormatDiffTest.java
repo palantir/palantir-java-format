@@ -58,10 +58,10 @@ class FormatDiffTest {
                 .map(FormatDiff.SingleFileDiff::toString)
                 .collect(Collectors.toList());
         assertThat(strings)
-                .isEqualTo(ImmutableList.of(
+                .containsExactly(
                         "SingleFileDiff{path=build.gradle, lineRanges=[[24..25), [29..30)]}",
                         "SingleFileDiff{path=tracing/src/test/java/com/palantir/tracing/TracersTest.java, "
-                                + "lineRanges=[[659..660), [675..676)]}"));
+                                + "lineRanges=[[659..660), [675..676)]}");
     }
 
     @ParameterizedTest
