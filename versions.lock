@@ -206,7 +206,7 @@ javax.inject:javax.inject:1 (7 constraints: e66230f0)
 
 junit:junit:4.13.2 (7 constraints: 3a63fd07)
 
-net.bytebuddy:byte-buddy:1.17.7 (1 constraints: 560b56df)
+net.bytebuddy:byte-buddy:1.18.3 (1 constraints: 530b55df)
 
 net.ltgt.gradle:gradle-errorprone-plugin:4.3.0 (2 constraints: 3d366a24)
 
@@ -252,7 +252,7 @@ org.apache.maven.shared:maven-shared-utils:3.3.4 (1 constraints: e60b61f3)
 
 org.apiguardian:apiguardian-api:1.1.2 (11 constraints: 3ac82b62)
 
-org.assertj:assertj-core:3.27.6 (2 constraints: 211f1a90)
+org.assertj:assertj-core:3.27.7 (2 constraints: 221f6290)
 
 org.checkerframework:checker-qual:2.5.2 (1 constraints: 3f0d9a22)
 
