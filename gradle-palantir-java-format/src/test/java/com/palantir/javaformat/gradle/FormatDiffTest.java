@@ -22,7 +22,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
-import com.google.common.io.ByteStreams;
 import com.palantir.javaformat.bootstrap.BootstrappingFormatterService;
 import com.palantir.javaformat.bootstrap.NativeImageFormatterService;
 import com.palantir.javaformat.java.FormatterService;
@@ -98,7 +97,7 @@ class FormatDiffTest {
         Preconditions.checkState(process.waitFor(10, TimeUnit.SECONDS), "git diff took too long to terminate");
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ByteStreams.copy(process.getErrorStream(), baos);
+        process.getErrorStream().transferTo(baos);
         String stderr = baos.toString(UTF_8);
 
         Preconditions.checkState(process.exitValue() == 0, "Expected return code of 0: " + stderr);
