@@ -1,1 +1,1 @@
-/Volumes/git/palantir-java-format/palantir-java-format/src/test/resources/com/palantir/javaformat/java/testdata/palantir-deeply-nested-calls.input
+../../../../palantir-java-format/src/test/resources/com/palantir/javaformat/java/testdata/palantir-deeply-nested-calls.input

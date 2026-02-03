@@ -33,6 +33,7 @@ tasks.named('jmh', JMHTask.class) {
 
 spotless {
     java {
+        // symlinks to a test input file that shouldn't be formatted
         targetExclude 'src/test/resources/*'
     }
 }

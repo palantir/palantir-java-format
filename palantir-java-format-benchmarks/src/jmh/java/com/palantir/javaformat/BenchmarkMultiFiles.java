@@ -130,8 +130,8 @@ public class BenchmarkMultiFiles {
 
     public static void main(String[] _args) throws RunnerException {
         new Runner(new OptionsBuilder()
-                .include(BenchmarkMultiFiles.class.getSimpleName())
-                .build())
+                        .include(BenchmarkMultiFiles.class.getSimpleName())
+                        .build())
                 .run();
     }
 }

@@ -54,7 +54,7 @@ public final class Level extends Doc {
     /**
      * The depth of nested levels in the current level tree from which we explore both breaking vs not breaking the current level.
      */
-    private static final int LAST_LEVELS_TO_EXPLORE = 7;
+    private static final int LAST_LEVELS_TO_EXPLORE = 12;
 
     private static final Collector<Level, ?, Optional<Level>> GET_LAST_COLLECTOR = Collectors.reducing((u, v) -> v);
 
