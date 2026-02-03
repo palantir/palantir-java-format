@@ -54,7 +54,7 @@ public final class Level extends Doc {
     /**
      * The depth of nested levels in the current level tree from which we explore both breaking vs not breaking the current level.
      */
-    private static final int LAST_LEVELS_TO_EXPLORE = 7;
+    private static final int LAST_LEVELS_TO_EXPLORE = 12;
 
     private static final Collector<Level, ?, Optional<Level>> GET_LAST_COLLECTOR = Collectors.reducing((u, v) -> v);
 
@@ -758,9 +758,7 @@ public final class Level extends Doc {
     }
 
     /**
-     * Calculate an approximation of the maximum depth of nested levels in this level tree, counting method call nesting.
-     * This counts levels that represent method invocations (including lambdas and other callable constructs),
-     * which provides a better measure of structural complexity than counting all levels.
+     * Calculates the maximum depth of nested levels in this level tree.
      * This computation is expensive, so it's memoized via {@link #getMaxDepth()}.
      */
     private int computeMaxDepth(Iterable<Doc> docs) {
@@ -772,10 +770,7 @@ public final class Level extends Doc {
             }
         }
 
-        // Count this level if it represents a method call or similar construct
-        // A level is considered a "method call level" if it has breaks (can span multiple lines)
-        // and is not just a simple wrapper. We use the presence of breaks as a proxy for
-        // meaningful structural nesting.
+        // We use the presence of breaks as a proxy for meaningful structural nesting.
         boolean hasBreaks = false;
         for (Doc doc : docs) {
             if (doc instanceof Break) {
@@ -784,7 +779,7 @@ public final class Level extends Doc {
             }
         }
 
-        // Only count levels that have breaks (i.e., can actually be formatted across multiple lines)
+        // Only count levels that have breaks (which can actually be formatted across multiple lines)
         return hasBreaks ? 1 + maxChildDepth : maxChildDepth;
     }
 
