@@ -182,13 +182,13 @@ com.palantir.gradle.jdks:gradle-jdks-setup-common:0.73.0 (3 constraints: 1d3b934
 
 com.palantir.gradle.jdkslatest:gradle-jdks-latest:0.26.0 (1 constraints: 3a05393b)
 
-com.palantir.gradle.plugintesting:configuration-cache-spec:0.53.0 (1 constraints: 3a053c3b)
+com.palantir.gradle.plugintesting:configuration-cache-spec:0.54.0 (1 constraints: 3b053f3b)
 
-com.palantir.gradle.plugintesting:discover-tests-cli:0.53.0 (1 constraints: 3a053c3b)
+com.palantir.gradle.plugintesting:discover-tests-cli:0.54.0 (1 constraints: 3b053f3b)
 
-com.palantir.gradle.plugintesting:gradle-plugin-testing-junit:0.53.0 (1 constraints: 3a053c3b)
+com.palantir.gradle.plugintesting:gradle-plugin-testing-junit:0.54.0 (1 constraints: 3b053f3b)
 
-com.palantir.gradle.plugintesting:plugin-testing-core:0.53.0 (1 constraints: 3a053c3b)
+com.palantir.gradle.plugintesting:plugin-testing-core:0.54.0 (1 constraints: 3b053f3b)
 
 com.palantir.gradle.utils:environment-variables:0.22.0 (2 constraints: 142f0f67)
 
