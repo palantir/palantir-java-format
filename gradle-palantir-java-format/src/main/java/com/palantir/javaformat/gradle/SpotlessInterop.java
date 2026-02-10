@@ -51,7 +51,10 @@ public abstract class SpotlessInterop implements Action<JavaExtension> {
 
     @Override
     public void execute(JavaExtension java) {
+        // Exclude build directories at root and in subprojects
         java.targetExclude("**/build/**/*");
+        // Re-include any build directories that are inside src directories
+        java.target("**/src/**/build/**/*");
         // This is configuration cache safe as happening afterEvaluate
         java.addStep(spotlessJavaFormatStep());
     }
