@@ -20,9 +20,9 @@ com.fasterxml.jackson.core:jackson-core:2.21.0 (6 constraints: 9974168e)
 
 com.fasterxml.jackson.core:jackson-databind:2.21.0 (7 constraints: 5d888a5a)
 
-com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.21.0 (3 constraints: c33bf0d8)
+com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.21.0 (3 constraints: c33bf2d8)
 
-com.fasterxml.jackson.datatype:jackson-datatype-guava:2.21.0 (3 constraints: c33bf0d8)
+com.fasterxml.jackson.datatype:jackson-datatype-guava:2.21.0 (3 constraints: c33bf2d8)
 
 com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.21.0 (2 constraints: db1f6cde)
 
@@ -162,7 +162,7 @@ com.palantir.baseline:gradle-baseline-java:7.0.0 (2 constraints: 9e14f8af)
 
 com.palantir.baseline-error-prone:gradle-baseline-error-prone:0.7.0 (1 constraints: c01105f5)
 
-com.palantir.gradle.consistentversions:gradle-consistent-versions:3.8.0 (1 constraints: 0d051236)
+com.palantir.gradle.consistentversions:gradle-consistent-versions:3.9.0 (1 constraints: 0e051536)
 
 com.palantir.gradle.failure-reports:gradle-failure-reports-exceptions:1.9.0 (3 constraints: db3cefde)
 
@@ -189,6 +189,8 @@ com.palantir.gradle.plugintesting:discover-tests-cli:0.54.0 (1 constraints: 3b05
 com.palantir.gradle.plugintesting:gradle-plugin-testing-junit:0.54.0 (1 constraints: 3b053f3b)
 
 com.palantir.gradle.plugintesting:plugin-testing-core:0.54.0 (1 constraints: 3b053f3b)
+
+com.palantir.gradle.utils:dependency-graph-utils:0.22.0 (1 constraints: e81b0562)
 
 com.palantir.gradle.utils:environment-variables:0.22.0 (2 constraints: 142f0f67)
 
