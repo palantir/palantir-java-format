@@ -14,7 +14,7 @@ com.diffplug.spotless:spotless-lib-extra:4.3.0 (1 constraints: 1713d82d)
 
 com.diffplug.spotless:spotless-plugin-gradle:8.2.1 (2 constraints: cf16b62c)
 
-com.fasterxml.jackson.core:jackson-annotations:2.21 (7 constraints: 487c0455)
+com.fasterxml.jackson.core:jackson-annotations:2.21 (7 constraints: 497c0555)
 
 com.fasterxml.jackson.core:jackson-core:2.21.0 (6 constraints: 9974168e)
 
@@ -54,11 +54,11 @@ com.googlecode.javaewah:JavaEWAH:1.2.3 (1 constraints: 460e7e50)
 
 com.palantir.gradle.idea-configuration:gradle-idea-configuration:0.7.0 (4 constraints: d941fe68)
 
-com.palantir.gradle.utils:exec:0.22.0 (1 constraints: 2f0f6176)
+com.palantir.gradle.utils:exec:0.23.0 (1 constraints: 300f6476)
 
-com.palantir.gradle.utils:platform:0.22.0 (6 constraints: cd6014c5)
+com.palantir.gradle.utils:platform:0.23.0 (6 constraints: ce6020c6)
 
-com.palantir.gradle.utils:providers:0.22.0 (1 constraints: 6f0dda31)
+com.palantir.gradle.utils:providers:0.23.0 (1 constraints: 700ddd31)
 
 com.squareup.okhttp3:okhttp:4.12.0 (1 constraints: f6093eb3)
 
@@ -158,7 +158,7 @@ com.googlecode.java-diff-utils:diffutils:1.3.0 (1 constraints: bd11fef4)
 
 com.netflix.nebula:nebula-test:10.6.2 (1 constraints: 9c18268f)
 
-com.palantir.baseline:gradle-baseline-java:7.0.0 (2 constraints: 9e14f8af)
+com.palantir.baseline:gradle-baseline-java:7.1.0 (2 constraints: 9f1429b0)
 
 com.palantir.baseline-error-prone:gradle-baseline-error-prone:0.7.0 (1 constraints: c01105f5)
 
@@ -190,9 +190,9 @@ com.palantir.gradle.plugintesting:gradle-plugin-testing-junit:0.54.0 (1 constrai
 
 com.palantir.gradle.plugintesting:plugin-testing-core:0.54.0 (1 constraints: 3b053f3b)
 
-com.palantir.gradle.utils:environment-variables:0.22.0 (2 constraints: 142f0f67)
+com.palantir.gradle.utils:environment-variables:0.23.0 (2 constraints: 142f0f67)
 
-com.palantir.gradle.utils:lazily-configured-mapping:0.22.0 (2 constraints: 7a219fd1)
+com.palantir.gradle.utils:lazily-configured-mapping:0.23.0 (2 constraints: 7a219fd1)
 
 com.palantir.suppressible-error-prone:gradle-suppressible-error-prone:2.26.0 (1 constraints: 7419b3d0)
 
