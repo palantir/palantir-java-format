@@ -162,7 +162,7 @@ com.palantir.baseline:gradle-baseline-java:7.1.0 (2 constraints: 9f1429b0)
 
 com.palantir.baseline-error-prone:gradle-baseline-error-prone:0.7.0 (1 constraints: c01105f5)
 
-com.palantir.gradle.consistentversions:gradle-consistent-versions:3.10.0 (1 constraints: 3605353b)
+com.palantir.gradle.consistentversions:gradle-consistent-versions:3.11.0 (1 constraints: 3705383b)
 
 com.palantir.gradle.failure-reports:gradle-failure-reports-exceptions:1.9.0 (3 constraints: db3cefde)
 
