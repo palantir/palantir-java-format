@@ -54,7 +54,7 @@ public final class Level extends Doc {
     /**
      * The depth of nested levels in the current level tree from which we explore both breaking vs not breaking the current level.
      */
-    private static final int LAST_LEVELS_TO_EXPLORE = 12;
+    private static final int LAST_LEVELS_TO_EXPLORE = 8;
 
     private static final Collector<Level, ?, Optional<Level>> GET_LAST_COLLECTOR = Collectors.reducing((u, v) -> v);
 
@@ -518,59 +518,6 @@ public final class Level extends Doc {
                                 exp -> innerLevel.tryInlineSuffix(
                                         commentsHelper, maxWidth, state, exp, isSimpleInlining))
                         .map(Exploration::markAccepted))
-                .breakOnlyIfInnerLevelsThenFitOnOneLine(keepIndentWhenInlined -> {
-                    // This case currently only matches lambda _expressions_ (without curlies)
-                    State state1 =
-                            keepIndentWhenInlined ? state.withIndentIncrementedBy(innerLevel.getPlusIndent()) : state;
-
-                    String humanDescription = "end tryBreakLastLevel chain -> breakOnlyIfInnerLevelsThenFitOnOneLine";
-                    LevelNode levelNode = explorationNode.newChildNode(innerLevel, state1);
-                    return levelNode
-                            .maybeExplore(humanDescription, state1, exp -> {
-                                // Not all levels would look good if inlined in this position, so we accept
-                                // levels that are meant to look good even if partially inlined, e.g. method
-                                // chains, which will catch things like builders, but not other kinds of levels like
-                                // constant expressions.
-                                // See the palantir-expression-lambdas.input test for an example of what this is
-                                // trying to avoid.
-
-                                // For this, need to actually check the last inner level of `lastLevel` (2 levels down).
-                                if (innerLevel.docs.isEmpty() || !(getLast(innerLevel.docs) instanceof Level)) {
-                                    return Optional.empty();
-                                }
-                                Level lastLevel2 = ((Level) getLast(innerLevel.docs));
-                                switch (lastLevel2.getBreakabilityIfLastLevel()) {
-                                    case ABORT:
-                                    case CHECK_INNER:
-                                        return Optional.empty();
-                                    case ACCEPT_INLINE_CHAIN:
-                                        Exploration broken =
-                                                innerLevel.breakNormally(state, levelNode, commentsHelper, maxWidth);
-                                        return innerLevel.handle_breakOnlyIfInnerLevelsThenFitOnOneLine(
-                                                commentsHelper,
-                                                maxWidth,
-                                                state1,
-                                                broken.state(),
-                                                keepIndentWhenInlined,
-                                                explorationNode);
-                                    case ACCEPT_INLINE_CHAIN_IF_SIMPLE_OTHERWISE_CHECK_INNER:
-                                        // We will allow inlining this kind of level but only if the level itself is
-                                        // not simple.
-                                        if (lastLevel2.openOp.complexity() == Complexity.SIMPLE) {
-                                            return Optional.empty();
-                                        }
-                                        return innerLevel.tryInlinePrefixOntoCurrentLine(
-                                                commentsHelper,
-                                                maxWidth,
-                                                state1,
-                                                keepIndentWhenInlined,
-                                                explorationNode);
-                                    default:
-                                        throw new RuntimeException("Unknown breakabilityIfLastLevel: " + lastLevel2);
-                                }
-                            })
-                            .map(Exploration::markAccepted);
-                })
                 // We don't know how to fit the inner level on the same line, so bail out.
                 .otherwise_(Optional.empty());
     }

@@ -1,0 +1,22 @@
+public class Foo {
+
+    public static void main(String[] args) {
+        assertThat(resultThatIsQuiteLong)
+                .containsExactly(SomeResonse.getValue("1".repeat((int) (MyClass.CHAR_LIMIT * 0.5))));
+        someArgResulsts.forEach((key, value) -> value.sync().ifPresent(myvalue -> {
+            myvalue.put(foo, bar, baz);
+        }));
+        EntryStream.of(SOME_NAME_TO_JSON_STRING)
+                .forKeyValue((tableName, jsonString) -> doReturn(
+                                getSelectJsonResponse(some(other(myValueTahatIsLong(jsonString)))))
+                        .when(session)
+                        .execute((Statement) argThat(statement -> statement instanceof Statement
+                                && statement.toString().contains(tableName))));
+        return someService.runWithLock(
+                foo,
+                Set.of("Running bar"),
+                () -> getOperationLock(MyClass.DOWNLOAD).runWithLock(MyClass.DOWNLOAD, () -> {
+                    return doStuff.builder().method1().method2().build();
+                }));
+    }
+}

@@ -1255,7 +1255,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 .breakBehaviour(
                         statementBody
                                 ? BreakBehaviours.preferBreakingLastInnerLevel(true)
-                                : BreakBehaviours.breakOnlyIfInnerLevelsThenFitOnOneLine(false))
+                                : BreakBehaviours.preferBreakingLastInnerLevel(false))
                 .breakabilityIfLastLevel(
                         statementBody
                                 ? LastLevelBreakability.ACCEPT_INLINE_CHAIN
