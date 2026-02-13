@@ -3,9 +3,13 @@ public class Foo {
 
         String value = myMethod.accept(SomeCreator.Visitor.<Optional<String>>builder()
                 .visitWebsite1(
-                        () -> Optional.of(
-                                "https://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"))
-                .visitWebsite2(() -> Optional.of("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"))
+                        () ->
+                                Optional.of(
+                                        "https://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"))
+                .visitWebsite2(() -> Optional.of(
+                                "https://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+                        .get())
+                .visitWebsite3(() -> Optional.of("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"))
                 .build());
 
         assertThat(resultThatIsQuiteLong)
