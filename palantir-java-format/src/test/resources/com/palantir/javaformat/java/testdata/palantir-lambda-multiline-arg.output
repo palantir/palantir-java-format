@@ -1,17 +1,31 @@
 public class Foo {
-
     public static void main(String[] args) {
+
+        String value = myMethod.accept(SomeCreator.Visitor.<Optional<String>>builder()
+                .visitWebsite1(
+                        () -> Optional.of(
+                                "https://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"))
+                .visitWebsite2(() -> Optional.of("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"))
+                .build());
+
         assertThat(resultThatIsQuiteLong)
                 .containsExactly(SomeResonse.getValue("1".repeat((int) (MyClass.CHAR_LIMIT * 0.5))));
+
         someArgResulsts.forEach((key, value) -> value.sync().ifPresent(myvalue -> {
             myvalue.put(foo, bar, baz);
         }));
+
+        Set<Value> convertedSet = castedObj.stream()
+                .map(val -> convertToFunctionValue(val, parameterizedType.getActualTypeArguments()[0]))
+                .collect(Collectors.toSet());
+
         EntryStream.of(SOME_NAME_TO_JSON_STRING)
                 .forKeyValue((tableName, jsonString) -> doReturn(
                                 getSelectJsonResponse(some(other(myValueTahatIsLong(jsonString)))))
                         .when(session)
                         .execute((Statement) argThat(statement -> statement instanceof Statement
                                 && statement.toString().contains(tableName))));
+
         return someService.runWithLock(
                 foo,
                 Set.of("Running bar"),
