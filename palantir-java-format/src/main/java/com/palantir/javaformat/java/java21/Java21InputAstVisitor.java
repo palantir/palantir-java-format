@@ -18,6 +18,7 @@ package com.palantir.javaformat.java.java21;
 
 import com.palantir.javaformat.OpsBuilder;
 import com.palantir.javaformat.java.java14.Java14InputAstVisitor;
+import com.sun.source.tree.AnyPatternTree;
 import com.sun.source.tree.CaseTree;
 import com.sun.source.tree.ConstantCaseLabelTree;
 import com.sun.source.tree.DeconstructionPatternTree;
@@ -87,5 +88,11 @@ public class Java21InputAstVisitor extends Java14InputAstVisitor {
         } else {
             visit(name);
         }
+    }
+
+    @Override
+    public Void visitAnyPattern(AnyPatternTree node, Void unused) {
+        token("_");
+        return null;
     }
 }

@@ -62,5 +62,5 @@ tasks.named("test") {
 }
 
 javaVersion {
-    target = 21
+    target = 23
 }
