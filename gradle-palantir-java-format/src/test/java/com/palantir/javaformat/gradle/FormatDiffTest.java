@@ -16,60 +16,57 @@
 
 package com.palantir.javaformat.gradle;
 
-import com.google.common.base.Splitter
-import com.palantir.javaformat.bootstrap.BootstrappingFormatterService
-import com.palantir.javaformat.java.FormatterService
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.MethodSource
-
-import java.util.stream.Stream
-
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
-import com.google.common.io.ByteStreams;
+import com.palantir.javaformat.bootstrap.BootstrappingFormatterService;
 import com.palantir.javaformat.bootstrap.NativeImageFormatterService;
-import java.nio.charset.StandardCharsets;
+import com.palantir.javaformat.java.FormatterService;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import org.junit.jupiter.api.Assertions;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class FormatDiffTest {
 
-    private static final CLASSPATH_FILE = new File("build/impl.classpath")
-    private static final NATIVE_IMAGE_FILE = new File("build/nativeImage.path")
+    private static final File CLASSPATH_FILE = new File("build/impl.classpath");
+    private static final File NATIVE_IMAGE_FILE = new File("build/nativeImage.path");
 
     @TempDir
     Path repo;
 
     @Test
     void parsing_git_diff_output_works() throws IOException {
-        String example1 = new String(
-                Files.readAllBytes(
-                        Paths.get("src/test/resources/com/palantir/javaformat/java/FormatDiffCliTest/example1.patch")),
-                StandardCharsets.UTF_8);
+        String example1 = Files.readString(
+                Paths.get("src/test/resources/com/palantir/javaformat/java/FormatDiffCliTest/example1.patch"));
 
         List<String> strings = FormatDiff.parseGitDiffOutput(example1)
                 .map(FormatDiff.SingleFileDiff::toString)
                 .collect(Collectors.toList());
-        Assertions.assertEquals(
-                ImmutableList.of(
+        assertThat(strings)
+                .containsExactly(
                         "SingleFileDiff{path=build.gradle, lineRanges=[[24..25), [29..30)]}",
                         "SingleFileDiff{path=tracing/src/test/java/com/palantir/tracing/TracersTest.java, "
-                                + "lineRanges=[[659..660), [675..676)]}"),
-                strings);
+                                + "lineRanges=[[659..660), [675..676)]}");
     }
 
     @ParameterizedTest
     @MethodSource("getFormatters")
-    void reformat_a_subpath_of_a_git_directory_for_only_changed_lines(FormatterService formatterService) throws IOException, InterruptedException {
+    void reformat_a_subpath_of_a_git_directory_for_only_changed_lines(FormatterService formatterService)
+            throws IOException, InterruptedException {
         runCommandInRepo("git", "init");
         runCommandInRepo("git", "config", "user.name", "Test User");
         runCommandInRepo("git", "config", "user.email", "test-user@palantir.com");
@@ -100,25 +97,25 @@ class FormatDiffTest {
         Preconditions.checkState(process.waitFor(10, TimeUnit.SECONDS), "git diff took too long to terminate");
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ByteStreams.copy(process.getErrorStream(), baos);
-        String stderr = new String(baos.toByteArray(), UTF_8);
+        process.getErrorStream().transferTo(baos);
+        String stderr = baos.toString(UTF_8);
 
         Preconditions.checkState(process.exitValue() == 0, "Expected return code of 0: " + stderr);
     }
 
-    private static Stream<FormatterService> getFormatters() {
+    private static Stream<FormatterService> getFormatters() throws IOException {
         return Stream.of(
                 new BootstrappingFormatterService(
                         javaBinPath(), Runtime.version().feature(), getClasspath()),
                 new NativeImageFormatterService(
-                        Path.of(NATIVE_IMAGE_FILE.text)));
+                        Path.of(Files.readString(NATIVE_IMAGE_FILE.toPath()).trim())));
     }
 
-    private static getClasspath() {
+    private static List<Path> getClasspath() throws IOException {
         return Splitter.on(':')
                 .trimResults()
                 .omitEmptyStrings()
-                .splitToStream(CLASSPATH_FILE.text)
+                .splitToStream(Files.readString(CLASSPATH_FILE.toPath()))
                 .map(Path::of)
                 .collect(Collectors.toList());
     }
@@ -127,5 +124,4 @@ class FormatDiffTest {
         String javaHome = Preconditions.checkNotNull(System.getProperty("java.home"), "java.home property not set");
         return Path.of(javaHome).resolve("bin").resolve("java");
     }
-
 }

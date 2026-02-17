@@ -129,13 +129,17 @@ final class FormatDiff {
         return Paths.get(gitCommand(dir, "git", "rev-parse", "--show-toplevel"));
     }
 
+    @SuppressWarnings("for-rollout:DefaultCharset")
     private static String gitCommand(Path dir, String... args) throws IOException, InterruptedException {
         Process process =
                 new ProcessBuilder().command(args).directory(dir.toFile()).start();
 
         Preconditions.checkState(process.waitFor(30, TimeUnit.SECONDS), "git diff took too long to terminate");
-        Preconditions.checkState(process.exitValue() == 0, "Expected return code of 0");
-
+        if (process.exitValue() != 0) {
+            throw new RuntimeException("Expected return code of 0 but got " + process.exitValue()
+                    + "\n stdout: " + new String(process.getInputStream().readAllBytes())
+                    + "\n stderr: " + new String(process.getErrorStream().readAllBytes()));
+        }
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         process.getInputStream().transferTo(baos);
         return new String(baos.toByteArray(), UTF_8).trim();
