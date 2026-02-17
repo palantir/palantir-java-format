@@ -3,9 +3,8 @@ public class Foo {
 
         String value = myMethod.accept(SomeCreator.Visitor.<Optional<String>>builder()
                 .visitWebsite1(
-                        () ->
-                                Optional.of(
-                                        "https://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"))
+                        () -> Optional.of(
+                                "https://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"))
                 .visitWebsite2(() -> Optional.of(
                                 "https://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
                         .get())
@@ -36,5 +35,34 @@ public class Foo {
                 () -> getOperationLock(MyClass.DOWNLOAD).runWithLock(MyClass.DOWNLOAD, () -> {
                     return doStuff.builder().method1().method2().build();
                 }));
+    }
+
+    public static Value convertToFunctionValue(Object sourceObject, Type sourceType) {
+        if (sourceType instanceof ParameterizedType parameterizedType) {
+            if (sourceObject instanceof Optional<?> castedObj) {
+                if (castedObj.isEmpty()) {
+                    return NULL_VALUE;
+                }
+                return convertToFunctionValue(castedObj.get(), parameterizedType.getActualTypeArguments()[0]);
+            } else if (sourceObject instanceof List<?> castedObj) {
+                List<Value> convertedList = castedObj.stream()
+                        .map(val ->
+                                convertToFunctionValue(val, parameterizedType.getActualTypeArguments()[0]))
+                        .toList();
+                return Value.list(ListValue.of(convertedList));
+            } else if (sourceObject instanceof Set<?> castedObj) {
+                Set<Value> convertedSet = castedObj.stream()
+                        .map(val -> convertToFunctionValue(
+                                val, parameterizedType.getActualTypeArguments().get()))
+                        .collect(Collectors.toSet());
+                return Value.set(SetValue.of(convertedSet));
+            } else if (sourceObject instanceof Set<?> castedObj) {
+                Set<Value> convertedSet = castedObj.stream()
+                        .map(val -> convertToFunctionValue(val, parameterizedType.getActualTypeArguments()))
+                        .collect(Collectors.toSet());
+                return Value.set(SetValue.of(convertedSet));
+            }
+        }
+        return null;
     }
 }
