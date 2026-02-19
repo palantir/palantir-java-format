@@ -554,7 +554,8 @@ public final class Level extends Doc {
                                                 keepIndentWhenInlined,
                                                 explorationNode);
                                     case ACCEPT_INLINE_CHAIN_IF_SIMPLE_OTHERWISE_CHECK_INNER:
-                                        // specific to lambda body expressions - falls back to `tryToFitOnOneLine`
+                                        // specific to lambda body expressions - falls back to `breakNormally` in
+                                        // `preferBreakingLastInnerLevel`
                                         return Optional.empty();
                                     default:
                                         throw new RuntimeException("Unknown breakabilityIfLastLevel: " + lastLevel2);
