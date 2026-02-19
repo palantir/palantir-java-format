@@ -38,7 +38,7 @@ com.google.auto.service:auto-service-annotations:1.1.1 (1 constraints: 9c0f6a86)
 
 com.google.code.findbugs:jsr305:3.0.2 (2 constraints: 4112851c)
 
-com.google.errorprone:error_prone_annotations:2.41.0 (5 constraints: 7037dea5)
+com.google.errorprone:error_prone_annotations:2.43.0 (5 constraints: 73371ca7)
 
 com.google.guava:failureaccess:1.0.3 (2 constraints: f3154f13)
 
@@ -142,7 +142,7 @@ aopalliance:aopalliance:1.0 (1 constraints: 170a83ac)
 
 cglib:cglib-nodep:3.2.2 (1 constraints: 490ded24)
 
-com.github.ben-manes.caffeine:caffeine:3.2.2 (2 constraints: cd16c12c)
+com.github.ben-manes.caffeine:caffeine:3.2.3 (2 constraints: c916f32b)
 
 com.google.auto.value:auto-value-annotations:1.11.0 (2 constraints: d01cd319)
 
