@@ -110,7 +110,7 @@ org.eclipse.platform:org.eclipse.osgi:3.24.0 (3 constraints: 3e21dfe7)
 
 org.eclipse.platform:org.eclipse.text:3.10.300 (1 constraints: 99053a46)
 
-org.functionaljava:functionaljava:4.8 (1 constraints: b0042b2c)
+org.functionaljava:functionaljava:5.0 (1 constraints: a904262c)
 
 org.immutables:value:2.12.1 (2 constraints: ab168834)
 
