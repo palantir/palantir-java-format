@@ -52,7 +52,7 @@ com.googlecode.concurrent-trees:concurrent-trees:2.6.1 (1 constraints: 761166da)
 
 com.googlecode.javaewah:JavaEWAH:1.2.3 (1 constraints: 460e7e50)
 
-com.palantir.gradle.idea-configuration:gradle-idea-configuration:0.7.0 (4 constraints: d941fe68)
+com.palantir.gradle.idea-configuration:gradle-idea-configuration:0.8.0 (4 constraints: de415f6c)
 
 com.palantir.gradle.utils:exec:0.23.0 (2 constraints: bd1e0eb5)
 
