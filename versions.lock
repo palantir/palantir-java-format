@@ -38,7 +38,7 @@ com.google.auto.service:auto-service-annotations:1.1.1 (1 constraints: 9c0f6a86)
 
 com.google.code.findbugs:jsr305:3.0.2 (1 constraints: 0705fc35)
 
-com.google.errorprone:error_prone_annotations:2.43.0 (5 constraints: a6379eda)
+com.google.errorprone:error_prone_annotations:2.47.0 (5 constraints: af3714e0)
 
 com.google.guava:failureaccess:1.0.3 (2 constraints: f3154f13)
 
