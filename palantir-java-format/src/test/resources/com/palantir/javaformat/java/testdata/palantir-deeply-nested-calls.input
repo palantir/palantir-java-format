@@ -12,4 +12,82 @@ class PalantirDeeplyNestedCalls {
                             .build()))
                     .build()))
             .build();
+
+    void testMethod() {
+        assertThat(ConfigServiceV1.getAllItems(item1, item2, item3, item4))
+                .containsExactlyInAnyOrderElementsOf(Set.of(
+                        new ItemWithCustomLocator(
+                                ItemConfigV1.DEFAULT_CONFIG.toCustomString(),
+                                ItemConfigV1.createCustomConfig(ItemConfigV1Locator.of(TEST_ITEM_A))),
+                        new ItemWithCustomLocator(
+                                ItemConfigV1.builder()
+                                        .id(getId(TEST_ITEM_A))
+                                        .name(ItemName.of(TEST_API_NAME.get()))
+                                        .apiName(TEST_API_NAME)
+                                        .spec(ItemConfigV1Spec.native_(NativeItemConfigV1Spec.model(TestModel.of())))
+                                        .category(TestCatalog.TEST_CATEGORY_ALPHA)
+                                        .creator(TestCatalog.TEST_CREATOR_BETA)
+                                        .status(ItemLifecycleStatus.EXPERIMENTAL)
+                                        .statusV2(ItemLifecycleStatusV2.experimental(LifecycleStatusExperimental.of()))
+                                        .inputSpec(ItemInputSpec.unknownInputType(UnknownInputSpec.of()))
+                                        .creationDate(ItemMetadataInfo.builder().build())
+                                        .performanceAttributes(
+                                                ItemAttributes.builder().build())
+                                        .categories(TestCatalog.TEST_CATEGORY_ALPHA)
+                                        .build(),
+                                CustomItemLocator.hosted(HostedItemLocator.of(TEST_ITEM_B))),
+                        new ItemWithCustomLocator(
+                                ItemConfigV1.builder()
+                                        .id(getId(TestModelCatalog.MODEL_XYZ_123.apiName()))
+                                        .name(ItemName.of(TestModelCatalog.MODEL_XYZ_123
+                                                .apiName()
+                                                .get()))
+                                        .apiName(TestModelCatalog.MODEL_XYZ_123.apiName())
+                                        .spec(ItemConfigV1Spec.native_(
+                                                NativeItemConfigV1Spec.hubModel(HubModelSpec.of())))
+                                        .category(TestCatalog.TEST_CATEGORY_ALPHA)
+                                        .creator(TestCatalog.TEST_CREATOR_BETA)
+                                        .status(ItemLifecycleStatus.EXPERIMENTAL)
+                                        .statusV2(ItemLifecycleStatusV2.experimental(LifecycleStatusExperimental.of()))
+                                        .inputSpec(ItemInputSpec.unknownInputType(UnknownInputSpec.of()))
+                                        .creationDate(ItemMetadataInfo.builder().build())
+                                        .performanceAttributes(
+                                                ItemAttributes.builder().build())
+                                        .categories(TestCatalog.TEST_CATEGORY_ALPHA)
+                                        .build(),
+                                CustomItemLocator.hosted(HostedItemLocator.of(TEST_ITEM_C))),
+                        // Discovered items
+                        new ItemWithCustomLocator(
+                                TestModelCatalog.MODEL_ABC_456.toItemApi(),
+                                CustomItemLocator.discovered(DiscoveredItemLocator.of())),
+                        new ItemWithCustomLocator(
+                                ItemConfigV1.builder()
+                                        .id(getId(TEST_API_NAME))
+                                        .name(ItemName.of(TEST_API_NAME.get()))
+                                        .apiName(TEST_API_NAME)
+                                        .spec(ItemConfigV1Spec.native_(
+                                                NativeItemConfigV1Spec.hubModel(HubModelSpec.of())))
+                                        .category(TestCatalog.TEST_CATEGORY_ALPHA)
+                                        .creator(TestCatalog.TEST_CREATOR_BETA)
+                                        .status(ItemLifecycleStatus.EXPERIMENTAL)
+                                        .statusV2(ItemLifecycleStatusV2.experimental(LifecycleStatusExperimental.of()))
+                                        .inputSpec(ItemInputSpec.unknownInputType(UnknownInputSpec.of()))
+                                        .creationDate(ItemMetadataInfo.builder().build())
+                                        .performanceAttributes(
+                                                ItemAttributes.builder().build())
+                                        .categories(TestCatalog.TEST_CATEGORY_ALPHA)
+                                        .build(),
+                                CustomItemLocator.discovered(DiscoveredItemLocator.of()))));
+    }
+
+    public Map<FooBarRid, BazQuxMetrics> otherMethod(
+            FooAuthHeader authHeader, Set<FooBarRid> thingRids, WidgetTimeRange timeRange) {
+        return myCustomService
+                .get()
+                .fetchData(authHeader, FooMyCustomClass.of(thingRids, timeRange))
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey, entry -> entry.getValue().getMetrics()));
+    }
 }

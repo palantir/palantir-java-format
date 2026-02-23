@@ -5,5 +5,11 @@ public class Foo {
                 .baz(argargargargargargargargargargargargargargargargargargargargarg, param -> doStuff()
                         .method1()
                         .method2(arljhfaldjfhalfjhalfjahflahflahfaljfhadlfjhljsahljhfsaljfhlfajhfljh));
+
+        thisIsMyObject
+               .callingMethod1()
+               .callingMethod2(argargargargargargargargargargargargargargargargargargargargarg, param -> doStuff()
+                       .method1()
+                       .method2(arljhfaldjfhalfjhalfjahflahflahfaljfhadlfjhljsahljhfsaljfhlfajhfljh));
     }
 }
