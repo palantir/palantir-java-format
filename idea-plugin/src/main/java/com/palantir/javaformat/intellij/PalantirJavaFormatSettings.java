@@ -115,23 +115,25 @@ public class PalantirJavaFormatSettings implements PersistentStateComponent<Pala
     }
 
     Optional<String> computeFormatterVersion() {
-        return getImplementationClassPath().map(classpath -> classpath.stream()
-                .flatMap(uri -> {
-                    try {
-                        JarFile jar = new JarFile(uri.getPath());
-                        // Identify the implementation jar by the service it produces.
-                        if (jar.getEntry("META-INF/services/" + FormatterService.class.getName()) != null) {
-                            String implementationVersion =
-                                    jar.getManifest().getMainAttributes().getValue("Implementation-Version");
-                            return Stream.of(implementationVersion);
-                        }
-                        return Stream.empty();
-                    } catch (IOException e) {
-                        throw new UncheckedIOException(e);
-                    }
-                })
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Couldn't find implementation JAR")));
+        return getImplementationClassPath()
+                .map(classpath -> classpath.stream()
+                        .flatMap(uri -> {
+                            try {
+                                JarFile jar = new JarFile(uri.getPath());
+                                // Identify the implementation jar by the service it produces.
+                                if (jar.getEntry("META-INF/services/" + FormatterService.class.getName()) != null) {
+                                    String implementationVersion = jar.getManifest()
+                                            .getMainAttributes()
+                                            .getValue("Implementation-Version");
+                                    return Stream.of(implementationVersion);
+                                }
+                                return Stream.empty();
+                            } catch (IOException e) {
+                                throw new UncheckedIOException(e);
+                            }
+                        })
+                        .findFirst()
+                        .orElseThrow(() -> new RuntimeException("Couldn't find implementation JAR")));
     }
 
     enum EnabledState {
