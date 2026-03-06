@@ -166,19 +166,19 @@ com.palantir.gradle.consistentversions:gradle-consistent-versions:3.13.0 (1 cons
 
 com.palantir.gradle.failure-reports:gradle-failure-reports-exceptions:1.9.0 (3 constraints: db3cefde)
 
-com.palantir.gradle.jdks:gradle-jdks:0.75.0 (2 constraints: 1b1ab812)
+com.palantir.gradle.jdks:gradle-jdks:0.76.0 (2 constraints: 1c1af612)
 
-com.palantir.gradle.jdks:gradle-jdks-distributions:0.75.0 (2 constraints: 10216c9c)
+com.palantir.gradle.jdks:gradle-jdks-distributions:0.76.0 (2 constraints: 1221a59c)
 
-com.palantir.gradle.jdks:gradle-jdks-enablement:0.75.0 (1 constraints: 950f5b92)
+com.palantir.gradle.jdks:gradle-jdks-enablement:0.76.0 (1 constraints: 960f5e92)
 
-com.palantir.gradle.jdks:gradle-jdks-json:0.75.0 (1 constraints: 950f5b92)
+com.palantir.gradle.jdks:gradle-jdks-json:0.76.0 (1 constraints: 960f5e92)
 
-com.palantir.gradle.jdks:gradle-jdks-settings:0.75.0 (1 constraints: 3e054a3b)
+com.palantir.gradle.jdks:gradle-jdks-settings:0.76.0 (1 constraints: 3f054d3b)
 
-com.palantir.gradle.jdks:gradle-jdks-setup:0.75.0 (1 constraints: 950f5b92)
+com.palantir.gradle.jdks:gradle-jdks-setup:0.76.0 (1 constraints: 960f5e92)
 
-com.palantir.gradle.jdks:gradle-jdks-setup-common:0.75.0 (3 constraints: 233be744)
+com.palantir.gradle.jdks:gradle-jdks-setup-common:0.76.0 (3 constraints: 263b9145)
 
 com.palantir.gradle.jdkslatest:gradle-jdks-latest:0.26.0 (1 constraints: 3a05393b)
 
