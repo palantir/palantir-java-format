@@ -61,17 +61,18 @@ public abstract class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
                                         .getByName(PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME));
                         maybeGetNativeImplConfiguration().ifPresent(config -> {
                             task.getNativeImageConfig().from(config);
-                            task.getNativeImageOutputFile().fileProvider(rootProject.provider(() -> rootProject
-                                    .getGradle()
-                                    .getGradleUserHomeDir()
-                                    .toPath()
-                                    .resolve("palantir-java-format-caches/")
-                                    .resolve(Paths.get(task.getNativeImageConfig()
-                                                    .getSingleFile()
-                                                    .toURI())
-                                            .getFileName()
-                                            .toString())
-                                    .toFile()));
+                            task.getNativeImageOutputFile()
+                                    .fileProvider(rootProject.provider(() -> rootProject
+                                            .getGradle()
+                                            .getGradleUserHomeDir()
+                                            .toPath()
+                                            .resolve("palantir-java-format-caches/")
+                                            .resolve(Paths.get(task.getNativeImageConfig()
+                                                            .getSingleFile()
+                                                            .toURI())
+                                                    .getFileName()
+                                                    .toString())
+                                            .toFile()));
                         });
                     });
 

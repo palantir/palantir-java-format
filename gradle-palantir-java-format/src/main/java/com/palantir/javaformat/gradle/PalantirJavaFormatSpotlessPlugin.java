@@ -37,8 +37,8 @@ public abstract class PalantirJavaFormatSpotlessPlugin implements Plugin<Project
 
         SpotlessInterop spotlessInterop = rootProject.getObjects().newInstance(SpotlessInterop.class, memoizedService);
         project.getPluginManager().withPlugin("java", _javaPlugin -> {
-            SPOTLESS_PLUGINS.forEach(
-                    spotlessPluginId -> project.getPluginManager().withPlugin(spotlessPluginId, _spotlessPlugin -> {
+            SPOTLESS_PLUGINS.forEach(spotlessPluginId -> project.getPluginManager()
+                    .withPlugin(spotlessPluginId, _spotlessPlugin -> {
                         SpotlessExtension spotlessExtension =
                                 project.getExtensions().getByType(SpotlessExtension.class);
                         spotlessExtension.java(spotlessInterop);
