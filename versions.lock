@@ -14,21 +14,19 @@ com.diffplug.spotless:spotless-lib-extra:4.4.0 (1 constraints: 1813db2d)
 
 com.diffplug.spotless:spotless-plugin-gradle:8.3.0 (2 constraints: cf16b82c)
 
-com.fasterxml.jackson.core:jackson-annotations:2.21 (7 constraints: 4b7c9455)
+com.fasterxml.jackson.core:jackson-annotations:2.21 (10 constraints: 84b29719)
 
-com.fasterxml.jackson.core:jackson-core:2.21.1 (6 constraints: 9f74e191)
+com.fasterxml.jackson.core:jackson-core:2.21.1 (4 constraints: 8856df02)
 
-com.fasterxml.jackson.core:jackson-databind:2.21.1 (7 constraints: 6388805f)
+com.fasterxml.jackson.core:jackson-databind:2.21.1 (5 constraints: 4c6a60f4)
 
-com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.21.1 (3 constraints: c43b88d9)
+com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.21.1 (2 constraints: 8d362195)
 
-com.fasterxml.jackson.datatype:jackson-datatype-guava:2.21.1 (3 constraints: c43b88d9)
+com.fasterxml.jackson.datatype:jackson-datatype-guava:2.21.1 (2 constraints: 8d362195)
 
-com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.21.1 (2 constraints: dc1fb7de)
+com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.21.1 (1 constraints: a51a8b21)
 
-com.fasterxml.jackson.module:jackson-module-parameter-names:2.21.1 (1 constraints: 3805373b)
-
-com.fasterxml.woodstox:woodstox-core:7.1.1 (1 constraints: 3d174926)
+com.fasterxml.woodstox:woodstox-core:7.1.1 (2 constraints: 672b48a8)
 
 com.google.auto:auto-common:1.2.2 (2 constraints: b421cd9d)
 
@@ -42,7 +40,7 @@ com.google.errorprone:error_prone_annotations:2.47.0 (5 constraints: af3714e0)
 
 com.google.guava:failureaccess:1.0.3 (2 constraints: f3154f13)
 
-com.google.guava:guava:33.5.0-jre (15 constraints: 6b297a19)
+com.google.guava:guava:33.5.0-jre (16 constraints: 6a3eb64b)
 
 com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava (1 constraints: bd17c918)
 
@@ -74,7 +72,7 @@ net.sf.jopt-simple:jopt-simple:5.0.4 (1 constraints: be0ad6cc)
 
 org.apache.commons:commons-math3:3.6.1 (1 constraints: bf0adbcc)
 
-org.codehaus.woodstox:stax2-api:4.2.2 (2 constraints: 6a278bd2)
+org.codehaus.woodstox:stax2-api:4.2.2 (3 constraints: 933b93de)
 
 org.derive4j:derive4j-annotation:1.1.1 (1 constraints: 0505f435)
 
@@ -133,6 +131,12 @@ org.openjdk.jmh:jmh-generator-annprocess:1.37 (1 constraints: df04fc30)
 org.slf4j:slf4j-api:2.0.17 (5 constraints: f94d322b)
 
 org.tukaani:xz:1.9 (1 constraints: 6b09e995)
+
+tools.jackson.core:jackson-core:3.1.0 (4 constraints: c63bf630)
+
+tools.jackson.core:jackson-databind:3.1.0 (3 constraints: 852ce54b)
+
+tools.jackson.datatype:jackson-datatype-guava:3.1.0 (1 constraints: 0605fd35)
 
 
 
@@ -319,3 +323,5 @@ org.ow2.asm:asm:9.9.1 (6 constraints: 116a3b0d)
 org.spockframework:spock-core:2.3-groovy-3.0 (3 constraints: 2c3deb38)
 
 org.spockframework:spock-junit4:2.3-groovy-3.0 (1 constraints: 7a1000b0)
+
+tools.jackson.dataformat:jackson-dataformat-xml:3.1.0 (1 constraints: 0605fd35)

@@ -17,7 +17,6 @@
 package com.palantir.javaformat.doc;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.Indent;
 import fj.data.Set;
@@ -28,6 +27,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import org.immutables.value.Value;
 import org.immutables.value.Value.Parameter;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 /** State for writing. */
 // Automatically suppressed to unblock enforcement in new code

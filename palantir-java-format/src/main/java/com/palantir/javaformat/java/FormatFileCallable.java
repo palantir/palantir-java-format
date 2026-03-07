@@ -14,18 +14,16 @@
 
 package com.palantir.javaformat.java;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
 import com.palantir.javaformat.Utils;
-import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.datatype.guava.GuavaModule;
 
 /** Encapsulates information about a file to be formatted, including which parts of the file to format. */
 class FormatFileCallable implements Callable<String> {
@@ -73,11 +71,7 @@ class FormatFileCallable implements Callable<String> {
     }
 
     String writeFormatReplacements(List<Replacement> replacements) throws FormatterException {
-        try {
-            return MAPPER.writeValueAsString(replacements);
-        } catch (JsonProcessingException e) {
-            throw new UncheckedIOException("Error serializing replacement output", e);
-        }
+        return MAPPER.writeValueAsString(replacements);
     }
 
     private String formatFile(Formatter formatter) throws FormatterException {

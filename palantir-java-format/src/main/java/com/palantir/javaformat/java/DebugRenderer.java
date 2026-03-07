@@ -16,10 +16,6 @@
 
 package com.palantir.javaformat.java;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableList;
 import com.google.common.hash.Hashing;
 import com.palantir.javaformat.CloseOp;
@@ -42,6 +38,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Collectors;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 public class DebugRenderer {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -139,19 +138,11 @@ public class DebugRenderer {
                 json.put("toString", op.toString());
             }
         }
-        try {
-            return OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(arrayNode);
-        } catch (JsonProcessingException e) {
-            throw new UncheckedIOException(e);
-        }
+        return OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(arrayNode);
     }
 
     private static String jsonEscapedString(String javaInput) {
-        try {
-            return OBJECT_MAPPER.writeValueAsString(javaInput);
-        } catch (JsonProcessingException e) {
-            throw new UncheckedIOException(e);
-        }
+        return OBJECT_MAPPER.writeValueAsString(javaInput);
     }
 
     private static long computeHue(HasUniqueId op) {

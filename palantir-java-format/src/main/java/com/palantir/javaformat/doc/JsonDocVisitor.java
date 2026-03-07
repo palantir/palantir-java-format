@@ -16,15 +16,12 @@
 
 package com.palantir.javaformat.doc;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 public final class JsonDocVisitor implements DocVisitor<JsonNode> {
-    private static final ObjectMapper MAPPER =
-            new ObjectMapper().registerModule(new ParameterNamesModule()).registerModule(new Jdk8Module());
+    private static final ObjectMapper MAPPER = new ObjectMapper();
     private final State state;
 
     public JsonDocVisitor(State state) {
@@ -58,9 +55,9 @@ public final class JsonDocVisitor implements DocVisitor<JsonNode> {
         return MAPPER.createObjectNode()
                 .put("type", "break")
                 .put("flat", doc.getFlat())
-                .<ObjectNode>set("breakState", MAPPER.valueToTree(state.getBreakState(doc)))
-                .<ObjectNode>set("plusIndent", MAPPER.valueToTree(doc.plusIndent()))
-                .<ObjectNode>set("optTag", MAPPER.valueToTree(doc.optTag()))
+                .set("breakState", MAPPER.valueToTree(state.getBreakState(doc)))
+                .set("plusIndent", MAPPER.valueToTree(doc.plusIndent()))
+                .set("optTag", MAPPER.valueToTree(doc.optTag()))
                 .put("evalPlusIndent", doc.evalPlusIndent(state))
                 .put("id", doc.id());
     }

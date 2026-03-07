@@ -15,17 +15,15 @@
  */
 package com.palantir.javaformat;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.errorprone.annotations.Immutable;
 import com.palantir.javaformat.doc.Doc;
 import com.palantir.javaformat.doc.Level;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import org.derive4j.ArgOption;
 import org.derive4j.Data;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 @Data(arguments = ArgOption.checkedNotNull)
 @Immutable
@@ -72,45 +70,28 @@ public abstract class BreakBehaviour {
      * This is gross but just wanted to get something working. See https://github.com/derive4j/derive4j/issues/51 for a
      * potential better implementation.
      */
-    static class Json extends JsonSerializer<BreakBehaviour> {
+    static class Json extends ValueSerializer<BreakBehaviour> {
 
         @Override
-        public void serialize(BreakBehaviour value, JsonGenerator gen, SerializerProvider serializers)
-                throws IOException {
+        public void serialize(BreakBehaviour value, JsonGenerator gen, SerializationContext serializers) {
             gen.writeStartObject();
             BreakBehaviours.caseOf(value)
                     .breakThisLevel(() -> {
-                        try {
-                            gen.writeObjectField("type", "breakThisLevel");
-                        } catch (IOException e) {
-                            throw new UncheckedIOException(e);
-                        }
+                        gen.writeStringProperty("type", "breakThisLevel");
                         return null;
                     })
                     .preferBreakingLastInnerLevel(keepIndentWhenInlined -> {
-                        try {
-                            gen.writeObjectField("type", "preferBreakingLastInnerLevel");
-                            gen.writeObjectField("keepIndentWhenInlined", keepIndentWhenInlined);
-                        } catch (IOException e) {
-                            throw new UncheckedIOException(e);
-                        }
+                        gen.writeStringProperty("type", "preferBreakingLastInnerLevel");
+                        gen.writeBooleanProperty("keepIndentWhenInlined", keepIndentWhenInlined);
                         return null;
                     })
                     .inlineSuffix(() -> {
-                        try {
-                            gen.writeObjectField("type", "inlineSuffix");
-                        } catch (IOException e) {
-                            throw new UncheckedIOException(e);
-                        }
+                        gen.writeStringProperty("type", "inlineSuffix");
                         return null;
                     })
                     .breakOnlyIfInnerLevelsThenFitOnOneLine(keepIndentWhenInlined -> {
-                        try {
-                            gen.writeObjectField("type", "breakOnlyIfInnerLevelsThenFitOnOneLine");
-                            gen.writeObjectField("keepIndentWhenInlined", keepIndentWhenInlined);
-                        } catch (IOException e) {
-                            throw new UncheckedIOException(e);
-                        }
+                        gen.writeStringProperty("type", "breakOnlyIfInnerLevelsThenFitOnOneLine");
+                        gen.writeBooleanProperty("keepIndentWhenInlined", keepIndentWhenInlined);
                         return null;
                     });
             gen.writeEndObject();

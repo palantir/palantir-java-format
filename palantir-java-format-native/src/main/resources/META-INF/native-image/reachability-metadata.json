@@ -1,28 +1,7 @@
 {
   "reflection": [
     {
-      "type": "[Lcom.fasterxml.jackson.databind.deser.Deserializers;"
-    },
-    {
-      "type": "[Lcom.fasterxml.jackson.databind.ser.BeanSerializerModifier;"
-    },
-    {
-      "type": "[Lcom.fasterxml.jackson.databind.ser.Serializers;"
-    },
-    {
-      "type": "[Ljava.lang.Object;"
-    },
-    {
-      "type": "com.fasterxml.jackson.databind.ext.Java7SupportImpl",
-      "methods": [
-        {
-          "name": "<init>",
-          "parameterTypes": []
-        }
-      ]
-    },
-    {
-      "type": "com.fasterxml.jackson.datatype.guava.deser.util.RangeHelper$RangeProperties",
+      "type": "tools.jackson.datatype.guava.deser.util.RangeHelper$RangeProperties",
       "fields": [
         {
           "name": "lowerBoundType"

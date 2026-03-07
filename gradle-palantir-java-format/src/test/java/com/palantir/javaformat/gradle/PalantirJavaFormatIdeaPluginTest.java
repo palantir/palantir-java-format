@@ -19,10 +19,6 @@ package com.palantir.javaformat.gradle;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.palantir.gradle.testing.execution.GradleInvoker;
 import com.palantir.gradle.testing.files.arbitrary.ArbitraryFile;
 import com.palantir.gradle.testing.junit.DisabledConfigurationCache;
@@ -34,6 +30,10 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.dataformat.xml.XmlMapper;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 @GradlePluginTests
 @DisabledConfigurationCache

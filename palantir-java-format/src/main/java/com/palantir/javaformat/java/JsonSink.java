@@ -15,25 +15,22 @@
  */
 package com.palantir.javaformat.java;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.palantir.javaformat.doc.JsonDocVisitor;
 import com.palantir.javaformat.doc.Level;
 import com.palantir.javaformat.doc.Obs.FinishExplorationNode;
 import com.palantir.javaformat.doc.Obs.FinishLevelNode;
 import com.palantir.javaformat.doc.Obs.Sink;
 import com.palantir.javaformat.doc.State;
-import java.io.UncheckedIOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 public final class JsonSink implements Sink {
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().registerModule(new Jdk8Module());
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private final Map<Integer, ArrayNode> childrenMap = new HashMap<>();
 
@@ -89,11 +86,7 @@ public final class JsonSink implements Sink {
 
     @Override
     public String getOutput() {
-        try {
-            return OBJECT_MAPPER.writeValueAsString(rootNode);
-        } catch (JsonProcessingException e) {
-            throw new UncheckedIOException(e);
-        }
+        return OBJECT_MAPPER.writeValueAsString(rootNode);
     }
 
     private void createChildrenNode(int id, ObjectNode json) {

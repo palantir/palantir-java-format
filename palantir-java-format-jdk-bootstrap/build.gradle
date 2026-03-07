@@ -13,13 +13,13 @@ dependencies {
 
     api project(':palantir-java-format-spi')
     compileOnly 'org.immutables:value::annotations'
-    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    implementation 'tools.jackson.core:jackson-databind'
 
     // So that we have pjf on our test classpath
     testImplementation project(':palantir-java-format')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'org.assertj:assertj-core'
-    testImplementation 'com.fasterxml.jackson.core:jackson-databind'
+    testImplementation 'tools.jackson.core:jackson-databind'
     formatterNativeImage(project(':palantir-java-format-native')) {
         attributes {
             attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements, 'nativeImage'))
