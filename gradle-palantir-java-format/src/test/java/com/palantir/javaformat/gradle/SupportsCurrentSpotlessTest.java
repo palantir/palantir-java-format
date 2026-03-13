@@ -16,7 +16,6 @@
 package com.palantir.javaformat.gradle;
 
 import com.palantir.gradle.testing.execution.GradleInvoker;
-import com.palantir.gradle.testing.junit.DisabledConfigurationCache;
 import com.palantir.gradle.testing.junit.GradlePluginTests;
 import com.palantir.gradle.testing.project.RootProject;
 import java.io.File;
@@ -34,7 +33,6 @@ import org.junit.jupiter.api.Test;
  * This test forces creation of the spotless steps, which will reveal any eager resolution of configurations.
  */
 @GradlePluginTests
-@DisabledConfigurationCache
 class SupportsCurrentSpotlessTest {
     private static final String CLASSPATH_FILE = new File("build/impl.classpath").getAbsolutePath();
 
