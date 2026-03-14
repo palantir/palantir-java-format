@@ -20,6 +20,8 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import com.intellij.execution.wsl.WSLDistribution;
+import com.intellij.execution.wsl.WslPath;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
 import com.intellij.openapi.application.ApplicationInfo;
@@ -95,6 +97,29 @@ final class FormatterProvider {
         if (useBootstrappingFormatter(
                 jdkMajorVersion, ApplicationInfo.getInstance().getBuild())) {
             Path jdkPath = getJdkPath(cacheKey.project);
+            if (SystemInfo.isWindows) {
+                WslPath jdkUncPath =
+                        WslPath.parseWindowsUncPath(jdkPath.toAbsolutePath().toString());
+                if (jdkUncPath != null) {
+                    // Project JDK is inside WSL2. We have to run the formatter inside WSL2 as well
+                    Path jdkLinuxPath = Path.of(jdkUncPath.getLinuxPath());
+                    String wslId = jdkUncPath.getDistributionId();
+                    WSLDistribution distro = jdkUncPath.getDistribution();
+                    List<Path> linuxImplementationClassPath = implementationClasspath.stream()
+                            .map(Path::toAbsolutePath)
+                            .map(distro::getWslPath)
+                            .map(Path::of)
+                            .toList();
+
+                    log.info(
+                            "Using bootstrapping formatter with WSL distribution {}, jdk version {} and path: {}",
+                            wslId,
+                            jdkMajorVersion,
+                            jdkLinuxPath);
+                    return Optional.of(new BootstrappingFormatterService(
+                            wslId, jdkLinuxPath, jdkMajorVersion, linuxImplementationClassPath));
+                }
+            }
             log.info("Using bootstrapping formatter with jdk version {} and path: {}", jdkMajorVersion, jdkPath);
             return Optional.of(new BootstrappingFormatterService(jdkPath, jdkMajorVersion, implementationClasspath));
         }
@@ -153,7 +178,9 @@ final class FormatterProvider {
         return getProjectJdk(project)
                 .map(Sdk::getHomePath)
                 .map(Path::of)
-                .map(sdkHome -> sdkHome.resolve("bin").resolve("java" + (SystemInfo.isWindows ? ".exe" : "")))
+                .map(sdkHome -> sdkHome.resolve("bin")
+                        .resolve("java"
+                                + (SystemInfo.isWindows && !WslPath.isWslUncPath(sdkHome.toString()) ? ".exe" : "")))
                 .filter(Files::exists)
                 .orElseThrow(() ->
                         new IllegalStateException("Could not determine JDK path for project: " + project.getName()));
