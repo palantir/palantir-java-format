@@ -8,11 +8,11 @@ com.diffplug.durian:durian-io:1.2.0 (1 constraints: 1313c62d)
 
 com.diffplug.durian:durian-swt.os:4.3.0 (1 constraints: c60948a9)
 
-com.diffplug.spotless:spotless-lib:4.4.0 (2 constraints: 8c2484a5)
+com.diffplug.spotless:spotless-lib:4.5.0 (2 constraints: 8e24bfa5)
 
-com.diffplug.spotless:spotless-lib-extra:4.4.0 (1 constraints: 1813db2d)
+com.diffplug.spotless:spotless-lib-extra:4.5.0 (1 constraints: 1913de2d)
 
-com.diffplug.spotless:spotless-plugin-gradle:8.3.0 (2 constraints: cf16b82c)
+com.diffplug.spotless:spotless-plugin-gradle:8.4.0 (2 constraints: d016ee2c)
 
 com.fasterxml.jackson.core:jackson-annotations:2.21 (7 constraints: 4b7c9455)
 
@@ -106,7 +106,7 @@ org.eclipse.platform:org.eclipse.equinox.registry:3.9.0 (1 constraints: 0e051536
 
 org.eclipse.platform:org.eclipse.equinox.supplement:1.10.0 (1 constraints: 3405293b)
 
-org.eclipse.platform:org.eclipse.osgi:3.24.0 (3 constraints: 3e21dfe7)
+org.eclipse.platform:org.eclipse.osgi:3.24.100 (3 constraints: 9f21c422)
 
 org.eclipse.platform:org.eclipse.text:3.10.300 (1 constraints: 99053a46)
 
