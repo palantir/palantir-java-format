@@ -80,5 +80,18 @@ class A {
         2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2
             + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2
             + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2 + 2;
+        return StreamEx.of(itemsToCreate)
+                .append(itemsToEdit)
+                .append(itemsToDelete)
+                .distinct()
+                .mapToEntry(item -> getArgsGenerator()
+                        .getNewArgs(
+                                extendedItems.getOrDefault(item, Set.of()),
+                                getOwningResource(
+                                        item,
+                                        getModificationContext()::getRestrictionStatusOrDefault,
+                                        RestrictionStatus::getPackageId,
+                                        getModificationContext())))
+                .toImmutableMap();
   }
 }
