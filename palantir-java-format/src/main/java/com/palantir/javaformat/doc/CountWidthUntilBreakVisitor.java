@@ -67,15 +67,11 @@ class CountWidthUntilBreakVisitor implements DocVisitor<Float> {
         if (found.isPresent()) {
             return visit(level.getDocs().get(found.getAsInt()));
         }
-        // Otherwise, assert that we encountered a break and move on.
-        if (StartsWithBreakVisitor.INSTANCE.visit(level) != Result.YES) {
-            // Avoid computing expensive level.representation() if we aren't throwing it in an exception.
-            throw new IllegalStateException(String.format(
-                    "Didn't find expected break at the beginning of level.\n%s",
-                    level.representation(State.startingState())));
-        }
-
-        return 0f;
+        // Level starts with tokens directly (e.g. method reference qualifier) — sum doc widths up to the first break.
+        return level.getDocs().stream()
+                .takeWhile(doc -> !(doc instanceof Break))
+                .map(Doc::getWidth)
+                .reduce(0f, Float::sum);
     }
 
     /**
