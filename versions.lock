@@ -114,7 +114,7 @@ org.functionaljava:functionaljava:5.0 (1 constraints: a904262c)
 
 org.immutables:value:2.12.1 (2 constraints: ad168e34)
 
-org.jetbrains:annotations:26.0.2 (2 constraints: b7284379)
+org.jetbrains:annotations:26.1.0 (2 constraints: b6281a79)
 
 org.jetbrains.kotlin:kotlin-stdlib:1.9.10 (2 constraints: c2210fe1)
 
@@ -182,13 +182,13 @@ com.palantir.gradle.jdks:gradle-jdks-setup-common:0.77.0 (3 constraints: 293b3b4
 
 com.palantir.gradle.jdkslatest:gradle-jdks-latest:0.26.0 (1 constraints: 3a05393b)
 
-com.palantir.gradle.plugintesting:configuration-cache-spec:0.54.0 (1 constraints: 3b053f3b)
+com.palantir.gradle.plugintesting:configuration-cache-spec:0.66.0 (1 constraints: 3e05493b)
 
-com.palantir.gradle.plugintesting:discover-tests-cli:0.54.0 (1 constraints: 3b053f3b)
+com.palantir.gradle.plugintesting:discover-tests-cli:0.66.0 (1 constraints: 3e05493b)
 
-com.palantir.gradle.plugintesting:gradle-plugin-testing-junit:0.54.0 (1 constraints: 3b053f3b)
+com.palantir.gradle.plugintesting:gradle-plugin-testing-junit:0.66.0 (1 constraints: 3e05493b)
 
-com.palantir.gradle.plugintesting:plugin-testing-core:0.54.0 (1 constraints: 3b053f3b)
+com.palantir.gradle.plugintesting:plugin-testing-core:0.66.0 (1 constraints: 3e05493b)
 
 com.palantir.gradle.utils:environment-variables:0.23.0 (3 constraints: a33e85ff)
 
