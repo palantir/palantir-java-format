@@ -52,7 +52,7 @@ com.googlecode.concurrent-trees:concurrent-trees:2.6.1 (1 constraints: 761166da)
 
 com.googlecode.javaewah:JavaEWAH:1.2.3 (1 constraints: 460e7e50)
 
-com.palantir.gradle.idea-configuration:gradle-idea-configuration:0.8.0 (4 constraints: de415f6c)
+com.palantir.gradle.idea-configuration:gradle-idea-configuration:0.8.0 (4 constraints: e3416e6c)
 
 com.palantir.gradle.utils:exec:0.23.0 (2 constraints: bd1e0eb5)
 
@@ -166,19 +166,19 @@ com.palantir.gradle.consistentversions:gradle-consistent-versions:3.15.0 (1 cons
 
 com.palantir.gradle.failure-reports:gradle-failure-reports-exceptions:1.9.0 (3 constraints: db3cefde)
 
-com.palantir.gradle.jdks:gradle-jdks:0.77.0 (2 constraints: 1d1a3413)
+com.palantir.gradle.jdks:gradle-jdks:0.79.0 (2 constraints: 1f1ab013)
 
-com.palantir.gradle.jdks:gradle-jdks-distributions:0.77.0 (2 constraints: 1421de9c)
+com.palantir.gradle.jdks:gradle-jdks-distributions:0.79.0 (2 constraints: 1821509d)
 
-com.palantir.gradle.jdks:gradle-jdks-enablement:0.77.0 (1 constraints: 970f6192)
+com.palantir.gradle.jdks:gradle-jdks-enablement:0.79.0 (1 constraints: 990f6792)
 
-com.palantir.gradle.jdks:gradle-jdks-json:0.77.0 (1 constraints: 970f6192)
+com.palantir.gradle.jdks:gradle-jdks-json:0.79.0 (1 constraints: 990f6792)
 
-com.palantir.gradle.jdks:gradle-jdks-settings:0.77.0 (1 constraints: 4005503b)
+com.palantir.gradle.jdks:gradle-jdks-settings:0.79.0 (1 constraints: 4205563b)
 
-com.palantir.gradle.jdks:gradle-jdks-setup:0.77.0 (1 constraints: 970f6192)
+com.palantir.gradle.jdks:gradle-jdks-setup:0.79.0 (1 constraints: 990f6792)
 
-com.palantir.gradle.jdks:gradle-jdks-setup-common:0.77.0 (3 constraints: 293b3b46)
+com.palantir.gradle.jdks:gradle-jdks-setup-common:0.79.0 (3 constraints: 2f3b8f47)
 
 com.palantir.gradle.jdkslatest:gradle-jdks-latest:0.26.0 (1 constraints: 3a05393b)
 
@@ -210,7 +210,7 @@ net.bytebuddy:byte-buddy:1.18.3 (1 constraints: 530b55df)
 
 net.ltgt.gradle:gradle-errorprone-plugin:4.3.0 (2 constraints: 3d366a24)
 
-one.util:streamex:0.8.4 (2 constraints: c1380a76)
+one.util:streamex:0.8.4 (3 constraints: 25486c8a)
 
 org.apache.commons:commons-compress:1.28.0 (1 constraints: 940f5692)
 
