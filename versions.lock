@@ -54,11 +54,13 @@ com.googlecode.javaewah:JavaEWAH:1.2.3 (1 constraints: 460e7e50)
 
 com.palantir.gradle.idea-configuration:gradle-idea-configuration:0.8.0 (4 constraints: de415f6c)
 
-com.palantir.gradle.utils:exec:0.23.0 (2 constraints: bd1e0eb5)
+com.palantir.gradle.utils:exec:0.24.0 (2 constraints: be1e11b5)
 
-com.palantir.gradle.utils:platform:0.23.0 (6 constraints: ca60f1c3)
+com.palantir.gradle.utils:platform:0.24.0 (6 constraints: cb60fdc4)
 
-com.palantir.gradle.utils:providers:0.23.0 (1 constraints: 700ddd31)
+com.palantir.gradle.utils:providers:0.24.0 (1 constraints: 710de031)
+
+com.palantir.gradle.utils:safe-exec-commandline:0.24.0 (1 constraints: 710de031)
 
 com.squareup.okhttp3:okhttp:4.12.0 (1 constraints: f6093eb3)
 
@@ -190,9 +192,9 @@ com.palantir.gradle.plugintesting:gradle-plugin-testing-junit:0.54.0 (1 constrai
 
 com.palantir.gradle.plugintesting:plugin-testing-core:0.54.0 (1 constraints: 3b053f3b)
 
-com.palantir.gradle.utils:environment-variables:0.23.0 (3 constraints: a33e85ff)
+com.palantir.gradle.utils:environment-variables:0.24.0 (3 constraints: a33e85ff)
 
-com.palantir.gradle.utils:lazily-configured-mapping:0.23.0 (2 constraints: 7b21ffd1)
+com.palantir.gradle.utils:lazily-configured-mapping:0.24.0 (2 constraints: 7b21ffd1)
 
 com.palantir.suppressible-error-prone:gradle-suppressible-error-prone:2.26.0 (1 constraints: 7419b3d0)
 
