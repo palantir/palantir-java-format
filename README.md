@@ -153,6 +153,8 @@ when formatting java code.
 
 ## JHarmonizer
 
+> This is a community-maintained third-party tool and is not officially supported by Palantir Technologies.
+
 [JHarmonizer](https://github.com/lemon-ant/JHarmonizer) sorts and formats
 Java source files. It reorders class members — fields, constructors,
 methods, nested types, and initializer blocks — according to configurable
