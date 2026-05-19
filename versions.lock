@@ -298,13 +298,13 @@ org.junit.platform:junit-platform-commons:6.1.0 (2 constraints: d5204b4a)
 
 org.junit.platform:junit-platform-console:6.1.0 (1 constraints: 4313543f)
 
-org.junit.platform:junit-platform-engine:6.1.0 (4 constraints: a04019e3)
+org.junit.platform:junit-platform-engine:6.1.0 (4 constraints: 9e40cde2)
 
 org.junit.platform:junit-platform-launcher:6.1.0 (4 constraints: 674157f6)
 
 org.junit.platform:junit-platform-reporting:6.1.0 (1 constraints: e8118cee)
 
-org.junit.vintage:junit-vintage-engine:6.0.3 (1 constraints: 0b050c36)
+org.junit.vintage:junit-vintage-engine:6.1.0 (1 constraints: 09050c36)
 
 org.objenesis:objenesis:2.4 (1 constraints: ea0c8c0a)
 
