@@ -113,6 +113,14 @@ public final class JavaCommentsHelper implements CommentsHelper {
     private static final Pattern LINE_COMMENT_MISSING_SPACE_PREFIX =
             Pattern.compile("^(//+)(?!noinspection|\\$NON-NLS-\\d+\\$)[^\\s/]");
 
+    private static String lineCommentPrefix(String line) {
+        int prefixLength = 0;
+        while (prefixLength < line.length() && line.charAt(prefixLength) == '/') {
+            prefixLength++;
+        }
+        return "/".repeat(Math.max(prefixLength, 2));
+    }
+
     private List<String> wrapLineComments(List<String> lines, int column0) {
         List<String> result = new ArrayList<>();
         for (String line : lines) {
@@ -128,11 +136,7 @@ public final class JavaCommentsHelper implements CommentsHelper {
                 continue;
             }
             // Preserve the original slash prefix (e.g. `///` for markdown docstrings) on wrapped lines.
-            int prefixLength = 0;
-            while (prefixLength < line.length() && line.charAt(prefixLength) == '/') {
-                prefixLength++;
-            }
-            String prefix = "/".repeat(Math.max(prefixLength, 2));
+            String prefix = lineCommentPrefix(line);
             while (line.length() + column0 > options.maxLineLength()) {
                 int idx = options.maxLineLength() - column0;
                 // only break on whitespace characters, and ignore the leading `// `
