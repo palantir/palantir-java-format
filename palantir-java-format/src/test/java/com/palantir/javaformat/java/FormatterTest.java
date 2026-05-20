@@ -432,19 +432,18 @@ public final class FormatterTest {
 
     @Test
     public void wrapMarkdownDocstringComment() throws Exception {
-        assertThat(Formatter.create()
-                        .formatSource("class T {\n"
-                                + "  /// one long incredibly"
-                                + " unbroken sentence moving from topic to topic so that no-one had a"
-                                + " chance to interrupt;\n"
-                                + "  void m() {}\n"
-                                + "}\n"))
-                .isEqualTo("class T {\n"
-                        + "  /// one long incredibly unbroken sentence moving from topic to topic so that"
-                        + " no-one had a chance\n"
-                        + "  /// to interrupt;\n"
-                        + "  void m() {}\n"
-                        + "}\n");
+        String input = "class T {\n"
+                + "  /// one long incredibly unbroken sentence moving from topic to topic so that no-one"
+                + " had a chance to interrupt;\n"
+                + "  void m() {}\n"
+                + "}\n";
+        String expected = "class T {\n"
+                + "  /// one long incredibly unbroken sentence moving from topic to topic so that no-one"
+                + " had a chance\n"
+                + "  /// to interrupt;\n"
+                + "  void m() {}\n"
+                + "}\n";
+        assertThat(Formatter.create().formatSource(input)).isEqualTo(expected);
     }
 
     @Test
