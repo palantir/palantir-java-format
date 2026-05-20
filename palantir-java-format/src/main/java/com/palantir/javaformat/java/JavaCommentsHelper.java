@@ -127,17 +127,23 @@ public final class JavaCommentsHelper implements CommentsHelper {
                 result.add(line);
                 continue;
             }
+            // Preserve the original slash prefix (e.g. `///` for markdown docstrings) on wrapped lines.
+            int prefixLength = 0;
+            while (prefixLength < line.length() && line.charAt(prefixLength) == '/') {
+                prefixLength++;
+            }
+            String prefix = "/".repeat(Math.max(prefixLength, 2));
             while (line.length() + column0 > options.maxLineLength()) {
                 int idx = options.maxLineLength() - column0;
                 // only break on whitespace characters, and ignore the leading `// `
-                while (idx >= 2 && !CharMatcher.whitespace().matches(line.charAt(idx))) {
+                while (idx >= prefix.length() && !CharMatcher.whitespace().matches(line.charAt(idx))) {
                     idx--;
                 }
-                if (idx <= 2) {
+                if (idx <= prefix.length()) {
                     break;
                 }
                 result.add(line.substring(0, idx));
-                line = "//" + line.substring(idx);
+                line = prefix + line.substring(idx);
             }
             result.add(line);
         }
