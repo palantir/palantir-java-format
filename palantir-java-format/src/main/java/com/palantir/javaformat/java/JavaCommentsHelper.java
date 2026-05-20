@@ -118,7 +118,7 @@ public final class JavaCommentsHelper implements CommentsHelper {
         while (prefixLength < line.length() && line.charAt(prefixLength) == '/') {
             prefixLength++;
         }
-        return "/".repeat(Math.max(prefixLength, 2));
+        return "/".repeat(prefixLength);
     }
 
     private List<String> wrapLineComments(List<String> lines, int column0) {
