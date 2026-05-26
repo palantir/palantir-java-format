@@ -1,5 +1,5 @@
 apply plugin: 'java-library'
-apply plugin: 'org.revapi.revapi-gradle-plugin'
+apply plugin: 'com.palantir.revapi'
 apply plugin: 'com.palantir.external-publish-jar'
 
 dependencies {
