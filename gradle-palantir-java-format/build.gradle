@@ -1,5 +1,5 @@
 apply plugin: 'java-gradle-plugin'
-apply plugin: 'org.revapi.revapi-gradle-plugin'
+apply plugin: 'com.palantir.revapi'
 apply plugin: 'groovy'
 apply plugin: 'com.palantir.external-publish-jar'
 apply plugin: 'com.palantir.gradle-plugin-testing'
