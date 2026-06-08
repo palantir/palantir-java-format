@@ -79,8 +79,10 @@ final class FormatterProvider {
     @SuppressWarnings("for-rollout:Slf4jLogsafeArgs")
     private static Optional<FormatterService> createFormatter(FormatterCacheKey cacheKey) {
         if (cacheKey.nativeImageClassPath.isPresent()) {
-            log.info("Using the native formatter with classpath: {}", cacheKey.nativeImageClassPath.get());
-            return Optional.of(new NativeImageFormatterService(Path.of(cacheKey.nativeImageClassPath.get())));
+            URI nativeUri = cacheKey.nativeImageClassPath.get();
+            validateClasspathEntry(nativeUri);
+            log.info("Using the native formatter with classpath: {}", nativeUri);
+            return Optional.of(new NativeImageFormatterService(Path.of(nativeUri)));
         }
         if (cacheKey.jdkMajorVersion.isEmpty()) {
             return Optional.empty();
@@ -118,6 +120,7 @@ final class FormatterProvider {
     }
 
     private static List<Path> getProvidedImplementationUrls(List<URI> implementationClasspath) {
+        implementationClasspath.forEach(FormatterProvider::validateClasspathEntry);
         return implementationClasspath.stream().map(Path::of).collect(Collectors.toList());
     }
 
@@ -209,6 +212,37 @@ final class FormatterProvider {
                     }
                 })
                 .toArray(URL[]::new);
+    }
+
+    @VisibleForTesting
+    static Path resolveGradleUserHome() {
+        return Optional.ofNullable(System.getenv("GRADLE_USER_HOME"))
+                .filter(envHome -> !envHome.isEmpty())
+                .map(Path::of)
+                .orElseGet(() -> Path.of(System.getProperty("user.home"), ".gradle"))
+                .toAbsolutePath()
+                .normalize();
+    }
+
+    static void validateClasspathEntry(URI uri) {
+        validateClasspathEntry(uri, resolveGradleUserHome());
+    }
+
+    @VisibleForTesting
+    static void validateClasspathEntry(URI uri, Path gradleUserHome) {
+        if (!"file".equals(uri.getScheme())) {
+            throw new IllegalArgumentException("Classpath entry must use the 'file' scheme, but was: " + uri);
+        }
+        try {
+            Path resolvedHome = gradleUserHome.toRealPath();
+            Path path = Path.of(uri).toRealPath();
+            if (!path.startsWith(resolvedHome)) {
+                throw new IllegalArgumentException(
+                        "Classpath entry is not within the Gradle user home (" + resolvedHome + "): " + uri);
+            }
+        } catch (IOException e) {
+            throw new UncheckedIOException("Failed to resolve real path for classpath entry: " + uri, e);
+        }
     }
 
     private static List<Path> listDirAsUrlsUnchecked(Path dir) {
