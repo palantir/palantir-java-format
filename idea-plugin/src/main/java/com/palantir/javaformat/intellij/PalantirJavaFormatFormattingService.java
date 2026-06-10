@@ -23,6 +23,7 @@ import com.google.common.collect.Range;
 import com.intellij.formatting.service.AsyncDocumentFormattingService;
 import com.intellij.formatting.service.AsyncFormattingRequest;
 import com.intellij.ide.highlighter.JavaFileType;
+import com.intellij.ide.impl.TrustedProjects;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.NlsSafe;
@@ -45,6 +46,13 @@ class PalantirJavaFormatFormattingService extends AsyncDocumentFormattingService
     @Override
     protected FormattingTask createFormattingTask(@NotNull AsyncFormattingRequest request) {
         Project project = request.getContext().getProject();
+        if (!TrustedProjects.isTrusted(project)) {
+            logger.warn("palantir-java-format: skipping formatting for untrusted project: " + project.getName());
+            request.onError(
+                    Notifications.GENERIC_ERROR_NOTIFICATION_GROUP,
+                    "palantir-java-format requires a trusted project to load the external formatter classpath.");
+            return null;
+        }
         PalantirJavaFormatSettings settings = PalantirJavaFormatSettings.getInstance(project);
         Optional<FormatterService> formatter = formatterProvider.get(project, settings);
         return new PalantirJavaFormatFormattingTask(request, formatter);
