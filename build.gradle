@@ -14,7 +14,7 @@ buildscript {
         classpath 'com.palantir.gradle.failure-reports:gradle-failure-reports:1.18.0'
         classpath 'com.palantir.gradle.gitversion:gradle-git-version:5.0.0'
         classpath 'com.palantir.gradle.guide:gradle-guide:1.27.0'
-        classpath 'com.palantir.gradle.idea-configuration:gradle-idea-configuration:0.8.0'
+        classpath 'com.palantir.gradle.idea-configuration:gradle-idea-configuration:0.9.0'
         classpath 'com.palantir.gradle.idea-language-injector:gradle-idea-language-injector:0.2.0'
         classpath 'com.palantir.gradle.jdks:gradle-jdks:0.79.0'
         classpath 'com.palantir.gradle.jdkslatest:gradle-jdks-latest:0.27.0'
