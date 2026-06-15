@@ -89,7 +89,7 @@ class SpotlessExcludesTest {
 
     @Test
     void format_checks_non_generated_files(GradleInvoker gradle, RootProject project) {
-        project.file("src/main/java/test/Test.java").overwrite("""
+        project.file("src/main/java/test/generatedNamespace/Test.java").overwrite("""
             package test;
             import java.lang.Void;
             public class Test { Void test() { return null; } }
