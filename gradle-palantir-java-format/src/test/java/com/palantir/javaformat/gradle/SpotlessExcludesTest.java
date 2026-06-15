@@ -24,6 +24,7 @@ import com.palantir.gradle.testing.junit.GradlePluginTests;
 import com.palantir.gradle.testing.project.RootProject;
 import java.io.File;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -82,6 +83,19 @@ class SpotlessExcludesTest {
             """);
 
         InvocationResult result = gradle.withArgs("spotlessJavaCheck").buildsSuccessfully();
+
+        assertThat(result).task(":spotlessJava").succeeded();
+    }
+
+    @Test
+    void format_checks_non_generated_files(GradleInvoker gradle, RootProject project) {
+        project.file("src/main/java/test/Test.java").overwrite("""
+            package test;
+            import java.lang.Void;
+            public class Test { Void test() { return null; } }
+            """);
+
+        InvocationResult result = gradle.withArgs("spotlessJavaCheck").buildsWithFailure();
 
         assertThat(result).task(":spotlessJava").succeeded();
     }
