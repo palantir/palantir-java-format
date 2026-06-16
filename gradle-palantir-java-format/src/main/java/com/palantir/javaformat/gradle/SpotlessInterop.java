@@ -52,9 +52,9 @@ public abstract class SpotlessInterop implements Action<JavaExtension> {
     @Override
     public void execute(JavaExtension java) {
         // Exclude generated source directories
-        // Note: We cannot simply exclude **/build/**/* because some repos might contain a build directory
-        // within the src sourceset that should be formatted.
         java.targetExclude(
+                // Note: We cannot simply exclude **/build/**/* because some repos might contain a build directory
+                // within the src sourceset that should be formatted.
                 "**/build/generated*/**",
                 "**/src/generated*/**",
                 "**/generated_*src/**",

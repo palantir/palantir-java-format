@@ -24,7 +24,6 @@ import com.palantir.gradle.testing.junit.GradlePluginTests;
 import com.palantir.gradle.testing.project.RootProject;
 import java.io.File;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -64,8 +63,9 @@ class SpotlessExcludesTest {
                 "build/generated/java",
                 "src/generated/java",
                 "src/main/generated_testsrc",
+                "src/main/generated_foo_testsrc",
                 "generated_testSrc",
-                "build/groovy-dsl-plugins/output",
+                "build/groovy-dsl-plugins/output"
             })
     void format_ignores_excluded_directories(String srcDir, GradleInvoker gradle, RootProject project) {
         project.buildGradle().append("""
@@ -87,9 +87,22 @@ class SpotlessExcludesTest {
         assertThat(result).task(":spotlessJava").succeeded();
     }
 
-    @Test
-    void format_checks_non_generated_files(GradleInvoker gradle, RootProject project) {
-        project.file("src/main/java/test/generatedNamespace/Test.java").overwrite("""
+    @ParameterizedTest
+    @ValueSource(
+            strings = {
+                "foo/generated_foo/src/bar",
+                "src/main/java/test/generatedNamespace",
+            })
+    void format_checks_non_generated_files(String srcDir, GradleInvoker gradle, RootProject project) {
+        project.buildGradle().append("""
+            sourceSets {
+                main {
+                    java { srcDir '%s' }
+                }
+            }
+            """, srcDir);
+
+        project.file(srcDir + "/Test.java").overwrite("""
             package test;
             import java.lang.Void;
             public class Test { Void test() { return null; } }
