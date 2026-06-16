@@ -8,11 +8,11 @@ com.diffplug.durian:durian-io:1.2.0 (1 constraints: 1313c62d)
 
 com.diffplug.durian:durian-swt.os:4.3.0 (1 constraints: c60948a9)
 
-com.diffplug.spotless:spotless-lib:4.6.2 (2 constraints: 942468a6)
+com.diffplug.spotless:spotless-lib:4.7.0 (2 constraints: 922435a6)
 
-com.diffplug.spotless:spotless-lib-extra:4.6.2 (1 constraints: 1c13e32d)
+com.diffplug.spotless:spotless-lib-extra:4.7.0 (1 constraints: 1b13e42d)
 
-com.diffplug.spotless:spotless-plugin-gradle:8.6.0 (2 constraints: d2165a2d)
+com.diffplug.spotless:spotless-plugin-gradle:8.7.0 (2 constraints: d316902d)
 
 com.fasterxml.jackson.core:jackson-annotations:2.21 (7 constraints: 4b7c9455)
 
@@ -68,9 +68,9 @@ com.squareup.okio:okio:3.6.0 (1 constraints: 530c38fd)
 
 com.squareup.okio:okio-jvm:3.6.0 (1 constraints: 500ad3b9)
 
-commons-codec:commons-codec:1.21.0 (2 constraints: 171e0987)
+commons-codec:commons-codec:1.22.0 (2 constraints: 181e0c87)
 
-dev.equo.ide:solstice:1.8.1 (1 constraints: 771167da)
+dev.equo.ide:solstice:1.8.2 (1 constraints: 781168da)
 
 net.sf.jopt-simple:jopt-simple:5.0.4 (1 constraints: be0ad6cc)
 
@@ -82,7 +82,7 @@ org.derive4j:derive4j-annotation:1.1.1 (1 constraints: 0505f435)
 
 org.eclipse.jdt:org.eclipse.jdt.core:3.23.0 (1 constraints: 3a05423b)
 
-org.eclipse.jgit:org.eclipse.jgit:7.6.0.202603022253-r (2 constraints: e62a63d7)
+org.eclipse.jgit:org.eclipse.jgit:7.7.0.202606012155-r (2 constraints: ee2ac1d8)
 
 org.eclipse.platform:org.eclipse.core.commands:3.9.700 (1 constraints: 7505d640)
 
@@ -108,7 +108,7 @@ org.eclipse.platform:org.eclipse.equinox.registry:3.9.0 (1 constraints: 0e051536
 
 org.eclipse.platform:org.eclipse.equinox.supplement:1.10.0 (1 constraints: 3405293b)
 
-org.eclipse.platform:org.eclipse.osgi:3.24.100 (3 constraints: 9f21c422)
+org.eclipse.platform:org.eclipse.osgi:3.24.200 (3 constraints: a021e822)
 
 org.eclipse.platform:org.eclipse.text:3.10.300 (1 constraints: 99053a46)
 
@@ -132,7 +132,7 @@ org.openjdk.jmh:jmh-core:1.37 (5 constraints: 52476be6)
 
 org.openjdk.jmh:jmh-generator-annprocess:1.37 (1 constraints: df04fc30)
 
-org.slf4j:slf4j-api:2.0.17 (5 constraints: f94d322b)
+org.slf4j:slf4j-api:2.0.18 (5 constraints: fa4d332b)
 
 org.tukaani:xz:1.9 (1 constraints: 6b09e995)
 
