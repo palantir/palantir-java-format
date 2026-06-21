@@ -11,7 +11,7 @@ buildscript {
         classpath 'com.palantir.baseline:gradle-baseline-java:6.80.0'
         classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:3.16.0'
         classpath 'com.palantir.gradle.externalpublish:gradle-external-publish-plugin:1.35.0'
-        classpath 'com.palantir.gradle.failure-reports:gradle-failure-reports:1.18.0'
+        classpath 'com.palantir.gradle.failure-reports:gradle-failure-reports:1.19.0'
         classpath 'com.palantir.gradle.gitversion:gradle-git-version:5.0.0'
         classpath 'com.palantir.gradle.guide:gradle-guide:1.27.0'
         classpath 'com.palantir.gradle.idea-configuration:gradle-idea-configuration:0.10.0'
