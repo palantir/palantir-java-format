@@ -52,16 +52,17 @@ public abstract class SpotlessInterop implements Action<JavaExtension> {
     @Override
     public void execute(JavaExtension java) {
         // Exclude generated source directories
-        // Note: We cannot simply exclude **/build/**/* because some repos might contain a build directory
-        // within the src sourceset that should be formatted.
-        java.targetExclude("**/build/generated*/**");
-        java.targetExclude("**/src/generated*/**");
-        java.targetExclude("**/generated_*src/**");
-        java.targetExclude("**/generated_*Src/**");
-        // build/groovy-dsl-plugins contains Java wrapper classes for
-        // https://docs.gradle.org/9.3.1/userguide/implementing_gradle_plugins_convention.html
-        // and don't need to be formatted.
-        java.targetExclude("**/groovy-dsl-plugins/**");
+        java.targetExclude(
+                // Note: We cannot simply exclude **/build/**/* because some repos might contain a build directory
+                // within the src sourceset that should be formatted.
+                "**/build/generated*/**",
+                "**/src/generated*/**",
+                "**/generated_*src/**",
+                "**/generated_*Src/**",
+                // build/groovy-dsl-plugins contains Java wrapper classes for
+                // https://docs.gradle.org/9.3.1/userguide/implementing_gradle_plugins_convention.html
+                // and don't need to be formatted.
+                "**/groovy-dsl-plugins/**");
         // This is configuration cache safe as happening afterEvaluate
         java.addStep(spotlessJavaFormatStep());
     }
