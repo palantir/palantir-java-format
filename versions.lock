@@ -294,17 +294,17 @@ org.junit.jupiter:junit-jupiter-migrationsupport:6.1.0 (1 constraints: 09050c36)
 
 org.junit.jupiter:junit-jupiter-params:6.1.0 (2 constraints: c22428d7)
 
-org.junit.platform:junit-platform-commons:6.1.0 (2 constraints: d5204b4a)
+org.junit.platform:junit-platform-commons:6.1.1 (2 constraints: d6204c4a)
 
-org.junit.platform:junit-platform-console:6.1.0 (1 constraints: 4313543f)
+org.junit.platform:junit-platform-console:6.1.1 (1 constraints: 4313543f)
 
-org.junit.platform:junit-platform-engine:6.1.0 (4 constraints: 9e40cde2)
+org.junit.platform:junit-platform-engine:6.1.1 (4 constraints: a0404ae3)
 
-org.junit.platform:junit-platform-launcher:6.1.0 (4 constraints: 674157f6)
+org.junit.platform:junit-platform-launcher:6.1.1 (4 constraints: 684158f6)
 
-org.junit.platform:junit-platform-reporting:6.1.0 (1 constraints: e8118cee)
+org.junit.platform:junit-platform-reporting:6.1.1 (1 constraints: e9118dee)
 
-org.junit.vintage:junit-vintage-engine:6.1.0 (1 constraints: 09050c36)
+org.junit.vintage:junit-vintage-engine:6.1.1 (1 constraints: 0a050d36)
 
 org.objenesis:objenesis:2.4 (1 constraints: ea0c8c0a)
 
