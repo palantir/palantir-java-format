@@ -300,7 +300,7 @@ org.junit.platform:junit-platform-console:6.1.1 (1 constraints: 4313543f)
 
 org.junit.platform:junit-platform-engine:6.1.1 (4 constraints: a0404ae3)
 
-org.junit.platform:junit-platform-launcher:6.1.1 (4 constraints: 684158f6)
+org.junit.platform:junit-platform-launcher:6.1.1 (4 constraints: 694101f7)
 
 org.junit.platform:junit-platform-reporting:6.1.1 (1 constraints: e9118dee)
 
