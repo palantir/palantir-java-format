@@ -155,7 +155,7 @@ when formatting java code.
 
 > This is a community-maintained third-party tool and is not officially supported by Palantir Technologies.
 
-[palantir-java-format-action](https://github.com/abashev/palantir-java-format-action) checks Java
+[palantir-java-format-action](https://github.com/marketplace/actions/palantir-java-format-check) checks Java
 code formatting in CI using the `palantir-java-format` native binary, without requiring Java, Maven,
 or Gradle on the runner.
 
