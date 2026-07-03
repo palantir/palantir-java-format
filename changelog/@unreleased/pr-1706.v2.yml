@@ -2,4 +2,4 @@ type: improvement
 improvement:
   description: Add palantir-java-format-action into the README as a third-party GitHub Action integration
   links:
-  - https://github.com/palantir/palantir-java-format/pull/0000
+  - https://github.com/palantir/palantir-java-format/pull/1706
