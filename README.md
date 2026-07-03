@@ -182,12 +182,16 @@ shortcut.
 
 ![Install plugin from disk](./docs/images/install_plugin_from_disk.png)
 
-## Java 21 Support
+## Java 26 Support
 
-In [1211](https://github.com/palantir/palantir-java-format/pull/1211) we shipped Java 21 support. In order to use the 
-Java 21 formatting capabilities, ensure that either: 
+In [1211](https://github.com/palantir/palantir-java-format/pull/1211) we shipped Java 21 support. Since then we've
+kept up with the language and now also support formatting the newer syntax introduced up through Java 26, including
+module import declarations, compact source files and instance main methods, flexible constructor bodies, markdown
+documentation comments, and unnamed patterns in deconstruction. In order to use these formatting capabilities, ensure
+that either:
 
-- the Gradle daemon and the Intellij Project SDK are set to Java 21
+- the Gradle daemon and the Intellij Project SDK are set to Java 26 (or, at minimum, to the JDK version in which the
+  feature you're relying on was finalized)
 - or that the gradle property `palantir.native.formatter=true`. This will run the formatter as a native image, 
 - independent of the Gradle daemon/Intellij project JDK version. 
 
