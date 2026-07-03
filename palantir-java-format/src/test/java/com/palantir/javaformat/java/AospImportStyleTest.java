@@ -277,6 +277,37 @@ public class AospImportStyleTest {
                     "public class Blim {}",
                 },
             },
+
+            // Module imports (JEP 511) form their own leading group, ahead of static, android,
+            // third-party and java imports alike, and are separated from the following group by a
+            // blank line, consistent with the other group boundaries in AOSP style.
+            {
+                {
+                    "package foo;",
+                    "",
+                    "import java.util.List;",
+                    "import static android.Bar.baz;",
+                    "import module java.desktop;",
+                    "import android.Bar;",
+                    "import module java.base;",
+                    "",
+                    "public class Blim {}",
+                },
+                {
+                    "package foo;",
+                    "",
+                    "import module java.base;",
+                    "import module java.desktop;",
+                    "",
+                    "import static android.Bar.baz;",
+                    "",
+                    "import android.Bar;",
+                    "",
+                    "import java.util.List;",
+                    "",
+                    "public class Blim {}",
+                },
+            },
         };
         ImmutableList.Builder<Object[]> builder = ImmutableList.builder();
         Arrays.stream(inputsOutputs).forEach(input -> builder.add(ImportOrdererUtils.createRow(input)));

@@ -1,0 +1,7 @@
+import module java.base;
+import module java.sql;
+import java.util.List;
+
+class ModuleImport {
+  List<String> xs;
+}

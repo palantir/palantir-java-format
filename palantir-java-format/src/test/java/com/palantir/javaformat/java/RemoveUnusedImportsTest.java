@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.truth.Truth;
 import com.palantir.javaformat.jupiter.ParameterizedClass;
 import java.util.List;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.Execution;
@@ -254,6 +255,21 @@ public class RemoveUnusedImportsTest {
                     "interface Test { private static void foo() {} }",
                 },
             },
+            {
+                // Module imports (JEP 511, `import module foo.bar;`) parse to JCModuleImport, a
+                // sibling of JCImport rather than a subtype. They must never be reported as unused
+                // (see isUnused), and must not crash buildReplacements when mixed with ordinary
+                // imports, some used and some not.
+                {
+                    "import module java.base;",
+                    "import java.util.List;",
+                    "import java.util.Map;",
+                    "class T { List<String> xs; }",
+                },
+                {
+                    "import module java.base;", "import java.util.List;", "class T { List<String> xs; }",
+                },
+            },
         };
         ImmutableList.Builder<Object[]> builder = ImmutableList.builder();
         for (String[][] inputAndOutput : inputsOutputs) {
@@ -278,6 +294,10 @@ public class RemoveUnusedImportsTest {
 
     @TestTemplate
     public void removeUnused() throws FormatterException {
+        // Module imports (JEP 511, `import module foo.bar;`) are only parseable on JDK 25+.
+        Assumptions.assumeTrue(
+                !input.contains("import module") || Formatter.getRuntimeVersion() >= 25,
+                "import module requires running on JDK 25 or later");
         Truth.assertThat(RemoveUnusedImports.removeUnusedImports(input)).isEqualTo(expected);
     }
 }

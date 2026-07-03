@@ -42,7 +42,6 @@ import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
 import com.sun.tools.javac.tree.JCTree.JCFieldAccess;
 import com.sun.tools.javac.tree.JCTree.JCIdent;
-import com.sun.tools.javac.tree.JCTree.JCImport;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.Options;
 import java.lang.reflect.Method;
@@ -226,13 +225,20 @@ public class RemoveUnusedImports {
             Set<String> usedNames,
             Multimap<String, Range<Integer>> usedInJavadoc) {
         RangeMap<Integer, String> replacements = TreeRangeMap.create();
-        for (JCImport importTree : unit.getImports()) {
+        // Since JDK 23, JCCompilationUnit#getImports() elements are no longer all JCImport: a module
+        // import (JEP 511, `import module foo.bar;`) parses to the sibling node JCModuleImport, which is
+        // not a JCImport subtype, so an element typed JCImport here would throw ClassCastException.
+        // JCTree is the common supertype of both and still exposes the position accessors we need below;
+        // ImportTree (the public, stable API both node kinds implement) gives us getQualifiedIdentifier()
+        // and isModule().
+        for (JCTree importDecl : unit.getImports()) {
+            ImportTree importTree = (ImportTree) importDecl;
             String simpleName = getSimpleName(importTree);
             if (!isUnused(unit, usedNames, usedInJavadoc, importTree, simpleName)) {
                 continue;
             }
             // delete the import
-            int endPosition = importTree.getEndPosition(unit.endPositions);
+            int endPosition = importDecl.getEndPosition(unit.endPositions);
             endPosition = Math.max(CharMatcher.isNot(' ').indexIn(contents, endPosition), endPosition);
             String sep = Newlines.guessLineSeparator(contents);
             if (endPosition + sep.length() < contents.length()
@@ -241,9 +247,34 @@ public class RemoveUnusedImports {
                             .equals(sep)) {
                 endPosition += sep.length();
             }
-            replacements.put(Range.closedOpen(importTree.getStartPosition(), endPosition), "");
+            replacements.put(Range.closedOpen(importDecl.getStartPosition(), endPosition), "");
         }
         return replacements;
+    }
+
+    // ImportTree#isModule() (JEP 511, module import declarations) was added in JDK 23. This module
+    // compiles at an older --release, so it can't be referenced directly and is reached reflectively,
+    // matching the CASE_TREE_GET_LABELS idiom above.
+    private static final Method IMPORT_TREE_IS_MODULE = importTreeIsModule();
+
+    @SuppressWarnings("for-rollout:NullAway")
+    private static Method importTreeIsModule() {
+        try {
+            return ImportTree.class.getMethod("isModule");
+        } catch (NoSuchMethodException e) {
+            return null;
+        }
+    }
+
+    private static boolean isModuleImport(ImportTree importTree) {
+        if (IMPORT_TREE_IS_MODULE == null) {
+            return false;
+        }
+        try {
+            return Boolean.TRUE.equals(IMPORT_TREE_IS_MODULE.invoke(importTree));
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     private static String getSimpleName(ImportTree importTree) {
@@ -260,6 +291,13 @@ public class RemoveUnusedImports {
             Multimap<String, Range<Integer>> usedInJavadoc,
             ImportTree importTree,
             String simpleName) {
+        if (isModuleImport(importTree)) {
+            // A module import (JEP 511, `import module foo.bar;`) binds every exported package of the
+            // module by wildcard. This scanner only records simple names actually referenced in the
+            // source, so it has no way to tell whether any particular module import is needed - same
+            // situation as a `.*` wildcard import below. Never remove it.
+            return false;
+        }
         String qualifier = ((JCFieldAccess) importTree.getQualifiedIdentifier())
                 .getExpression()
                 .toString();

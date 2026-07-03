@@ -123,16 +123,25 @@ public final class ImportOrderer {
     /**
      * A {@link Comparator} that orders {@link Import}s by Google Style, defined at
      * https://google.github.io/styleguide/javaguide.html#s3.3.3-import-ordering-and-spacing.
+     *
+     * <p>Module imports ({@code import module foo.bar;}, JEP 511) are sorted into their own leading group, ahead of
+     * both static and non-static type imports: they bind whole modules' worth of exported packages, so they read
+     * most naturally as the broadest, first declarations in the file.
      */
-    private static final Comparator<Import> GOOGLE_IMPORT_COMPARATOR =
-            Comparator.comparing(Import::isStatic, trueFirst()).thenComparing(Import::imported);
+    private static final Comparator<Import> GOOGLE_IMPORT_COMPARATOR = Comparator.comparing(
+                    Import::isModule, trueFirst())
+            .thenComparing(Import::isStatic, trueFirst())
+            .thenComparing(Import::imported);
 
     /**
      * A {@link Comparator} that orders {@link Import}s by AOSP Style, defined at
      * https://source.android.com/setup/contribute/code-style#order-import-statements and implemented in IntelliJ at
      * https://android.googlesource.com/platform/development/+/master/ide/intellij/codestyles/AndroidStyle.xml.
+     *
+     * <p>As with {@link #GOOGLE_IMPORT_COMPARATOR}, module imports sort into their own leading group.
      */
-    private static final Comparator<Import> AOSP_IMPORT_COMPARATOR = Comparator.comparing(Import::isStatic, trueFirst())
+    private static final Comparator<Import> AOSP_IMPORT_COMPARATOR = Comparator.comparing(Import::isModule, trueFirst())
+            .thenComparing(Import::isStatic, trueFirst())
             .thenComparing(Import::isAndroid, trueFirst())
             .thenComparing(Import::isThirdParty, trueFirst())
             .thenComparing(Import::isJava, trueFirst())
@@ -143,6 +152,11 @@ public final class ImportOrderer {
      * Google style.
      */
     private static boolean shouldInsertBlankLineGoogle(Import prev, Import curr) {
+        // Module imports (JEP 511) form their own leading group; separate it from whatever follows,
+        // the same way static imports are separated from non-static imports below.
+        if (prev.isModule() && !curr.isModule()) {
+            return true;
+        }
         return prev.isStatic() && !curr.isStatic();
     }
 
@@ -151,6 +165,11 @@ public final class ImportOrderer {
      * style.
      */
     private static boolean shouldInsertBlankLineAosp(Import prev, Import curr) {
+        // Module imports (JEP 511) form their own leading group; separate it from whatever follows,
+        // consistent with the other group boundaries below.
+        if (prev.isModule() && !curr.isModule()) {
+            return true;
+        }
         if (prev.isStatic() && !curr.isStatic()) {
             return true;
         }
@@ -186,12 +205,14 @@ public final class ImportOrderer {
     class Import {
         private final String imported;
         private final boolean isStatic;
+        private final boolean isModule;
         private final String trailing;
 
-        Import(String imported, String trailing, boolean isStatic) {
+        Import(String imported, String trailing, boolean isStatic, boolean isModule) {
             this.imported = imported;
             this.trailing = trailing;
             this.isStatic = isStatic;
+            this.isModule = isModule;
         }
 
         /** The name being imported, for example {@code java.util.List}. */
@@ -202,6 +223,11 @@ public final class ImportOrderer {
         /** True if this is {@code import static}. */
         boolean isStatic() {
             return isStatic;
+        }
+
+        /** True if this is {@code import module} (JEP 511). */
+        boolean isModule() {
+            return isModule;
         }
 
         /** The top-level package of the import. */
@@ -246,7 +272,9 @@ public final class ImportOrderer {
         public String toString() {
             StringBuilder sb = new StringBuilder();
             sb.append("import ");
-            if (isStatic()) {
+            if (isModule()) {
+                sb.append("module ");
+            } else if (isStatic()) {
                 sb.append("static ");
             }
             sb.append(imported()).append(';');
@@ -282,7 +310,7 @@ public final class ImportOrderer {
      *
      * <pre>{@code
      * <imports> -> (<end-of-line> | <import>)*
-     * <import> -> "import" <whitespace> ("static" <whitespace>)?
+     * <import> -> "import" <whitespace> (("static" | "module") <whitespace>)?
      *    <identifier> ("." <identifier>)* ("." "*")? <whitespace>? ";"
      *    <whitespace>? <end-of-line>? (<line-comment> <end-of-line>)*
      * }</pre>
@@ -302,7 +330,14 @@ public final class ImportOrderer {
             if (isSpaceToken(i)) {
                 i++;
             }
-            boolean isStatic = tokenAt(i).equals("static");
+            boolean isModule = isModuleKeyword(i);
+            if (isModule) {
+                i++;
+                if (isSpaceToken(i)) {
+                    i++;
+                }
+            }
+            boolean isStatic = !isModule && tokenAt(i).equals("static");
             if (isStatic) {
                 i++;
                 if (isSpaceToken(i)) {
@@ -344,7 +379,7 @@ public final class ImportOrderer {
                     i++;
                 }
             }
-            imports.add(new Import(importedName, trailing.toString(), isStatic));
+            imports.add(new Import(importedName, trailing.toString(), isStatic, isModule));
             // Remember the position just after the import we just saw, before skipping blank lines.
             // If the next thing after the blank lines is not another import then we don't want to
             // include those blank lines in the text to be replaced.
@@ -450,6 +485,25 @@ public final class ImportOrderer {
 
     private String tokenAt(int i) {
         return toks.get(i).getOriginalText();
+    }
+
+    /**
+     * Returns true if the token at {@code i} is the {@code module} contextual keyword introducing a module import
+     * declaration ({@code import module foo.bar;}, JEP 511), as opposed to an ordinary import whose first segment
+     * happens to be an identifier literally named {@code module} (for example {@code import module.Foo;}). As with
+     * other contextual keywords ({@code var}, {@code yield}, ...), this is disambiguated by lookahead: {@code
+     * module} only introduces a module import when it is immediately followed by another identifier, rather than
+     * {@code .} or {@code ;}.
+     */
+    private boolean isModuleKeyword(int i) {
+        if (!tokenAt(i).equals("module")) {
+            return false;
+        }
+        int next = i + 1;
+        if (isSpaceToken(next)) {
+            next++;
+        }
+        return isIdentifierToken(next);
     }
 
     private boolean isIdentifierToken(int i) {

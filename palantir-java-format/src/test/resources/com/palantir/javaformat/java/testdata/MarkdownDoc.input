@@ -1,0 +1,10 @@
+/// A greeter.
+///
+/// Says hello. See [String].
+class MarkdownDoc {
+  /// Returns the greeting.
+  /// @return the text
+  String greeting() {
+    return "hi";
+  }
+}
