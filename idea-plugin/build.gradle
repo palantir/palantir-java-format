@@ -76,6 +76,6 @@ tasks.named("javadoc", Javadoc) {
     failOnError = false
 }
 
-tasks.named('jar') {
+tasks.withType(Jar).configureEach {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
