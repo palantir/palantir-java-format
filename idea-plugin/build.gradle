@@ -76,6 +76,10 @@ tasks.named("javadoc", Javadoc) {
     failOnError = false
 }
 
-tasks.withType(Jar).configureEach {
+// Prevent duplicate class entries in the instrumentedJar, which the JetBrains marketplace rejects.
+// The jar task's duplicatesStrategy is overridden from INHERIT to WARN. The instrumentedJar task
+// uses with(jarTask) to include the jar's CopySpec, so it picks up WARN and allows duplicates through.
+// Setting EXCLUDE here on the jar task propagates into instrumentedJar via that with(jarTask) call.
+tasks.named('jar') {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
