@@ -75,3 +75,7 @@ dependencies {
 tasks.named("javadoc", Javadoc) {
     failOnError = false
 }
+
+tasks.named('jar') {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
