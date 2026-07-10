@@ -54,6 +54,8 @@ final class Token {
         PRE_CLOSE_TAG,
         CODE_OPEN_TAG,
         CODE_CLOSE_TAG,
+        SNIPPET_TAG_OPEN,
+        SNIPPET_TAG_CLOSE,
         TABLE_OPEN_TAG,
         TABLE_CLOSE_TAG,
         /** {@code <!-- MOE：begin_intracomment_strip -->} */
