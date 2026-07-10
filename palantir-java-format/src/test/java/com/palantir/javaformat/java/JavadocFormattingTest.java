@@ -1419,22 +1419,10 @@ public final class JavadocFormattingTest {
     @Test
     public void snippetBlockWithLangAttributePreservesNewlines() {
         String[] input = {
-            "/**",
-            " * {@snippet lang=\"properties\" :",
-            " * foo=\\",
-            " * bar",
-            " * }",
-            " */",
-            "class Test {}",
+            "/**", " * {@snippet lang=\"properties\" :", " * foo=\\", " * bar", " * }", " */", "class Test {}",
         };
         String[] expected = {
-            "/**",
-            " * {@snippet lang=\"properties\" :",
-            " * foo=\\",
-            " * bar",
-            " * }",
-            " */",
-            "class Test {}",
+            "/**", " * {@snippet lang=\"properties\" :", " * foo=\\", " * bar", " * }", " */", "class Test {}",
         };
         doFormatTest(input, expected);
     }

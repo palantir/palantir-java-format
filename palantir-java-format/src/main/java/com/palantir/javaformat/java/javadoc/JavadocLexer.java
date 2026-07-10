@@ -254,8 +254,7 @@ final class JavadocLexer {
     }
 
     private boolean preserveExistingFormatting() {
-        return preDepth.isPositive() || tableDepth.isPositive() || codeDepth.isPositive()
-                || snippetDepth.isPositive();
+        return preDepth.isPositive() || tableDepth.isPositive() || codeDepth.isPositive() || snippetDepth.isPositive();
     }
 
     private void checkMatchingTags() throws LexException {
