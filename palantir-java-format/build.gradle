@@ -1,7 +1,7 @@
 apply plugin: 'application'
 apply plugin: 'com.palantir.external-publish-jar'
 
-mainClassName = 'com.palantir.javaformat.java.Main'
+application.mainClass = 'com.palantir.javaformat.java.Main'
 
 description = 'Palantir Java Format'
 
