@@ -8,11 +8,11 @@ com.diffplug.durian:durian-io:1.2.0 (1 constraints: 1313c62d)
 
 com.diffplug.durian:durian-swt.os:4.3.0 (1 constraints: c60948a9)
 
-com.diffplug.spotless:spotless-lib:4.8.0 (2 constraints: 942470a6)
+com.diffplug.spotless:spotless-lib:4.9.0 (2 constraints: 9624aba6)
 
-com.diffplug.spotless:spotless-lib-extra:4.8.0 (1 constraints: 1c13e72d)
+com.diffplug.spotless:spotless-lib-extra:4.9.0 (1 constraints: 1d13ea2d)
 
-com.diffplug.spotless:spotless-plugin-gradle:8.8.0 (2 constraints: d416c62d)
+com.diffplug.spotless:spotless-plugin-gradle:8.9.0 (2 constraints: d516fc2d)
 
 com.fasterxml.jackson.core:jackson-annotations:2.21 (7 constraints: 4b7c9455)
 
