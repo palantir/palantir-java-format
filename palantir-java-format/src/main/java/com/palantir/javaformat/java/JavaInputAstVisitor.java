@@ -3269,9 +3269,14 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         return MAP_FACTORY_TYPES.contains(receiverName);
     }
 
-    private static final ImmutableSet<String> MAP_FACTORY_TYPES =
-            ImmutableSet.of("Map", "ImmutableMap", "ImmutableSortedMap", "ImmutableBiMap", "SortedMap", "NavigableMap",
-                    "ConcurrentMap");
+    private static final ImmutableSet<String> MAP_FACTORY_TYPES =ImmutableSet.of(
+            "Map",
+            "ImmutableMap",
+            "ImmutableSortedMap",
+            "ImmutableBiMap",
+            "SortedMap",
+            "NavigableMap",
+            "ConcurrentMap");
 
     private void argList(List<? extends ExpressionTree> arguments) {
         builder.open(OpenOp.builder()
