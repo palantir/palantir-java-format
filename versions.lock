@@ -14,7 +14,7 @@ com.diffplug.spotless:spotless-lib-extra:4.9.0 (1 constraints: 1d13ea2d)
 
 com.diffplug.spotless:spotless-plugin-gradle:8.9.0 (2 constraints: d516fc2d)
 
-com.fasterxml.jackson.core:jackson-annotations:2.22 (7 constraints: 4e7c2758)
+com.fasterxml.jackson.core:jackson-annotations:2.22 (7 constraints: 4f7c2858)
 
 com.fasterxml.jackson.core:jackson-core:2.22.1 (6 constraints: a7742898)
 
@@ -54,13 +54,13 @@ com.googlecode.javaewah:JavaEWAH:1.2.3 (1 constraints: 460e7e50)
 
 com.palantir.gradle.idea-configuration:gradle-idea-configuration:0.8.0 (4 constraints: e041096d)
 
-com.palantir.gradle.utils:exec:0.26.0 (2 constraints: c01e17b5)
+com.palantir.gradle.utils:exec:0.27.0 (2 constraints: c11e1ab5)
 
-com.palantir.gradle.utils:platform:0.26.0 (6 constraints: d26024c7)
+com.palantir.gradle.utils:platform:0.27.0 (6 constraints: d36030c8)
 
-com.palantir.gradle.utils:providers:0.26.0 (1 constraints: 730de631)
+com.palantir.gradle.utils:providers:0.27.0 (1 constraints: 740de931)
 
-com.palantir.gradle.utils:safe-exec-commandline:0.26.0 (1 constraints: 730de631)
+com.palantir.gradle.utils:safe-exec-commandline:0.27.0 (1 constraints: 740de931)
 
 com.squareup.okhttp3:okhttp:4.12.0 (1 constraints: f6093eb3)
 
@@ -194,9 +194,9 @@ com.palantir.gradle.plugintesting:gradle-plugin-testing-junit:0.54.0 (1 constrai
 
 com.palantir.gradle.plugintesting:plugin-testing-core:0.54.0 (1 constraints: 3b053f3b)
 
-com.palantir.gradle.utils:environment-variables:0.26.0 (3 constraints: a63e1401)
+com.palantir.gradle.utils:environment-variables:0.27.0 (3 constraints: a63e1401)
 
-com.palantir.gradle.utils:lazily-configured-mapping:0.26.0 (2 constraints: 7e2192d2)
+com.palantir.gradle.utils:lazily-configured-mapping:0.27.0 (2 constraints: 7e2192d2)
 
 com.palantir.suppressible-error-prone:gradle-suppressible-error-prone:2.26.0 (1 constraints: 7419b3d0)
 
