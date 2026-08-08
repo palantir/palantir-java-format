@@ -284,21 +284,21 @@ org.hamcrest:hamcrest-core:1.3 (1 constraints: cc05fe3f)
 
 org.immutables:serial:2.12.1 (1 constraints: 761145ef)
 
-org.junit.jupiter:junit-jupiter:6.1.2 (2 constraints: 901aff38)
+org.junit.jupiter:junit-jupiter:6.1.3 (2 constraints: 911a3739)
 
-org.junit.jupiter:junit-jupiter-api:6.1.2 (6 constraints: 167511a8)
+org.junit.jupiter:junit-jupiter-api:6.1.3 (6 constraints: 1a7543a9)
 
-org.junit.jupiter:junit-jupiter-engine:6.1.2 (1 constraints: 060ecf3b)
+org.junit.jupiter:junit-jupiter-engine:6.1.3 (1 constraints: 070ed03b)
 
-org.junit.jupiter:junit-jupiter-migrationsupport:6.1.2 (1 constraints: 0b050e36)
+org.junit.jupiter:junit-jupiter-migrationsupport:6.1.3 (1 constraints: 0c050f36)
 
-org.junit.jupiter:junit-jupiter-params:6.1.2 (2 constraints: c4242ad7)
+org.junit.jupiter:junit-jupiter-params:6.1.3 (2 constraints: c5242bd7)
 
-org.junit.platform:junit-platform-commons:6.1.3 (2 constraints: da20b24a)
+org.junit.platform:junit-platform-commons:6.1.3 (2 constraints: db20e44a)
 
 org.junit.platform:junit-platform-console:6.1.3 (1 constraints: 4313543f)
 
-org.junit.platform:junit-platform-engine:6.1.3 (4 constraints: a64056e5)
+org.junit.platform:junit-platform-engine:6.1.3 (4 constraints: a740dfe5)
 
 org.junit.platform:junit-platform-launcher:6.1.3 (4 constraints: 6d4155f8)
 
