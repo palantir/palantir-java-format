@@ -38,11 +38,11 @@ com.google.auto.service:auto-service-annotations:1.1.1 (1 constraints: 9c0f6a86)
 
 com.google.code.findbugs:jsr305:3.0.2 (1 constraints: 0705fc35)
 
-com.google.errorprone:error_prone_annotations:2.49.0 (5 constraints: bb3758e4)
+com.google.errorprone:error_prone_annotations:2.50.0 (5 constraints: b53797e2)
 
 com.google.guava:failureaccess:1.0.3 (2 constraints: f3154f13)
 
-com.google.guava:guava:33.6.0-jre (16 constraints: 1546ee26)
+com.google.guava:guava:33.7.0-jre (16 constraints: 1646782a)
 
 com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava (1 constraints: bd17c918)
 
@@ -126,7 +126,7 @@ org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10 (1 constraints: e210ffd2)
 
 org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10 (2 constraints: 8118c1c5)
 
-org.jspecify:jspecify:1.0.0 (15 constraints: 1af49d9a)
+org.jspecify:jspecify:1.0.1 (15 constraints: 1bf4059d)
 
 org.openjdk.jmh:jmh-core:1.37 (5 constraints: 52476be6)
 
