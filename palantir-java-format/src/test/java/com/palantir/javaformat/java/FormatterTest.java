@@ -491,14 +491,16 @@ public final class FormatterTest {
         // this shows that despite the replacements happening they are superfluous
         assertThat(formattedClass).isEqualTo(reformattedClass);
 
-        assertWithMessage("""
-            If this test is failing and you are reading this message it means that an underlying bug
-            in the formatting service was fixed. Previously, this formatter always produced a "replacement"
-            even when the document was fully formatted. You can see evidence of this in
-            https://github.com/palantir/palantir-java-format/pull/1188. To fix this failing test, consider
-            relying on the new behavior and instead checking that the 'replacements' is empty instead of
-            full string comparison.
-            """)
+        String failureMessage = String.join(
+                "\n",
+                "If this test is failing and you are reading this message it means that an underlying bug",
+                "in the formatting service was fixed. Previously, this formatter always produced a \"replacement\"",
+                "even when the document was fully formatted. You can see evidence of this in",
+                "https://github.com/palantir/palantir-java-format/pull/1188. To fix this failing test, consider",
+                "relying on the new behavior and instead checking that the 'replacements' is empty instead of",
+                "full string comparison.",
+                "");
+        assertWithMessage(failureMessage)
                 .that(formatter.getFormatReplacements(
                         formattedClass, List.of(Range.closedOpen(0, formattedClass.length()))))
                 .isNotEmpty();

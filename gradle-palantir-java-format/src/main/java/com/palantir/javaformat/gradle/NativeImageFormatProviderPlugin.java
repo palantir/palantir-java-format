@@ -44,7 +44,6 @@ public abstract class NativeImageFormatProviderPlugin implements Plugin<Project>
         String implementationVersion = JavaFormatExtension.class.getPackage().getImplementationVersion();
         rootProject.getConfigurations().register(NATIVE_CONFIGURATION_NAME, conf -> {
             conf.setDescription("Internal configuration for resolving the palantir-java-format native image");
-            conf.setVisible(false);
             conf.setCanBeConsumed(false);
             conf.setCanBeResolved(true);
             conf.defaultDependencies(deps -> {
