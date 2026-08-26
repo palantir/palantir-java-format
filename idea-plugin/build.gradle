@@ -26,6 +26,7 @@ repositories {
 }
 
 intellijPlatform {
+    projectName = pluginName
     pluginConfiguration {
         name = pluginName
         description = "Formats source code using the palantir-java-format tool."
