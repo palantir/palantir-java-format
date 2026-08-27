@@ -12,7 +12,7 @@ buildscript {
         classpath 'com.palantir.gradle.consistentversions:gradle-consistent-versions:3.18.0'
         classpath 'com.palantir.gradle.externalpublish:gradle-external-publish-plugin:1.37.0'
         classpath 'com.palantir.gradle.failure-reports:gradle-failure-reports:1.21.0'
-        classpath 'com.palantir.gradle.gitversion:gradle-git-version:5.0.0'
+        classpath 'com.palantir.gradle.gitversion:gradle-git-version:5.1.0'
         classpath 'com.palantir.gradle.guide:gradle-guide:1.27.0'
         classpath 'com.palantir.gradle.idea-configuration:gradle-idea-configuration:0.11.0'
         classpath 'com.palantir.gradle.idea-language-injector:gradle-idea-language-injector:0.5.0'
