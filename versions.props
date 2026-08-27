@@ -19,7 +19,7 @@ org.junit.platform:* = 6.1.3
 org.slf4j:* = 2.0.17
 com.fasterxml.jackson.*:* = 2.22.1
 org.openjdk.jmh:* = 1.37
-com.palantir.gradle.utils:* = 0.27.0
+com.palantir.gradle.utils:* = 0.28.0
 com.palantir.gradle.idea-configuration:gradle-idea-configuration = 0.8.0
 
 # Testing
