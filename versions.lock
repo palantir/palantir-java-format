@@ -42,7 +42,7 @@ com.google.errorprone:error_prone_annotations:2.50.0 (5 constraints: b53797e2)
 
 com.google.guava:failureaccess:1.0.3 (2 constraints: f3154f13)
 
-com.google.guava:guava:33.7.1-jre (16 constraints: 19465232)
+com.google.guava:guava:33.7.1-jre (16 constraints: 1b467035)
 
 com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava (1 constraints: bd17c918)
 
@@ -164,7 +164,7 @@ com.palantir.baseline:gradle-baseline-java:7.9.0 (2 constraints: a714b1b1)
 
 com.palantir.baseline-error-prone:gradle-baseline-error-prone:0.7.0 (1 constraints: c01105f5)
 
-com.palantir.gradle.consistentversions:gradle-consistent-versions:3.18.0 (1 constraints: 3e054d3b)
+com.palantir.gradle.consistentversions:gradle-consistent-versions:3.19.0 (1 constraints: 3f05503b)
 
 com.palantir.gradle.failure-reports:gradle-failure-reports-common:1.18.0 (1 constraints: f21c3bc2)
 
@@ -197,6 +197,8 @@ com.palantir.gradle.plugintesting:plugin-testing-core:0.54.0 (1 constraints: 3b0
 com.palantir.gradle.utils:environment-variables:0.29.0 (3 constraints: a83e1402)
 
 com.palantir.gradle.utils:lazily-configured-mapping:0.29.0 (2 constraints: 8021f4d2)
+
+com.palantir.gradle.utils:project-dependency-utils:0.29.0 (1 constraints: ef1b1a62)
 
 com.palantir.suppressible-error-prone:gradle-suppressible-error-prone:2.26.0 (1 constraints: 7419b3d0)
 
