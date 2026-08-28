@@ -24,6 +24,6 @@ com.palantir.gradle.idea-configuration:gradle-idea-configuration = 0.8.0
 
 # Testing
 com.palantir.gradle.jdks:* = 0.77.0
-com.palantir.baseline:gradle-baseline-java = 7.8.0
+com.palantir.baseline:gradle-baseline-java = 7.9.0
 com.palantir.gradle.jdkslatest:gradle-jdks-latest = 0.32.0
 com.palantir.gradle.consistentversions:gradle-consistent-versions = 3.18.0
