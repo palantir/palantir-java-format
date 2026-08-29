@@ -44,6 +44,8 @@ import static com.palantir.javaformat.java.javadoc.Token.Type.PARAGRAPH_CLOSE_TA
 import static com.palantir.javaformat.java.javadoc.Token.Type.PARAGRAPH_OPEN_TAG;
 import static com.palantir.javaformat.java.javadoc.Token.Type.PRE_CLOSE_TAG;
 import static com.palantir.javaformat.java.javadoc.Token.Type.PRE_OPEN_TAG;
+import static com.palantir.javaformat.java.javadoc.Token.Type.SNIPPET_TAG_CLOSE;
+import static com.palantir.javaformat.java.javadoc.Token.Type.SNIPPET_TAG_OPEN;
 import static com.palantir.javaformat.java.javadoc.Token.Type.TABLE_CLOSE_TAG;
 import static com.palantir.javaformat.java.javadoc.Token.Type.TABLE_OPEN_TAG;
 import static com.palantir.javaformat.java.javadoc.Token.Type.WHITESPACE;
@@ -98,6 +100,7 @@ final class JavadocLexer {
     private final NestingCounter preDepth = new NestingCounter();
     private final NestingCounter codeDepth = new NestingCounter();
     private final NestingCounter tableDepth = new NestingCounter();
+    private final NestingCounter snippetDepth = new NestingCounter();
     private boolean somethingSinceNewline;
 
     private JavadocLexer(CharStream input) {
@@ -159,7 +162,11 @@ final class JavadocLexer {
         }
         somethingSinceNewline = true;
 
-        if (input.tryConsumeRegex(INLINE_TAG_OPEN_PATTERN)) {
+        if (input.tryConsumeRegex(SNIPPET_INLINE_TAG_OPEN_PATTERN)) {
+            braceDepth.increment();
+            snippetDepth.increment();
+            return SNIPPET_TAG_OPEN;
+        } else if (input.tryConsumeRegex(INLINE_TAG_OPEN_PATTERN)) {
             braceDepth.increment();
             return INLINE_TAG_OPEN;
         } else if (input.tryConsume("{")) {
@@ -167,7 +174,14 @@ final class JavadocLexer {
             return LITERAL;
         } else if (input.tryConsume("}")) {
             braceDepth.decrementIfPositive();
-            return braceDepth.isPositive() ? LITERAL : INLINE_TAG_CLOSE;
+            if (!braceDepth.isPositive()) {
+                if (snippetDepth.isPositive()) {
+                    snippetDepth.decrementIfPositive();
+                    return SNIPPET_TAG_CLOSE;
+                }
+                return INLINE_TAG_CLOSE;
+            }
+            return LITERAL;
         }
 
         // Inside an inline tag, don't do any HTML interpretation.
@@ -240,7 +254,7 @@ final class JavadocLexer {
     }
 
     private boolean preserveExistingFormatting() {
-        return preDepth.isPositive() || tableDepth.isPositive() || codeDepth.isPositive();
+        return preDepth.isPositive() || tableDepth.isPositive() || codeDepth.isPositive() || snippetDepth.isPositive();
     }
 
     private void checkMatchingTags() throws LexException {
@@ -541,6 +555,7 @@ final class JavadocLexer {
     private static final Pattern BLOCKQUOTE_OPEN_PATTERN = openTagPattern("blockquote");
     private static final Pattern BLOCKQUOTE_CLOSE_PATTERN = closeTagPattern("blockquote");
     private static final Pattern BR_PATTERN = openTagPattern("br");
+    private static final Pattern SNIPPET_INLINE_TAG_OPEN_PATTERN = compile("^[{]@snippet\\b");
     private static final Pattern INLINE_TAG_OPEN_PATTERN = compile("^[{]@\\w*");
     /*
      * We exclude < so that we don't swallow following HTML tags. This lets us fix up "foo<p>" (~400

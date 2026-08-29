@@ -103,6 +103,12 @@ public final class JavadocFormatter {
                 case CODE_CLOSE_TAG:
                     output.writeCodeClose(token);
                     break;
+                case SNIPPET_TAG_OPEN:
+                    output.writeSnippetOpen(token);
+                    break;
+                case SNIPPET_TAG_CLOSE:
+                    output.writeSnippetClose(token);
+                    break;
                 case TABLE_OPEN_TAG:
                     output.writeTableOpen(token);
                     break;
