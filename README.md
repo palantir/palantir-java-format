@@ -13,6 +13,7 @@ _A modern, lambda-friendly, 120 character Java formatter._
 - [Eclipse plugin](https://github.com/palantir/palantir-java-format/tree/develop/eclipse_plugin)
 - [IntelliJ plugin](https://plugins.jetbrains.com/plugin/13180-palantir-java-format)
 - [Gradle plugin](#palantir-java-format-gradle-plugin)
+- [Mill support](https://mill-build.org/mill/javalib/linting.html#_autoformatting_with_palantir_java_format)
 - [Spotless](#spotless)
 
 It is based on the excellent [google-java-format](https://github.com/google/google-java-format), and benefits from the work of all the [original authors](https://github.com/google/google-java-format/graphs/contributors). palantir-java-format is available under the same [Apache 2.0 License](./LICENSE).
@@ -149,6 +150,7 @@ when formatting java code.
 
 - See [integration in Spotless Gradle plugin](https://github.com/diffplug/spotless/tree/main/plugin-gradle#palantir-java-format).
 - See [integration in Spotless Maven plugin](https://github.com/diffplug/spotless/tree/main/plugin-maven#palantir-java-format).
+- See [integration in Spotless Mill support](https://mill-build.org/mill/javalib/linting.html#_auto_formatting_with_spotless).
 
 ## IntelliJ plugin
 
