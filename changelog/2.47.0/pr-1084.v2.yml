@@ -1,5 +1,0 @@
-type: improvement
-improvement:
-  description: Add instructions for how to run a prerelease version of the idea plugin
-  links:
-  - https://github.com/palantir/palantir-java-format/pull/1084

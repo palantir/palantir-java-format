@@ -1,5 +1,0 @@
-type: improvement
-improvement:
-  description: Allow long binary operations to wrap starting from the current line.
-  links:
-  - https://github.com/palantir/palantir-java-format/pull/30
