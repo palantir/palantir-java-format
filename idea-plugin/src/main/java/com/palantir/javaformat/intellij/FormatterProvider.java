@@ -22,13 +22,11 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
-import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.JdkUtil;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.roots.ProjectRootManager;
-import com.intellij.openapi.util.BuildNumber;
 import com.intellij.openapi.util.SystemInfo;
 import com.palantir.javaformat.bootstrap.BootstrappingFormatterService;
 import com.palantir.javaformat.bootstrap.NativeImageFormatterService;
@@ -92,8 +90,7 @@ final class FormatterProvider {
 
         // When running with JDK 15+ or using newer language features, we use the bootstrapping formatter which injects
         // required "--add-exports" args.
-        if (useBootstrappingFormatter(
-                jdkMajorVersion, ApplicationInfo.getInstance().getBuild())) {
+        if (useBootstrappingFormatter(jdkMajorVersion, Runtime.version().feature())) {
             Path jdkPath = getJdkPath(cacheKey.project);
             log.info("Using bootstrapping formatter with jdk version {} and path: {}", jdkMajorVersion, jdkPath);
             return Optional.of(new BootstrappingFormatterService(jdkPath, jdkMajorVersion, implementationClasspath));
@@ -109,12 +106,32 @@ final class FormatterProvider {
     /**
      * When projects use JDK 15+ as their SDK, they might use newer language features which are only supported by the
      * bootstrapping formatter.
-     * Separately, starting from 2022.2 (branch number '222'), Intellij now runs with JDK 17 which also requires the
-     * bootstrapping formatter. See https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html for
-     * how the build number is formatted.
+     * Separately, starting from 2022.2, Intellij now runs with JDK 17 which also requires the
+     * bootstrapping formatter unless custom VM Options to add exports are provided.
      */
-    private static boolean useBootstrappingFormatter(int jdkMajorVersion, BuildNumber buildNumber) {
-        return jdkMajorVersion >= 15 || buildNumber.getBaselineVersion() >= 222;
+    private static boolean useBootstrappingFormatter(int jdkMajorVersion, int jreMajorVersion) {
+        return (jreMajorVersion < 15 && jdkMajorVersion >= 15) || !isModulesExported();
+    }
+
+    private static boolean isModulesExported() {
+        return Stream.of(
+                        "com.sun.tools.javac.api.JavacTrees",
+                        "com.sun.tools.javac.file.JavacFileManager",
+                        "com.sun.tools.javac.parser.JavacParser",
+                        "com.sun.tools.javac.tree.JCTree",
+                        "com.sun.tools.javac.util.Log")
+                .allMatch(className -> {
+                    Class<?> klass;
+                    try {
+                        klass = Class.forName(className);
+                    } catch (ClassNotFoundException e) {
+                        return false;
+                    }
+                    return klass.getModule()
+                            .isExported(
+                                    klass.getPackageName(),
+                                    FormatterProvider.class.getClassLoader().getUnnamedModule());
+                });
     }
 
     private static List<Path> getProvidedImplementationUrls(List<URI> implementationClasspath) {
