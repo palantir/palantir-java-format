@@ -1,5 +1,0 @@
-type: improvement
-improvement:
-  description: Cherry-pick upstream changes.
-  links:
-  - https://github.com/palantir/palantir-java-format/pull/615

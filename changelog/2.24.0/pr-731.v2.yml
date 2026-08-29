@@ -1,5 +1,0 @@
-type: improvement
-improvement:
-  description: Publish gradle plugin to gradle plugin portal
-  links:
-  - https://github.com/palantir/palantir-java-format/pull/731
