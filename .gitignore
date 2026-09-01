@@ -46,6 +46,7 @@ fileeditor
 *.ipr
 *.iws
 .idea/
+.intellijPlatform/
 out/
 
 # Eclipse/IntelliJ APT
