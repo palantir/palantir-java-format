@@ -14,21 +14,32 @@
  * limitations under the License.
  */
 
+import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+
 apply plugin: 'java'
 apply plugin: 'com.palantir.external-publish-intellij'
 
 def name = "palantir-java-format"
-intellij {
-    pluginName = name
-    updateSinceUntilBuild = true
-    version = "2024.1"
-    plugins = ['java']
+repositories {
+    intellijPlatform {
+        defaultRepositories()
+    }
 }
 
-patchPluginXml {
-    pluginDescription = "Formats source code using the palantir-java-format tool."
-    sinceBuild = '241' // TODO: keep the intellij version & sinceBuild in sync
-    untilBuild = ''
+intellijPlatform {
+    projectName = name
+    pluginConfiguration {
+        description = 'Formats source code using the palantir-java-format tool.'
+        ideaVersion {
+            sinceBuild = '241' // TODO: keep the intellij version & sinceBuild in sync
+            untilBuild = provider { null }
+        }
+    }
+    pluginVerification {
+        ides {
+            create('IC', '2024.1')
+        }
+    }
 }
 
 configurations {
@@ -42,8 +53,8 @@ configurations {
 
 // This task will resolve runtimeClasspath without telling Gradle that it depends on it, therefore dependent jars won't
 // be created beforehand. Therefore, ensure that it knows about it.
-// see https://github.com/JetBrains/gradle-intellij-plugin/blob/master/src/main/groovy/org/jetbrains/intellij/tasks/PrepareSandboxTask.groovy
-tasks.withType(org.jetbrains.intellij.tasks.PrepareSandboxTask).configureEach {
+// see https://github.com/JetBrains/intellij-platform-gradle-plugin/blob/main/src/main/kotlin/org/jetbrains/intellij/platform/gradle/tasks/PrepareSandboxTask.kt
+tasks.withType(org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask).configureEach {
     dependsOn configurations.runtimeClasspath
 
     // Also pack the formatter in its own directory
@@ -55,6 +66,15 @@ tasks.withType(org.jetbrains.intellij.tasks.PrepareSandboxTask).configureEach {
 }
 
 dependencies {
+    intellijPlatform {
+        intellijIdeaCommunity('2024.1') {
+            useInstaller = false
+        }
+        bundledPlugins('com.intellij.java')
+        testFramework(TestFrameworkType.Platform.INSTANCE)
+        testFramework(TestFrameworkType.Plugin.Java.INSTANCE)
+    }
+
     implementation project(':palantir-java-format-jdk-bootstrap')
     implementation 'com.github.ben-manes.caffeine:caffeine'
     implementation('com.palantir.sls.versions:sls-versions') {
@@ -66,6 +86,7 @@ dependencies {
     formatter project(':palantir-java-format')
 
     testImplementation 'org.assertj:assertj-core'
+    testImplementation 'junit:junit'
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'org.junit.platform:junit-platform-launcher'
     implementation 'com.google.code.findbugs:jsr305'
