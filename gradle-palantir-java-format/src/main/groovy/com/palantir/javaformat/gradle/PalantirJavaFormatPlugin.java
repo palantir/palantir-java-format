@@ -18,6 +18,7 @@ package com.palantir.javaformat.gradle;
 
 import com.palantir.javaformat.bootstrap.NativeImageFormatterService;
 import com.palantir.javaformat.java.FormatterService;
+import com.palantir.javaformat.java.JavaFormatterOptions;
 import java.io.File;
 import java.io.IOException;
 import org.gradle.api.DefaultTask;
@@ -84,7 +85,7 @@ public abstract class PalantirJavaFormatPlugin implements Plugin<Project> {
                 FormatDiff.formatDiff(
                         getProject().getProjectDir().toPath(),
                         new NativeImageFormatterService(
-                                getNativeImage().get().getAsFile().toPath()));
+                                getNativeImage().get().getAsFile().toPath(), JavaFormatterOptions.defaultOptions()));
             } else {
                 log.info("Using the Java-based formatter");
                 JavaFormatExtension extension =
