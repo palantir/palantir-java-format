@@ -58,6 +58,12 @@ javaVersion {
     target = 11
 }
 
+tasks.named('javadoc') {
+    javadocTool = javaToolchains.javadocToolFor {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
 afterEvaluate {
     tasks.named("compileTestJava", JavaCompile) {
         sourceCompatibility = JavaVersion.VERSION_17

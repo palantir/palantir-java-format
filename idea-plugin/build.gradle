@@ -35,6 +35,11 @@ intellijPlatform {
             untilBuild = provider { null }
         }
     }
+    pluginVerification {
+        ides {
+            create('IC', '2024.1')
+        }
+    }
 }
 
 configurations {
