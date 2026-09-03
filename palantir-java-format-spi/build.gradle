@@ -12,11 +12,7 @@ dependencies {
     testImplementation 'com.fasterxml.jackson.core:jackson-databind'
 }
 
-tasks.withType(JavaCompile).named('compileJava') {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
-
 javaVersion {
-    target = 21
+    javaCompiler = 21
+    target = 11
 }

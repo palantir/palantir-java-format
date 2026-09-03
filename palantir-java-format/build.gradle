@@ -41,15 +41,6 @@ moduleJvmArgs {
             'jdk.compiler/com.sun.tools.javac.api')
 }
 
-tasks.withType(JavaCompile).named('compileJava') {
-    // By setting the source and target compatibility to 11, while still using a higher level
-    // JDK for compilation, we can compile against the AST classes we need to support >11 source
-    // features but still run on 11 JDKs (with the addition of checking the java version at runtime
-    // and dynamically loading the correct formatter implementation)
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
-
 // false positives due to org.junit.runners.* in the test cases
 tasks.named("checkJUnitDependencies") {
     enabled = false
@@ -62,5 +53,14 @@ tasks.named("test") {
 }
 
 javaVersion {
-    target = 21
+    // Compile against the current AST classes while producing bytecode that can run on JDK 11.
+    javaCompiler = 21
+    target = 11
+}
+
+afterEvaluate {
+    tasks.named("compileTestJava", JavaCompile) {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
 }
