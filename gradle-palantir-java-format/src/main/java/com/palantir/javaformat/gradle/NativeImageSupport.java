@@ -20,6 +20,7 @@ import com.palantir.platform.Architecture;
 import com.palantir.platform.GradleOperatingSystem;
 import com.palantir.platform.OperatingSystem;
 import javax.inject.Inject;
+import org.gradle.api.provider.Provider;
 import org.gradle.api.provider.ProviderFactory;
 import org.gradle.api.tasks.Nested;
 
@@ -33,6 +34,10 @@ public abstract class NativeImageSupport {
 
     public boolean isNativeImageConfigured() {
         return isNativeFlagEnabled() && isNativeImageSupported();
+    }
+
+    Provider<OperatingSystem> getOperatingSystem() {
+        return getOs().getOperatingSystem();
     }
 
     private boolean isNativeImageSupported() {

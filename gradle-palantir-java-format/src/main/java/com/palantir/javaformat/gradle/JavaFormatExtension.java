@@ -26,13 +26,18 @@ import java.net.URLClassLoader;
 import java.util.ServiceLoader;
 import java.util.function.Supplier;
 import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.file.FileCollection;
 
 public class JavaFormatExtension {
-    private final Configuration configuration;
+    private final FileCollection implementationClasspath;
     private final Supplier<FormatterService> memoizedService;
 
     public JavaFormatExtension(Configuration configuration) {
-        this.configuration = configuration;
+        this((FileCollection) configuration);
+    }
+
+    JavaFormatExtension(FileCollection implementationClasspath) {
+        this.implementationClasspath = implementationClasspath;
         this.memoizedService = Suppliers.memoize(this::serviceLoadInternal);
     }
 
@@ -42,7 +47,7 @@ public class JavaFormatExtension {
 
     @SuppressWarnings("for-rollout:NullAway")
     private FormatterService serviceLoadInternal() {
-        URL[] jarUris = configuration.getFiles().stream()
+        URL[] jarUris = implementationClasspath.getFiles().stream()
                 .map(file -> {
                     try {
                         return file.toURI().toURL();

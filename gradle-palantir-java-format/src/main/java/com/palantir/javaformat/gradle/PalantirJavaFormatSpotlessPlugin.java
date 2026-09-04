@@ -21,21 +21,28 @@ import com.palantir.javaformat.java.FormatterService;
 import java.util.function.Supplier;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.tasks.Nested;
 
 public abstract class PalantirJavaFormatSpotlessPlugin implements Plugin<Project> {
     // The spotless gradle plugin got renamed to 'com.diffplug.spotless' at version 5.0.0
     private static final ImmutableList<String> SPOTLESS_PLUGINS =
             ImmutableList.of("com.diffplug.gradle.spotless", "com.diffplug.spotless");
 
+    @Nested
+    protected abstract NativeImageSupport getNativeImageSupport();
+
     @Override
     public void apply(Project project) {
         Project rootProject = project.getRootProject();
         rootProject.getPluginManager().apply(PalantirJavaFormatProviderPlugin.class);
 
-        Supplier<FormatterService> memoizedService =
-                rootProject.getExtensions().getByType(JavaFormatExtension.class)::serviceLoad;
+        Configuration implementation = PalantirJavaFormatProviderPlugin.getImplementationConfiguration(project);
+        NativeImageFormatProviderPlugin.getNativeImageConfiguration(
+                project, getNativeImageSupport().getOperatingSystem());
+        Supplier<FormatterService> memoizedService = new JavaFormatExtension(implementation)::serviceLoad;
 
-        SpotlessInterop spotlessInterop = rootProject.getObjects().newInstance(SpotlessInterop.class, memoizedService);
+        SpotlessInterop spotlessInterop = project.getObjects().newInstance(SpotlessInterop.class, memoizedService);
         project.getPluginManager().withPlugin("java", _javaPlugin -> {
             SPOTLESS_PLUGINS.forEach(spotlessPluginId -> project.getPluginManager()
                     .withPlugin(spotlessPluginId, _spotlessPlugin -> {

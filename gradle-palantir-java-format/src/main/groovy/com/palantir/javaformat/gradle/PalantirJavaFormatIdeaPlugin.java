@@ -58,7 +58,7 @@ public abstract class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
                         task.getImplementationConfig()
                                 .from(rootProject
                                         .getConfigurations()
-                                        .getByName(PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME));
+                                        .getByName(PalantirJavaFormatProviderPlugin.RESOLVABLE_CONFIGURATION_NAME));
                         maybeGetNativeImplConfiguration().ifPresent(config -> {
                             task.getNativeImageConfig().from(config);
                             task.getNativeImageOutputFile()
@@ -103,7 +103,8 @@ public abstract class PalantirJavaFormatIdeaPlugin implements Plugin<Project> {
 
     private Optional<Configuration> maybeGetNativeImplConfiguration() {
         return getNativeImageSupport().isNativeImageConfigured()
-                ? Optional.of(getConfigurations().getByName(NativeImageFormatProviderPlugin.NATIVE_CONFIGURATION_NAME))
+                ? Optional.of(getConfigurations()
+                        .getByName(NativeImageFormatProviderPlugin.NATIVE_RESOLVABLE_CONFIGURATION_NAME))
                 : Optional.empty();
     }
 }

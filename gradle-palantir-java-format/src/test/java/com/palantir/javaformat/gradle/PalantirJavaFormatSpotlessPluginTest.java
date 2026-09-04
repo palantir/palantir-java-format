@@ -20,8 +20,10 @@ import com.palantir.gradle.testing.execution.InvocationResult;
 import com.palantir.gradle.testing.junit.DisabledConfigurationCache;
 import com.palantir.gradle.testing.junit.GradlePluginTests;
 import com.palantir.gradle.testing.project.RootProject;
+import com.palantir.gradle.testing.project.SubProject;
 import java.io.File;
 import java.util.Optional;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -36,6 +38,101 @@ class PalantirJavaFormatSpotlessPluginTest {
 
     private static final String NATIVE_CONFIG =
             "palantirJavaFormatNative files(file(\"" + NATIVE_IMAGE_FILE + "\").text)";
+
+    @Test
+    void formats_a_subproject_using_the_root_formatter_dependency(
+            GradleInvoker gradle, RootProject rootProject, SubProject child) {
+        rootProject.buildGradle().plugins().add("com.palantir.java-format");
+        rootProject.buildGradle().append("""
+            dependencies {
+                palantirJavaFormat files(file("%s").text.split(':'))
+            }
+            """, CLASSPATH_FILE);
+
+        child.buildGradle()
+                .plugins()
+                .add("java")
+                .add("com.palantir.java-format")
+                .add("com.diffplug.spotless");
+        rootProject
+                .gradlePropertiesFile()
+                .appendProperty("org.gradle.parallel", "true")
+                .appendProperty(
+                        "org.gradle.jvmargs",
+                        "--add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED "
+                                + "--add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED "
+                                + "--add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED "
+                                + "--add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED "
+                                + "--add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED");
+        child.file("src/main/java/Main.java").overwrite(invalidJavaFile());
+
+        InvocationResult result =
+                gradle.withArgs(":child:spotlessApply", "--info").buildsSuccessfully();
+
+        child.file("src/main/java/Main.java").assertThat().hasContent(validJavaFile());
+        result.assertThat().output().contains("Using the Java-based formatter");
+    }
+
+    @Test
+    void formats_a_subproject_using_the_root_native_formatter_dependency(
+            GradleInvoker gradle, RootProject rootProject, SubProject child) {
+        rootProject.settingsGradle().plugins().add("com.palantir.jdks.settings");
+        rootProject
+                .buildGradle()
+                .plugins()
+                .add("com.palantir.java-format")
+                .add("com.palantir.baseline-java-versions")
+                .add("com.palantir.jdks")
+                .add("com.palantir.jdks.latest");
+        rootProject.buildGradle().append("""
+            javaVersions {
+                libraryTarget = 17
+            }
+
+            jdks {
+                daemonTarget = 17
+            }
+            """);
+        rootProject
+                .gradlePropertiesFile()
+                .appendProperty("org.gradle.parallel", "true")
+                .appendProperty(
+                        "org.gradle.jvmargs",
+                        "--add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED "
+                                + "--add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED "
+                                + "--add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED "
+                                + "--add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED "
+                                + "--add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED")
+                .appendProperty("palantir.jdk.setup.enabled", "true")
+                .appendProperty("palantir.native.formatter", "true");
+
+        gradle.withArgs("wrapper").buildsSuccessfully();
+
+        rootProject.buildGradle().append("""
+            dependencies {
+                palantirJavaFormat files(file("%s").text.split(':'))
+                %s
+            }
+            """, CLASSPATH_FILE, NATIVE_CONFIG);
+        child.buildGradle()
+                .plugins()
+                .add("java")
+                .add("com.palantir.java-format")
+                .add("com.diffplug.spotless");
+        child.file("src/main/java/Main.java").overwrite(invalidJavaFile());
+
+        String javaHome =
+                rootProject.file("build/installedJdkPaths").text().trim().substring("17:".length());
+        InvocationResult result = gradle.withArgs(
+                        ":child:spotlessApply", "--info", "-Dorg.gradle.java.home=" + javaHome)
+                .buildsSuccessfully();
+
+        child.file("src/main/java/Main.java").assertThat().hasContent(validJavaFile());
+        result.assertThat()
+                .output()
+                .contains("Using the native-image formatter")
+                .containsPattern("Using native-image at .*\\.bin\\.executable");
+    }
 
     @ParameterizedTest
     @CsvSource(

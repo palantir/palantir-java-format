@@ -23,11 +23,13 @@ import java.io.IOException;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.file.ConfigurableFileCollection;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.gradle.api.provider.Provider;
+import org.gradle.api.tasks.Classpath;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.Nested;
 import org.gradle.api.tasks.TaskAction;
@@ -52,15 +54,17 @@ public abstract class PalantirJavaFormatPlugin implements Plugin<Project> {
             project.getTasks().register("formatDiff", FormatDiffTask.class, task -> {
                 if (getNativeImageSupport().isNativeImageConfigured()) {
                     task.getNativeImage().fileProvider(getNativeImplConfiguration(project));
+                } else {
+                    task.getImplementationClasspath()
+                            .from(PalantirJavaFormatProviderPlugin.getImplementationConfiguration(project));
                 }
             });
         });
     }
 
     private static Provider<File> getNativeImplConfiguration(Project project) {
-        return (project.getRootProject()
-                .getConfigurations()
-                .named(NativeImageFormatProviderPlugin.NATIVE_CONFIGURATION_NAME)
+        return (project.getConfigurations()
+                .named(NativeImageFormatProviderPlugin.NATIVE_RESOLVABLE_CONFIGURATION_NAME)
                 .map(FileCollection::getSingleFile));
     }
 
@@ -71,6 +75,9 @@ public abstract class PalantirJavaFormatPlugin implements Plugin<Project> {
         @org.gradle.api.tasks.Optional
         @InputFile
         abstract RegularFileProperty getNativeImage();
+
+        @Classpath
+        abstract ConfigurableFileCollection getImplementationClasspath();
 
         public FormatDiffTask() {
             setDescription("Format only chunks of files that appear in git diff");
@@ -87,8 +94,7 @@ public abstract class PalantirJavaFormatPlugin implements Plugin<Project> {
                                 getNativeImage().get().getAsFile().toPath()));
             } else {
                 log.info("Using the Java-based formatter");
-                JavaFormatExtension extension =
-                        getProject().getRootProject().getExtensions().getByType(JavaFormatExtension.class);
+                JavaFormatExtension extension = new JavaFormatExtension(getImplementationClasspath());
                 FormatterService formatterService = extension.serviceLoad();
                 FormatDiff.formatDiff(getProject().getProjectDir().toPath(), formatterService);
             }

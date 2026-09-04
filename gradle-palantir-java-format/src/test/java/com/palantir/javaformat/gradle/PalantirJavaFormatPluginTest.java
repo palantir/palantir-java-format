@@ -24,6 +24,7 @@ import com.palantir.gradle.testing.files.gradle.GradleFile;
 import com.palantir.gradle.testing.junit.DisabledConfigurationCache;
 import com.palantir.gradle.testing.junit.GradlePluginTests;
 import com.palantir.gradle.testing.project.RootProject;
+import com.palantir.gradle.testing.project.SubProject;
 import java.io.File;
 import java.io.IOException;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -114,6 +115,87 @@ class PalantirJavaFormatPluginTest {
                 .assertThat()
                 .content()
                 .isEqualTo(expectedMainJava);
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+            delimiter = '|',
+            value = {
+                " | Using the Java-based formatter",
+                "palantir.native.formatter=true | Using the native-image formatter"
+            })
+    void formatDiff_formats_a_subproject_using_root_formatter_dependencies(
+            String extraGradleProperties,
+            String expectedOutput,
+            GradleInvoker gradle,
+            RootProject rootProject,
+            SubProject child)
+            throws IOException, InterruptedException {
+        if (extraGradleProperties != null && !extraGradleProperties.isBlank()) {
+            rootProject.gradlePropertiesFile().append("%s\n", extraGradleProperties);
+        }
+        rootProject.gradlePropertiesFile().append("""
+            org.gradle.parallel=true
+            org.gradle.jvmargs=--add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED \
+              --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED \
+              --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED \
+              --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED \
+              --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED
+            """);
+
+        String extraDependencies =
+                (extraGradleProperties == null || extraGradleProperties.isBlank()) ? "" : NATIVE_CONFIG;
+        rootProject.buildGradle().plugins().add("com.palantir.java-format");
+        rootProject.buildGradle().append("""
+            dependencies {
+                palantirJavaFormat files(file("%s").text.split(':'))
+                %s
+            }
+            """, CLASSPATH_FILE, extraDependencies);
+        child.buildGradle().plugins().add("java").add("com.palantir.java-format");
+
+        executeGitCommand(rootProject, "git", "init");
+        executeGitCommand(rootProject, "git", "config", "user.name", "Foo");
+        executeGitCommand(rootProject, "git", "config", "user.email", "foo@bar.com");
+
+        child.mainSourceSet().java().writeClass("""
+            class Main {
+                public static void crazyExistingFormatting  (  String... args) {
+
+                }
+            }
+            """);
+
+        executeGitCommand(rootProject, "git", "add", ".");
+        executeGitCommand(rootProject, "git", "commit", "-m", "Commit");
+
+        child.mainSourceSet().java().fileByClassName("Main").overwrite("""
+            class Main {
+                public static void crazyExistingFormatting  (  String... args) {
+                                            System.out.println("Reformat me please");
+                    // some comments
+                                                    System.out.println("Reformat me again please");
+                }
+            }
+            """);
+
+        InvocationResult result = gradle.withArgs(":child:formatDiff", "--info").buildsSuccessfully();
+
+        assertThat(result).output().contains(expectedOutput);
+        child.mainSourceSet()
+                .java()
+                .fileByClassName("Main")
+                .assertThat()
+                .content()
+                .isEqualTo("""
+                    class Main {
+                        public static void crazyExistingFormatting  (  String... args) {
+                            System.out.println("Reformat me please");
+                            // some comments
+                            System.out.println("Reformat me again please");
+                        }
+                    }
+                    """);
     }
 
     private GradleFile standardBuildFile(RootProject project, String extraDependencies) {

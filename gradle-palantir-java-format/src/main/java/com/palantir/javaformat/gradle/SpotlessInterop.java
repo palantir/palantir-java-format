@@ -71,11 +71,12 @@ public abstract class SpotlessInterop implements Action<JavaExtension> {
         if (getNativeImageSupport().isNativeImageConfigured()
                 && JavaVersion.current().compareTo(JavaVersion.VERSION_21) < 0) {
             logger.info("Using the native-image formatter");
-            return NativePalantirJavaFormatStep.create(
-                    getConfigurations().getByName(NativeImageFormatProviderPlugin.NATIVE_CONFIGURATION_NAME));
+            return NativePalantirJavaFormatStep.create(getConfigurations()
+                    .getByName(NativeImageFormatProviderPlugin.NATIVE_RESOLVABLE_CONFIGURATION_NAME));
         }
         logger.info("Using the Java-based formatter {}", JavaVersion.current());
         return PalantirJavaFormatStep.create(
-                getConfigurations().getByName(PalantirJavaFormatProviderPlugin.CONFIGURATION_NAME), formatterService);
+                getConfigurations().getByName(PalantirJavaFormatProviderPlugin.RESOLVABLE_CONFIGURATION_NAME),
+                formatterService);
     }
 }
