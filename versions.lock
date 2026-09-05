@@ -116,7 +116,7 @@ org.functionaljava:functionaljava:5.0 (1 constraints: a904262c)
 
 org.immutables:value:2.12.2 (2 constraints: ae16c234)
 
-org.jetbrains:annotations:26.0.2 (2 constraints: b7284379)
+org.jetbrains:annotations:26.1.0 (2 constraints: b6281a79)
 
 org.jetbrains.kotlin:kotlin-stdlib:1.9.10 (2 constraints: c2210fe1)
 
@@ -126,7 +126,7 @@ org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10 (1 constraints: e210ffd2)
 
 org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10 (2 constraints: 8118c1c5)
 
-org.jspecify:jspecify:1.0.1 (15 constraints: 1bf4059d)
+org.jspecify:jspecify:1.0.1 (16 constraints: 6c013ea8)
 
 org.openjdk.jmh:jmh-core:1.37 (5 constraints: 52476be6)
 
@@ -158,7 +158,7 @@ com.google.truth:truth:1.4.5 (1 constraints: 1d1219fb)
 
 com.googlecode.java-diff-utils:diffutils:1.3.0 (1 constraints: bd11fef4)
 
-com.netflix.nebula:nebula-test:10.6.2 (1 constraints: 9c18268f)
+com.netflix.nebula:nebula-test:11.1.0 (1 constraints: 96181a8f)
 
 com.palantir.baseline:gradle-baseline-java:7.9.0 (2 constraints: a714b1b1)
 
@@ -186,13 +186,13 @@ com.palantir.gradle.jdks:gradle-jdks-setup-common:0.77.0 (3 constraints: 293b3b4
 
 com.palantir.gradle.jdkslatest:gradle-jdks-latest:0.32.0 (1 constraints: 3705313b)
 
-com.palantir.gradle.plugintesting:configuration-cache-spec:0.54.0 (1 constraints: 3b053f3b)
+com.palantir.gradle.plugintesting:configuration-cache-spec:0.76.0 (1 constraints: 3f054d3b)
 
-com.palantir.gradle.plugintesting:discover-tests-cli:0.54.0 (1 constraints: 3b053f3b)
+com.palantir.gradle.plugintesting:discover-tests-cli:0.76.0 (1 constraints: 3f054d3b)
 
-com.palantir.gradle.plugintesting:gradle-plugin-testing-junit:0.54.0 (1 constraints: 3b053f3b)
+com.palantir.gradle.plugintesting:gradle-plugin-testing-junit:0.76.0 (1 constraints: 3f054d3b)
 
-com.palantir.gradle.plugintesting:plugin-testing-core:0.54.0 (1 constraints: 3b053f3b)
+com.palantir.gradle.plugintesting:plugin-testing-core:0.76.0 (2 constraints: 1a1fac8e)
 
 com.palantir.gradle.utils:environment-variables:0.29.0 (3 constraints: a83e1402)
 
@@ -202,7 +202,7 @@ com.palantir.gradle.utils:project-dependency-utils:0.29.0 (1 constraints: ef1b1a
 
 com.palantir.suppressible-error-prone:gradle-suppressible-error-prone:2.26.0 (1 constraints: 7419b3d0)
 
-commons-io:commons-io:2.22.0 (4 constraints: f24a08f1)
+commons-io:commons-io:2.22.0 (4 constraints: ec4ae9ef)
 
 info.picocli:picocli:4.7.7 (1 constraints: 2816dcdd)
 
@@ -210,7 +210,7 @@ javax.annotation:javax.annotation-api:1.2 (1 constraints: e01020af)
 
 javax.inject:javax.inject:1 (7 constraints: e66230f0)
 
-junit:junit:4.13.2 (7 constraints: 9b63a984)
+junit:junit:4.13.2 (6 constraints: 81553a86)
 
 net.bytebuddy:byte-buddy:1.18.3 (1 constraints: 530b55df)
 
@@ -258,9 +258,7 @@ org.apache.maven.shared:maven-shared-utils:3.3.4 (1 constraints: e60b61f3)
 
 org.apiguardian:apiguardian-api:1.1.2 (11 constraints: 3ac82b62)
 
-org.assertj:assertj-core:3.27.7 (2 constraints: 221f6290)
-
-org.codehaus.groovy:groovy:3.0.24 (3 constraints: 133429dd)
+org.assertj:assertj-core:3.27.7 (3 constraints: a22c4954)
 
 org.codehaus.plexus:plexus-cipher:2.0 (1 constraints: 641174c7)
 
@@ -280,8 +278,6 @@ org.eclipse.sisu:org.eclipse.sisu.plexus:0.3.5 (2 constraints: 141abc34)
 
 org.graalvm.buildtools:junit-platform-native:0.10.4 (1 constraints: 3705273b)
 
-org.hamcrest:hamcrest:2.2 (1 constraints: d20cdc04)
-
 org.hamcrest:hamcrest-core:1.3 (1 constraints: cc05fe3f)
 
 org.immutables:serial:2.12.1 (1 constraints: 761145ef)
@@ -300,9 +296,9 @@ org.junit.platform:junit-platform-commons:6.1.3 (2 constraints: db20e44a)
 
 org.junit.platform:junit-platform-console:6.1.3 (1 constraints: 4313543f)
 
-org.junit.platform:junit-platform-engine:6.1.3 (4 constraints: a740dfe5)
+org.junit.platform:junit-platform-engine:6.1.3 (3 constraints: 72339423)
 
-org.junit.platform:junit-platform-launcher:6.1.3 (4 constraints: 6d4155f8)
+org.junit.platform:junit-platform-launcher:6.1.3 (5 constraints: e74e14cd)
 
 org.junit.platform:junit-platform-reporting:6.1.3 (1 constraints: eb118fee)
 
@@ -321,7 +317,3 @@ org.opentest4j:opentest4j:1.3.0 (2 constraints: cf209249)
 org.opentest4j.reporting:open-test-reporting-tooling-spi:0.2.5 (1 constraints: cf12e318)
 
 org.ow2.asm:asm:9.10.1 (6 constraints: 996a4513)
-
-org.spockframework:spock-core:2.3-groovy-3.0 (3 constraints: 2c3deb38)
-
-org.spockframework:spock-junit4:2.3-groovy-3.0 (1 constraints: 7a1000b0)
