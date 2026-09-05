@@ -256,7 +256,6 @@ public final class JavaInput extends Input {
      * output.
      */
 
-    @SuppressWarnings("for-rollout:AlmostJavadoc")
     private final ImmutableMap<Integer, Integer> positionToColumnMap; // Map Tok position to column.
 
     private final ImmutableList<Token> tokens; // The Tokens for this input.

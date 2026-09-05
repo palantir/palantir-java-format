@@ -128,7 +128,6 @@ public class RemoveUnusedImports {
             }
         }
 
-        @SuppressWarnings("for-rollout:VoidUsed")
         @Override
         public Void scan(Tree tree, Void unused) {
             if (tree == null) {
@@ -186,7 +185,6 @@ public class RemoveUnusedImports {
                     this.basePos = basePos;
                 }
 
-                @SuppressWarnings("for-rollout:VoidUsed")
                 @Override
                 public Void visitIdentifier(IdentifierTree node, Void aVoid) {
                     usedInJavadoc.put(
