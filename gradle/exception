@@ -1,0 +1,612 @@
+
+1: Task failed with an exception.
+-----------
+* What went wrong:
+Execution failed for task ':eclipse_plugin:compileJava'.
+> Compilation failed; see the compiler output below.
+  /repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:17: error: package com.google.common.collect does not exist
+  import static com.google.common.collect.ImmutableList.toImmutableList;
+                                         ^
+  51 errors
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to get full insights.
+
+* Exception is:
+org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':eclipse_plugin:compileJava'.
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.lambda$executeIfValid$1(ExecuteActionsTaskExecuter.java:130)
+	at org.gradle.internal.Try$Failure.ifSuccessfulOrElse(Try.java:293)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:128)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.execute(ExecuteActionsTaskExecuter.java:116)
+	at org.gradle.api.internal.tasks.execution.ProblemsTaskPathTrackingTaskExecuter.execute(ProblemsTaskPathTrackingTaskExecuter.java:41)
+	at org.gradle.api.internal.tasks.execution.FinalizePropertiesTaskExecuter.execute(FinalizePropertiesTaskExecuter.java:46)
+	at org.gradle.api.internal.tasks.execution.ResolveTaskExecutionModeExecuter.execute(ResolveTaskExecutionModeExecuter.java:51)
+	at org.gradle.api.internal.tasks.execution.SkipTaskWithNoActionsExecuter.execute(SkipTaskWithNoActionsExecuter.java:57)
+	at org.gradle.api.internal.tasks.execution.SkipOnlyIfTaskExecuter.execute(SkipOnlyIfTaskExecuter.java:74)
+	at org.gradle.api.internal.tasks.execution.CatchExceptionTaskExecuter.execute(CatchExceptionTaskExecuter.java:36)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.executeTask(EventFiringTaskExecuter.java:77)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:55)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:52)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:210)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:205)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:54)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter.execute(EventFiringTaskExecuter.java:52)
+	at org.gradle.execution.plan.LocalTaskNodeExecutor.execute(LocalTaskNodeExecutor.java:42)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:331)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:318)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.lambda$execute$0(DefaultTaskExecutionGraph.java:314)
+	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:85)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:314)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:303)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:459)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)
+Caused by: org.gradle.api.internal.tasks.compile.CompilationFailedException: Compilation failed; see the compiler output below.
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:17: error: static import only from classes and interfaces
+import static com.google.common.collect.ImmutableList.toImmutableList;
+^
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:64: error: cannot find symbol
+    private final Formatter formatter = Formatter.createFormatter(
+                  ^
+  symbol:   class Formatter
+  location: class SnippetFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:66: error: cannot find symbol
+    private static final CharMatcher NOT_WHITESPACE = CharMatcher.whitespace().negate();
+                         ^
+  symbol:   class CharMatcher
+  location: class SnippetFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:79: error: cannot find symbol
+    private static Range<Integer> offsetRange(Range<Integer> range, int offset) {
+                                              ^
+  symbol:   class Range
+  location: class SnippetFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:79: error: cannot find symbol
+    private static Range<Integer> offsetRange(Range<Integer> range, int offset) {
+                   ^
+  symbol:   class Range
+  location: class SnippetFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:84: error: cannot find symbol
+    private static List<Range<Integer>> offsetRanges(List<Range<Integer>> ranges, int offset) {
+                                                          ^
+  symbol:   class Range
+  location: class SnippetFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:84: error: cannot find symbol
+    private static List<Range<Integer>> offsetRanges(List<Range<Integer>> ranges, int offset) {
+                        ^
+  symbol:   class Range
+  location: class SnippetFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:97: error: cannot find symbol
+            SnippetKind kind, String source, List<Range<Integer>> ranges, int initialIndent, boolean includeComments)
+                                                  ^
+  symbol:   class Range
+  location: class SnippetFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:96: error: cannot find symbol
+    public ImmutableList<Replacement> format(
+           ^
+  symbol:   class ImmutableList
+  location: class SnippetFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:96: error: cannot find symbol
+    public ImmutableList<Replacement> format(
+                         ^
+  symbol:   class Replacement
+  location: class SnippetFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:98: error: cannot find symbol
+            throws FormatterException {
+                   ^
+  symbol:   class FormatterException
+  location: class SnippetFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:126: error: cannot find symbol
+    private static List<Replacement> toReplacements(String source, String replacement) {
+                        ^
+  symbol:   class Replacement
+  location: class SnippetFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/PalantirJavaFormatter.java:91: error: cannot find symbol
+    private List<Range<Integer>> rangesFromRegions(IRegion[] regions) {
+                 ^
+  symbol:   class Range
+  location: class PalantirJavaFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/PalantirJavaFormatter.java:100: error: cannot find symbol
+    private boolean idempotent(String source, IRegion[] regions, List<Replacement> replacements) {
+                                                                      ^
+  symbol:   class Replacement
+  location: class PalantirJavaFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/PalantirJavaFormatter.java:121: error: cannot find symbol
+    private TextEdit editFromReplacements(List<Replacement> replacements) {
+                                               ^
+  symbol:   class Replacement
+  location: class PalantirJavaFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:64: error: cannot find symbol
+    private final Formatter formatter = Formatter.createFormatter(
+                                        ^
+  symbol:   variable Formatter
+  location: class SnippetFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:65: error: cannot find symbol
+            JavaFormatterOptions.builder().style(Style.PALANTIR).build());
+                                                 ^
+  symbol:   variable Style
+  location: class SnippetFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:65: error: cannot find symbol
+            JavaFormatterOptions.builder().style(Style.PALANTIR).build());
+            ^
+  symbol:   variable JavaFormatterOptions
+  location: class SnippetFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:66: error: cannot find symbol
+    private static final CharMatcher NOT_WHITESPACE = CharMatcher.whitespace().negate();
+                                                      ^
+  symbol:   variable CharMatcher
+  location: class SnippetFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:69: error: cannot find symbol
+        Preconditions.checkArgument(
+        ^
+  symbol:   variable Preconditions
+  location: class SnippetFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:80: error: cannot find symbol
+        range = range.canonical(DiscreteDomain.integers());
+                                ^
+  symbol:   variable DiscreteDomain
+  location: class SnippetFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:81: error: cannot find symbol
+        return Range.closedOpen(range.lowerEndpoint() + offset, range.upperEndpoint() + offset);
+               ^
+  symbol:   variable Range
+  location: class SnippetFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:85: error: cannot find symbol
+        List<Range<Integer>> result = new ArrayList<>();
+             ^
+  symbol:   class Range
+  location: class SnippetFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:86: error: cannot find symbol
+        for (Range<Integer> range : ranges) {
+             ^
+  symbol:   class Range
+  location: class SnippetFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:99: error: cannot find symbol
+        RangeSet<Integer> rangeSet = TreeRangeSet.create();
+        ^
+  symbol:   class RangeSet
+  location: class SnippetFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:99: error: cannot find symbol
+        RangeSet<Integer> rangeSet = TreeRangeSet.create();
+                                     ^
+  symbol:   variable TreeRangeSet
+  location: class SnippetFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:100: error: cannot find symbol
+        for (Range<Integer> range : ranges) {
+             ^
+  symbol:   class Range
+  location: class SnippetFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:135: error: cannot find symbol
+        List<Replacement> replacements = new ArrayList<>();
+             ^
+  symbol:   class Replacement
+  location: class SnippetFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:139: error: cannot find symbol
+            replacements.add(Replacement.create(0, i, replacement.substring(0, j)));
+                             ^
+  symbol:   variable Replacement
+  location: class SnippetFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:148: error: cannot find symbol
+                replacements.add(Replacement.create(i + 1, i2, replacement.substring(j + 1, j2)));
+                                 ^
+  symbol:   variable Replacement
+  location: class SnippetFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/PalantirJavaFormatter.java:52: error: cannot find symbol
+        Preconditions.checkArgument(
+        ^
+  symbol:   variable Preconditions
+  location: class PalantirJavaFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/PalantirJavaFormatter.java:77: error: cannot find symbol
+            List<Replacement> replacements = new SnippetFormatter()
+                 ^
+  symbol:   class Replacement
+  location: class PalantirJavaFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/PalantirJavaFormatter.java:85: error: cannot find symbol
+        } catch (IllegalArgumentException | FormatterException exception) {
+                                            ^
+  symbol:   class FormatterException
+  location: class PalantirJavaFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/PalantirJavaFormatter.java:92: error: cannot find symbol
+        List<Range<Integer>> ranges = new ArrayList<>();
+             ^
+  symbol:   class Range
+  location: class PalantirJavaFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/PalantirJavaFormatter.java:94: error: cannot find symbol
+            ranges.add(Range.closedOpen(region.getOffset(), region.getOffset() + region.getLength()));
+                       ^
+  symbol:   variable Range
+  location: class PalantirJavaFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/PalantirJavaFormatter.java:103: error: cannot find symbol
+            Replacement replacement = replacements.get(0);
+            ^
+  symbol:   class Replacement
+  location: class PalantirJavaFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/PalantirJavaFormatter.java:111: error: cannot find symbol
+                Range<Integer> range = replacement.getReplaceRange();
+                ^
+  symbol:   class Range
+  location: class PalantirJavaFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/PalantirJavaFormatter.java:124: error: cannot find symbol
+        for (Replacement replacement : replacements) {
+             ^
+  symbol:   class Replacement
+  location: class PalantirJavaFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/PalantirJavaFormatter.java:125: error: cannot find symbol
+            Range<Integer> replaceRange = replacement.getReplaceRange();
+            ^
+  symbol:   class Range
+  location: class PalantirJavaFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:118: error: cannot find symbol
+                .collect(toImmutableList());
+                         ^
+  symbol:   method toImmutableList()
+  location: class SnippetFormatter
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:17: error: package com.google.common.collect does not exist
+import static com.google.common.collect.ImmutableList.toImmutableList;
+                                       ^
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:19: error: package com.google.common.base does not exist
+import com.google.common.base.CharMatcher;
+                             ^
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:20: error: package com.google.common.base does not exist
+import com.google.common.base.Preconditions;
+                             ^
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:21: error: package com.google.common.collect does not exist
+import com.google.common.collect.DiscreteDomain;
+                                ^
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:22: error: package com.google.common.collect does not exist
+import com.google.common.collect.ImmutableList;
+                                ^
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:23: error: package com.google.common.collect does not exist
+import com.google.common.collect.Range;
+                                ^
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:24: error: package com.google.common.collect does not exist
+import com.google.common.collect.RangeSet;
+                                ^
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:25: error: package com.google.common.collect does not exist
+import com.google.common.collect.TreeRangeSet;
+                                ^
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/SnippetFormatter.java:26: error: package com.palantir.javaformat.java.JavaFormatterOptions does not exist
+import com.palantir.javaformat.java.JavaFormatterOptions.Style;
+                                                        ^
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/PalantirJavaFormatter.java:17: error: package com.google.common.base does not exist
+import com.google.common.base.Preconditions;
+                             ^
+/repo/eclipse_plugin/src/main/java/com/palantir/javaformat/java/PalantirJavaFormatter.java:18: error: package com.google.common.collect does not exist
+import com.google.common.collect.Range;
+                                ^
+51 errors
+	at org.gradle.api.internal.tasks.compile.JdkJavaCompiler.execute(JdkJavaCompiler.java:89)
+	at org.gradle.api.internal.tasks.compile.JdkJavaCompiler.execute(JdkJavaCompiler.java:50)
+	at org.gradle.api.internal.tasks.compile.daemon.AbstractIsolatedCompilerWorkerExecutor$CompilerWorkAction.execute(AbstractIsolatedCompilerWorkerExecutor.java:78)
+	at org.gradle.workers.internal.DefaultWorkerServer.execute(DefaultWorkerServer.java:63)
+	at org.gradle.workers.internal.AbstractClassLoaderWorker$1.create(AbstractClassLoaderWorker.java:54)
+	at org.gradle.workers.internal.AbstractClassLoaderWorker$1.create(AbstractClassLoaderWorker.java:48)
+	at org.gradle.internal.classloader.ClassLoaderUtils.executeInClassloader(ClassLoaderUtils.java:100)
+	at org.gradle.workers.internal.AbstractClassLoaderWorker.executeInClassLoader(AbstractClassLoaderWorker.java:48)
+	at org.gradle.workers.internal.FlatClassLoaderWorker.run(FlatClassLoaderWorker.java:32)
+	at org.gradle.workers.internal.FlatClassLoaderWorker.run(FlatClassLoaderWorker.java:22)
+	at org.gradle.workers.internal.WorkerDaemonServer.run(WorkerDaemonServer.java:108)
+	at org.gradle.workers.internal.WorkerDaemonServer.run(WorkerDaemonServer.java:77)
+	at org.gradle.process.internal.worker.request.WorkerAction.lambda$run$1(WorkerAction.java:150)
+	at org.gradle.process.internal.worker.child.WorkerLogEventListener.withWorkerLoggingProtocol(WorkerLogEventListener.java:41)
+	at org.gradle.process.internal.worker.request.WorkerAction.lambda$run$2(WorkerAction.java:150)
+	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:85)
+	at org.gradle.process.internal.worker.request.WorkerAction.run(WorkerAction.java:142)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:36)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	at org.gradle.internal.remote.internal.hub.MessageHubBackedObjectConnection$DispatchWrapper.dispatch(MessageHubBackedObjectConnection.java:182)
+	at org.gradle.internal.remote.internal.hub.MessageHubBackedObjectConnection$DispatchWrapper.dispatch(MessageHubBackedObjectConnection.java:164)
+	at org.gradle.internal.remote.internal.hub.MessageHub$Handler.run(MessageHub.java:414)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)
+
+==============================================================================
+
+2: Task failed with an exception.
+-----------
+* What went wrong:
+Execution failed for task ':palantir-java-format-jdk-bootstrap:compileJava'.
+> Compilation failed; see the compiler output below.
+
+* Try:
+> Run with --scan to get full insights.
+
+* Exception is:
+org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':palantir-java-format-jdk-bootstrap:compileJava'.
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.lambda$executeIfValid$1(ExecuteActionsTaskExecuter.java:130)
+	at org.gradle.internal.Try$Failure.ifSuccessfulOrElse(Try.java:293)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:128)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.execute(ExecuteActionsTaskExecuter.java:116)
+	at org.gradle.api.internal.tasks.execution.ProblemsTaskPathTrackingTaskExecuter.execute(ProblemsTaskPathTrackingTaskExecuter.java:41)
+	at org.gradle.api.internal.tasks.execution.FinalizePropertiesTaskExecuter.execute(FinalizePropertiesTaskExecuter.java:46)
+	at org.gradle.api.internal.tasks.execution.ResolveTaskExecutionModeExecuter.execute(ResolveTaskExecutionModeExecuter.java:51)
+	at org.gradle.api.internal.tasks.execution.SkipTaskWithNoActionsExecuter.execute(SkipTaskWithNoActionsExecuter.java:57)
+	at org.gradle.api.internal.tasks.execution.SkipOnlyIfTaskExecuter.execute(SkipOnlyIfTaskExecuter.java:74)
+	at org.gradle.api.internal.tasks.execution.CatchExceptionTaskExecuter.execute(CatchExceptionTaskExecuter.java:36)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.executeTask(EventFiringTaskExecuter.java:77)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:55)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:52)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:210)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:205)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:54)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter.execute(EventFiringTaskExecuter.java:52)
+	at org.gradle.execution.plan.LocalTaskNodeExecutor.execute(LocalTaskNodeExecutor.java:42)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:331)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:318)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.lambda$execute$0(DefaultTaskExecutionGraph.java:314)
+	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:85)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:314)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:303)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:459)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: org.gradle.api.internal.tasks.compile.CompilationFailedException: Compilation failed; see the compiler output below.
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/NativeImageFormatterService.java:53: error: incompatible types: inference variable T has incompatible bounds
+                    .characterRanges(
+                    ^
+    equality constraints: String
+    lower bounds: Object
+  where T is a type-variable:
+    T extends Object declared in method <T>toList()
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/BootstrappingFormatterService.java:88: error: incompatible types: inference variable T has incompatible bounds
+                .characterRanges(ranges.stream().map(RangeUtils::toStringRange).collect(Collectors.toList()))
+                ^
+    equality constraints: String
+    lower bounds: Object
+  where T is a type-variable:
+    T extends Object declared in method <T>toList()
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/RangeUtils.java:25: error: cannot find symbol
+    public static String toStringRange(Range<Integer> range) {
+                                       ^
+  symbol:   class Range
+  location: class RangeUtils
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/NativeImageFormatterService.java:26: error: cannot find symbol
+import com.palantir.javaformat.java.FormatterService;
+                                   ^
+  symbol:   class FormatterService
+  location: package com.palantir.javaformat.java
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/NativeImageFormatterService.java:27: error: cannot find symbol
+import com.palantir.javaformat.java.Replacement;
+                                   ^
+  symbol:   class Replacement
+  location: package com.palantir.javaformat.java
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/NativeImageFormatterService.java:47: error: cannot find symbol
+    public ImmutableList<Replacement> getFormatReplacements(String input, Collection<Range<Integer>> ranges) {
+                                                                                     ^
+  symbol:   class Range
+  location: class NativeImageFormatterService
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/NativeImageFormatterService.java:47: error: cannot find symbol
+    public ImmutableList<Replacement> getFormatReplacements(String input, Collection<Range<Integer>> ranges) {
+           ^
+  symbol:   class ImmutableList
+  location: class NativeImageFormatterService
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/NativeImageFormatterService.java:47: error: cannot find symbol
+    public ImmutableList<Replacement> getFormatReplacements(String input, Collection<Range<Integer>> ranges) {
+                         ^
+  symbol:   class Replacement
+  location: class NativeImageFormatterService
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/BootstrappingFormatterService.java:26: error: cannot find symbol
+import com.palantir.javaformat.java.FormatterException;
+                                   ^
+  symbol:   class FormatterException
+  location: package com.palantir.javaformat.java
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/BootstrappingFormatterService.java:27: error: cannot find symbol
+import com.palantir.javaformat.java.FormatterService;
+                                   ^
+  symbol:   class FormatterService
+  location: package com.palantir.javaformat.java
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/BootstrappingFormatterService.java:28: error: cannot find symbol
+import com.palantir.javaformat.java.Replacement;
+                                   ^
+  symbol:   class Replacement
+  location: package com.palantir.javaformat.java
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/BootstrappingFormatterService.java:55: error: cannot find symbol
+    public ImmutableList<Replacement> getFormatReplacements(String input, Collection<Range<Integer>> ranges) {
+                                                                                     ^
+  symbol:   class Range
+  location: class BootstrappingFormatterService
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/BootstrappingFormatterService.java:55: error: cannot find symbol
+    public ImmutableList<Replacement> getFormatReplacements(String input, Collection<Range<Integer>> ranges) {
+           ^
+  symbol:   class ImmutableList
+  location: class BootstrappingFormatterService
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/BootstrappingFormatterService.java:55: error: cannot find symbol
+    public ImmutableList<Replacement> getFormatReplacements(String input, Collection<Range<Integer>> ranges) {
+                         ^
+  symbol:   class Replacement
+  location: class BootstrappingFormatterService
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/BootstrappingFormatterService.java:73: error: cannot find symbol
+    public String fixImports(String input) throws FormatterException {
+                                                  ^
+  symbol:   class FormatterException
+  location: class BootstrappingFormatterService
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/BootstrappingFormatterService.java:81: error: cannot find symbol
+    private ImmutableList<Replacement> getFormatReplacementsInternal(String input, Collection<Range<Integer>> ranges)
+                                                                                              ^
+  symbol:   class Range
+  location: class BootstrappingFormatterService
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/BootstrappingFormatterService.java:81: error: cannot find symbol
+    private ImmutableList<Replacement> getFormatReplacementsInternal(String input, Collection<Range<Integer>> ranges)
+            ^
+  symbol:   class ImmutableList
+  location: class BootstrappingFormatterService
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/BootstrappingFormatterService.java:81: error: cannot find symbol
+    private ImmutableList<Replacement> getFormatReplacementsInternal(String input, Collection<Range<Integer>> ranges)
+                          ^
+  symbol:   class Replacement
+  location: class BootstrappingFormatterService
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/RangeUtils.java:26: error: cannot find symbol
+        int lower = range.lowerBoundType() == BoundType.CLOSED ? range.lowerEndpoint() : range.lowerEndpoint() + 1;
+                                              ^
+  symbol:   variable BoundType
+  location: class RangeUtils
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/RangeUtils.java:27: error: cannot find symbol
+        int higher = range.upperBoundType() == BoundType.CLOSED ? range.upperEndpoint() : range.upperEndpoint() - 1;
+                                               ^
+  symbol:   variable BoundType
+  location: class RangeUtils
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/NativeImageFormatterService.java:39: error: cannot find symbol
+            JsonMapper.builder().addModule(new GuavaModule()).build();
+                                               ^
+  symbol:   class GuavaModule
+  location: class NativeImageFormatterService
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/NativeImageFormatterService.java:60: error: cannot find symbol
+                return ImmutableList.of();
+                       ^
+  symbol:   variable ImmutableList
+  location: class NativeImageFormatterService
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/NativeImageFormatterService.java:107: error: cannot find symbol
+            ImmutableList.Builder<String> args = ImmutableList.<String>builder()
+                                                 ^
+  symbol:   variable ImmutableList
+  location: interface FormatterNativeImageArgs
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/NativeImageFormatterService.java:111: error: cannot find symbol
+                args.add("--character-ranges", Joiner.on(',').join(characterRanges()));
+                                               ^
+  symbol:   variable Joiner
+  location: interface FormatterNativeImageArgs
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/BootstrappingFormatterService.java:40: error: cannot find symbol
+            JsonMapper.builder().addModule(new GuavaModule()).build();
+                                               ^
+  symbol:   class GuavaModule
+  location: class BootstrappingFormatterService
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/BootstrappingFormatterService.java:95: error: cannot find symbol
+            return ImmutableList.of();
+                   ^
+  symbol:   variable ImmutableList
+  location: class BootstrappingFormatterService
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/BootstrappingFormatterService.java:124: error: cannot find symbol
+            ImmutableList.Builder<String> args = ImmutableList.<String>builder()
+                                                 ^
+  symbol:   variable ImmutableList
+  location: interface FormatterCliArgs
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/BootstrappingFormatterService.java:135: error: cannot find symbol
+                args.add("--character-ranges", Joiner.on(',').join(characterRanges()));
+                                               ^
+  symbol:   variable Joiner
+  location: interface FormatterCliArgs
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/BootstrappingFormatterService.java:58: error: exception IOException is never thrown in body of corresponding try statement
+        } catch (IOException e) {
+          ^
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/NativeImageFormatterService.java:46: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/NativeImageFormatterService.java:69: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/NativeImageFormatterService.java:78: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/BootstrappingFormatterService.java:54: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/BootstrappingFormatterService.java:63: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/BootstrappingFormatterService.java:72: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/NativeImageFormatterService.java:37: error: cannot find symbol
+public class NativeImageFormatterService implements FormatterService {
+                                                    ^
+  symbol: class FormatterService
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/BootstrappingFormatterService.java:38: error: cannot find symbol
+public final class BootstrappingFormatterService implements FormatterService {
+                                                            ^
+  symbol: class FormatterService
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/RangeUtils.java:19: error: package com.google.common.collect does not exist
+import com.google.common.collect.BoundType;
+                                ^
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/RangeUtils.java:20: error: package com.google.common.collect does not exist
+import com.google.common.collect.Range;
+                                ^
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/NativeImageFormatterService.java:22: error: package com.fasterxml.jackson.datatype.guava does not exist
+import com.fasterxml.jackson.datatype.guava.GuavaModule;
+                                           ^
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/NativeImageFormatterService.java:23: error: package com.google.common.base does not exist
+import com.google.common.base.Joiner;
+                             ^
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/NativeImageFormatterService.java:24: error: package com.google.common.collect does not exist
+import com.google.common.collect.ImmutableList;
+                                ^
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/NativeImageFormatterService.java:25: error: package com.google.common.collect does not exist
+import com.google.common.collect.Range;
+                                ^
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/BootstrappingFormatterService.java:22: error: package com.fasterxml.jackson.datatype.guava does not exist
+import com.fasterxml.jackson.datatype.guava.GuavaModule;
+                                           ^
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/BootstrappingFormatterService.java:23: error: package com.google.common.base does not exist
+import com.google.common.base.Joiner;
+                             ^
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/BootstrappingFormatterService.java:24: error: package com.google.common.collect does not exist
+import com.google.common.collect.ImmutableList;
+                                ^
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/BootstrappingFormatterService.java:25: error: package com.google.common.collect does not exist
+import com.google.common.collect.Range;
+                                ^
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/NativeImageFormatterService.java:107: error: package ImmutableList does not exist
+            ImmutableList.Builder<String> args = ImmutableList.<String>builder()
+                         ^
+/repo/palantir-java-format-jdk-bootstrap/src/main/java/com/palantir/javaformat/bootstrap/BootstrappingFormatterService.java:124: error: package ImmutableList does not exist
+            ImmutableList.Builder<String> args = ImmutableList.<String>builder()
+                         ^
+49 errors
+	at org.gradle.api.internal.tasks.compile.JdkJavaCompiler.execute(JdkJavaCompiler.java:89)
+	at org.gradle.api.internal.tasks.compile.JdkJavaCompiler.execute(JdkJavaCompiler.java:50)
+	at org.gradle.api.internal.tasks.compile.daemon.AbstractIsolatedCompilerWorkerExecutor$CompilerWorkAction.execute(AbstractIsolatedCompilerWorkerExecutor.java:78)
+	at org.gradle.workers.internal.DefaultWorkerServer.execute(DefaultWorkerServer.java:63)
+	at org.gradle.workers.internal.AbstractClassLoaderWorker$1.create(AbstractClassLoaderWorker.java:54)
+	at org.gradle.workers.internal.AbstractClassLoaderWorker$1.create(AbstractClassLoaderWorker.java:48)
+	at org.gradle.internal.classloader.ClassLoaderUtils.executeInClassloader(ClassLoaderUtils.java:100)
+	at org.gradle.workers.internal.AbstractClassLoaderWorker.executeInClassLoader(AbstractClassLoaderWorker.java:48)
+	at org.gradle.workers.internal.FlatClassLoaderWorker.run(FlatClassLoaderWorker.java:32)
+	at org.gradle.workers.internal.FlatClassLoaderWorker.run(FlatClassLoaderWorker.java:22)
+	at org.gradle.workers.internal.WorkerDaemonServer.run(WorkerDaemonServer.java:108)
+	at org.gradle.workers.internal.WorkerDaemonServer.run(WorkerDaemonServer.java:77)
+	at org.gradle.process.internal.worker.request.WorkerAction.lambda$run$1(WorkerAction.java:150)
+	at org.gradle.process.internal.worker.child.WorkerLogEventListener.withWorkerLoggingProtocol(WorkerLogEventListener.java:41)
+	at org.gradle.process.internal.worker.request.WorkerAction.lambda$run$2(WorkerAction.java:150)
+	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:85)
+	at org.gradle.process.internal.worker.request.WorkerAction.run(WorkerAction.java:142)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:36)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	at org.gradle.internal.remote.internal.hub.MessageHubBackedObjectConnection$DispatchWrapper.dispatch(MessageHubBackedObjectConnection.java:182)
+	at org.gradle.internal.remote.internal.hub.MessageHubBackedObjectConnection$DispatchWrapper.dispatch(MessageHubBackedObjectConnection.java:164)
+	at org.gradle.internal.remote.internal.hub.MessageHub$Handler.run(MessageHub.java:414)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+
+==============================================================================
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.14.4/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 20s
+20 actionable tasks: 14 executed, 2 from cache, 4 up-to-date
