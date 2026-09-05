@@ -132,7 +132,11 @@ public final class Formatter {
         OpsBuilder opsBuilder = new OpsBuilder(javaInput);
 
         JavaInputAstVisitor visitor;
-        if (getRuntimeVersion() >= 21) {
+        if (getRuntimeVersion() >= 26) {
+            visitor = createVisitor("com.palantir.javaformat.java.java26.Java26InputAstVisitor", opsBuilder, options);
+        } else if (getRuntimeVersion() >= 25) {
+            visitor = createVisitor("com.palantir.javaformat.java.java25.Java25InputAstVisitor", opsBuilder, options);
+        } else if (getRuntimeVersion() >= 21) {
             visitor = createVisitor("com.palantir.javaformat.java.java21.Java21InputAstVisitor", opsBuilder, options);
         } else if (getRuntimeVersion() >= 14) {
             visitor = createVisitor("com.palantir.javaformat.java.java14.Java14InputAstVisitor", opsBuilder, options);

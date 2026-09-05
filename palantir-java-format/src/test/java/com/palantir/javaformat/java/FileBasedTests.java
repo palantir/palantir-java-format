@@ -60,6 +60,9 @@ public final class FileBasedTests {
                             "I880",
                             "I1309",
                             "Unnamed")
+                    .putAll(22, "UnnamedPattern")
+                    .putAll(23, "MarkdownDoc")
+                    .putAll(25, "FlexibleConstructor", "ModuleImport", "CompactSource")
                     .build();
 
     private final Class<?> testClass;

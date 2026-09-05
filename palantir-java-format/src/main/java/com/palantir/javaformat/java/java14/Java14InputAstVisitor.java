@@ -351,23 +351,6 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
         return null;
     }
 
-    @SuppressWarnings("for-rollout:NullAway")
-    private static Method maybeGetMethod(Class<?> c, String name) {
-        try {
-            return c.getMethod(name);
-        } catch (ReflectiveOperationException e) {
-            return null;
-        }
-    }
-
-    private static Object invoke(Method m, Object target) {
-        try {
-            return m.invoke(target);
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
-
     @SuppressWarnings({"NullableProblems", "for-rollout:NullAway"})
     protected ExpressionTree getGuard(final CaseTree node) {
         return null;

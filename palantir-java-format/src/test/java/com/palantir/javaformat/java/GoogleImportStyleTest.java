@@ -524,6 +524,34 @@ public class GoogleImportStyleTest {
                     "class Test {}",
                 }
             },
+
+            // Module imports (JEP 511) form their own leading group, ahead of both static and
+            // non-static type imports, and are separated from the following group by a blank line,
+            // just like static imports are separated from non-static imports.
+            {
+                {
+                    "package foo;",
+                    "",
+                    "import java.util.List;",
+                    "import static com.google.truth.Truth.assertThat;",
+                    "import module java.desktop;",
+                    "import module java.base;",
+                    "",
+                    "public class Blim {}",
+                },
+                {
+                    "package foo;",
+                    "",
+                    "import module java.base;",
+                    "import module java.desktop;",
+                    "",
+                    "import static com.google.truth.Truth.assertThat;",
+                    "",
+                    "import java.util.List;",
+                    "",
+                    "public class Blim {}",
+                },
+            },
         };
 
         ImmutableList.Builder<Object[]> builder = ImmutableList.builder();

@@ -1,0 +1,12 @@
+class FlexibleConstructor {
+  private final int value;
+
+  FlexibleConstructor(int raw) {
+    if (raw < 0) {
+      throw new IllegalArgumentException("negative");
+    }
+    var normalized = Math.max(raw, 1);
+    super();
+    this.value = normalized;
+  }
+}

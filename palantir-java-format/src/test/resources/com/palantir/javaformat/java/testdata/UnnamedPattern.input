@@ -1,0 +1,19 @@
+class UnnamedPattern {
+  sealed interface Shape permits Box {}
+  record Box(Object a, Object b) implements Shape {}
+
+  int classify(Shape s) {
+    return switch (s) {
+      case Box(_, _) -> 0;
+      case Box(Integer i, _) -> i;
+    };
+  }
+
+  void swallow(Runnable r) {
+    try {
+      r.run();
+    } catch (Exception _) {
+      // ignored
+    }
+  }
+}

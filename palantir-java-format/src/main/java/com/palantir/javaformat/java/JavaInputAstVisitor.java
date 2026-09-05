@@ -132,6 +132,7 @@ import com.sun.source.util.TreePathScanner;
 import com.sun.tools.javac.code.Flags;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.TreeScanner;
+import java.lang.reflect.Method;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -376,8 +377,15 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 builder.blankLineWanted(BlankLineWanted.YES);
             }
             markForPartialFormat();
-            scan(type, null);
-            builder.forcedBreak();
+            if (isCompactSourceFile(type)) {
+                // JEP 512 (Java 25): a "compact source file" has top-level fields/methods and no
+                // explicit class declaration. javac models this by synthesizing an implicit wrapper
+                // class; format its member list directly, at column zero, with no enclosing braces.
+                addBodyDeclarations(((ClassTree) type).getMembers(), BracesOrNot.NO, FirstDeclarationsOrNot.YES, ZERO);
+            } else {
+                scan(type, null);
+                builder.forcedBreak();
+            }
             first = false;
             dropEmptyDeclarations();
         }
@@ -1380,6 +1388,17 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     protected static final long COMPACT_RECORD_CONSTRUCTOR = 1L << 51;
 
     protected static final long RECORD = 1L << 61;
+
+    // TODO: Use Flags.IMPLICIT_CLASS once if/when we drop support for Java 11. javac sets this flag
+    // on the synthetic wrapper class it generates for a "compact source file" (JEP 512, Java 25):
+    // top-level fields/methods with no explicit enclosing class declaration.
+    protected static final long IMPLICIT_CLASS = 1L << 19;
+
+    /** Is {@code type} the implicit wrapper class javac synthesizes for a compact source file? */
+    private static boolean isCompactSourceFile(Tree type) {
+        return type instanceof JCTree.JCClassDecl
+                && (((JCTree.JCClassDecl) type).mods.flags & IMPLICIT_CLASS) == IMPLICIT_CLASS;
+    }
 
     @SuppressWarnings("for-rollout:NullAway")
     @Override
@@ -2609,7 +2628,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     }
 
     /** Helper method for import declarations, names, and qualified names. */
-    private void visitName(Tree node) {
+    protected void visitName(Tree node) {
         Deque<Name> stack = new ArrayDeque<>();
         for (; node instanceof MemberSelectTree; node = ((MemberSelectTree) node).getExpression()) {
             stack.addFirst(((MemberSelectTree) node).getIdentifier());
@@ -3741,9 +3760,22 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     }
 
     /** Add a list of declarations. */
-    @SuppressWarnings("for-rollout:NullAway")
     protected void addBodyDeclarations(
             List<? extends Tree> bodyDeclarations, BracesOrNot braces, FirstDeclarationsOrNot first0) {
+        addBodyDeclarations(bodyDeclarations, braces, first0, plusTwo);
+    }
+
+    /**
+     * Add a list of declarations, indenting the member list by {@code memberIndent}. Used both for ordinary
+     * class/interface/enum bodies (indented by {@link #plusTwo}) and for the bare top-level member list of a
+     * compact source file (JEP 512), which is indented by {@link Indent.Const#ZERO}.
+     */
+    @SuppressWarnings("for-rollout:NullAway")
+    protected void addBodyDeclarations(
+            List<? extends Tree> bodyDeclarations,
+            BracesOrNot braces,
+            FirstDeclarationsOrNot first0,
+            Indent memberIndent) {
         if (bodyDeclarations.isEmpty()) {
             if (braces.isYes()) {
                 builder.space();
@@ -3759,7 +3791,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 tokenBreakTrailingComment("{", plusTwo);
                 builder.open(ZERO, BreakBehaviours.breakThisLevel(), LastLevelBreakability.ACCEPT_INLINE_CHAIN);
             }
-            builder.open(plusTwo);
+            builder.open(memberIndent);
             boolean first = first0.isYes();
             boolean lastOneGotBlankLineBefore = false;
             PeekingIterator<Tree> it = Iterators.peekingIterator(bodyDeclarations.iterator());
@@ -3956,6 +3988,28 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
      */
     protected void sync(Tree node) {
         builder.sync(((JCTree) node).getStartPosition());
+    }
+
+    /**
+     * Looks up a no-arg method that may not exist on older language levels (e.g. {@code
+     * ImportTree#isModule()}, added in JDK 23). Used together with {@link #invoke} so that newer AST accessors can
+     * be reached reflectively without raising the source/target level of this module.
+     */
+    @SuppressWarnings("for-rollout:NullAway")
+    protected static Method maybeGetMethod(Class<?> c, String name) {
+        try {
+            return c.getMethod(name);
+        } catch (ReflectiveOperationException e) {
+            return null;
+        }
+    }
+
+    protected static Object invoke(Method m, Object target) {
+        try {
+            return m.invoke(target);
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     @Override

@@ -81,10 +81,43 @@ javaVersions {
 jdks {
     daemonTarget = 21
 
+    jdk(22) {
+        distribution = 'azul-zulu'
+        jdkVersion = '22.32.15-22.0.2'
+    }
+
     jdk(23) {
         distribution = 'graalvm-ce'
         jdkVersion = '23.0.1'
     }
 
+    jdk(25) {
+        distribution = 'azul-zulu'
+        jdkVersion = '25.32.21-25.0.2'
+
+        // The bundled com.palantir.jdks.latest defaults (applied earlier in this file)
+        // pre-populate major version 25 with amazon-corretto, pinned per-OS/arch. JdkExtension
+        // configuration actions accumulate rather than replace, so those per-arch jdkVersion
+        // values are hard-set before this block runs and don't pick up the top-level override
+        // above. Re-pin every OS/arch explicitly to the desired Zulu build.
+        ['macos', 'linux-glibc', 'linux-musl', 'windows'].each { osName ->
+            os(osName) {
+                ['x86', 'x86-64', 'aarch64'].each { archName ->
+                    arch(archName) {
+                        jdkVersion = '25.32.21-25.0.2'
+                    }
+                }
+            }
+        }
+    }
+
+    jdk(26) {
+        distribution = 'azul-zulu'
+        jdkVersion = '26.30.11-26.0.1'
+    }
+
+    jdkMajorVersionsToUse().add(JavaLanguageVersion.of("22"))
     jdkMajorVersionsToUse().add(JavaLanguageVersion.of("23"))
+    jdkMajorVersionsToUse().add(JavaLanguageVersion.of("25"))
+    jdkMajorVersionsToUse().add(JavaLanguageVersion.of("26"))
 }
