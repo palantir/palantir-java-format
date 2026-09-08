@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import org.jetbrains.intellij.platform.gradle.TestFrameworkType
-
 apply plugin: 'java'
 apply plugin: 'com.palantir.external-publish-intellij'
 
@@ -31,13 +29,15 @@ intellijPlatform {
     pluginConfiguration {
         description = 'Formats source code using the palantir-java-format tool.'
         ideaVersion {
-            sinceBuild = '241' // TODO: keep the intellij version & sinceBuild in sync
+            // sinceBuild derives from the intellijIdeaCommunity() version
             untilBuild = provider { null }
         }
     }
     pluginVerification {
         ides {
             create('IC', '2024.1')
+            create('IU', '2025.3.6.1')
+            create('IU', '2026.2.2')
         }
     }
 }
@@ -71,8 +71,6 @@ dependencies {
             useInstaller = false
         }
         bundledPlugins('com.intellij.java')
-        testFramework(TestFrameworkType.Platform.INSTANCE)
-        testFramework(TestFrameworkType.Plugin.Java.INSTANCE)
     }
 
     implementation project(':palantir-java-format-jdk-bootstrap')
