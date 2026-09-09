@@ -171,7 +171,7 @@ public final class ImportOrderer {
         this.text = text;
         this.toks = toks;
         this.lineSeparator = Newlines.guessLineSeparator(text);
-        if (style.equals(Style.GOOGLE) || style.equals(Style.PALANTIR)) {
+        if (style.equals(Style.GOOGLE) || style.equals(Style.PALANTIR) || style.equals(Style.WALMART)) {
             this.importComparator = GOOGLE_IMPORT_COMPARATOR;
             this.shouldInsertBlankLineFn = ImportOrderer::shouldInsertBlankLineGoogle;
         } else if (style.equals(Style.AOSP)) {
