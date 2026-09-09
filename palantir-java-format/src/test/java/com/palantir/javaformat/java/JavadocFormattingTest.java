@@ -1388,6 +1388,104 @@ public final class JavadocFormattingTest {
     }
 
     @Test
+    public void snippetBlockPreservesNewlines() {
+        String[] input = {
+            "/**",
+            " * Example:",
+            " *",
+            " * {@snippet :",
+            " * class FooFactory {",
+            " *     Foo getFoo() { return null; }",
+            " * }",
+            " * }",
+            " */",
+            "class Test {}",
+        };
+        String[] expected = {
+            "/**",
+            " * Example:",
+            " *",
+            " * {@snippet :",
+            " * class FooFactory {",
+            " *     Foo getFoo() { return null; }",
+            " * }",
+            " * }",
+            " */",
+            "class Test {}",
+        };
+        doFormatTest(input, expected);
+    }
+
+    @Test
+    public void snippetBlockWithLangAttributePreservesNewlines() {
+        String[] input = {
+            "/**", " * {@snippet lang=\"properties\" :", " * foo=\\", " * bar", " * }", " */", "class Test {}",
+        };
+        String[] expected = {
+            "/**", " * {@snippet lang=\"properties\" :", " * foo=\\", " * bar", " * }", " */", "class Test {}",
+        };
+        doFormatTest(input, expected);
+    }
+
+    @Test
+    public void snippetBlockFollowedByBodyText() {
+        String[] input = {
+            "/**",
+            " * Description.",
+            " *",
+            " * {@snippet :",
+            " * code here",
+            " * }",
+            " *",
+            " * More text.",
+            " */",
+            "class Test {}",
+        };
+        String[] expected = {
+            "/**",
+            " * Description.",
+            " *",
+            " * {@snippet :",
+            " * code here",
+            " * }",
+            " *",
+            " * More text.",
+            " */",
+            "class Test {}",
+        };
+        doFormatTest(input, expected);
+    }
+
+    @Test
+    public void snippetBlockFollowedByFooterTag() {
+        String[] input = {
+            "/**",
+            " * Description.",
+            " *",
+            " * {@snippet :",
+            " * code here",
+            " * }",
+            " *",
+            " * @param foo the foo",
+            " */",
+            "class Test {}",
+        };
+        String[] expected = {
+            "/**",
+            " * Description.",
+            " *",
+            " * {@snippet :",
+            " * code here",
+            " * }",
+            " *",
+            " * @param foo the foo",
+            " */",
+            "class Test {}",
+        };
+        doFormatTest(input, expected);
+    }
+
+    @Test
     public void windowsLineSeparator() throws FormatterException {
         String[] input = {
             "/**", " * hello", " *", " * <p>world", " */", "class Test {}",
