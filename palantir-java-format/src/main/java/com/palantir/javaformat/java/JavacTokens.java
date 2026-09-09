@@ -27,7 +27,9 @@ import com.sun.tools.javac.parser.Tokens.Token;
 import com.sun.tools.javac.parser.Tokens.TokenKind;
 import com.sun.tools.javac.parser.UnicodeReader;
 import com.sun.tools.javac.util.Context;
+import com.sun.tools.javac.util.JCDiagnostic.DiagnosticPosition;
 import java.util.Set;
+import javax.annotation.Nullable;
 
 /** A wrapper around javac's lexer. */
 class JavacTokens {
@@ -176,6 +178,12 @@ class JavacTokens {
             checkArgument(
                     0 <= index && index < (endPos - pos), "Expected %s in the range [0, %s)", index, endPos - pos);
             return pos + index;
+        }
+
+        @Override
+        @Nullable
+        public DiagnosticPosition getPos() {
+            return null;
         }
 
         @Override

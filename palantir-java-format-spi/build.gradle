@@ -18,5 +18,5 @@ tasks.withType(JavaCompile).named('compileJava') {
 }
 
 javaVersion {
-    target = 21
+    target = 23
 }
