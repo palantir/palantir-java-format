@@ -32,6 +32,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.immutables.value.Value;
 
@@ -44,11 +45,21 @@ public final class BootstrappingFormatterService implements FormatterService {
     private final Path jdkPath;
     private final Integer jdkMajorVersion;
     private final List<Path> implementationClassPath;
+    private final Optional<String> wslDistributionId;
 
     public BootstrappingFormatterService(Path jdkPath, Integer jdkMajorVersion, List<Path> implementationClassPath) {
         this.jdkPath = jdkPath;
         this.jdkMajorVersion = jdkMajorVersion;
         this.implementationClassPath = implementationClassPath;
+        this.wslDistributionId = Optional.empty();
+    }
+
+    public BootstrappingFormatterService(
+            String wslDistributionId, Path jdkPath, Integer jdkMajorVersion, List<Path> implementationClassPath) {
+        this.jdkPath = jdkPath;
+        this.jdkMajorVersion = jdkMajorVersion;
+        this.implementationClassPath = implementationClassPath;
+        this.wslDistributionId = Optional.of(wslDistributionId);
     }
 
     @Override
@@ -84,13 +95,16 @@ public final class BootstrappingFormatterService implements FormatterService {
                 .jdkPath(jdkPath)
                 .withJvmArgsForVersion(jdkMajorVersion)
                 .implementationClasspath(implementationClassPath)
+                .wslDistributionId(wslDistributionId)
                 .outputReplacements(true)
                 .characterRanges(ranges.stream().map(RangeUtils::toStringRange).collect(Collectors.toList()))
                 .build();
 
         @SuppressWarnings("for-rollout:NullAway")
-        Optional<String> output =
-                FormatterCommandRunner.runWithStdin(command.toArgs(), input, Optional.of(jdkPath.getParent()));
+        Optional<String> output = FormatterCommandRunner.runWithStdin(
+                command.toArgs(),
+                input,
+                wslDistributionId.isPresent() ? Optional.empty() : Optional.of(jdkPath.getParent()));
         if (output.isEmpty() || output.get().isEmpty()) {
             return ImmutableList.of();
         }
@@ -102,9 +116,13 @@ public final class BootstrappingFormatterService implements FormatterService {
                 .jdkPath(jdkPath)
                 .withJvmArgsForVersion(jdkMajorVersion)
                 .implementationClasspath(implementationClassPath)
+                .wslDistributionId(wslDistributionId)
                 .outputReplacements(false)
                 .build();
-        return FormatterCommandRunner.runWithStdin(command.toArgs(), input, Optional.ofNullable(jdkPath.getParent()))
+        return FormatterCommandRunner.runWithStdin(
+                        command.toArgs(),
+                        input,
+                        wslDistributionId.isPresent() ? Optional.empty() : Optional.ofNullable(jdkPath.getParent()))
                 .orElse(input);
     }
 
@@ -114,6 +132,8 @@ public final class BootstrappingFormatterService implements FormatterService {
 
         boolean outputReplacements();
 
+        Optional<String> wslDistributionId();
+
         Path jdkPath();
 
         List<Path> implementationClasspath();
@@ -121,14 +141,29 @@ public final class BootstrappingFormatterService implements FormatterService {
         List<String> jvmArgs();
 
         default List<String> toArgs() {
-            ImmutableList.Builder<String> args = ImmutableList.<String>builder()
-                    .add(jdkPath().toAbsolutePath().toString())
+            ImmutableList.Builder<String> args = ImmutableList.<String>builder();
+
+            String pathSeparator;
+            Function<Path, String> pathToString;
+            if (wslDistributionId().isPresent()) {
+                pathSeparator = ":";
+                pathToString = path -> path.toString().replace('\\', '/');
+
+                args.add("wsl", "-d", wslDistributionId().get());
+                args.add("--cd", pathToString.apply(jdkPath().getParent()));
+            } else {
+                pathSeparator = System.getProperty("path.separator");
+                pathToString = path -> path.toAbsolutePath().toString();
+            }
+
+            args.add()
+                    .add(pathToString.apply(jdkPath()))
                     .addAll(jvmArgs())
                     .add(
                             "-cp",
                             implementationClasspath().stream()
-                                    .map(path -> path.toAbsolutePath().toString())
-                                    .collect(Collectors.joining(System.getProperty("path.separator"))))
+                                    .map(pathToString)
+                                    .collect(Collectors.joining(pathSeparator)))
                     .add(FORMATTER_MAIN_CLASS);
 
             if (!characterRanges().isEmpty()) {
