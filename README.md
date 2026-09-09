@@ -14,6 +14,7 @@ _A modern, lambda-friendly, 120 character Java formatter._
 - [IntelliJ plugin](https://plugins.jetbrains.com/plugin/13180-palantir-java-format)
 - [Gradle plugin](#palantir-java-format-gradle-plugin)
 - [Spotless](#spotless)
+- [GitHub Action](#github-action)
 
 It is based on the excellent [google-java-format](https://github.com/google/google-java-format), and benefits from the work of all the [original authors](https://github.com/google/google-java-format/graphs/contributors). palantir-java-format is available under the same [Apache 2.0 License](./LICENSE).
 
@@ -149,6 +150,26 @@ when formatting java code.
 
 - See [integration in Spotless Gradle plugin](https://github.com/diffplug/spotless/tree/main/plugin-gradle#palantir-java-format).
 - See [integration in Spotless Maven plugin](https://github.com/diffplug/spotless/tree/main/plugin-maven#palantir-java-format).
+
+## GitHub Action
+
+> This is a community-maintained third-party tool and is not officially supported by Palantir Technologies.
+
+[palantir-java-format-action](https://github.com/marketplace/actions/palantir-java-format-check) checks Java
+code formatting in CI using the `palantir-java-format` native binary, without requiring Java, Maven,
+or Gradle on the runner.
+
+```yaml
+- uses: actions/checkout@v4
+
+- uses: abashev/palantir-java-format-action@v1
+  with:
+    version: '2.89.0'
+```
+
+By default it only checks files changed in a pull request or push, and caches the native binary
+between runs. See the [action's README](https://github.com/abashev/palantir-java-format-action#readme)
+for configuration options and a git pre-commit hook.
 
 ## IntelliJ plugin
 
