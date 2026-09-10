@@ -28,7 +28,6 @@ final class RemoveUnusedImportsCaseLabelsTest {
     @Test
     void preserveTypesInCaseLabels() throws FormatterException {
         Assumptions.assumeTrue(Formatter.getRuntimeVersion() >= 17, "Not running on jdk 17 or later");
-        @SuppressWarnings("for-rollout:StringConcatToTextBlock")
         String input = Joiner.on('\n')
                 .join(
                         "package example;",

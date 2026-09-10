@@ -129,7 +129,6 @@ final class FormatDiff {
         return Paths.get(gitCommand(dir, "git", "rev-parse", "--show-toplevel"));
     }
 
-    @SuppressWarnings("for-rollout:DefaultCharset")
     private static String gitCommand(Path dir, String... args) throws IOException, InterruptedException {
         Process process =
                 new ProcessBuilder().command(args).directory(dir.toFile()).start();
