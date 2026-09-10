@@ -21,9 +21,7 @@ apply plugin: 'com.palantir.external-publish-intellij'
 
 def name = "palantir-java-format"
 repositories {
-    intellijPlatform {
-        defaultRepositories()
-    }
+    mavenCentral() { metadataSources { mavenPom(); ignoreGradleMetadataRedirection() } }
 }
 
 intellijPlatform {
