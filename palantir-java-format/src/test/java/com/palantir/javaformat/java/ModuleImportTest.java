@@ -18,6 +18,10 @@ package com.palantir.javaformat.java;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.ByteArrayInputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -48,6 +52,24 @@ public class ModuleImportTest {
         String input = "import module java.base;\n" + "class Example {}\n";
         String expected = "import module java.base;\n" + "\n" + "class Example {}\n";
         assertFormats(input, expected);
+    }
+
+    @Test
+    public void fixesImportsOnlyFromTheCommandLine() throws Exception {
+        // The flag combination from the #1506 report, which failed with `Expected ; after import`.
+        String input = "import module java.base;\n" + "class Example {}\n";
+        // Reordering puts a blank line after the import block; nothing else changes.
+        String expected = "import module java.base;\n" + "\n" + "class Example {}\n";
+        StringWriter out = new StringWriter();
+        StringWriter err = new StringWriter();
+        Main main = new Main(
+                new PrintWriter(out, true),
+                new PrintWriter(err, true),
+                new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)));
+        int exitCode = main.format("-", "--fix-imports-only", "--skip-removing-unused-imports");
+        assertThat(err.toString()).isEmpty();
+        assertThat(exitCode).isZero();
+        assertThat(out.toString()).isEqualTo(expected);
     }
 
     @Test

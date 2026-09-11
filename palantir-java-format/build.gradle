@@ -78,6 +78,14 @@ javaVersion {
             languageVersion = JavaLanguageVersion.of(jdkVersion)
         }
 
+        doFirst {
+            // Belt and braces for FormatterVersionTest, which cannot catch a typo in the property name.
+            int resolved = javaLauncher.get().metadata.languageVersion.asInt()
+            if (resolved != jdkVersion) {
+                throw new GradleException("testJdk${jdkVersion} resolved to JDK ${resolved}")
+            }
+        }
+
         testClassesDirs = sourceSets.test.output.classesDirs
         classpath = sourceSets.test.runtimeClasspath
         useJUnitPlatform()
@@ -95,6 +103,10 @@ javaVersion {
             includeTestsMatching 'com.palantir.javaformat.java.RemoveUnusedImportsTest'
             // Covers module imports through formatSourceAndFixImports, the entry point Spotless uses.
             includeTestsMatching 'com.palantir.javaformat.java.ModuleImportTest'
+            // Carry the module-import ordering rows. ImportOrderer only lexes, so JDK 21 covers them
+            // too, but this is where a new module-import ordering test would land.
+            includeTestsMatching 'com.palantir.javaformat.java.GoogleImportStyleTest'
+            includeTestsMatching 'com.palantir.javaformat.java.AospImportStyleTest'
         }
     }
 }

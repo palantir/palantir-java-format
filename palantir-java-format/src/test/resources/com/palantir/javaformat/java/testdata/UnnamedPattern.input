@@ -9,6 +9,10 @@ class UnnamedPattern {
     };
   }
 
+  boolean isBox(Object o) {
+    return o instanceof Box(Integer _, _);
+  }
+
   void swallow(Runnable r) {
     try {
       r.run();

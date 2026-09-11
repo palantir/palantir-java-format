@@ -1398,7 +1398,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
 
     // TODO: use Flags.IMPLICIT_CLASS once this module compiles with JDK 22 or later (JDK 21 calls
     // bit 19 UNNAMED_CLASS). javac sets it on the class it synthesizes for a compact source file.
-    protected static final long IMPLICIT_CLASS = 1L << 19;
+    private static final long IMPLICIT_CLASS = 1L << 19;
 
     /** Is {@code type} the implicit wrapper class javac synthesizes for a compact source file? */
     private static boolean isCompactSourceFile(Tree type) {
@@ -3777,7 +3777,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
      * compact source file (JEP 512), which is indented by {@link Indent.Const#ZERO}.
      */
     @SuppressWarnings("for-rollout:NullAway")
-    protected void addBodyDeclarations(
+    private void addBodyDeclarations(
             List<? extends Tree> bodyDeclarations,
             BracesOrNot braces,
             FirstDeclarationsOrNot first0,

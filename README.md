@@ -191,8 +191,8 @@ added compact source files with instance main methods (JEP 512), unnamed pattern
 and module import declarations (JEP 511).
 
 The formatter parses with preview features enabled, so which syntax it can format depends on the JVM that *runs* it:
-the Gradle daemon for the Gradle plugin and Spotless, the Project SDK for IntelliJ, and GraalVM 23 for the native
-image. Compact source files and unnamed patterns format on Java 21 and later; module imports need Java 23 or later.
+the Gradle daemon for the Gradle plugin and Spotless, the Project SDK for IntelliJ, the Eclipse JVM for the Eclipse
+plugin, and GraalVM 23 for the native image. Compact source files and unnamed patterns format on Java 21 and later; module imports need Java 23 or later.
 So, ensure that either:
 
 - the Gradle daemon and the Intellij Project SDK are set to a JDK that parses the syntax you use, or

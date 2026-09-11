@@ -10,6 +10,11 @@ improvement:
     * compact source files and instance main methods (JEP 512) - `expected token: 'void'`
     * unnamed patterns in record deconstruction (JEP 456) - `expected token: '_'; generated , instead`
 
+    Whitespace, a line break, or a block comment between the tokens of an import declaration no longer fails with
+    `Unexpected token after import` or `Imports not contiguous (perhaps a comment separates them?)`; the comment is
+    kept, after the semicolon. This applies to ordinary and static imports as well as module imports. A javadoc
+    comment inside or trailing an import is still rejected.
+
     Module imports sort between static and non-static imports, matching google-java-format. Formatting them
     requires the JVM that runs the formatter to be JDK 23 or later - the Gradle daemon for the Gradle plugin and
     Spotless, the Project SDK for IntelliJ - because that is the parser the formatter uses.
