@@ -225,12 +225,8 @@ public class RemoveUnusedImports {
             Set<String> usedNames,
             Multimap<String, Range<Integer>> usedInJavadoc) {
         RangeMap<Integer, String> replacements = TreeRangeMap.create();
-        // Since JDK 23, JCCompilationUnit#getImports() elements are no longer all JCImport: a module
-        // import (JEP 511, `import module foo.bar;`) parses to the sibling node JCModuleImport, which is
-        // not a JCImport subtype, so an element typed JCImport here would throw ClassCastException.
-        // JCTree is the common supertype of both and still exposes the position accessors we need below;
-        // ImportTree (the public, stable API both node kinds implement) gives us getQualifiedIdentifier()
-        // and isModule().
+        // From JDK 23 on, getImports() also returns JCModuleImport, which is not a JCImport, so iterate
+        // over their common supertype and use ImportTree, which both implement.
         for (JCTree importDecl : unit.getImports()) {
             ImportTree importTree = (ImportTree) importDecl;
             String simpleName = getSimpleName(importTree);
