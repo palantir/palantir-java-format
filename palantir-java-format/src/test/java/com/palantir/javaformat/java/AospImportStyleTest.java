@@ -362,6 +362,10 @@ public class AospImportStyleTest {
             String output = ImportOrderer.reorderImports(input, JavaFormatterOptions.Style.AOSP);
             assertWithMessage("Expected exception").that(reordered).doesNotMatch("^!!");
             assertWithMessage(input).that(output).isEqualTo(reordered);
+            // Reordering must be a fixed point: a formatted file has to survive being formatted again.
+            assertWithMessage("not idempotent: %s", output)
+                    .that(ImportOrderer.reorderImports(output, JavaFormatterOptions.Style.AOSP))
+                    .isEqualTo(output);
         } catch (FormatterException e) {
             if (!reordered.startsWith("!!")) {
                 throw e;

@@ -405,13 +405,35 @@ public class GoogleImportStyleTest {
                     "!!Imports not contiguous (perhaps a comment separates them?)",
                 }
             },
+            // A block comment on the same line as the `;` trails its import and travels with it.
             {
                 {
-                    "import com.foo.Second; /* no block comments after imports */", //
+                    "import com.foo.Second; /* stays with Second */", //
+                    "import com.foo.First;",
+                },
+                {
+                    "import com.foo.First;", //
+                    "import com.foo.Second; /* stays with Second */",
+                }
+            },
+            // Javadoc is the exception: the formatter moves it onto a line of its own, which would
+            // separate the imports, so an import carrying one is still rejected.
+            {
+                {
+                    "import com.foo.Second; /** javadoc after an import */", //
                     "import com.foo.First;",
                 },
                 {
                     "!!Imports not contiguous (perhaps a comment separates them?)",
+                }
+            },
+            {
+                {
+                    "import /** javadoc inside an import */ com.foo.Second;", //
+                    "import com.foo.First;",
+                },
+                {
+                    "!!Unexpected token after import: /** javadoc inside an import */",
                 }
             },
             {
@@ -658,6 +680,10 @@ public class GoogleImportStyleTest {
             String output = ImportOrderer.reorderImports(input, JavaFormatterOptions.Style.GOOGLE);
             assertWithMessage("Expected exception").that(reordered).doesNotMatch("^!!");
             assertWithMessage(input).that(output).isEqualTo(reordered);
+            // Reordering must be a fixed point: a formatted file has to survive being formatted again.
+            assertWithMessage("not idempotent: %s", output)
+                    .that(ImportOrderer.reorderImports(output, JavaFormatterOptions.Style.GOOGLE))
+                    .isEqualTo(output);
         } catch (FormatterException e) {
             if (!reordered.startsWith("!!")) {
                 throw e;

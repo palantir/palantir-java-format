@@ -35,27 +35,32 @@ public class ModuleImportTest {
                 Formatter.getRuntimeVersion() >= 23, "import module requires running on JDK 23 or later");
     }
 
+    /** Asserts both entry points that reorder imports, and that their output survives a second pass. */
+    private static void assertFormats(String input, String expected) throws FormatterException {
+        assertThat(Formatter.create().formatSourceAndFixImports(input)).isEqualTo(expected);
+        assertThat(Formatter.create().fixImports(input)).isEqualTo(expected);
+        assertThat(Formatter.create().formatSourceAndFixImports(expected)).isEqualTo(expected);
+        assertThat(Formatter.create().fixImports(expected)).isEqualTo(expected);
+    }
+
     @Test
     public void formatsAndFixesImports() throws FormatterException {
         String input = "import module java.base;\n" + "class Example {}\n";
         String expected = "import module java.base;\n" + "\n" + "class Example {}\n";
-        assertThat(Formatter.create().formatSourceAndFixImports(input)).isEqualTo(expected);
-        assertThat(Formatter.create().fixImports(input)).isEqualTo(expected);
+        assertFormats(input, expected);
     }
 
     @Test
     public void keepsACommentBetweenModuleAndTheModuleName() throws FormatterException {
         String input = "import module /* comment */ java.base;\n" + "class Example {}\n";
         String expected = "import module java.base; /* comment */\n" + "\n" + "class Example {}\n";
-        assertThat(Formatter.create().formatSourceAndFixImports(input)).isEqualTo(expected);
-        assertThat(Formatter.create().fixImports(input)).isEqualTo(expected);
+        assertFormats(input, expected);
     }
 
     @Test
     public void acceptsALineBreakAfterModule() throws FormatterException {
         String input = "import module\n" + "    java.base;\n" + "class Example {}\n";
         String expected = "import module java.base;\n" + "\n" + "class Example {}\n";
-        assertThat(Formatter.create().formatSourceAndFixImports(input)).isEqualTo(expected);
-        assertThat(Formatter.create().fixImports(input)).isEqualTo(expected);
+        assertFormats(input, expected);
     }
 }

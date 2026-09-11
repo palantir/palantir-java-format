@@ -271,18 +271,29 @@ public final class ImportOrderer {
             sb.append(imported()).append(';');
             StringBuilder tail = new StringBuilder();
             for (String comment : comments) {
-                tail.append(' ').append(comment);
+                if (!endsInNewline(tail)) {
+                    tail.append(' ');
+                }
+                tail.append(comment);
                 if (comment.startsWith("//")) {
-                    // A // comment swallows the rest of the line, so it has to end one.
+                    // A // comment swallows the rest of its line, so nothing may follow it there.
                     tail.append(lineSeparator);
                 }
             }
-            tail.append(trailing());
+            String trailingText = trailing();
+            if (endsInNewline(tail)) {
+                // Don't double the line terminator the trailing text already starts with.
+                int newline = Newlines.hasNewlineAt(trailingText, 0);
+                if (newline > 0) {
+                    trailingText = trailingText.substring(newline);
+                }
+            }
+            tail.append(trailingText);
             if (tail.toString().trim().isEmpty()) {
                 sb.append(lineSeparator);
             } else {
                 sb.append(tail);
-                if (!Newlines.isNewline(tail.substring(tail.length() - 1))) {
+                if (!endsInNewline(tail)) {
                     sb.append(lineSeparator);
                 }
             }
@@ -360,7 +371,11 @@ public final class ImportOrderer {
                 i++;
             }
             StringBuilder trailing = new StringBuilder();
-            if (isSpaceToken(i)) {
+            // A block comment on the same line as the `;` trails this import; one on a later line
+            // belongs to whatever follows it, so only same-line toks are absorbed here. Javadoc is
+            // excluded: the formatter moves a javadoc comment onto a line of its own, which would
+            // separate the imports.
+            while (isSpaceToken(i) || isBlockCommentToken(i)) {
                 trailing.append(tokenAt(i));
                 i++;
             }
@@ -504,13 +519,15 @@ public final class ImportOrderer {
 
     /**
      * Skips whitespace, line terminators and comments starting at {@code i}, appending the text of each comment to
-     * {@code comments}, and returns the index of the first token that is none of those.
+     * {@code comments}, and returns the index of the first token that is none of those. Javadoc comments are not
+     * skipped: the formatter moves them onto a line of their own, so an import carrying one is rejected, as it was
+     * before module imports were supported.
      */
     private int skipIgnored(int i, List<String> comments) {
         while (i < toks.size()) {
             if (isSpaceToken(i) || isNewlineToken(i)) {
                 i++;
-            } else if (toks.get(i).isComment()) {
+            } else if (isSlashSlashCommentToken(i) || isBlockCommentToken(i)) {
                 comments.add(tokenAt(i).trim());
                 i++;
             } else {
@@ -536,6 +553,18 @@ public final class ImportOrderer {
 
     private boolean isSlashSlashCommentToken(int i) {
         return toks.get(i).isSlashSlashComment();
+    }
+
+    /** True if the tok is a {@code /* *}{@code /} comment that is not javadoc. */
+    private boolean isBlockCommentToken(int i) {
+        return toks.get(i).isSlashStarComment() && !toks.get(i).isJavadocComment();
+    }
+
+    /** True if {@code text} ends in a line terminator. */
+    private static boolean endsInNewline(CharSequence text) {
+        return text.length() > 0
+                && Newlines.isNewline(
+                        text.subSequence(text.length() - 1, text.length()).toString());
     }
 
     private boolean isNewlineToken(int i) {
