@@ -75,7 +75,42 @@ public class ModuleImportTest {
     @Test
     public void keepsACommentBetweenModuleAndTheModuleName() throws FormatterException {
         String input = "import module /* comment */ java.base;\n" + "class Example {}\n";
-        String expected = "import module java.base; /* comment */\n" + "\n" + "class Example {}\n";
+        String expected = "import module /* comment */ java.base;\n" + "\n" + "class Example {}\n";
+        assertFormats(input, expected);
+    }
+
+    @Test
+    public void keepsACommentBetweenThePartsOfTheModuleName() throws FormatterException {
+        String input = "import module java./* comment */base;\n" + "class Example {}\n";
+        // Reordering normalizes the whitespace around the comment and leaves it between the parts.
+        String reordered = "import module java./* comment */ base;\n" + "\n" + "class Example {}\n";
+        assertThat(Formatter.create().fixImports(input)).isEqualTo(reordered);
+        assertThat(Formatter.create().fixImports(reordered)).isEqualTo(reordered);
+
+        // Formatting then breaks the line after the dot, which is where the formatter puts a comment
+        // in a qualified name; that output is stable too.
+        String formatted = "import module java.\n" + "/* comment */ base;\n" + "\n" + "class Example {}\n";
+        assertThat(Formatter.create().formatSourceAndFixImports(input)).isEqualTo(formatted);
+        assertThat(Formatter.create().formatSourceAndFixImports(formatted)).isEqualTo(formatted);
+    }
+
+    @Test
+    public void normalizesWhitespaceInsideTheModuleName() throws FormatterException {
+        String input = "import module java . base;\n" + "class Example {}\n";
+        String expected = "import module java.base;\n" + "\n" + "class Example {}\n";
+        assertFormats(input, expected);
+    }
+
+    @Test
+    public void keepsBothCopiesOfADuplicateThatCarriesAComment() throws FormatterException {
+        // Identical declarations collapse; ones that differ are both kept, so no comment is dropped.
+        String input = "import module /* explanation A */ java.base;\n"
+                + "import module /* explanation B */ java.base;\n"
+                + "class Example {}\n";
+        String expected = "import module /* explanation A */ java.base;\n"
+                + "import module /* explanation B */ java.base;\n"
+                + "\n"
+                + "class Example {}\n";
         assertFormats(input, expected);
     }
 

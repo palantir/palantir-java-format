@@ -130,7 +130,10 @@ public final class ImportOrderer {
     private static final Comparator<Import> GOOGLE_IMPORT_COMPARATOR = Comparator.comparing(
                     Import::isStatic, trueFirst())
             .thenComparing(Import::isModule, trueFirst())
-            .thenComparing(Import::imported);
+            .thenComparing(Import::imported)
+            // Imports that compare equal collapse into one, so two that are written differently -- one of them
+            // carrying a comment, say -- must not compare equal, or that comment disappears with it.
+            .thenComparing(Import::declaration);
 
     /**
      * A {@link Comparator} that orders {@link Import}s by AOSP Style, defined at
@@ -144,7 +147,8 @@ public final class ImportOrderer {
             .thenComparing(Import::isAndroid, trueFirst())
             .thenComparing(Import::isThirdParty, trueFirst())
             .thenComparing(Import::isJava, trueFirst())
-            .thenComparing(Import::imported);
+            .thenComparing(Import::imported)
+            .thenComparing(Import::declaration);
 
     /**
      * Determines whether to insert a blank line between the {@code prev} and {@code curr} {@link Import}s based on
@@ -196,14 +200,22 @@ public final class ImportOrderer {
         private final boolean isStatic;
         private final boolean isModule;
         private final String trailing;
-        private final ImmutableList<String> comments;
+        private final String declaration;
 
-        Import(String imported, String trailing, boolean isStatic, boolean isModule, ImmutableList<String> comments) {
+        Import(String imported, String trailing, boolean isStatic, boolean isModule, String declaration) {
             this.imported = imported;
             this.trailing = trailing;
             this.isStatic = isStatic;
             this.isModule = isModule;
-            this.comments = comments;
+            this.declaration = declaration;
+        }
+
+        /**
+         * The declaration as it will be written: the {@code import} keyword through the semicolon, with whitespace
+         * normalized and any comments left in the slot the author wrote them in.
+         */
+        String declaration() {
+            return declaration;
         }
 
         /** The name being imported, for example {@code java.util.List}. */
@@ -262,42 +274,49 @@ public final class ImportOrderer {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();
-            sb.append("import ");
-            if (isModule()) {
-                sb.append("module ");
-            } else if (isStatic()) {
-                sb.append("static ");
-            }
-            sb.append(imported()).append(';');
-            StringBuilder tail = new StringBuilder();
-            for (String comment : comments) {
-                if (!endsInNewline(tail)) {
-                    tail.append(' ');
-                }
-                tail.append(comment);
-                if (comment.startsWith("//")) {
-                    // A // comment swallows the rest of its line, so nothing may follow it there.
-                    tail.append(lineSeparator);
-                }
-            }
-            String trailingText = trailing();
-            if (endsInNewline(tail)) {
-                // Don't double the line terminator the trailing text already starts with.
-                int newline = Newlines.hasNewlineAt(trailingText, 0);
-                if (newline > 0) {
-                    trailingText = trailingText.substring(newline);
-                }
-            }
-            tail.append(trailingText);
-            if (tail.toString().trim().isEmpty()) {
+            sb.append(declaration());
+            if (trailing().trim().isEmpty()) {
                 sb.append(lineSeparator);
             } else {
-                sb.append(tail);
-                if (!endsInNewline(tail)) {
-                    sb.append(lineSeparator);
-                }
+                sb.append(trailing());
             }
             return sb.toString();
+        }
+    }
+
+    /**
+     * Renders one import declaration from the toks it is made of. Whitespace between the toks is normalized, since the
+     * style guide puts one import on a line of its own, but a comment stays in the slot the author wrote it in rather
+     * than being moved to wherever the rendered declaration can accommodate it.
+     */
+    private final class Declaration {
+        private final StringBuilder text = new StringBuilder();
+        private boolean atLineStart = false;
+
+        /** Appends one tok: a keyword, an identifier, {@code .}, {@code *}, {@code ;}, or a comment. */
+        void append(String piece) {
+            if (text.length() > 0 && !atLineStart && needsSpaceBefore(piece)) {
+                text.append(' ');
+            }
+            text.append(piece);
+            atLineStart = false;
+            if (piece.startsWith("//")) {
+                // A // comment swallows the rest of its line, so the declaration continues on the next one.
+                text.append(lineSeparator);
+                atLineStart = true;
+            }
+        }
+
+        private boolean needsSpaceBefore(String piece) {
+            if (piece.equals(".") || piece.equals(";") || piece.equals("*")) {
+                return false;
+            }
+            return text.charAt(text.length() - 1) != '.';
+        }
+
+        @Override
+        public String toString() {
+            return text.toString();
         }
     }
 
@@ -341,31 +360,33 @@ public final class ImportOrderer {
         // of our tests here and protects us from running off the end of the toks list. Since it is
         // zero-width it doesn't matter if we include it in our string concatenation at the end.
         while (i < toks.size() && tokenAt(i).equals("import")) {
+            Declaration declaration = new Declaration();
+            declaration.append(tokenAt(i));
             i++;
-            // Comments between the tokens of the import are collected and re-emitted after the
-            // semicolon, so nothing is dropped.
-            List<String> comments = new ArrayList<>();
-            i = skipIgnored(i, comments);
+            i = skipIgnored(i, declaration);
             boolean isModule = isModuleKeyword(i);
             if (isModule) {
+                declaration.append(tokenAt(i));
                 i++;
-                i = skipIgnored(i, comments);
+                i = skipIgnored(i, declaration);
             }
             boolean isStatic = !isModule && tokenAt(i).equals("static");
             if (isStatic) {
+                declaration.append(tokenAt(i));
                 i++;
-                i = skipIgnored(i, comments);
+                i = skipIgnored(i, declaration);
             }
             if (!isIdentifierToken(i)) {
                 throw new FormatterException("Unexpected token after import: " + tokenAt(i));
             }
-            StringAndIndex imported = scanImported(i);
+            StringAndIndex imported = scanImported(i, declaration);
             String importedName = imported.string;
             i = imported.index;
-            i = skipIgnored(i, comments);
+            i = skipIgnored(i, declaration);
             if (!tokenAt(i).equals(";")) {
                 throw new FormatterException("Expected ; after import");
             }
+            declaration.append(";");
             while (tokenAt(i).equals(";")) {
                 // Extra semicolons are not allowed by the JLS but are accepted by javac.
                 i++;
@@ -393,8 +414,7 @@ public final class ImportOrderer {
                     i++;
                 }
             }
-            imports.add(
-                    new Import(importedName, trailing.toString(), isStatic, isModule, ImmutableList.copyOf(comments)));
+            imports.add(new Import(importedName, trailing.toString(), isStatic, isModule, declaration.toString()));
             // Remember the position just after the import we just saw, before skipping blank lines.
             // If the next thing after the blank lines is not another import then we don't want to
             // include those blank lines in the text to be replaced.
@@ -437,17 +457,19 @@ public final class ImportOrderer {
     }
 
     /**
-     * Scans the imported thing, the dot-separated name that comes after import [static] and before the semicolon. We
-     * don't allow spaces inside the dot-separated name. Wildcard imports are supported: if the input is {@code import
-     * java.util.*;} then the returned string will be {@code java.util.*}.
+     * Scans the imported thing, the dot-separated name that comes after import [static] and before the semicolon.
+     * Whitespace, line terminators and comments may appear between its parts, as they may anywhere else in the
+     * declaration; the returned name contains none of them. Wildcard imports are supported: if the input is
+     * {@code import java.util.*;} then the returned string will be {@code java.util.*}.
      *
      * @param start the index of the start of the identifier. If the import is {@code import java.util.List;} then this
      *     index points to the token {@code java}.
+     * @param declaration collects the toks scanned, so a comment between the parts of the name keeps its place
      * @return the parsed import ({@code java.util.List} in the example) and the index of the first token after the
      *     imported thing ({@code ;} in the example).
      * @throws FormatterException if the imported name could not be parsed.
      */
-    private StringAndIndex scanImported(int start) throws FormatterException {
+    private StringAndIndex scanImported(int start, Declaration declaration) throws FormatterException {
         int i = start;
         StringBuilder imported = new StringBuilder();
         // At the start of each iteration of this loop, i points to an identifier.
@@ -455,14 +477,19 @@ public final class ImportOrderer {
         while (true) {
             Preconditions.checkState(isIdentifierToken(i));
             imported.append(tokenAt(i));
+            declaration.append(tokenAt(i));
             i++;
+            i = skipIgnored(i, declaration);
             if (!tokenAt(i).equals(".")) {
                 return new StringAndIndex(imported.toString(), i);
             }
             imported.append('.');
+            declaration.append(".");
             i++;
+            i = skipIgnored(i, declaration);
             if (tokenAt(i).equals("*")) {
                 imported.append('*');
+                declaration.append("*");
                 return new StringAndIndex(imported.toString(), i + 1);
             } else if (!isIdentifierToken(i)) {
                 throw new FormatterException("Could not parse imported name, at: " + tokenAt(i));
@@ -514,21 +541,21 @@ public final class ImportOrderer {
         if (!tokenAt(i).equals("module")) {
             return false;
         }
-        return isIdentifierToken(skipIgnored(i + 1, new ArrayList<>()));
+        return isIdentifierToken(skipIgnored(i + 1, new Declaration()));
     }
 
     /**
-     * Skips whitespace, line terminators and comments starting at {@code i}, appending the text of each comment to
-     * {@code comments}, and returns the index of the first token that is none of those. Javadoc comments are not
-     * skipped: the formatter moves them onto a line of their own, so an import carrying one is rejected, as it was
-     * before module imports were supported.
+     * Skips whitespace, line terminators and comments starting at {@code i}, appending each comment to
+     * {@code declaration}, and returns the index of the first token that is none of those. Javadoc comments are not
+     * skipped: the formatter moves them onto a line of their own, which would separate the imports, so an import
+     * carrying one is rejected, as it was before module imports were supported.
      */
-    private int skipIgnored(int i, List<String> comments) {
+    private int skipIgnored(int i, Declaration declaration) {
         while (i < toks.size()) {
             if (isSpaceToken(i) || isNewlineToken(i)) {
                 i++;
             } else if (isSlashSlashCommentToken(i) || isBlockCommentToken(i)) {
-                comments.add(tokenAt(i).trim());
+                declaration.append(tokenAt(i).trim());
                 i++;
             } else {
                 break;

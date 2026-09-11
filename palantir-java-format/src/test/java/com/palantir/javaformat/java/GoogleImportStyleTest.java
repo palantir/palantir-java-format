@@ -453,13 +453,15 @@ public class GoogleImportStyleTest {
                     "*/",
                 }
             },
+            // Whitespace may appear between the parts of a qualified name; it is normalized away.
             {
                 {
-                    "import com . foo . Second ;", // syntactically valid, but we don't support it
+                    "import com . foo . Second ;", //
                     "import com.foo.First;",
                 },
                 {
-                    "!!Expected ; after import",
+                    "import com.foo.First;", //
+                    "import com.foo.Second;",
                 }
             },
             {
@@ -613,7 +615,7 @@ public class GoogleImportStyleTest {
                 {
                     "package foo;",
                     "",
-                    "import module java.base; /* the base module */",
+                    "import module /* the base module */ java.base;",
                     "import module java.desktop;",
                     "",
                     "public class Blim {}",
@@ -635,10 +637,45 @@ public class GoogleImportStyleTest {
                 {
                     "package foo;",
                     "",
-                    "import static com.foo.First.first; /* a member */",
+                    "import static /* a member */ com.foo.First.first;",
                     "",
-                    "import com.foo.Second; /* a type */",
+                    "import /* a type */ com.foo.Second;",
                     "import com.foo.Third;",
+                    "",
+                    "public class Blim {}",
+                },
+            },
+
+            // A comment may also sit between the parts of the name, and stays there. Only the
+            // whitespace around it is normalized.
+            {
+                {
+                    "package foo;", "", "import com.foo./* the second one */Second;", "", "public class Blim {}",
+                },
+                {
+                    "package foo;", "", "import com.foo./* the second one */ Second;", "", "public class Blim {}",
+                },
+            },
+
+            // Identical declarations collapse into one; ones that differ are both kept, so that a
+            // comment does not disappear with the copy that goes.
+            {
+                {
+                    "package foo;",
+                    "",
+                    "import com.foo.First;",
+                    "import com.foo.First;",
+                    "import /* explanation A */ com.foo.Second;",
+                    "import /* explanation B */ com.foo.Second;",
+                    "",
+                    "public class Blim {}",
+                },
+                {
+                    "package foo;",
+                    "",
+                    "import com.foo.First;",
+                    "import /* explanation A */ com.foo.Second;",
+                    "import /* explanation B */ com.foo.Second;",
                     "",
                     "public class Blim {}",
                 },
