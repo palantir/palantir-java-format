@@ -34,11 +34,8 @@ import javax.lang.model.element.Name;
  */
 @SuppressWarnings("Since21")
 public class Java21InputAstVisitor extends Java14InputAstVisitor {
-    // AnyPatternTree (the unnamed pattern `_`, JEP 456) remains a preview API through JDK 21 and is
-    // only finalized in JDK 22, so it cannot be referenced by type here without breaking compilation
-    // on JDK 21 toolchains. Detect it by Tree.Kind name instead, and short-circuit dispatch before it
-    // reaches the (unimplementable) visitAnyPattern method, whose default no-op implementation would
-    // otherwise silently drop the `_` token and corrupt the output.
+    // AnyPatternTree (the unnamed pattern `_`, JEP 456) is still a preview API on JDK 21, which this
+    // module compiles with, so match it by Tree.Kind name instead of by type.
     private static final String ANY_PATTERN_KIND_NAME = "ANY_PATTERN";
 
     public Java21InputAstVisitor(OpsBuilder builder, int indentMultiplier) {
@@ -48,13 +45,8 @@ public class Java21InputAstVisitor extends Java14InputAstVisitor {
     @Override
     public Void scan(Tree tree, Void unused) {
         if (tree != null && tree.getKind().name().equals(ANY_PATTERN_KIND_NAME)) {
-            // Deliberately not calling sync(tree) here: javac's parser records an off-by-one start
-            // position for AnyPatternTree (one past the `_` character), which would make sync() think
-            // a token was skipped and throw. token("_") alone is sufficient since it matches against
-            // the next pending input token regardless of position. Returning here instead of falling
-            // through to super.scan() also bypasses its inExpression tracking, checkClosed check, and
-            // exception-wrapping logic; that's benign here because this branch only ever emits a single
-            // leaf token("_") and never recurses into child trees.
+            // No sync(tree): javac records the start position one past the `_`, which makes sync()
+            // think a token was skipped and throw. This branch emits one leaf token and never recurses.
             token("_");
             return null;
         }

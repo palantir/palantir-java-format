@@ -294,10 +294,10 @@ public class RemoveUnusedImportsTest {
 
     @TestTemplate
     public void removeUnused() throws FormatterException {
-        // Module imports (JEP 511, `import module foo.bar;`) are only parseable on JDK 25+.
+        // Module imports (JEP 511) parse from JDK 23 on, as preview there; the formatter enables preview.
         Assumptions.assumeTrue(
-                !input.contains("import module") || Formatter.getRuntimeVersion() >= 25,
-                "import module requires running on JDK 25 or later");
+                !input.contains("import module") || Formatter.getRuntimeVersion() >= 23,
+                "import module requires running on JDK 23 or later");
         Truth.assertThat(RemoveUnusedImports.removeUnusedImports(input)).isEqualTo(expected);
     }
 }

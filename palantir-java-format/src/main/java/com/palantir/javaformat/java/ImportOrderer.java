@@ -124,13 +124,12 @@ public final class ImportOrderer {
      * A {@link Comparator} that orders {@link Import}s by Google Style, defined at
      * https://google.github.io/styleguide/javaguide.html#s3.3.3-import-ordering-and-spacing.
      *
-     * <p>Module imports ({@code import module foo.bar;}, JEP 511) are sorted into their own leading group, ahead of
-     * both static and non-static type imports: they bind whole modules' worth of exported packages, so they read
-     * most naturally as the broadest, first declarations in the file.
+     * <p>Google Style says nothing about module imports ({@code import module foo.bar;}, JEP 511); they sort
+     * between static and non-static type imports, matching google-java-format.
      */
     private static final Comparator<Import> GOOGLE_IMPORT_COMPARATOR = Comparator.comparing(
-                    Import::isModule, trueFirst())
-            .thenComparing(Import::isStatic, trueFirst())
+                    Import::isStatic, trueFirst())
+            .thenComparing(Import::isModule, trueFirst())
             .thenComparing(Import::imported);
 
     /**
@@ -138,10 +137,10 @@ public final class ImportOrderer {
      * https://source.android.com/setup/contribute/code-style#order-import-statements and implemented in IntelliJ at
      * https://android.googlesource.com/platform/development/+/master/ide/intellij/codestyles/AndroidStyle.xml.
      *
-     * <p>As with {@link #GOOGLE_IMPORT_COMPARATOR}, module imports sort into their own leading group.
+     * <p>As with {@link #GOOGLE_IMPORT_COMPARATOR}, module imports sort after static imports.
      */
-    private static final Comparator<Import> AOSP_IMPORT_COMPARATOR = Comparator.comparing(Import::isModule, trueFirst())
-            .thenComparing(Import::isStatic, trueFirst())
+    private static final Comparator<Import> AOSP_IMPORT_COMPARATOR = Comparator.comparing(Import::isStatic, trueFirst())
+            .thenComparing(Import::isModule, trueFirst())
             .thenComparing(Import::isAndroid, trueFirst())
             .thenComparing(Import::isThirdParty, trueFirst())
             .thenComparing(Import::isJava, trueFirst())
@@ -152,12 +151,7 @@ public final class ImportOrderer {
      * Google style.
      */
     private static boolean shouldInsertBlankLineGoogle(Import prev, Import curr) {
-        // Module imports (JEP 511) form their own leading group; separate it from whatever follows,
-        // the same way static imports are separated from non-static imports below.
-        if (prev.isModule() && !curr.isModule()) {
-            return true;
-        }
-        return prev.isStatic() && !curr.isStatic();
+        return prev.isStatic() != curr.isStatic() || prev.isModule() != curr.isModule();
     }
 
     /**
@@ -165,12 +159,7 @@ public final class ImportOrderer {
      * style.
      */
     private static boolean shouldInsertBlankLineAosp(Import prev, Import curr) {
-        // Module imports (JEP 511) form their own leading group; separate it from whatever follows,
-        // consistent with the other group boundaries below.
-        if (prev.isModule() && !curr.isModule()) {
-            return true;
-        }
-        if (prev.isStatic() && !curr.isStatic()) {
+        if (prev.isStatic() != curr.isStatic() || prev.isModule() != curr.isModule()) {
             return true;
         }
         // insert blank line between "com.android" from "com.anythingelse"

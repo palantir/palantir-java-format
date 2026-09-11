@@ -114,6 +114,15 @@
       "type": "com.sun.source.tree.CaseTree"
     },
     {
+      "type": "com.sun.source.tree.ImportTree",
+      "methods": [
+        {
+          "name": "isModule",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
       "type": "com.sun.source.tree.ClassTree",
       "methods": [
         {

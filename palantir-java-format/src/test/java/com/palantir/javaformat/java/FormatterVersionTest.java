@@ -14,17 +14,24 @@
  * limitations under the License.
  */
 
-package com.palantir.javaformat.java.java26;
+package com.palantir.javaformat.java;
 
-import com.palantir.javaformat.OpsBuilder;
-import com.palantir.javaformat.java.java25.Java25InputAstVisitor;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Test;
 
 /**
- * Extends {@link Java25InputAstVisitor} with support for AST nodes that were added or modified in
- * Java 26.
+ * Guards the {@code testJdkNN} legs: without this, a leg that resolves to the wrong JDK skips every
+ * version-gated golden test and still passes.
  */
-public class Java26InputAstVisitor extends Java25InputAstVisitor {
-    public Java26InputAstVisitor(OpsBuilder builder, int indentMultiplier) {
-        super(builder, indentMultiplier);
+public class FormatterVersionTest {
+
+    @Test
+    public void runsOnTheJdkTheTestTaskAskedFor() {
+        String expected = System.getProperty("expectedJavaVersion");
+        if (expected == null) {
+            return; // the default `test` task doesn't set it
+        }
+        assertThat(Formatter.getRuntimeVersion()).isEqualTo(Integer.parseInt(expected));
     }
 }

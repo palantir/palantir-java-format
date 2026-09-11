@@ -1131,12 +1131,19 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         return null;
     }
 
+    // ImportTree#isModule() (JEP 511) exists from JDK 23 on; this module compiles with a JDK 21
+    // compiler, so it can't be referenced directly.
+    private static final Method IMPORT_TREE_IS_MODULE = maybeGetMethod(ImportTree.class, "isModule");
+
     @Override
     public Void visitImport(ImportTree node, Void unused) {
         sync(node);
         token("import");
         builder.space();
-        if (node.isStatic()) {
+        if (IMPORT_TREE_IS_MODULE != null && Boolean.TRUE.equals(invoke(IMPORT_TREE_IS_MODULE, node))) {
+            token("module");
+            builder.space();
+        } else if (node.isStatic()) {
             token("static");
             builder.space();
         }
@@ -1389,9 +1396,8 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
 
     protected static final long RECORD = 1L << 61;
 
-    // TODO: Use Flags.IMPLICIT_CLASS once if/when we drop support for Java 11. javac sets this flag
-    // on the synthetic wrapper class it generates for a "compact source file" (JEP 512, Java 25):
-    // top-level fields/methods with no explicit enclosing class declaration.
+    // TODO: use Flags.IMPLICIT_CLASS once this module compiles with JDK 22 or later (JDK 21 calls
+    // bit 19 UNNAMED_CLASS). javac sets it on the class it synthesizes for a compact source file.
     protected static final long IMPLICIT_CLASS = 1L << 19;
 
     /** Is {@code type} the implicit wrapper class javac synthesizes for a compact source file? */
@@ -3991,9 +3997,9 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     }
 
     /**
-     * Looks up a no-arg method that may not exist on older language levels (e.g. {@code
-     * ImportTree#isModule()}, added in JDK 23). Used together with {@link #invoke} so that newer AST accessors can
-     * be reached reflectively without raising the source/target level of this module.
+     * Returns the public no-argument method {@code name} of {@code c}, or {@code null} if the running JDK does not
+     * have it. Used with {@link #invoke} to reach AST accessors that are newer than the compiler this module builds
+     * with, such as {@code ImportTree#isModule()} (JDK 23).
      */
     @SuppressWarnings("for-rollout:NullAway")
     protected static Method maybeGetMethod(Class<?> c, String name) {
@@ -4004,6 +4010,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         }
     }
 
+    /** Invokes {@code m} on {@code target}, wrapping any {@link ReflectiveOperationException} in a runtime one. */
     protected static Object invoke(Method m, Object target) {
         try {
             return m.invoke(target);

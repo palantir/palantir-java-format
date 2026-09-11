@@ -182,16 +182,20 @@ shortcut.
 
 ![Install plugin from disk](./docs/images/install_plugin_from_disk.png)
 
-## Java 26 Support
+<a id="java-21-support"></a>
+
+## Java language support
 
 In [1211](https://github.com/palantir/palantir-java-format/pull/1211) we shipped Java 21 support. Since then we've
-kept up with the language and now also support formatting the newer syntax introduced up through Java 26, including
-module import declarations, compact source files and instance main methods, flexible constructor bodies, markdown
-documentation comments, and unnamed patterns in deconstruction. In order to use these formatting capabilities, ensure
-that either:
+added compact source files with instance main methods (JEP 512), unnamed patterns in record deconstruction (JEP 456),
+and module import declarations (JEP 511).
 
-- the Gradle daemon and the Intellij Project SDK are set to Java 26 (or, at minimum, to the JDK version in which the
-  feature you're relying on was finalized)
+The formatter parses with preview features enabled, so which syntax it can format depends on the JVM that *runs* it:
+the Gradle daemon for the Gradle plugin and Spotless, the Project SDK for IntelliJ, and GraalVM 23 for the native
+image. Compact source files and unnamed patterns format on Java 21 and later; module imports need Java 23 or later.
+So, ensure that either:
+
+- the Gradle daemon and the Intellij Project SDK are set to a JDK that parses the syntax you use
 - or that the gradle property `palantir.native.formatter=true`. This will run the formatter as a native image, 
 - independent of the Gradle daemon/Intellij project JDK version. 
 

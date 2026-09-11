@@ -252,29 +252,14 @@ public class RemoveUnusedImports {
         return replacements;
     }
 
-    // ImportTree#isModule() (JEP 511, module import declarations) was added in JDK 23. This module
-    // compiles at an older --release, so it can't be referenced directly and is reached reflectively,
-    // matching the CASE_TREE_GET_LABELS idiom above.
-    private static final Method IMPORT_TREE_IS_MODULE = importTreeIsModule();
-
-    @SuppressWarnings("for-rollout:NullAway")
-    private static Method importTreeIsModule() {
-        try {
-            return ImportTree.class.getMethod("isModule");
-        } catch (NoSuchMethodException e) {
-            return null;
-        }
-    }
+    // ImportTree#isModule() (JEP 511) exists from JDK 23 on; this module compiles with a JDK 21
+    // compiler, so it can't be referenced directly. Same idiom as CASE_TREE_GET_LABELS above.
+    private static final Method IMPORT_TREE_IS_MODULE =
+            JavaInputAstVisitor.maybeGetMethod(ImportTree.class, "isModule");
 
     private static boolean isModuleImport(ImportTree importTree) {
-        if (IMPORT_TREE_IS_MODULE == null) {
-            return false;
-        }
-        try {
-            return Boolean.TRUE.equals(IMPORT_TREE_IS_MODULE.invoke(importTree));
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
+        return IMPORT_TREE_IS_MODULE != null
+                && Boolean.TRUE.equals(JavaInputAstVisitor.invoke(IMPORT_TREE_IS_MODULE, importTree));
     }
 
     private static String getSimpleName(ImportTree importTree) {
@@ -292,10 +277,8 @@ public class RemoveUnusedImports {
             ImportTree importTree,
             String simpleName) {
         if (isModuleImport(importTree)) {
-            // A module import (JEP 511, `import module foo.bar;`) binds every exported package of the
-            // module by wildcard. This scanner only records simple names actually referenced in the
-            // source, so it has no way to tell whether any particular module import is needed - same
-            // situation as a `.*` wildcard import below. Never remove it.
+            // A module import binds every exported package of the module, so this scanner can't tell
+            // whether it's needed - same as the `.*` wildcard imports below. Never remove it.
             return false;
         }
         String qualifier = ((JCFieldAccess) importTree.getQualifiedIdentifier())

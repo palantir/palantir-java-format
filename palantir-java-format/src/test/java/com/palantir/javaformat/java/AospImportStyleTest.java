@@ -278,9 +278,8 @@ public class AospImportStyleTest {
                 },
             },
 
-            // Module imports (JEP 511) form their own leading group, ahead of static, android,
-            // third-party and java imports alike, and are separated from the following group by a
-            // blank line, consistent with the other group boundaries in AOSP style.
+            // Module imports (JEP 511) sort between static imports and the android/third-party/java
+            // groups, as in google-java-format, each group separated by a blank line.
             {
                 {
                     "package foo;",
@@ -296,10 +295,10 @@ public class AospImportStyleTest {
                 {
                     "package foo;",
                     "",
+                    "import static android.Bar.baz;",
+                    "",
                     "import module java.base;",
                     "import module java.desktop;",
-                    "",
-                    "import static android.Bar.baz;",
                     "",
                     "import android.Bar;",
                     "",

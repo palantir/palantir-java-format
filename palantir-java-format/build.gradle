@@ -65,16 +65,11 @@ javaVersion {
     target = 21
 }
 
-// The default `test` task runs on JDK 21 (see the root `javaVersions.runtime`), which exercises
-// the Java21InputAstVisitor dispatch branch and all Java-21-and-earlier golden tests; newer-feature
-// golden tests self-skip on JDK 21 via FileBasedTests#assumeJavaVersionForTest. To get *native*
-// coverage of the newer dispatch branches (Java25InputAstVisitor, Java26InputAstVisitor) and the
-// golden tests gated on newer feature JDKs (MarkdownDoc @ 23, UnnamedPattern @ 22,
-// FlexibleConstructor/ModuleImport/CompactSource @ 25), run the same version-gated golden suites
-// again on each additional JDK registered in the root `jdks { }` block. The JDK-independent unit
-// tests are already covered once by the default JDK-21 `test`, so these extra legs only re-run the
-// file-based integration suites.
-[22, 23, 25, 26].each { jdkVersion ->
+// The default `test` task runs on JDK 21 (see the root `javaVersions.runtime`) and covers every
+// golden test except ModuleImport, which needs a parser that produces module import declarations
+// (JDK 23+, preview). Re-run the file-based suites on 23 and 25: 23 parses module imports as
+// preview, 25 as a final feature.
+[23, 25].each { jdkVersion ->
     tasks.register("testJdk${jdkVersion}", Test) {
         group = 'verification'
         description = "Runs the JDK-version-gated golden test suites on JDK ${jdkVersion}."
@@ -87,22 +82,21 @@ javaVersion {
         classpath = sourceSets.test.runtimeClasspath
         useJUnitPlatform()
         systemProperty 'recreate', System.getProperty('recreate', 'false')
+        // Asserted by FormatterVersionTest, so a leg that resolves to the wrong JDK fails instead
+        // of silently skipping every version-gated golden.
+        systemProperty 'expectedJavaVersion', jdkVersion
 
         filter {
             includeTestsMatching 'com.palantir.javaformat.java.FormatterIntegrationTest'
             includeTestsMatching 'com.palantir.javaformat.java.StringWrapperIntegrationTest'
-            if (jdkVersion >= 25) {
-                // The module-import case in RemoveUnusedImportsTest guards a JDK-25+-only
-                // ClassCastException fix for JCModuleImport and self-skips below JDK 25, so it
-                // needs native coverage on these legs (it's otherwise never exercised by the
-                // JDK-21 default `test`, which skips it, or by the integration suites above,
-                // which never call removeUnusedImports).
-                includeTestsMatching 'com.palantir.javaformat.java.RemoveUnusedImportsTest'
-            }
+            includeTestsMatching 'com.palantir.javaformat.java.FormatterVersionTest'
+            // Covers the JCModuleImport ClassCastException fix, which the JDK 21 default `test`
+            // skips and the integration suites never reach (they don't call removeUnusedImports).
+            includeTestsMatching 'com.palantir.javaformat.java.RemoveUnusedImportsTest'
         }
     }
 }
 
 tasks.named('check') {
-    dependsOn tasks.named('testJdk22'), tasks.named('testJdk23'), tasks.named('testJdk25'), tasks.named('testJdk26')
+    dependsOn tasks.named('testJdk23'), tasks.named('testJdk25')
 }

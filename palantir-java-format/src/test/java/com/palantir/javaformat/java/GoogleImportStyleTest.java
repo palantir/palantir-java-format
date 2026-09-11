@@ -525,9 +525,8 @@ public class GoogleImportStyleTest {
                 }
             },
 
-            // Module imports (JEP 511) form their own leading group, ahead of both static and
-            // non-static type imports, and are separated from the following group by a blank line,
-            // just like static imports are separated from non-static imports.
+            // Module imports (JEP 511) sort between static and non-static type imports, as in
+            // google-java-format, each group separated by a blank line.
             {
                 {
                     "package foo;",
@@ -542,12 +541,36 @@ public class GoogleImportStyleTest {
                 {
                     "package foo;",
                     "",
+                    "import static com.google.truth.Truth.assertThat;",
+                    "",
                     "import module java.base;",
                     "import module java.desktop;",
                     "",
-                    "import static com.google.truth.Truth.assertThat;",
+                    "import java.util.List;",
+                    "",
+                    "public class Blim {}",
+                },
+            },
+
+            // A package literally named `module` is an ordinary import, not a module import:
+            // `module` only introduces one when another identifier follows it.
+            {
+                {
+                    "package foo;",
+                    "",
+                    "import module.Foo;",
+                    "import java.util.List;",
+                    "import module java.base;",
+                    "",
+                    "public class Blim {}",
+                },
+                {
+                    "package foo;",
+                    "",
+                    "import module java.base;",
                     "",
                     "import java.util.List;",
+                    "import module.Foo;",
                     "",
                     "public class Blim {}",
                 },
