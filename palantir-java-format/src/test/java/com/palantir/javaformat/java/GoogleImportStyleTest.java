@@ -598,6 +598,30 @@ public class GoogleImportStyleTest {
                 },
             },
 
+            // The same holds for ordinary and static imports, which had this limitation before.
+            {
+                {
+                    "package foo;",
+                    "",
+                    "import /* a type */ com.foo.Second;",
+                    "import static /* a member */ com.foo.First.first;",
+                    "import",
+                    "    com.foo.Third;",
+                    "",
+                    "public class Blim {}",
+                },
+                {
+                    "package foo;",
+                    "",
+                    "import static com.foo.First.first; /* a member */",
+                    "",
+                    "import com.foo.Second; /* a type */",
+                    "import com.foo.Third;",
+                    "",
+                    "public class Blim {}",
+                },
+            },
+
             // A package literally named `module` is an ordinary import, not a module import:
             // `module` only introduces one when another identifier follows it.
             {
