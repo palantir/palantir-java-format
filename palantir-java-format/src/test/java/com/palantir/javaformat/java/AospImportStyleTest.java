@@ -307,6 +307,49 @@ public class AospImportStyleTest {
                     "public class Blim {}",
                 },
             },
+
+            // A module import and a non-module import that share a top level package: the blank line
+            // comes from the module boundary, not from the top-level-package rule.
+            {
+                {
+                    "package foo;",
+                    "",
+                    "import java.util.List;",
+                    "import module java.base;",
+                    "",
+                    "public class Blim {}",
+                },
+                {
+                    "package foo;",
+                    "",
+                    "import module java.base;",
+                    "",
+                    "import java.util.List;",
+                    "",
+                    "public class Blim {}",
+                },
+            },
+
+            // Module imports sort before third-party imports, which would otherwise come first.
+            {
+                {
+                    "package foo;",
+                    "",
+                    "import org.example.Bar;",
+                    "import module java.base;",
+                    "",
+                    "public class Blim {}",
+                },
+                {
+                    "package foo;",
+                    "",
+                    "import module java.base;",
+                    "",
+                    "import org.example.Bar;",
+                    "",
+                    "public class Blim {}",
+                },
+            },
         };
         ImmutableList.Builder<Object[]> builder = ImmutableList.builder();
         Arrays.stream(inputsOutputs).forEach(input -> builder.add(ImportOrdererUtils.createRow(input)));

@@ -18,20 +18,19 @@ package com.palantir.javaformat.java;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Guards the {@code testJdkNN} legs: without this, a leg that resolves to the wrong JDK skips every
- * version-gated golden test and still passes.
+ * Guards the {@code testJdkNN} legs: without this, a leg that resolves to a JDK older than the one it asked for skips
+ * the {@code ModuleImport} golden and the module import tests, and still passes.
  */
 public class FormatterVersionTest {
 
     @Test
     public void runsOnTheJdkTheTestTaskAskedFor() {
         String expected = System.getProperty("expectedJavaVersion");
-        if (expected == null) {
-            return; // the default `test` task doesn't set it
-        }
+        Assumptions.assumeTrue(expected != null, "expectedJavaVersion is set only by the testJdkNN tasks");
         assertThat(Formatter.getRuntimeVersion()).isEqualTo(Integer.parseInt(expected));
     }
 }

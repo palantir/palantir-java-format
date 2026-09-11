@@ -368,7 +368,9 @@ public class GoogleImportStyleTest {
                     "import",
                 },
                 {
-                    "!!Unexpected token after import: \n",
+                    // The line break after `import` is skipped, so the token we report is the
+                    // zero-width EOF tok rather than the newline.
+                    "!!Unexpected token after import: ",
                 }
             },
             {
@@ -547,6 +549,50 @@ public class GoogleImportStyleTest {
                     "import module java.desktop;",
                     "",
                     "import java.util.List;",
+                    "",
+                    "public class Blim {}",
+                },
+            },
+
+            // A module whose name sorts after a non-module import: the module still comes first, and a
+            // blank line separates the two groups.
+            {
+                {
+                    "package foo;",
+                    "",
+                    "import java.util.List;",
+                    "import module org.example.api;",
+                    "",
+                    "public class Blim {}",
+                },
+                {
+                    "package foo;",
+                    "",
+                    "import module org.example.api;",
+                    "",
+                    "import java.util.List;",
+                    "",
+                    "public class Blim {}",
+                },
+            },
+
+            // Whitespace, line breaks and comments may appear between the tokens of an import. The
+            // comments are re-emitted after the semicolon so that nothing is dropped.
+            {
+                {
+                    "package foo;",
+                    "",
+                    "import module /* the base module */ java.base;",
+                    "import module",
+                    "    java.desktop;",
+                    "",
+                    "public class Blim {}",
+                },
+                {
+                    "package foo;",
+                    "",
+                    "import module java.base; /* the base module */",
+                    "import module java.desktop;",
                     "",
                     "public class Blim {}",
                 },

@@ -82,8 +82,8 @@ javaVersion {
         classpath = sourceSets.test.runtimeClasspath
         useJUnitPlatform()
         systemProperty 'recreate', System.getProperty('recreate', 'false')
-        // Asserted by FormatterVersionTest, so a leg that resolves to the wrong JDK fails instead
-        // of silently skipping every version-gated golden.
+        // Asserted by FormatterVersionTest, so a leg that resolves to an older JDK fails instead
+        // of silently skipping the ModuleImport golden and the module import tests.
         systemProperty 'expectedJavaVersion', jdkVersion
 
         filter {
@@ -93,6 +93,8 @@ javaVersion {
             // Covers the JCModuleImport ClassCastException fix, which the JDK 21 default `test`
             // skips and the integration suites never reach (they don't call removeUnusedImports).
             includeTestsMatching 'com.palantir.javaformat.java.RemoveUnusedImportsTest'
+            // Covers module imports through formatSourceAndFixImports, the entry point Spotless uses.
+            includeTestsMatching 'com.palantir.javaformat.java.ModuleImportTest'
         }
     }
 }

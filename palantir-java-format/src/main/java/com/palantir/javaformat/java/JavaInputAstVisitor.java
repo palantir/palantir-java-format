@@ -2634,7 +2634,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     }
 
     /** Helper method for import declarations, names, and qualified names. */
-    protected void visitName(Tree node) {
+    private void visitName(Tree node) {
         Deque<Name> stack = new ArrayDeque<>();
         for (; node instanceof MemberSelectTree; node = ((MemberSelectTree) node).getExpression()) {
             stack.addFirst(((MemberSelectTree) node).getIdentifier());

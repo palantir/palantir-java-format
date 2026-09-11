@@ -124,8 +124,8 @@ public final class ImportOrderer {
      * A {@link Comparator} that orders {@link Import}s by Google Style, defined at
      * https://google.github.io/styleguide/javaguide.html#s3.3.3-import-ordering-and-spacing.
      *
-     * <p>Google Style says nothing about module imports ({@code import module foo.bar;}, JEP 511); they sort
-     * between static and non-static type imports, matching google-java-format.
+     * <p>Google Style does not use module imports ({@code import module foo.bar;}, JEP 511); when present, they
+     * sort between static and non-static type imports, matching google-java-format.
      */
     private static final Comparator<Import> GOOGLE_IMPORT_COMPARATOR = Comparator.comparing(
                     Import::isStatic, trueFirst())
@@ -196,12 +196,14 @@ public final class ImportOrderer {
         private final boolean isStatic;
         private final boolean isModule;
         private final String trailing;
+        private final ImmutableList<String> comments;
 
-        Import(String imported, String trailing, boolean isStatic, boolean isModule) {
+        Import(String imported, String trailing, boolean isStatic, boolean isModule, ImmutableList<String> comments) {
             this.imported = imported;
             this.trailing = trailing;
             this.isStatic = isStatic;
             this.isModule = isModule;
+            this.comments = comments;
         }
 
         /** The name being imported, for example {@code java.util.List}. */
@@ -267,10 +269,22 @@ public final class ImportOrderer {
                 sb.append("static ");
             }
             sb.append(imported()).append(';');
-            if (trailing().trim().isEmpty()) {
+            StringBuilder tail = new StringBuilder();
+            for (String comment : comments) {
+                tail.append(' ').append(comment);
+                if (comment.startsWith("//")) {
+                    // A // comment swallows the rest of the line, so it has to end one.
+                    tail.append(lineSeparator);
+                }
+            }
+            tail.append(trailing());
+            if (tail.toString().trim().isEmpty()) {
                 sb.append(lineSeparator);
             } else {
-                sb.append(trailing());
+                sb.append(tail);
+                if (!Newlines.isNewline(tail.substring(tail.length() - 1))) {
+                    sb.append(lineSeparator);
+                }
             }
             return sb.toString();
         }
@@ -299,9 +313,10 @@ public final class ImportOrderer {
      *
      * <pre>{@code
      * <imports> -> (<end-of-line> | <import>)*
-     * <import> -> "import" <whitespace> (("static" | "module") <whitespace>)?
-     *    <identifier> ("." <identifier>)* ("." "*")? <whitespace>? ";"
+     * <import> -> "import" <ignorable> (("static" | "module") <ignorable>)?
+     *    <identifier> ("." <identifier>)* ("." "*")? <ignorable>? ";"
      *    <whitespace>? <end-of-line>? (<line-comment> <end-of-line>)*
+     * <ignorable> -> (<whitespace> | <end-of-line> | <comment>)+
      * }</pre>
      *
      * @param i the index to start parsing at.
@@ -316,22 +331,19 @@ public final class ImportOrderer {
         // zero-width it doesn't matter if we include it in our string concatenation at the end.
         while (i < toks.size() && tokenAt(i).equals("import")) {
             i++;
-            if (isSpaceToken(i)) {
-                i++;
-            }
+            // Comments between the tokens of the import are collected and re-emitted after the
+            // semicolon, so nothing is dropped.
+            List<String> comments = new ArrayList<>();
+            i = skipIgnored(i, comments);
             boolean isModule = isModuleKeyword(i);
             if (isModule) {
                 i++;
-                if (isSpaceToken(i)) {
-                    i++;
-                }
+                i = skipIgnored(i, comments);
             }
             boolean isStatic = !isModule && tokenAt(i).equals("static");
             if (isStatic) {
                 i++;
-                if (isSpaceToken(i)) {
-                    i++;
-                }
+                i = skipIgnored(i, comments);
             }
             if (!isIdentifierToken(i)) {
                 throw new FormatterException("Unexpected token after import: " + tokenAt(i));
@@ -339,9 +351,7 @@ public final class ImportOrderer {
             StringAndIndex imported = scanImported(i);
             String importedName = imported.string;
             i = imported.index;
-            if (isSpaceToken(i)) {
-                i++;
-            }
+            i = skipIgnored(i, comments);
             if (!tokenAt(i).equals(";")) {
                 throw new FormatterException("Expected ; after import");
             }
@@ -368,7 +378,8 @@ public final class ImportOrderer {
                     i++;
                 }
             }
-            imports.add(new Import(importedName, trailing.toString(), isStatic, isModule));
+            imports.add(
+                    new Import(importedName, trailing.toString(), isStatic, isModule, ImmutableList.copyOf(comments)));
             // Remember the position just after the import we just saw, before skipping blank lines.
             // If the next thing after the blank lines is not another import then we don't want to
             // include those blank lines in the text to be replaced.
@@ -481,18 +492,32 @@ public final class ImportOrderer {
      * declaration ({@code import module foo.bar;}, JEP 511), as opposed to an ordinary import whose first segment
      * happens to be an identifier literally named {@code module} (for example {@code import module.Foo;}). As with
      * other contextual keywords ({@code var}, {@code yield}, ...), this is disambiguated by lookahead: {@code
-     * module} only introduces a module import when it is immediately followed by another identifier, rather than
-     * {@code .} or {@code ;}.
+     * module} only introduces a module import when the next token is another identifier, rather than {@code .} or
+     * {@code ;}. Whitespace, line terminators and comments are skipped, as they are by the parsing that follows.
      */
     private boolean isModuleKeyword(int i) {
         if (!tokenAt(i).equals("module")) {
             return false;
         }
-        int next = i + 1;
-        if (isSpaceToken(next)) {
-            next++;
+        return isIdentifierToken(skipIgnored(i + 1, new ArrayList<>()));
+    }
+
+    /**
+     * Skips whitespace, line terminators and comments starting at {@code i}, appending the text of each comment to
+     * {@code comments}, and returns the index of the first token that is none of those.
+     */
+    private int skipIgnored(int i, List<String> comments) {
+        while (i < toks.size()) {
+            if (isSpaceToken(i) || isNewlineToken(i)) {
+                i++;
+            } else if (toks.get(i).isComment()) {
+                comments.add(tokenAt(i).trim());
+                i++;
+            } else {
+                break;
+            }
         }
-        return isIdentifierToken(next);
+        return i;
     }
 
     private boolean isIdentifierToken(int i) {
