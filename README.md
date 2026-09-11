@@ -193,6 +193,8 @@ and module import declarations (JEP 511).
 The formatter parses with preview features enabled, so which syntax it can format depends on the JVM that *runs* it:
 the Gradle daemon for the Gradle plugin and Spotless, the Project SDK for IntelliJ, the Eclipse JVM for the Eclipse
 plugin, and GraalVM 23 for the native image. Compact source files and unnamed patterns format on Java 21 and later; module imports need Java 23 or later.
+Markdown documentation comments (`///`, JEP 467) are recognised as documentation from Java 23 on, so on an older JVM
+an import referenced only from a markdown link (`/// see [List]`) is removed as unused.
 So, ensure that either:
 
 - the Gradle daemon and the Intellij Project SDK are set to a JDK that parses the syntax you use, or
