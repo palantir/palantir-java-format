@@ -1,5 +1,15 @@
+import java.util.List;
+
+/// A field with a markdown doc comment.
 String greeting = "hello";
 
+record Pair(String first, String second) {}
+
+/** Javadoc on a top-level member of a compact source file. */
+List<String> names() {
+  return List.of(greeting, new Pair(greeting, greeting).second());
+}
+
 void main() {
-  System.out.println(greeting);
+  System.out.println(names());
 }
