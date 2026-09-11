@@ -1828,7 +1828,6 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         return true;
     }
 
-    @SuppressWarnings("for-rollout:deprecation")
     @Override
     public Void visitCase(CaseTree node, Void unused) {
         sync(node);
