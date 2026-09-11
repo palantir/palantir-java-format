@@ -195,9 +195,12 @@ the Gradle daemon for the Gradle plugin and Spotless, the Project SDK for Intell
 image. Compact source files and unnamed patterns format on Java 21 and later; module imports need Java 23 or later.
 So, ensure that either:
 
-- the Gradle daemon and the Intellij Project SDK are set to a JDK that parses the syntax you use
-- or that the gradle property `palantir.native.formatter=true`. This will run the formatter as a native image, 
-- independent of the Gradle daemon/Intellij project JDK version. 
+- the Gradle daemon and the Intellij Project SDK are set to a JDK that parses the syntax you use, or
+- the gradle property `palantir.native.formatter=true`, which runs the formatter as a native image, independent of the
+  Gradle daemon/Intellij project JDK version. The native image is built for Linux (glibc) and macOS aarch64 only, and
+  `spotlessApply` uses it only when the Gradle daemon runs on Java 20 or older (see
+  [Native image formatter](#native-image-formatter)) — on a newer daemon Spotless formats in the daemon, so the
+  daemon's JDK decides which syntax can be formatted.
 
 ### Native image formatter
 

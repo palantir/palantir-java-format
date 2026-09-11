@@ -4,11 +4,14 @@ improvement:
     Format Java 22-25 language features that previously crashed the formatter:
 
     * module import declarations (JEP 511) - `expected token: 'module'; generated java instead`,
-      and `class com.sun.tools.javac.tree.JCTree$JCModuleImport cannot be cast to class
+      `Expected ; after import` from `--fix-imports-only --skip-removing-unused-imports`, and
+      `class com.sun.tools.javac.tree.JCTree$JCModuleImport cannot be cast to class
       com.sun.tools.javac.tree.JCTree$JCImport` from `--fix-imports-only`
     * compact source files and instance main methods (JEP 512) - `expected token: 'void'`
     * unnamed patterns in record deconstruction (JEP 456) - `expected token: '_'; generated , instead`
 
-    Module imports sort between static and non-static imports, matching google-java-format.
+    Module imports sort between static and non-static imports, matching google-java-format. Formatting them
+    requires the JVM that runs the formatter to be JDK 23 or later - the Gradle daemon for the Gradle plugin and
+    Spotless, the Project SDK for IntelliJ - because that is the parser the formatter uses.
   links:
   - https://github.com/palantir/palantir-java-format/pull/1707
