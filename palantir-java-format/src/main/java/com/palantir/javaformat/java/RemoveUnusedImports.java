@@ -42,7 +42,6 @@ import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
 import com.sun.tools.javac.tree.JCTree.JCFieldAccess;
 import com.sun.tools.javac.tree.JCTree.JCIdent;
-import com.sun.tools.javac.tree.JCTree.JCImport;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.Options;
 import java.lang.reflect.Method;
@@ -226,13 +225,16 @@ public class RemoveUnusedImports {
             Set<String> usedNames,
             Multimap<String, Range<Integer>> usedInJavadoc) {
         RangeMap<Integer, String> replacements = TreeRangeMap.create();
-        for (JCImport importTree : unit.getImports()) {
+        // From JDK 23 on, getImports() also returns JCModuleImport, which is not a JCImport, so iterate
+        // over their common supertype and use ImportTree, which both implement.
+        for (JCTree importDecl : unit.getImports()) {
+            ImportTree importTree = (ImportTree) importDecl;
             String simpleName = getSimpleName(importTree);
             if (!isUnused(unit, usedNames, usedInJavadoc, importTree, simpleName)) {
                 continue;
             }
             // delete the import
-            int endPosition = importTree.getEndPosition(unit.endPositions);
+            int endPosition = importDecl.getEndPosition(unit.endPositions);
             endPosition = Math.max(CharMatcher.isNot(' ').indexIn(contents, endPosition), endPosition);
             String sep = Newlines.guessLineSeparator(contents);
             if (endPosition + sep.length() < contents.length()
@@ -241,9 +243,19 @@ public class RemoveUnusedImports {
                             .equals(sep)) {
                 endPosition += sep.length();
             }
-            replacements.put(Range.closedOpen(importTree.getStartPosition(), endPosition), "");
+            replacements.put(Range.closedOpen(importDecl.getStartPosition(), endPosition), "");
         }
         return replacements;
+    }
+
+    // ImportTree#isModule() (JEP 511) exists from JDK 23 on; this module compiles with a JDK 21
+    // compiler, so it can't be referenced directly. Same idiom as CASE_TREE_GET_LABELS above.
+    private static final Method IMPORT_TREE_IS_MODULE =
+            JavaInputAstVisitor.maybeGetMethod(ImportTree.class, "isModule");
+
+    private static boolean isModuleImport(ImportTree importTree) {
+        return IMPORT_TREE_IS_MODULE != null
+                && Boolean.TRUE.equals(JavaInputAstVisitor.invoke(IMPORT_TREE_IS_MODULE, importTree));
     }
 
     private static String getSimpleName(ImportTree importTree) {
@@ -260,6 +272,11 @@ public class RemoveUnusedImports {
             Multimap<String, Range<Integer>> usedInJavadoc,
             ImportTree importTree,
             String simpleName) {
+        if (isModuleImport(importTree)) {
+            // A module import binds every exported package of the module, so this scanner can't tell
+            // whether it's needed - same as the `.*` wildcard imports below. Never remove it.
+            return false;
+        }
         String qualifier = ((JCFieldAccess) importTree.getQualifiedIdentifier())
                 .getExpression()
                 .toString();

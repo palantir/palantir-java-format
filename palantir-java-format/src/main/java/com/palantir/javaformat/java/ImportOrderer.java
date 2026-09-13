@@ -123,27 +123,39 @@ public final class ImportOrderer {
     /**
      * A {@link Comparator} that orders {@link Import}s by Google Style, defined at
      * https://google.github.io/styleguide/javaguide.html#s3.3.3-import-ordering-and-spacing.
+     *
+     * <p>Google Style does not use module imports ({@code import module foo.bar;}, JEP 511); when present, they
+     * sort between static and non-static type imports, matching google-java-format.
      */
-    private static final Comparator<Import> GOOGLE_IMPORT_COMPARATOR =
-            Comparator.comparing(Import::isStatic, trueFirst()).thenComparing(Import::imported);
+    private static final Comparator<Import> GOOGLE_IMPORT_COMPARATOR = Comparator.comparing(
+                    Import::isStatic, trueFirst())
+            .thenComparing(Import::isModule, trueFirst())
+            .thenComparing(Import::imported)
+            // Imports that compare equal collapse into one, so two that are written differently -- one of them
+            // carrying a comment, say -- must not compare equal, or that comment disappears with it.
+            .thenComparing(Import::declaration);
 
     /**
      * A {@link Comparator} that orders {@link Import}s by AOSP Style, defined at
      * https://source.android.com/setup/contribute/code-style#order-import-statements and implemented in IntelliJ at
      * https://android.googlesource.com/platform/development/+/master/ide/intellij/codestyles/AndroidStyle.xml.
+     *
+     * <p>As with {@link #GOOGLE_IMPORT_COMPARATOR}, module imports sort after static imports.
      */
     private static final Comparator<Import> AOSP_IMPORT_COMPARATOR = Comparator.comparing(Import::isStatic, trueFirst())
+            .thenComparing(Import::isModule, trueFirst())
             .thenComparing(Import::isAndroid, trueFirst())
             .thenComparing(Import::isThirdParty, trueFirst())
             .thenComparing(Import::isJava, trueFirst())
-            .thenComparing(Import::imported);
+            .thenComparing(Import::imported)
+            .thenComparing(Import::declaration);
 
     /**
      * Determines whether to insert a blank line between the {@code prev} and {@code curr} {@link Import}s based on
      * Google style.
      */
     private static boolean shouldInsertBlankLineGoogle(Import prev, Import curr) {
-        return prev.isStatic() && !curr.isStatic();
+        return prev.isStatic() != curr.isStatic() || prev.isModule() != curr.isModule();
     }
 
     /**
@@ -151,7 +163,7 @@ public final class ImportOrderer {
      * style.
      */
     private static boolean shouldInsertBlankLineAosp(Import prev, Import curr) {
-        if (prev.isStatic() && !curr.isStatic()) {
+        if (prev.isStatic() != curr.isStatic() || prev.isModule() != curr.isModule()) {
             return true;
         }
         // insert blank line between "com.android" from "com.anythingelse"
@@ -186,12 +198,24 @@ public final class ImportOrderer {
     class Import {
         private final String imported;
         private final boolean isStatic;
+        private final boolean isModule;
         private final String trailing;
+        private final String declaration;
 
-        Import(String imported, String trailing, boolean isStatic) {
+        Import(String imported, String trailing, boolean isStatic, boolean isModule, String declaration) {
             this.imported = imported;
             this.trailing = trailing;
             this.isStatic = isStatic;
+            this.isModule = isModule;
+            this.declaration = declaration;
+        }
+
+        /**
+         * The declaration as it will be written: the {@code import} keyword through the semicolon, with whitespace
+         * normalized and any comments left in the slot the author wrote them in.
+         */
+        String declaration() {
+            return declaration;
         }
 
         /** The name being imported, for example {@code java.util.List}. */
@@ -202,6 +226,11 @@ public final class ImportOrderer {
         /** True if this is {@code import static}. */
         boolean isStatic() {
             return isStatic;
+        }
+
+        /** True if this is {@code import module} (JEP 511). */
+        boolean isModule() {
+            return isModule;
         }
 
         /** The top-level package of the import. */
@@ -245,17 +274,49 @@ public final class ImportOrderer {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();
-            sb.append("import ");
-            if (isStatic()) {
-                sb.append("static ");
-            }
-            sb.append(imported()).append(';');
+            sb.append(declaration());
             if (trailing().trim().isEmpty()) {
                 sb.append(lineSeparator);
             } else {
                 sb.append(trailing());
             }
             return sb.toString();
+        }
+    }
+
+    /**
+     * Renders one import declaration from the toks it is made of. Whitespace between the toks is normalized, since the
+     * style guide puts one import on a line of its own, but a comment stays in the slot the author wrote it in rather
+     * than being moved to wherever the rendered declaration can accommodate it.
+     */
+    private final class Declaration {
+        private final StringBuilder text = new StringBuilder();
+        private boolean atLineStart = false;
+
+        /** Appends one tok: a keyword, an identifier, {@code .}, {@code *}, {@code ;}, or a comment. */
+        void append(String piece) {
+            if (text.length() > 0 && !atLineStart && needsSpaceBefore(piece)) {
+                text.append(' ');
+            }
+            text.append(piece);
+            atLineStart = false;
+            if (piece.startsWith("//")) {
+                // A // comment swallows the rest of its line, so the declaration continues on the next one.
+                text.append(lineSeparator);
+                atLineStart = true;
+            }
+        }
+
+        private boolean needsSpaceBefore(String piece) {
+            if (piece.equals(".") || piece.equals(";") || piece.equals("*")) {
+                return false;
+            }
+            return text.charAt(text.length() - 1) != '.';
+        }
+
+        @Override
+        public String toString() {
+            return text.toString();
         }
     }
 
@@ -282,9 +343,10 @@ public final class ImportOrderer {
      *
      * <pre>{@code
      * <imports> -> (<end-of-line> | <import>)*
-     * <import> -> "import" <whitespace> ("static" <whitespace>)?
-     *    <identifier> ("." <identifier>)* ("." "*")? <whitespace>? ";"
+     * <import> -> "import" <ignorable> (("static" | "module") <ignorable>)?
+     *    <identifier> ("." <identifier>)* ("." "*")? <ignorable>? ";"
      *    <whitespace>? <end-of-line>? (<line-comment> <end-of-line>)*
+     * <ignorable> -> (<whitespace> | <end-of-line> | <comment>)+
      * }</pre>
      *
      * @param i the index to start parsing at.
@@ -298,35 +360,43 @@ public final class ImportOrderer {
         // of our tests here and protects us from running off the end of the toks list. Since it is
         // zero-width it doesn't matter if we include it in our string concatenation at the end.
         while (i < toks.size() && tokenAt(i).equals("import")) {
+            Declaration declaration = new Declaration();
+            declaration.append(tokenAt(i));
             i++;
-            if (isSpaceToken(i)) {
+            i = skipIgnored(i, declaration);
+            boolean isModule = isModuleKeyword(i);
+            if (isModule) {
+                declaration.append(tokenAt(i));
                 i++;
+                i = skipIgnored(i, declaration);
             }
-            boolean isStatic = tokenAt(i).equals("static");
+            boolean isStatic = !isModule && tokenAt(i).equals("static");
             if (isStatic) {
+                declaration.append(tokenAt(i));
                 i++;
-                if (isSpaceToken(i)) {
-                    i++;
-                }
+                i = skipIgnored(i, declaration);
             }
             if (!isIdentifierToken(i)) {
                 throw new FormatterException("Unexpected token after import: " + tokenAt(i));
             }
-            StringAndIndex imported = scanImported(i);
+            StringAndIndex imported = scanImported(i, declaration);
             String importedName = imported.string;
             i = imported.index;
-            if (isSpaceToken(i)) {
-                i++;
-            }
+            i = skipIgnored(i, declaration);
             if (!tokenAt(i).equals(";")) {
                 throw new FormatterException("Expected ; after import");
             }
+            declaration.append(";");
             while (tokenAt(i).equals(";")) {
                 // Extra semicolons are not allowed by the JLS but are accepted by javac.
                 i++;
             }
             StringBuilder trailing = new StringBuilder();
-            if (isSpaceToken(i)) {
+            // A block comment on the same line as the `;` trails this import; one on a later line
+            // belongs to whatever follows it, so only same-line toks are absorbed here. Javadoc is
+            // excluded: the formatter moves a javadoc comment onto a line of its own, which would
+            // separate the imports.
+            while (isSpaceToken(i) || isBlockCommentToken(i)) {
                 trailing.append(tokenAt(i));
                 i++;
             }
@@ -344,7 +414,7 @@ public final class ImportOrderer {
                     i++;
                 }
             }
-            imports.add(new Import(importedName, trailing.toString(), isStatic));
+            imports.add(new Import(importedName, trailing.toString(), isStatic, isModule, declaration.toString()));
             // Remember the position just after the import we just saw, before skipping blank lines.
             // If the next thing after the blank lines is not another import then we don't want to
             // include those blank lines in the text to be replaced.
@@ -387,17 +457,19 @@ public final class ImportOrderer {
     }
 
     /**
-     * Scans the imported thing, the dot-separated name that comes after import [static] and before the semicolon. We
-     * don't allow spaces inside the dot-separated name. Wildcard imports are supported: if the input is {@code import
-     * java.util.*;} then the returned string will be {@code java.util.*}.
+     * Scans the imported thing, the dot-separated name that comes after import [static] and before the semicolon.
+     * Whitespace, line terminators and comments may appear between its parts, as they may anywhere else in the
+     * declaration; the returned name contains none of them. Wildcard imports are supported: if the input is
+     * {@code import java.util.*;} then the returned string will be {@code java.util.*}.
      *
      * @param start the index of the start of the identifier. If the import is {@code import java.util.List;} then this
      *     index points to the token {@code java}.
+     * @param declaration collects the toks scanned, so a comment between the parts of the name keeps its place
      * @return the parsed import ({@code java.util.List} in the example) and the index of the first token after the
      *     imported thing ({@code ;} in the example).
      * @throws FormatterException if the imported name could not be parsed.
      */
-    private StringAndIndex scanImported(int start) throws FormatterException {
+    private StringAndIndex scanImported(int start, Declaration declaration) throws FormatterException {
         int i = start;
         StringBuilder imported = new StringBuilder();
         // At the start of each iteration of this loop, i points to an identifier.
@@ -405,14 +477,19 @@ public final class ImportOrderer {
         while (true) {
             Preconditions.checkState(isIdentifierToken(i));
             imported.append(tokenAt(i));
+            declaration.append(tokenAt(i));
             i++;
+            i = skipIgnored(i, declaration);
             if (!tokenAt(i).equals(".")) {
                 return new StringAndIndex(imported.toString(), i);
             }
             imported.append('.');
+            declaration.append(".");
             i++;
+            i = skipIgnored(i, declaration);
             if (tokenAt(i).equals("*")) {
                 imported.append('*');
+                declaration.append("*");
                 return new StringAndIndex(imported.toString(), i + 1);
             } else if (!isIdentifierToken(i)) {
                 throw new FormatterException("Could not parse imported name, at: " + tokenAt(i));
@@ -452,6 +529,41 @@ public final class ImportOrderer {
         return toks.get(i).getOriginalText();
     }
 
+    /**
+     * Returns true if the token at {@code i} is the {@code module} contextual keyword introducing a module import
+     * declaration ({@code import module foo.bar;}, JEP 511), as opposed to an ordinary import whose first segment
+     * happens to be an identifier literally named {@code module} (for example {@code import module.Foo;}). As with
+     * other contextual keywords ({@code var}, {@code yield}, ...), this is disambiguated by lookahead: {@code
+     * module} only introduces a module import when the next token is another identifier, rather than {@code .} or
+     * {@code ;}. Whitespace, line terminators and comments are skipped, as they are by the parsing that follows.
+     */
+    private boolean isModuleKeyword(int i) {
+        if (!tokenAt(i).equals("module")) {
+            return false;
+        }
+        return isIdentifierToken(skipIgnored(i + 1, new Declaration()));
+    }
+
+    /**
+     * Skips whitespace, line terminators and comments starting at {@code i}, appending each comment to
+     * {@code declaration}, and returns the index of the first token that is none of those. Javadoc comments are not
+     * skipped: the formatter moves them onto a line of their own, which would separate the imports, so an import
+     * carrying one is rejected, as it was before module imports were supported.
+     */
+    private int skipIgnored(int i, Declaration declaration) {
+        while (i < toks.size()) {
+            if (isSpaceToken(i) || isNewlineToken(i)) {
+                i++;
+            } else if (isSlashSlashCommentToken(i) || isBlockCommentToken(i)) {
+                declaration.append(tokenAt(i).trim());
+                i++;
+            } else {
+                break;
+            }
+        }
+        return i;
+    }
+
     private boolean isIdentifierToken(int i) {
         String s = tokenAt(i);
         return !s.isEmpty() && Character.isJavaIdentifierStart(s.codePointAt(0));
@@ -468,6 +580,18 @@ public final class ImportOrderer {
 
     private boolean isSlashSlashCommentToken(int i) {
         return toks.get(i).isSlashSlashComment();
+    }
+
+    /** True if the tok is a {@code /* *}{@code /} comment that is not javadoc. */
+    private boolean isBlockCommentToken(int i) {
+        return toks.get(i).isSlashStarComment() && !toks.get(i).isJavadocComment();
+    }
+
+    /** True if {@code text} ends in a line terminator. */
+    private static boolean endsInNewline(CharSequence text) {
+        return text.length() > 0
+                && Newlines.isNewline(
+                        text.subSequence(text.length() - 1, text.length()).toString());
     }
 
     private boolean isNewlineToken(int i) {
