@@ -1,0 +1,16 @@
+type: fix
+fix:
+  description: |-
+    Wrapping a markdown documentation comment (`///`, JEP 467) no longer drops the `///`
+    from the wrapped line. From JDK 23 on javac returns a run of `///` lines as one comment
+    token, so the prefix was read from a line that still carried its source indentation and
+    came back empty: in Google style the output did not compile (`illegal start of type`),
+    and in Palantir style a trailing word such as `@Deprecated` became an annotation on the
+    following declaration, which compiles. The indentation was also counted twice in the
+    width test, so lines under the column limit were wrapped.
+
+    An unbreakable token is now left long rather than producing an empty `///` followed by
+    bare text, and `///foo` -> `/// foo` applies to every line of the run, so the same source
+    formats identically whichever JDK runs the formatter.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/1776
