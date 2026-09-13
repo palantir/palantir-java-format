@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: Add JHarmonizer into the README as a third-party integration
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/1661
