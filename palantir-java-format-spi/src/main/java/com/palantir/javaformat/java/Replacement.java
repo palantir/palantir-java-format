@@ -52,6 +52,7 @@ public final class Replacement {
         return replacementString;
     }
 
+    @SuppressWarnings("for-rollout:PatternMatchingInstanceof")
     @Override
     public boolean equals(Object o) {
         if (o == this) {
