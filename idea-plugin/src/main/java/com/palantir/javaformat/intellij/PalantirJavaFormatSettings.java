@@ -82,6 +82,14 @@ public class PalantirJavaFormatSettings implements PersistentStateComponent<Pala
         state.style = style;
     }
 
+    boolean isSkipReflowingLongStrings() {
+        return state.skipReflowingLongStrings;
+    }
+
+    void setSkipReflowingLongStrings(boolean skipReflowingLongStrings) {
+        state.skipReflowingLongStrings = skipReflowingLongStrings;
+    }
+
     /**
      * The paths to jars that provide an alternative implementation of the formatter. If set, this implementation will
      * be used instead of the bundled version.
@@ -149,6 +157,7 @@ public class PalantirJavaFormatSettings implements PersistentStateComponent<Pala
         private Optional<URI> nativeImageClassPath = Optional.empty();
 
         public JavaFormatterOptions.Style style = JavaFormatterOptions.Style.PALANTIR;
+        public boolean skipReflowingLongStrings = false;
 
         public void setImplementationClassPath(@Nullable List<String> value) {
             implementationClassPath = Optional.ofNullable(value)
