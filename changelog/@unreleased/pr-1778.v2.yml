@@ -1,0 +1,11 @@
+type: fix
+fix:
+  description: |-
+    Don't remove a `java.lang` import that disambiguates a simple name. A
+    single-type-import such as `import java.lang.Byte;` shadows same-package
+    types and types brought in by an import-on-demand (JLS 6.4.1), so removing
+    it could make the reference ambiguous or silently rebind it to a different
+    class, breaking compilation. Such an import is now only removed when its
+    simple name is unused. `import java.lang.*;` is still always removed.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/1778
