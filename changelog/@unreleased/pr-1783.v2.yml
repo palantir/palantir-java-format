@@ -1,0 +1,11 @@
+type: fix
+fix:
+  description: |-
+    Keep a two-column argument list or array initialiser grid laid out as a
+    table even when the values are different kinds of expression. Previously the
+    grid was discarded unless a majority of the values in each column shared an
+    AST node kind, so an argument list mixing a concatenation, a variable and a
+    method call collapsed onto one line while an otherwise identical call kept
+    its table.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/1783
