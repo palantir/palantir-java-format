@@ -184,8 +184,8 @@ public final class Formatter {
         };
         Log.instance(context).useSource(source);
         ParserFactory parserFactory = ParserFactory.instance(context);
-        JavacParser parser = parserFactory.newParser(
-                sourceText, /*keepDocComments=*/ true, /*keepEndPos=*/ true, /*keepLineMap=*/ true);
+        JavacParser parser =
+                Trees.newParser(parserFactory, sourceText, /*keepDocComments=*/ true, /*keepLineMap=*/ true);
         unit = parser.parseCompilationUnit();
         unit.sourcefile = source;
 

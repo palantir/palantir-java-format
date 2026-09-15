@@ -23,11 +23,19 @@ import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.ParenthesizedTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
+import com.sun.tools.javac.parser.JavacParser;
+import com.sun.tools.javac.parser.ParserFactory;
 import com.sun.tools.javac.tree.JCTree;
+import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
 import com.sun.tools.javac.tree.Pretty;
 import com.sun.tools.javac.tree.TreeInfo;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+import java.lang.invoke.VarHandle;
+import javax.annotation.Nullable;
 import javax.lang.model.element.Name;
 
 /** Utilities for working with {@link Tree}s. */
@@ -44,8 +52,73 @@ class Trees {
 
     /** Returns the source end position of the node. */
     static int getEndPosition(Tree expression, TreePath path) {
-        return ((JCTree) expression)
-                .getEndPosition(((JCTree.JCCompilationUnit) path.getCompilationUnit()).endPositions);
+        return getEndPosition(expression, (JCCompilationUnit) path.getCompilationUnit());
+    }
+
+    /** Returns the source end position of the node. */
+    static int getEndPosition(Tree tree, JCCompilationUnit unit) {
+        try {
+            return (int) GET_END_POSITION.invokeExact((JCTree) tree, unit);
+        } catch (RuntimeException | Error e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    /**
+     * Creates a parser that records end positions. JDK-8372948 (JDK 27) dropped the {@code keepEndPos} argument
+     * from {@link ParserFactory#newParser}, so the remaining four-argument overload now reads
+     * {@code (input, keepDocComments, keepLineMap, parseModuleInfo)}.
+     */
+    static JavacParser newParser(
+            ParserFactory parserFactory, CharSequence input, boolean keepDocComments, boolean keepLineMap) {
+        if (END_POS_TABLE_CLASS != null) {
+            return parserFactory.newParser(input, keepDocComments, /* keepEndPos= */ true, keepLineMap);
+        }
+        // The last argument is parseModuleInfo on these JDKs.
+        return parserFactory.newParser(input, keepDocComments, keepLineMap, false);
+    }
+
+    /**
+     * {@code com.sun.tools.javac.tree.EndPosTable}, or null on JDKs that store end positions directly in the tree
+     * (JDK-8372948, JDK 27 and later).
+     */
+    @Nullable
+    private static final Class<?> END_POS_TABLE_CLASS = endPosTableClass();
+
+    /** {@code (JCTree, JCCompilationUnit) -> int}, bound to whichever end position API this JDK has. */
+    private static final MethodHandle GET_END_POSITION = getEndPositionHandle();
+
+    @Nullable
+    private static Class<?> endPosTableClass() {
+        try {
+            return Class.forName("com.sun.tools.javac.tree.EndPosTable");
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
+    }
+
+    private static MethodHandle getEndPositionHandle() {
+        MethodHandles.Lookup lookup = MethodHandles.lookup();
+        try {
+            if (END_POS_TABLE_CLASS == null) {
+                // (tree, unit) -> tree.getEndPosition()
+                return MethodHandles.dropArguments(
+                        lookup.findVirtual(JCTree.class, "getEndPosition", MethodType.methodType(int.class)),
+                        1,
+                        JCCompilationUnit.class);
+            }
+            // (tree, unit) -> tree.getEndPosition(unit.endPositions)
+            return MethodHandles.filterArguments(
+                    lookup.findVirtual(
+                            JCTree.class, "getEndPosition", MethodType.methodType(int.class, END_POS_TABLE_CLASS)),
+                    1,
+                    lookup.findVarHandle(JCCompilationUnit.class, "endPositions", END_POS_TABLE_CLASS)
+                            .toMethodHandle(VarHandle.AccessMode.GET));
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException("Unsupported javac end position API", e);
+        }
     }
 
     /** Returns the source text for the node. */
