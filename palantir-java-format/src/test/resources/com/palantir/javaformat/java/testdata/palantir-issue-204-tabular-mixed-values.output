@@ -1,0 +1,50 @@
+class PalantirIssue204TabularMixedValues {
+    void valuesMayBeDifferentKindsOfExpression() {
+        assertThatTheThing(
+                "alpha", firstOperand + secondOperand,
+                "bravo", someBareVariableName,
+                "charlie", computeSomething(),
+                "delta", anotherOperand + more);
+    }
+
+    void leadingColumnStillHasToLookAlike() {
+        assertThatTheThing(
+                computeSomething(),
+                someBareVariableName,
+                "bravo",
+                someBareVariableName,
+                "charlie",
+                someBareVariableName,
+                "delta",
+                someBareVariableName);
+    }
+
+    void uniformValuesKeepWorking() {
+        assertThatTheThing(
+                "alpha", computeA(),
+                "bravo", computeB(),
+                "charlie", computeC(),
+                "delta", computeD());
+    }
+
+    // Array initialisers use the same tabular detection, but unlike method arguments they are not
+    // restricted to two columns.
+    Object[] arrayInitialiserGridWithMixedValues = {
+        "alpha", 1 + 1, someBareVariableName,
+        "bravo", computeSomething(), someBareVariableName,
+        "charlie", someBareVariableName, computeSomething(),
+    };
+
+    // Method arguments only ever use the two column layout, whatever the grid in the source looks like.
+    void fourColumnMethodArgumentsAreNotTabular() {
+        register(
+                "alpha",
+                1 + 1,
+                someBareVariableName,
+                computeSomething(),
+                "bravo",
+                2,
+                computeSomething(),
+                someBareVariableName);
+    }
+}
