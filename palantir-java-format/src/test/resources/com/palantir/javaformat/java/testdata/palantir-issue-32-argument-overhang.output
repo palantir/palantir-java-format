@@ -1,0 +1,32 @@
+class PalantirIssue32ArgumentOverhang {
+    public void apply(Project project) {
+        project.getExtensions().getExtraProperties().set("getVersion", new Closure<String>(project, project) {
+            public String doCall(Object moduleVersion) {
+                return doCall(
+                        moduleVersion,
+                        project.getRootProject()
+                                .getConfigurations()
+                                .getByName(VersionsLockPlugin.UNIFIED_CLASSPATH_CONFIGURATION_NAME));
+            }
+
+            public String doCall(String group, String name) {
+                return getVersion(
+                        project,
+                        group,
+                        name,
+                        project.getRootProject()
+                                .getConfigurations()
+                                .getByName(VersionsLockPlugin.UNIFIED_CLASSPATH_CONFIGURATION_NAME));
+            }
+        });
+    }
+
+    private void setupDependenciesToProject(Project project) {
+        NamedDomainObjectProvider<Configuration> consistentVersionsProduction = project.getConfigurations()
+                .register(CONSISTENT_VERSIONS_PRODUCTION, conf -> {
+                    conf.setDescription("Outgoing configuration for production dependencies meant to be used by "
+                            + "consistent-versions");
+                    conf.setVisible(false);
+                });
+    }
+}
