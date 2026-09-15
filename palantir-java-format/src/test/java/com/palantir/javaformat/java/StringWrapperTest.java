@@ -23,6 +23,45 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 
 @Execution(ExecutionMode.CONCURRENT)
 public class StringWrapperTest {
+    // https://github.com/palantir/palantir-java-format/issues/68
+    @Test
+    public void joiningWouldChangeEscapes_flagsOctalEscapesThatCanSwallowAnotherDigit() {
+        // `\1` then `2` is not the same as `\12`
+        assertThat(StringWrapper.joiningWouldChangeEscapes("a\\1", "2b")).isTrue();
+        assertThat(StringWrapper.joiningWouldChangeEscapes("\\12", "3")).isTrue();
+        assertThat(StringWrapper.joiningWouldChangeEscapes("\\0", "0")).isTrue();
+    }
+
+    @Test
+    public void joiningWouldChangeEscapes_allowsEverythingElse() {
+        // A three digit octal escape is already maximal.
+        assertThat(StringWrapper.joiningWouldChangeEscapes("\\377", "7")).isFalse();
+        // An escaped backslash means the digits are literal text, not an escape.
+        assertThat(StringWrapper.joiningWouldChangeEscapes("back\\\\", "1")).isFalse();
+        // Plain trailing digits are not an escape.
+        assertThat(StringWrapper.joiningWouldChangeEscapes("12", "3")).isFalse();
+        // 8 and 9 are not octal digits.
+        assertThat(StringWrapper.joiningWouldChangeEscapes("\\1", "8")).isFalse();
+        // Nothing to swallow.
+        assertThat(StringWrapper.joiningWouldChangeEscapes("\\1", "")).isFalse();
+        assertThat(StringWrapper.joiningWouldChangeEscapes("", "1")).isFalse();
+    }
+
+    @Test
+    public void mayHaveJoinableLiterals_onlyMatchesAPlusBetweenTwoQuotes() {
+        assertThat(StringWrapper.mayHaveJoinableLiterals("String s = \"a\" + \"b\";"))
+                .isTrue();
+        assertThat(StringWrapper.mayHaveJoinableLiterals("String s = \"a\"+\"b\";"))
+                .isTrue();
+        // Only one side is a literal, so there is nothing to join.
+        assertThat(StringWrapper.mayHaveJoinableLiterals("String s = value + \"b\";"))
+                .isFalse();
+        assertThat(StringWrapper.mayHaveJoinableLiterals("String s = \"a\" + value;"))
+                .isFalse();
+        assertThat(StringWrapper.mayHaveJoinableLiterals("int i = one + two;")).isFalse();
+        assertThat(StringWrapper.mayHaveJoinableLiterals("")).isFalse();
+    }
+
     @Test
     public void testAwkwardLineEndWrapping() throws Exception {
         String input = lines(

@@ -9,6 +9,5 @@ class MultilineStringConstant {
             + "field_3," //$NON-NLS-1$
             + "field_4"; //$NON-NLS-1$
 
-    private static final String MULTIPLE_LINE_NO_COMMENT =
-            "field_0," + "field_1," + "field_2," + "field_3," + "field_4";
+    private static final String MULTIPLE_LINE_NO_COMMENT = "field_0,field_1,field_2,field_3,field_4";
 }
