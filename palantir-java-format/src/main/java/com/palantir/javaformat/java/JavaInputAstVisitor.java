@@ -2197,7 +2197,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 visitVariables(
                         fragments,
                         DeclarationKind.NONE,
-                        canLocalHaveHorizontalAnnotations(fragments.get(0).getModifiers()));
+                        canHaveHorizontalAnnotations(fragments.get(0).getModifiers()));
             } else {
                 scan(tree, null);
             }
@@ -3780,8 +3780,9 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                     visitVariables(
                             variableFragments(it, bodyDeclaration),
                             DeclarationKind.FIELD,
-                            // We always want field annotations to be vertical
-                            Direction.VERTICAL);
+                            // A single marker annotation stays on the field's line, the same as for locals and
+                            // parameters; anything richer stays vertical. See #215.
+                            canHaveHorizontalAnnotations(((VariableTree) bodyDeclaration).getModifiers()));
                 } else {
                     scan(bodyDeclaration, null);
                 }
@@ -3875,13 +3876,17 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     }
 
     /**
-     * Can a local with a set of modifiers be declared with horizontal annotations? This is currently true if there is
-     * at most one marker annotation, and no others.
+     * Can a declaration with a set of modifiers be declared with horizontal annotations? This is currently true if
+     * there is at most one marker annotation, and no others.
+     *
+     * <p>Keeping this to a single argument-less annotation is what makes it safe for the left-hand column to stay
+     * scannable: {@code @Mock private Foo foo;} shifts the type by a fixed, short amount, whereas an annotation with
+     * arguments would push it an arbitrary distance and vary line to line.
      *
      * @param modifiers the list of {@link ModifiersTree}s
-     * @return whether the local can be declared with horizontal annotations
+     * @return whether the declaration can be declared with horizontal annotations
      */
-    private Direction canLocalHaveHorizontalAnnotations(ModifiersTree modifiers) {
+    private Direction canHaveHorizontalAnnotations(ModifiersTree modifiers) {
         int markerAnnotations = 0;
         for (AnnotationTree annotation : modifiers.getAnnotations()) {
             if (annotation.getArguments().isEmpty()) {
