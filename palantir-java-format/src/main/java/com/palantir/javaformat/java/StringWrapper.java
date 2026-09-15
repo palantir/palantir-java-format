@@ -56,8 +56,25 @@ public final class StringWrapper {
 
     public static final String TEXT_BLOCK_DELIMITER = "\"\"\"";
 
+    /**
+     * How many times {@link #wrapOnce} may be re-run while it is still changing the source. The indentation chosen
+     * for a text block is derived from the layout around it, which this pass can itself move, so a single round is
+     * not always a fixed point and the formatter would not be idempotent. See
+     * <a href="https://github.com/palantir/palantir-java-format/issues/1343">#1343</a>.
+     */
+    private static final int MAX_ROUNDS = 5;
+
     /** Reflows string literals in the given Java source code that extend past the given column limit. */
     static String wrap(final int columnLimit, String input, Formatter formatter) throws FormatterException {
+        String result = wrapOnce(columnLimit, input, formatter);
+        for (int round = 1; round < MAX_ROUNDS && !result.equals(input); round++) {
+            input = result;
+            result = wrapOnce(columnLimit, input, formatter);
+        }
+        return result;
+    }
+
+    private static String wrapOnce(final int columnLimit, String input, Formatter formatter) throws FormatterException {
         if (!needWrapping(columnLimit, input)) {
             // fast path
             return input;
