@@ -576,7 +576,7 @@ public final class StringWrapper {
             CharMatcher.whitespace().or(CharMatcher.anyOf("\"+"));
 
     private static int getEndPosition(JCTree.JCCompilationUnit unit, Tree tree) {
-        return ((JCTree) tree).getEndPosition(unit.endPositions);
+        return Trees.getEndPosition(tree, unit);
     }
 
     private static int getStartPosition(Tree tree) {
