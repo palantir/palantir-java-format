@@ -38,7 +38,7 @@ com.google.auto.service:auto-service-annotations:1.1.1 (1 constraints: 9c0f6a86)
 
 com.google.code.findbugs:jsr305:3.0.2 (1 constraints: 0705fc35)
 
-com.google.errorprone:error_prone_annotations:2.50.0 (5 constraints: b53797e2)
+com.google.errorprone:error_prone_annotations:2.50.0 (5 constraints: ad3740df)
 
 com.google.guava:failureaccess:1.0.3 (2 constraints: f3154f13)
 
@@ -126,7 +126,7 @@ org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10 (1 constraints: e210ffd2)
 
 org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10 (2 constraints: 8118c1c5)
 
-org.jspecify:jspecify:1.0.1 (15 constraints: 1bf4059d)
+org.jspecify:jspecify:1.0.1 (15 constraints: 1cf48c9f)
 
 org.openjdk.jmh:jmh-core:1.37 (5 constraints: 52476be6)
 
@@ -144,7 +144,7 @@ aopalliance:aopalliance:1.0 (1 constraints: 170a83ac)
 
 cglib:cglib-nodep:3.2.2 (1 constraints: 490ded24)
 
-com.github.ben-manes.caffeine:caffeine:3.2.4 (2 constraints: cc16292c)
+com.github.ben-manes.caffeine:caffeine:3.3.0 (2 constraints: c9168f2b)
 
 com.google.auto.value:auto-value-annotations:1.11.0 (2 constraints: d01cd319)
 
