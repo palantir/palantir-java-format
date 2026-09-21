@@ -1,0 +1,8 @@
+type: improvement
+improvement:
+  description: |-
+    Add a regression test pinning the argument layout reported in #32 (long
+    trailing arguments overhanging their indent). The behaviour was fixed by
+    #37 in 2019 but was not covered by any test.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/1780
