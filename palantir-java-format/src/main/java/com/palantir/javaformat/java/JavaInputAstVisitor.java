@@ -3594,15 +3594,10 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                     initializer.get().accept(this, null);
                     builder.close();
                 } else {
-                    if (builder.peekToken().get().equals("switch")) {
-                        // TODO(fawind): Don't break switch expression assignment
-                        builder.open(Indent.If.make(typeBreak, plusFour, ZERO));
-                    } else {
-                        builder.open(
-                                Indent.If.make(typeBreak, plusFour, ZERO),
-                                BreakBehaviours.breakOnlyIfInnerLevelsThenFitOnOneLine(true),
-                                LastLevelBreakability.ABORT);
-                    }
+                    builder.open(
+                            Indent.If.make(typeBreak, plusFour, ZERO),
+                            BreakBehaviours.breakOnlyIfInnerLevelsThenFitOnOneLine(true),
+                            LastLevelBreakability.ABORT);
                     {
                         builder.breakToFill(" ");
                         scan(initializer.get(), null);
