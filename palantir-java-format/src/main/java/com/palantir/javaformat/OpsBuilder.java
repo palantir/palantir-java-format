@@ -342,7 +342,8 @@ public final class OpsBuilder {
             Indent plusIndentCommentsBefore,
             Optional<Indent> breakAndIndentTrailingComment) {
         ImmutableList<? extends Input.Token> tokens = input.getTokens();
-        if (token.equals(peekToken().orElse(null))) { // Found the input token. Output it.
+        if (token.equals(peekToken().orElse(null))
+                || (token.isEmpty() && peekToken().equals(Optional.of("_")))) { // Found the input token. Output it.
             add(Token.make(
                     tokens.get(tokenI++),
                     RealOrImaginary.REAL,
