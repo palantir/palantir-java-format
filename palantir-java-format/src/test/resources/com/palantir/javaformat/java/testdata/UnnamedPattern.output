@@ -1,0 +1,25 @@
+class UnnamedPattern {
+    public static void main(String[] args) {
+        var cp = new ColoredPoint(new Point(1, 2), Color.RED);
+
+        // The colour doesn't matter, so use an unnamed pattern
+        // (as opposed to the unnamed type pattern `var _`).
+        if (cp instanceof ColoredPoint(Point(int x, int y), _)) {
+            System.out.println(x + "," + y);
+        }
+
+        if (cp instanceof ColoredPoint(_, var c)) {
+            System.out.println(c);
+        }
+    }
+}
+
+record Point(int x, int y) {}
+
+enum Color {
+    RED,
+    GREEN,
+    BLUE
+}
+
+record ColoredPoint(Point p, Color c) {}
