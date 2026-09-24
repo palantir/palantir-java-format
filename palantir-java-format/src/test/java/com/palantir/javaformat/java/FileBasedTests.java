@@ -59,7 +59,12 @@ public final class FileBasedTests {
                             "SwitchUnderscore",
                             "I880",
                             "I1309",
-                            "Unnamed")
+                            "Unnamed",
+                            "UnnamedPattern",
+                            "CompactSource",
+                            "MarkdownDoc",
+                            "FlexibleConstructor")
+                    .putAll(23, "ModuleImport")
                     .build();
 
     private final Class<?> testClass;

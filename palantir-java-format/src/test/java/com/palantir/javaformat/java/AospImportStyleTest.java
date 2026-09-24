@@ -277,6 +277,79 @@ public class AospImportStyleTest {
                     "public class Blim {}",
                 },
             },
+
+            // Module imports (JEP 511) sort between static imports and the android/third-party/java
+            // groups, as in google-java-format, each group separated by a blank line.
+            {
+                {
+                    "package foo;",
+                    "",
+                    "import java.util.List;",
+                    "import static android.Bar.baz;",
+                    "import module java.desktop;",
+                    "import android.Bar;",
+                    "import module java.base;",
+                    "",
+                    "public class Blim {}",
+                },
+                {
+                    "package foo;",
+                    "",
+                    "import static android.Bar.baz;",
+                    "",
+                    "import module java.base;",
+                    "import module java.desktop;",
+                    "",
+                    "import android.Bar;",
+                    "",
+                    "import java.util.List;",
+                    "",
+                    "public class Blim {}",
+                },
+            },
+
+            // A module import and a non-module import that share a top level package: the blank line
+            // comes from the module boundary, not from the top-level-package rule.
+            {
+                {
+                    "package foo;",
+                    "",
+                    "import java.util.List;",
+                    "import module java.base;",
+                    "",
+                    "public class Blim {}",
+                },
+                {
+                    "package foo;",
+                    "",
+                    "import module java.base;",
+                    "",
+                    "import java.util.List;",
+                    "",
+                    "public class Blim {}",
+                },
+            },
+
+            // Module imports sort before third-party imports, which would otherwise come first.
+            {
+                {
+                    "package foo;",
+                    "",
+                    "import org.example.Bar;",
+                    "import module java.base;",
+                    "",
+                    "public class Blim {}",
+                },
+                {
+                    "package foo;",
+                    "",
+                    "import module java.base;",
+                    "",
+                    "import org.example.Bar;",
+                    "",
+                    "public class Blim {}",
+                },
+            },
         };
         ImmutableList.Builder<Object[]> builder = ImmutableList.builder();
         Arrays.stream(inputsOutputs).forEach(input -> builder.add(ImportOrdererUtils.createRow(input)));
@@ -289,6 +362,10 @@ public class AospImportStyleTest {
             String output = ImportOrderer.reorderImports(input, JavaFormatterOptions.Style.AOSP);
             assertWithMessage("Expected exception").that(reordered).doesNotMatch("^!!");
             assertWithMessage(input).that(output).isEqualTo(reordered);
+            // Reordering must be a fixed point: a formatted file has to survive being formatted again.
+            assertWithMessage("not idempotent: %s", output)
+                    .that(ImportOrderer.reorderImports(output, JavaFormatterOptions.Style.AOSP))
+                    .isEqualTo(output);
         } catch (FormatterException e) {
             if (!reordered.startsWith("!!")) {
                 throw e;

@@ -87,4 +87,5 @@ jdks {
     }
 
     jdkMajorVersionsToUse().add(JavaLanguageVersion.of("23"))
+    jdkMajorVersionsToUse().add(JavaLanguageVersion.of("25"))
 }
