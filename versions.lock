@@ -8,11 +8,11 @@ com.diffplug.durian:durian-io:1.2.0 (1 constraints: 1313c62d)
 
 com.diffplug.durian:durian-swt.os:4.3.0 (1 constraints: c60948a9)
 
-com.diffplug.spotless:spotless-lib:4.10.2 (2 constraints: ea24bfe5)
+com.diffplug.spotless:spotless-lib:4.10.3 (2 constraints: ec24f7e5)
 
-com.diffplug.spotless:spotless-lib-extra:4.10.2 (1 constraints: 47131b41)
+com.diffplug.spotless:spotless-lib-extra:4.10.3 (1 constraints: 48131c41)
 
-com.diffplug.spotless:spotless-plugin-gradle:8.10.2 (2 constraints: ff16813b)
+com.diffplug.spotless:spotless-plugin-gradle:8.10.3 (2 constraints: 0017b53b)
 
 com.fasterxml.jackson.core:jackson-annotations:2.22 (7 constraints: 507c7559)
 
@@ -68,7 +68,7 @@ com.squareup.okio:okio:3.6.0 (1 constraints: 530c38fd)
 
 com.squareup.okio:okio-jvm:3.6.0 (1 constraints: 500ad3b9)
 
-commons-codec:commons-codec:1.22.0 (2 constraints: 181e0c87)
+commons-codec:commons-codec:1.22.1 (2 constraints: 191e0d87)
 
 dev.equo.ide:solstice:1.8.2 (1 constraints: 781168da)
 
@@ -82,7 +82,7 @@ org.derive4j:derive4j-annotation:1.1.1 (1 constraints: 0505f435)
 
 org.eclipse.jdt:org.eclipse.jdt.core:3.23.0 (1 constraints: 3a05423b)
 
-org.eclipse.jgit:org.eclipse.jgit:7.7.1.202607240634-r (2 constraints: fc2a1ddb)
+org.eclipse.jgit:org.eclipse.jgit:7.8.0.202609011348-r (2 constraints: fc2a09db)
 
 org.eclipse.platform:org.eclipse.core.commands:3.9.700 (1 constraints: 7505d640)
 
@@ -108,7 +108,7 @@ org.eclipse.platform:org.eclipse.equinox.registry:3.9.0 (1 constraints: 0e051536
 
 org.eclipse.platform:org.eclipse.equinox.supplement:1.10.0 (1 constraints: 3405293b)
 
-org.eclipse.platform:org.eclipse.osgi:3.24.200 (3 constraints: a021e822)
+org.eclipse.platform:org.eclipse.osgi:3.24.300 (3 constraints: a1210c23)
 
 org.eclipse.platform:org.eclipse.text:3.10.300 (1 constraints: 99053a46)
 
