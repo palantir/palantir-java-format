@@ -14,6 +14,7 @@ _A modern, lambda-friendly, 120 character Java formatter._
 - [IntelliJ plugin](https://plugins.jetbrains.com/plugin/13180-palantir-java-format)
 - [Gradle plugin](#palantir-java-format-gradle-plugin)
 - [Spotless](#spotless)
+- [Command line](#running-from-the-command-line)
 
 It is based on the excellent [google-java-format](https://github.com/google/google-java-format), and benefits from the work of all the [original authors](https://github.com/google/google-java-format/graphs/contributors). palantir-java-format is available under the same [Apache 2.0 License](./LICENSE).
 
@@ -149,6 +150,71 @@ when formatting java code.
 
 - See [integration in Spotless Gradle plugin](https://github.com/diffplug/spotless/tree/main/plugin-gradle#palantir-java-format).
 - See [integration in Spotless Maven plugin](https://github.com/diffplug/spotless/tree/main/plugin-maven#palantir-java-format).
+
+## Running from the command line
+
+### Native binary (recommended)
+
+Every release publishes a self-contained binary to Maven Central. It needs no JVM, no classpath and no JVM flags:
+
+```bash
+VERSION=2.98.0
+# one of: macos_aarch64, linux-glibc_x86-64, linux-glibc_aarch64
+PLATFORM=macos_aarch64
+
+curl -fL -o palantir-java-format \
+  "https://repo1.maven.org/maven2/com/palantir/javaformat/palantir-java-format-native/$VERSION/palantir-java-format-native-$VERSION-nativeImage-$PLATFORM.bin"
+chmod +x palantir-java-format
+
+./palantir-java-format --palantir Main.java       # write the formatted file to stdout
+./palantir-java-format --palantir -i Main.java    # format in place
+./palantir-java-format --help                     # all options
+```
+
+### On the JVM
+
+Invoking `com.palantir.javaformat.java.Main` yourself needs two things that are easy to get wrong.
+
+**1. The complete runtime classpath — not just `palantir-java-format.jar`.** The formatter also needs Guava,
+functionaljava and Jackson. Assembling the classpath by hand is what usually goes wrong: a missing dependency only
+shows up at runtime, as something like `java.lang.NoClassDefFoundError: fj/F`. Let a dependency manager resolve it
+instead. For example, with Gradle:
+
+```gradle
+// build.gradle
+plugins { id 'java' }
+repositories { mavenCentral() }
+configurations { formatter }
+dependencies { formatter 'com.palantir.javaformat:palantir-java-format:2.98.0' }
+tasks.register('formatterClasspath', Copy) {
+    from configurations.formatter
+    into layout.buildDirectory.dir('formatter-libs')
+}
+```
+
+```bash
+./gradlew formatterClasspath
+```
+
+**2. `--add-exports` flags.** The formatter reads javac's internal AST classes, which are not exported by the
+`jdk.compiler` module. Without these flags it fails with `IllegalAccessError`.
+
+Putting both together:
+
+```bash
+java \
+  --add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED \
+  --add-exports jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED \
+  --add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED \
+  --add-exports jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED \
+  --add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED \
+  --add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED \
+  --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED \
+  -cp "build/formatter-libs/*" \
+  com.palantir.javaformat.java.Main --palantir Main.java
+```
+
+Note that `Main` defaults to Google style; pass `--palantir` for this project's style, and `-` to read from stdin.
 
 ## IntelliJ plugin
 
