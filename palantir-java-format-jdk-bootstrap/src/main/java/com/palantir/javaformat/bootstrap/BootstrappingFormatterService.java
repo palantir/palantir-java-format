@@ -25,6 +25,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import com.palantir.javaformat.java.FormatterException;
 import com.palantir.javaformat.java.FormatterService;
+import com.palantir.javaformat.java.JavaFormatterOptions.Style;
 import com.palantir.javaformat.java.Replacement;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -44,11 +45,18 @@ public final class BootstrappingFormatterService implements FormatterService {
     private final Path jdkPath;
     private final Integer jdkMajorVersion;
     private final List<Path> implementationClassPath;
+    private final Style style;
 
     public BootstrappingFormatterService(Path jdkPath, Integer jdkMajorVersion, List<Path> implementationClassPath) {
+        this(jdkPath, jdkMajorVersion, implementationClassPath, Style.PALANTIR);
+    }
+
+    public BootstrappingFormatterService(
+            Path jdkPath, Integer jdkMajorVersion, List<Path> implementationClassPath, Style style) {
         this.jdkPath = jdkPath;
         this.jdkMajorVersion = jdkMajorVersion;
         this.implementationClassPath = implementationClassPath;
+        this.style = style;
     }
 
     @Override
@@ -86,6 +94,7 @@ public final class BootstrappingFormatterService implements FormatterService {
                 .implementationClasspath(implementationClassPath)
                 .outputReplacements(true)
                 .characterRanges(ranges.stream().map(RangeUtils::toStringRange).collect(Collectors.toList()))
+                .style(style)
                 .build();
 
         @SuppressWarnings("for-rollout:NullAway")
@@ -103,6 +112,7 @@ public final class BootstrappingFormatterService implements FormatterService {
                 .withJvmArgsForVersion(jdkMajorVersion)
                 .implementationClasspath(implementationClassPath)
                 .outputReplacements(false)
+                .style(style)
                 .build();
         return FormatterCommandRunner.runWithStdin(command.toArgs(), input, Optional.ofNullable(jdkPath.getParent()))
                 .orElse(input);
@@ -119,6 +129,8 @@ public final class BootstrappingFormatterService implements FormatterService {
         List<Path> implementationClasspath();
 
         List<String> jvmArgs();
+
+        Style style();
 
         default List<String> toArgs() {
             ImmutableList.Builder<String> args = ImmutableList.<String>builder()
@@ -138,9 +150,16 @@ public final class BootstrappingFormatterService implements FormatterService {
                 args.add("--output-replacements");
             }
 
+            switch (style()) {
+                case GOOGLE -> {}
+                case PALANTIR -> {
+                    args.add("--palantir");
+                }
+                case AOSP -> {
+                    args.add("--aosp");
+                }
+            }
             return args
-                    // Use palantir style
-                    .add("--palantir")
                     // Trailing "-" enables formatting stdin -> stdout
                     .add("-")
                     .build();

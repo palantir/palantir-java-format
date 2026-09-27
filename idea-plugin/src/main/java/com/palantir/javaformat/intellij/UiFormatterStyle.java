@@ -24,6 +24,8 @@ import java.util.Objects;
 /** Configuration options for the formatting style. */
 enum UiFormatterStyle {
     PALANTIR("Default Palantir Java style", Style.PALANTIR),
+    GOOGLE("Default Google Java Style", Style.GOOGLE),
+    AOSP("AOSP-compliant Style", Style.AOSP),
     ;
 
     private final String description;
