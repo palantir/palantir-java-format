@@ -24,6 +24,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import com.palantir.javaformat.java.FormatterService;
+import com.palantir.javaformat.java.JavaFormatterOptions;
 import com.palantir.javaformat.java.Replacement;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -38,9 +39,22 @@ public class NativeImageFormatterService implements FormatterService {
     private static final ObjectMapper MAPPER =
             JsonMapper.builder().addModule(new GuavaModule()).build();
     private final Path nativeImagePath;
+    private final JavaFormatterOptions formatterOptions;
 
+    /**
+     * Creates a NativeImageFormatterService with default formatter options.
+     * Provided for backward compatibility with code that does not pass JavaFormatterOptions.
+     *
+     * @deprecated Use {@link #NativeImageFormatterService(Path, JavaFormatterOptions)} instead
+     */
+    @Deprecated
     public NativeImageFormatterService(Path nativeImagePath) {
+        this(nativeImagePath, JavaFormatterOptions.builder().build());
+    }
+
+    public NativeImageFormatterService(Path nativeImagePath, JavaFormatterOptions formatterOptions) {
         this.nativeImagePath = nativeImagePath;
+        this.formatterOptions = formatterOptions;
     }
 
     @Override
@@ -50,6 +64,7 @@ public class NativeImageFormatterService implements FormatterService {
             FormatterNativeImageArgs command = FormatterNativeImageArgs.builder()
                     .nativeImagePath(nativeImagePath)
                     .outputReplacements(true)
+                    .skipReflowingLongStrings(formatterOptions.skipReflowingLongStrings())
                     .characterRanges(
                             ranges.stream().map(RangeUtils::toStringRange).collect(Collectors.toList()))
                     .build();
@@ -88,6 +103,7 @@ public class NativeImageFormatterService implements FormatterService {
         FormatterNativeImageArgs command = FormatterNativeImageArgs.builder()
                 .nativeImagePath(nativeImagePath)
                 .outputReplacements(false)
+                .skipReflowingLongStrings(formatterOptions.skipReflowingLongStrings())
                 .build();
         return FormatterCommandRunner.runWithStdin(
                         command.toArgs(), input, Optional.ofNullable(nativeImagePath.getParent()))
@@ -101,6 +117,8 @@ public class NativeImageFormatterService implements FormatterService {
 
         boolean outputReplacements();
 
+        boolean skipReflowingLongStrings();
+
         Path nativeImagePath();
 
         default List<String> toArgs() {
@@ -112,6 +130,9 @@ public class NativeImageFormatterService implements FormatterService {
             }
             if (outputReplacements()) {
                 args.add("--output-replacements");
+            }
+            if (skipReflowingLongStrings()) {
+                args.add("--skip-reflowing-long-strings");
             }
 
             return args
