@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: Preserve newlines and prevent spurious `<p>` tags inside `{@snippet}` Javadoc blocks
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/1717
