@@ -1,5 +1,0 @@
-type: improvement
-improvement:
-  description: Enable Nullaway
-  links:
-  - https://github.com/palantir/palantir-java-format/pull/988

@@ -1,13 +1,13 @@
-com.diffplug.spotless:spotless-plugin-gradle = 8.10.0
+com.diffplug.spotless:spotless-plugin-gradle = 8.10.3
 com.fasterxml.jackson.core:jackson-annotations = 2.22
-com.github.ben-manes.caffeine:caffeine = 3.2.4
+com.github.ben-manes.caffeine:caffeine = 3.3.0
 com.google.auto.service:auto-service = 1.1.1
 com.google.code.findbugs:* = 3.0.2
 com.google.errorprone:error_prone_annotations = 2.47.0
 com.google.guava:guava = 33.7.1-jre
 com.google.guava:guava-testlib = 33.5.0-jre
 com.google.testing.compile:compile-testing = 0.23.0
-com.palantir.sls.versions:sls-versions = 1.17.0
+com.palantir.sls.versions:sls-versions = 1.18.0
 junit:junit = 4.13.2
 org.assertj:assertj-core = 3.27.7
 org.derive4j:* = 1.1.1
@@ -19,11 +19,11 @@ org.junit.platform:* = 6.1.3
 org.slf4j:* = 2.0.17
 com.fasterxml.jackson.*:* = 2.22.1
 org.openjdk.jmh:* = 1.37
-com.palantir.gradle.utils:* = 0.27.0
+com.palantir.gradle.utils:* = 0.29.0
 com.palantir.gradle.idea-configuration:gradle-idea-configuration = 0.8.0
 
 # Testing
 com.palantir.gradle.jdks:* = 0.77.0
-com.palantir.baseline:gradle-baseline-java = 7.8.0
-com.palantir.gradle.jdkslatest:gradle-jdks-latest = 0.32.0
-com.palantir.gradle.consistentversions:gradle-consistent-versions = 3.18.0
+com.palantir.baseline:gradle-baseline-java = 7.9.0
+com.palantir.gradle.jdkslatest:gradle-jdks-latest = 0.33.0
+com.palantir.gradle.consistentversions:gradle-consistent-versions = 3.20.0

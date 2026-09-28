@@ -1,6 +1,0 @@
-type: fix
-fix:
-  description: Make lambda/assignment logic more resilient so it doesn't crash when
-    encountering long comments.
-  links:
-  - https://github.com/palantir/palantir-java-format/pull/203

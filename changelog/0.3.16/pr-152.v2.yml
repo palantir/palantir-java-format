@@ -1,5 +1,0 @@
-type: improvement
-improvement:
-  description: Turn off the javadoc formatter entirely.
-  links:
-  - https://github.com/palantir/palantir-java-format/pull/152

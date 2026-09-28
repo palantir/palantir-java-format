@@ -1,5 +1,0 @@
-type: improvement
-improvement:
-  description: Add formatter Intellij logs
-  links:
-  - https://github.com/palantir/palantir-java-format/pull/1263

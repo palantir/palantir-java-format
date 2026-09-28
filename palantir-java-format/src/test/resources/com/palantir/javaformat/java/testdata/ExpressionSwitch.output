@@ -20,12 +20,11 @@ class ExpressionSwitch {
     }
 
     int assignment(int j) {
-        boolean val =
-                switch (j) {
-                    case 0 -> true;
-                    case 1 -> false;
-                    default -> false;
-                };
+        boolean val = switch (j) {
+            case 0 -> true;
+            case 1 -> false;
+            default -> false;
+        };
         return val;
     }
 
@@ -49,12 +48,11 @@ class ExpressionSwitch {
     }
 
     public void test1(int y) {
-        int x =
-                switch (y) {
-                    case 1 -> 1;
-                    case 2 -> throw new IllegalArgumentException();
-                    default -> throw new IllegalStateException();
-                };
+        int x = switch (y) {
+            case 1 -> 1;
+            case 2 -> throw new IllegalArgumentException();
+            default -> throw new IllegalStateException();
+        };
     }
 
     public void test2(int y) {

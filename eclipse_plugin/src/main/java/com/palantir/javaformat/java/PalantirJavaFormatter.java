@@ -66,14 +66,13 @@ public class PalantirJavaFormatter extends CodeFormatter {
             boolean includeComments = (kind & CodeFormatter.F_INCLUDE_COMMENTS) == CodeFormatter.F_INCLUDE_COMMENTS;
             kind &= ~CodeFormatter.F_INCLUDE_COMMENTS;
 
-            SnippetKind snippetKind =
-                    switch (kind) {
-                        case ASTParser.K_EXPRESSION -> SnippetKind.EXPRESSION;
-                        case ASTParser.K_STATEMENTS -> SnippetKind.STATEMENTS;
-                        case ASTParser.K_CLASS_BODY_DECLARATIONS -> SnippetKind.CLASS_BODY_DECLARATIONS;
-                        case ASTParser.K_COMPILATION_UNIT -> SnippetKind.COMPILATION_UNIT;
-                        default -> throw new IllegalArgumentException(String.format("Unknown snippet kind: %d", kind));
-                    };
+            SnippetKind snippetKind = switch (kind) {
+                case ASTParser.K_EXPRESSION -> SnippetKind.EXPRESSION;
+                case ASTParser.K_STATEMENTS -> SnippetKind.STATEMENTS;
+                case ASTParser.K_CLASS_BODY_DECLARATIONS -> SnippetKind.CLASS_BODY_DECLARATIONS;
+                case ASTParser.K_COMPILATION_UNIT -> SnippetKind.COMPILATION_UNIT;
+                default -> throw new IllegalArgumentException(String.format("Unknown snippet kind: %d", kind));
+            };
             List<Replacement> replacements = new SnippetFormatter()
                     .format(snippetKind, source, rangesFromRegions(regions), initialIndent, includeComments);
             if (idempotent(source, regions, replacements)) {
