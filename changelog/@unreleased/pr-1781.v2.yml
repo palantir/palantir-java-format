@@ -1,0 +1,10 @@
+type: improvement
+improvement:
+  description: |-
+    Join adjacent string literals that normal formatting brings back onto a
+    single line, so `"one " + "two"` becomes `"one two"` instead of keeping a
+    `+` that no longer breaks anything. Concatenations that remain split across
+    lines, are separated by a comment (such as `//$NON-NLS-1$`), or would change
+    an octal escape are left alone.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/1781

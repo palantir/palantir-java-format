@@ -64,6 +64,10 @@ public final class StringWrapper {
         }
 
         TreeRangeMap<Integer, String> replacements = getReflowReplacements(columnLimit, input);
+        if (replacements.asMapOfRanges().isEmpty()) {
+            // needWrapping is an over-approximation, so there may be nothing to do after all.
+            return input;
+        }
         String firstPass =
                 formatter.formatSource(input, replacements.asMapOfRanges().keySet());
 
@@ -152,7 +156,93 @@ public final class StringWrapper {
             TreeRangeMap<Integer, String> replacements = TreeRangeMap.create();
             indentTextBlocks(replacements, textBlocks);
             wrapLongStrings(replacements, longStringLiterals);
+            // Must run last: it skips any concatenation that the passes above already claimed.
+            joinAdjacentLiterals(replacements);
             return replacements;
+        }
+
+        /**
+         * Pjf specific: joins adjacent string literals that normal formatting has brought back onto a single line, so
+         * that {@code "one " + "two"} becomes {@code "one two"} rather than keeping a {@code +} that no longer breaks
+         * anything. See <a href="https://github.com/palantir/palantir-java-format/issues/68">#68</a>.
+         *
+         * <p>Only literals that already share a line are joined; a concatenation that is still split across lines is
+         * deliberate wrapping and is left to {@link #wrapLongStrings}.
+         */
+        private void joinAdjacentLiterals(TreeRangeMap<Integer, String> replacements) {
+            new ConcatenationScanner(replacements).scan(new TreePath(unit), null);
+        }
+
+        private class ConcatenationScanner extends TreePathScanner<Void, Void> {
+
+            private final TreeRangeMap<Integer, String> replacements;
+
+            ConcatenationScanner(TreeRangeMap<Integer, String> replacements) {
+                this.replacements = replacements;
+            }
+
+            @Override
+            public Void visitBinary(BinaryTree node, Void unused) {
+                // Only consider the root of a concatenation chain, so that `a + b + c` is flattened once.
+                if (node.getKind() == Kind.PLUS
+                        && getCurrentPath().getParentPath().getLeaf().getKind() != Kind.PLUS) {
+                    joinRuns(flattenExpressionTree(node));
+                }
+                return super.visitBinary(node, null);
+            }
+
+            /** Replaces each maximal run of joinable adjacent literals with the single literal it is equivalent to. */
+            private void joinRuns(List<Tree> flat) {
+                int start = 0;
+                while (start < flat.size()) {
+                    if (!isJoinableLiteral(flat.get(start))) {
+                        start++;
+                        continue;
+                    }
+                    int end = start + 1;
+                    while (end < flat.size() && canJoinWithPrevious(flat.get(end - 1), flat.get(end))) {
+                        end++;
+                    }
+                    if (end - start > 1) {
+                        putJoinReplacement(flat.subList(start, end));
+                    }
+                    start = end;
+                }
+            }
+
+            private boolean canJoinWithPrevious(Tree previous, Tree next) {
+                return isJoinableLiteral(next)
+                        // Anything still split across lines is intentional wrapping, so leave it alone.
+                        && lineMap.getLineNumber(getEndPosition(unit, previous))
+                                == lineMap.getLineNumber(getStartPosition(next))
+                        && noComments(input, unit, previous, next)
+                        && !joiningWouldChangeEscapes(literalText(previous), literalText(next));
+            }
+
+            private boolean isJoinableLiteral(Tree tree) {
+                return tree.getKind() == Kind.STRING_LITERAL
+                        // Text blocks are re-indented by indentTextBlocks and must not be spliced together.
+                        && !input.startsWith(TEXT_BLOCK_DELIMITER, getStartPosition(tree));
+            }
+
+            private void putJoinReplacement(List<Tree> run) {
+                Range<Integer> range =
+                        Range.closedOpen(getStartPosition(run.get(0)), getEndPosition(unit, run.get(run.size() - 1)));
+                if (!replacements.subRangeMap(range).asMapOfRanges().isEmpty()) {
+                    // Overlaps a wrap or text-block replacement; that pass wins.
+                    return;
+                }
+                StringBuilder joined = new StringBuilder("\"");
+                for (Tree tree : run) {
+                    joined.append(literalText(tree));
+                }
+                joined.append('"');
+                replacements.put(range, joined.toString());
+            }
+
+            private String literalText(Tree tree) {
+                return input.substring(getStartPosition(tree) + 1, getEndPosition(unit, tree) - 1);
+            }
         }
 
         private class LongStringsAndTextBlockScanner extends TreePathScanner<Void, Void> {
@@ -567,6 +657,59 @@ public final class StringWrapper {
         return flat;
     }
 
+    /**
+     * Returns true if splicing {@code right} onto the end of {@code left} would change how the source text is
+     * escaped, which happens when {@code left} ends in an octal escape short enough to swallow another digit:
+     * {@code "\1" + "2"} holds {@code \1} then {@code 2}, but {@code "\12"} is a single character.
+     *
+     * <p>Octal escapes are at most three digits, so one that is already three digits long is safe, as is a digit run
+     * that is not preceded by an odd number of backslashes (and so is literal text rather than an escape).
+     */
+    static boolean joiningWouldChangeEscapes(String left, String right) {
+        if (right.isEmpty() || !isOctalDigit(right.charAt(0))) {
+            return false;
+        }
+        int index = left.length();
+        while (index > 0 && isOctalDigit(left.charAt(index - 1))) {
+            index--;
+        }
+        int digits = left.length() - index;
+        if (digits == 0 || digits > 2) {
+            return false;
+        }
+        int backslashes = 0;
+        while (index - backslashes > 0 && left.charAt(index - backslashes - 1) == '\\') {
+            backslashes++;
+        }
+        return backslashes % 2 == 1;
+    }
+
+    private static boolean isOctalDigit(char character) {
+        return character >= '0' && character <= '7';
+    }
+
+    /**
+     * Returns true if the line might contain two adjacent string literals that could be joined, i.e. a {@code +} with
+     * a quote directly on either side of it. This is a deliberately cheap over-approximation used to keep the fast
+     * paths fast; {@link Reflower} decides what is actually joinable.
+     */
+    static boolean mayHaveJoinableLiterals(String line) {
+        for (int plus = line.indexOf('+'); plus != -1; plus = line.indexOf('+', plus + 1)) {
+            int before = plus - 1;
+            while (before >= 0 && (line.charAt(before) == ' ' || line.charAt(before) == '\t')) {
+                before--;
+            }
+            int after = plus + 1;
+            while (after < line.length() && (line.charAt(after) == ' ' || line.charAt(after) == '\t')) {
+                after++;
+            }
+            if (before >= 0 && line.charAt(before) == '"' && after < line.length() && line.charAt(after) == '"') {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static boolean noComments(String input, JCTree.JCCompilationUnit unit, Tree one, Tree two) {
         return STRING_CONCAT_DELIMITER.matchesAllOf(
                 input.subSequence(getEndPosition(unit, one), getStartPosition(two)));
@@ -592,7 +735,11 @@ public final class StringWrapper {
         Iterator<String> it = Newlines.lineIterator(input);
         while (it.hasNext()) {
             String line = it.next();
-            if (line.length() > columnLimit || line.contains(TEXT_BLOCK_DELIMITER)) {
+            if (line.length() > columnLimit
+                    || line.contains(TEXT_BLOCK_DELIMITER)
+                    // #68: a concatenation that now fits on one line leaves no over-long line to trigger wrapping,
+                    // but its `+` still needs removing.
+                    || mayHaveJoinableLiterals(line)) {
                 return true;
             }
         }
@@ -612,7 +759,7 @@ public final class StringWrapper {
         boolean insideTextBlock = false;
         while (it.hasNext()) {
             String line = it.next();
-            if (line.length() > columnLimit) {
+            if (line.length() > columnLimit || mayHaveJoinableLiterals(line)) {
                 linesToChange.add(Range.closedOpen(i, i + 1));
             }
             if (!insideTextBlock && line.contains(TEXT_BLOCK_DELIMITER)) {
