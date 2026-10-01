@@ -1,0 +1,35 @@
+class PalantirIssue1343TextBlockIndentStable {
+    String[][] withCommentFirstLine = {
+        {
+            """
+            // tmp fix
+            @Deprecated
+            class Test {}
+            """
+        },
+        {
+            """
+
+            @Deprecated
+            class Test {}
+            """
+        }
+    };
+
+    String[][] blankLineInTheMiddle = {
+        {
+            """
+            import java.util.List;
+
+            @Deprecated
+            class Test {}
+            """
+        },
+        {
+            """
+
+            class Test {}
+            """
+        }
+    };
+}
