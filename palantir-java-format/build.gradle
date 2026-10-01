@@ -41,6 +41,16 @@ moduleJvmArgs {
             'jdk.compiler/com.sun.tools.javac.api')
 }
 
+applicationDefaultJvmArgs = [
+        '--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED',
+        '--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED',
+        '--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED',
+        '--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED',
+        '--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED',
+        '--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED',
+        '--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED'
+]
+
 tasks.withType(JavaCompile).named('compileJava') {
     // By setting the source and target compatibility to 11, while still using a higher level
     // JDK for compilation, we can compile against the AST classes we need to support >11 source
@@ -62,5 +72,5 @@ tasks.named("test") {
 }
 
 javaVersion {
-    target = 21
+    target = 23
 }

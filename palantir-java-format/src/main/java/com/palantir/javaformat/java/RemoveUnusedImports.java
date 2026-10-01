@@ -226,7 +226,12 @@ public class RemoveUnusedImports {
             Set<String> usedNames,
             Multimap<String, Range<Integer>> usedInJavadoc) {
         RangeMap<Integer, String> replacements = TreeRangeMap.create();
-        for (JCImport importTree : unit.getImports()) {
+        for (Object o : unit.getImports()) {
+            if (!(o instanceof JCImport)) {
+                // TODO: In Java >=23, getImports() returns JCImportBase
+                continue;
+            }
+            JCImport importTree = (JCImport) o;
             String simpleName = getSimpleName(importTree);
             if (!isUnused(unit, usedNames, usedInJavadoc, importTree, simpleName)) {
                 continue;
