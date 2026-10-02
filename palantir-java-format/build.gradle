@@ -64,3 +64,53 @@ tasks.named("test") {
 javaVersion {
     target = 21
 }
+
+// The default `test` task runs on JDK 21 (see the root `javaVersions.runtime`) and covers every
+// golden test except ModuleImport, which needs a parser that produces module import declarations
+// (JDK 23+, preview). Re-run the file-based suites on 23 and 25: 23 parses module imports as
+// preview, 25 as a final feature.
+[23, 25].each { jdkVersion ->
+    tasks.register("testJdk${jdkVersion}", Test) {
+        group = 'verification'
+        description = "Runs the JDK-version-gated golden test suites on JDK ${jdkVersion}."
+
+        javaLauncher = javaToolchains.launcherFor {
+            languageVersion = JavaLanguageVersion.of(jdkVersion)
+        }
+
+        doFirst {
+            // Belt and braces for FormatterVersionTest, which cannot catch a typo in the property name.
+            int resolved = javaLauncher.get().metadata.languageVersion.asInt()
+            if (resolved != jdkVersion) {
+                throw new GradleException("testJdk${jdkVersion} resolved to JDK ${resolved}")
+            }
+        }
+
+        testClassesDirs = sourceSets.test.output.classesDirs
+        classpath = sourceSets.test.runtimeClasspath
+        useJUnitPlatform()
+        systemProperty 'recreate', System.getProperty('recreate', 'false')
+        // Asserted by FormatterVersionTest, so a leg that resolves to an older JDK fails instead
+        // of silently skipping the ModuleImport golden and the module import tests.
+        systemProperty 'expectedJavaVersion', jdkVersion
+
+        filter {
+            includeTestsMatching 'com.palantir.javaformat.java.FormatterIntegrationTest'
+            includeTestsMatching 'com.palantir.javaformat.java.StringWrapperIntegrationTest'
+            includeTestsMatching 'com.palantir.javaformat.java.FormatterVersionTest'
+            // Covers the JCModuleImport ClassCastException fix, which the JDK 21 default `test`
+            // skips and the integration suites never reach (they don't call removeUnusedImports).
+            includeTestsMatching 'com.palantir.javaformat.java.RemoveUnusedImportsTest'
+            // Covers module imports through formatSourceAndFixImports, the entry point Spotless uses.
+            includeTestsMatching 'com.palantir.javaformat.java.ModuleImportTest'
+            // Carry the module-import ordering rows. ImportOrderer only lexes, so JDK 21 covers them
+            // too, but this is where a new module-import ordering test would land.
+            includeTestsMatching 'com.palantir.javaformat.java.GoogleImportStyleTest'
+            includeTestsMatching 'com.palantir.javaformat.java.AospImportStyleTest'
+        }
+    }
+}
+
+tasks.named('check') {
+    dependsOn tasks.named('testJdk23'), tasks.named('testJdk25')
+}
