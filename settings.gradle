@@ -4,7 +4,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath 'com.palantir.gradle.jdks:gradle-jdks-settings:0.82.0'
+        classpath 'com.palantir.gradle.jdks:gradle-jdks-settings:0.83.0'
     }
 }
 apply plugin: 'com.palantir.jdks.settings'
