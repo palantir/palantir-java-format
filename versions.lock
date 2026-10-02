@@ -42,7 +42,7 @@ com.google.errorprone:error_prone_annotations:2.50.0 (5 constraints: ad3740df)
 
 com.google.guava:failureaccess:1.0.3 (2 constraints: f3154f13)
 
-com.google.guava:guava:33.7.2-jre (16 constraints: 1c46f838)
+com.google.guava:guava:33.7.2-jre (16 constraints: 1d46203b)
 
 com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava (1 constraints: bd17c918)
 
@@ -144,7 +144,7 @@ aopalliance:aopalliance:1.0 (1 constraints: 170a83ac)
 
 cglib:cglib-nodep:3.2.2 (1 constraints: 490ded24)
 
-com.github.ben-manes.caffeine:caffeine:3.3.0 (2 constraints: c9168f2b)
+com.github.ben-manes.caffeine:caffeine:3.3.0 (2 constraints: c6168e2b)
 
 com.google.auto.value:auto-value-annotations:1.11.0 (2 constraints: d01cd319)
 
@@ -160,7 +160,7 @@ com.googlecode.java-diff-utils:diffutils:1.3.0 (1 constraints: bd11fef4)
 
 com.netflix.nebula:nebula-test:10.6.2 (1 constraints: 9c18268f)
 
-com.palantir.baseline:gradle-baseline-java:7.9.0 (2 constraints: a714b1b1)
+com.palantir.baseline:gradle-baseline-java:7.11.0 (2 constraints: d01436be)
 
 com.palantir.baseline-error-prone:gradle-baseline-error-prone:0.7.0 (1 constraints: c01105f5)
 
@@ -194,9 +194,9 @@ com.palantir.gradle.plugintesting:gradle-plugin-testing-junit:0.54.0 (1 constrai
 
 com.palantir.gradle.plugintesting:plugin-testing-core:0.54.0 (1 constraints: 3b053f3b)
 
-com.palantir.gradle.utils:environment-variables:0.30.0 (3 constraints: a83e1402)
+com.palantir.gradle.utils:environment-variables:0.30.0 (3 constraints: a13e86fe)
 
-com.palantir.gradle.utils:lazily-configured-mapping:0.30.0 (2 constraints: 8021f4d2)
+com.palantir.gradle.utils:lazily-configured-mapping:0.30.0 (2 constraints: 79219ed1)
 
 com.palantir.gradle.utils:project-dependency-utils:0.30.0 (1 constraints: ef1b1a62)
 
@@ -220,7 +220,7 @@ one.util:streamex:0.9.0 (2 constraints: be381f75)
 
 org.apache.commons:commons-compress:1.28.0 (1 constraints: 940f5692)
 
-org.apache.commons:commons-lang3:3.20.0 (5 constraints: 5e4e9eae)
+org.apache.commons:commons-lang3:3.21.0 (5 constraints: 5f4e51af)
 
 org.apache.maven:maven-artifact:3.9.1 (3 constraints: 82293854)
 
@@ -252,7 +252,7 @@ org.apache.maven.resolver:maven-resolver-spi:1.9.7 (3 constraints: 6e306f6a)
 
 org.apache.maven.resolver:maven-resolver-util:1.9.7 (3 constraints: 6e306f6a)
 
-org.apache.maven.shared:maven-dependency-analyzer:1.17.1 (1 constraints: f3110a07)
+org.apache.maven.shared:maven-dependency-analyzer:1.17.2 (1 constraints: f4110b07)
 
 org.apache.maven.shared:maven-shared-utils:3.3.4 (1 constraints: e60b61f3)
 
@@ -320,7 +320,7 @@ org.opentest4j:opentest4j:1.3.0 (2 constraints: cf209249)
 
 org.opentest4j.reporting:open-test-reporting-tooling-spi:0.2.5 (1 constraints: cf12e318)
 
-org.ow2.asm:asm:9.10.1 (6 constraints: 996a4513)
+org.ow2.asm:asm:9.10.1 (6 constraints: c16a4476)
 
 org.spockframework:spock-core:2.3-groovy-3.0 (3 constraints: 2c3deb38)
 
