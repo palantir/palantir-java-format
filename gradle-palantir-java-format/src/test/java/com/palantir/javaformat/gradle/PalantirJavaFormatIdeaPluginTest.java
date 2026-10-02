@@ -25,7 +25,6 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.palantir.gradle.testing.execution.GradleInvoker;
 import com.palantir.gradle.testing.files.arbitrary.ArbitraryFile;
-import com.palantir.gradle.testing.junit.DisabledConfigurationCache;
 import com.palantir.gradle.testing.junit.GradlePluginTests;
 import com.palantir.gradle.testing.project.RootProject;
 import java.io.File;
@@ -36,7 +35,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 @GradlePluginTests
-@DisabledConfigurationCache
 class PalantirJavaFormatIdeaPluginTest {
 
     private static final String NATIVE_IMAGE_FILE = new File("build/nativeImage.path").getAbsolutePath();
