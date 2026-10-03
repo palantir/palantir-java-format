@@ -1,0 +1,8 @@
+type: fix
+fix:
+  description: |-
+    Support JDK 27 end positions (JDK-8372948). `Trees` now looks up the end-position API once through a
+    method handle: `JCTree.getEndPosition()` on JDKs without `EndPosTable`, and `getEndPosition(unit.endPositions)`
+    on older ones. `Trees.newParser` passes the parser flags in the order each JDK generation expects.
+  links:
+    - https://github.com/palantir/palantir-java-format/pull/1786
