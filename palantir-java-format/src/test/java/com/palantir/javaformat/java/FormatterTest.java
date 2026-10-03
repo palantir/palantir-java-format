@@ -33,6 +33,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.parallel.Execution;
@@ -441,6 +442,28 @@ public final class FormatterTest {
                 + "  /// one long incredibly unbroken sentence moving from topic to topic so that no-one"
                 + " had a chance\n"
                 + "  /// to interrupt;\n"
+                + "  void m() {}\n"
+                + "}\n";
+        assertThat(Formatter.create().formatSource(input)).isEqualTo(expected);
+    }
+
+    @Test
+    public void wrapMarkdownDocstringRunKeepsTheSlashPrefix() throws Exception {
+        // javac returns a run of `///` lines as one comment token from JDK 23 on; before that each line is its
+        // own token and the wrapped line is always the first of its token, which is never misread.
+        Assumptions.assumeTrue(
+                Formatter.getRuntimeVersion() >= 23, "a `///` run is one comment token only from JDK 23 on");
+        String input = "class T {\n"
+                + "  /// Summary line.\n"
+                + "  /// one long incredibly unbroken sentence moving from topic to topic so that no-one had a"
+                + " chance to interrupt; @Deprecated\n"
+                + "  void m() {}\n"
+                + "}\n";
+        String expected = "class T {\n"
+                + "  /// Summary line.\n"
+                + "  /// one long incredibly unbroken sentence moving from topic to topic so that no-one had a"
+                + " chance\n"
+                + "  /// to interrupt; @Deprecated\n"
                 + "  void m() {}\n"
                 + "}\n";
         assertThat(Formatter.create().formatSource(input)).isEqualTo(expected);
