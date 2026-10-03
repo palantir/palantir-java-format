@@ -41,6 +41,9 @@ public final class Main {
     private static final int MAX_THREADS = 20;
     private static final String STDIN_FILENAME = "<stdin>";
 
+    private static final String COMMAND_LINE_DOCS =
+            "https://github.com/palantir/palantir-java-format#running-from-the-command-line";
+
     static String versionString() {
         return "palantir-java-format: Version " + Main.class.getPackage().getImplementationVersion();
     }
@@ -72,6 +75,12 @@ public final class Main {
         } catch (UsageException e) {
             err.print(e.getMessage());
             result = 0;
+        } catch (LinkageError e) {
+            // A LinkageError here means the JVM running the formatter is misconfigured rather than that there is
+            // anything wrong with the input, so report it as such instead of letting it escape as a bare stack trace.
+            err.println("palantir-java-format failed to start: " + e);
+            commandLineSetupHint(e).ifPresent(err::println);
+            result = 1;
         } finally {
             err.flush();
             out.flush();
@@ -153,6 +162,9 @@ public final class Main {
                             + Optional.ofNullable(e.getCause())
                                     .map(Throwable::getMessage)
                                     .orElse("null"));
+                    Optional.ofNullable(e.getCause())
+                            .flatMap(Main::commandLineSetupHint)
+                            .ifPresent(errWriter::println);
                     Optional.ofNullable(e.getCause()).ifPresent(cause -> cause.printStackTrace(errWriter));
                 }
                 allOk = false;
@@ -214,6 +226,36 @@ public final class Main {
             // TODO(cpovirk): Catch other types of exception (as we do in the formatFiles case).
         }
         return ok ? 0 : 1;
+    }
+
+    /**
+     * Explains a {@link LinkageError} in terms of how the formatter was launched. When palantir-java-format is run
+     * from the command line, these mean the JVM was not set up correctly, but the messages the JVM produces for them
+     * give no hint of that: omitting functionaljava from the classpath surfaces only as
+     * {@code java.lang.NoClassDefFoundError: fj/F}.
+     *
+     * <p>See <a href="https://github.com/palantir/palantir-java-format/issues/1513">#1513</a>.
+     *
+     * @return a hint to print alongside the error, or empty if this error says nothing about the JVM setup
+     */
+    static Optional<String> commandLineSetupHint(Throwable error) {
+        if (error instanceof NoClassDefFoundError) {
+            String missingClass = Optional.ofNullable(error.getMessage())
+                    .map(message -> message.replace('/', '.'))
+                    .orElse("a class it depends on");
+            return Optional.of("hint: palantir-java-format could not load " + missingClass + ", which usually means"
+                    + " its runtime classpath is incomplete. palantir-java-format needs its transitive dependencies"
+                    + " (Guava, functionaljava and Jackson) on the classpath, not just its own jar. See "
+                    + COMMAND_LINE_DOCS);
+        }
+        if (error instanceof IllegalAccessError
+                && Optional.ofNullable(error.getMessage())
+                        .filter(message -> message.contains("jdk.compiler"))
+                        .isPresent()) {
+            return Optional.of("hint: palantir-java-format needs access to jdk.compiler internals. Pass the"
+                    + " --add-exports flags listed at " + COMMAND_LINE_DOCS + " to the JVM running the formatter.");
+        }
+        return Optional.empty();
     }
 
     /** Parses and validates command-line flags. */
