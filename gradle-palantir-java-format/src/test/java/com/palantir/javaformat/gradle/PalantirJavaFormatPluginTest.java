@@ -72,6 +72,7 @@ class PalantirJavaFormatPluginTest {
         executeGitCommand(project, "git", "init");
         executeGitCommand(project, "git", "config", "user.name", "Foo");
         executeGitCommand(project, "git", "config", "user.email", "foo@bar.com");
+        executeGitCommand(project, "git", "config", "commit.gpgsign", "false");
 
         project.mainSourceSet().java().writeClass("""
             class Main {
