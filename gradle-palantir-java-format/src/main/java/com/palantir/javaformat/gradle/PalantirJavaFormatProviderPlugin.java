@@ -37,7 +37,6 @@ public final class PalantirJavaFormatProviderPlugin implements Plugin<Project> {
         @SuppressWarnings("for-rollout:ConfigurationAvoidanceRegistration")
         Configuration configuration = rootProject.getConfigurations().create(CONFIGURATION_NAME, conf -> {
             conf.setDescription("Internal configuration for resolving the palantir-java-format implementation");
-
             conf.setCanBeConsumed(false);
             conf.defaultDependencies(deps -> {
                 deps.add(rootProject
