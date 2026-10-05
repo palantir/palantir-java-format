@@ -20,15 +20,6 @@
         <property name="format" value="&gt;&gt;&gt;&gt;&gt;&gt;&gt;"/>
         <property name="message" value="Found (&gt;&gt;&gt;&gt;&gt;&gt;&gt;), so it looks like you had a merge conflict that compiles. Please fix it."/>
     </module>
-    <module name="RegexpSingleline">
-        <property name="format" value="\s+$"/>
-        <property name="message" value="Whitespace at end-of-line"/>
-    </module>
-    <module name="RegexpMultiline"> <!-- Java Style Guide: Vertical Whitespace -->
-        <property name="fileExtensions" value="java"/>
-        <property name="format" value="^\n\n$"/>
-        <property name="message" value="Two consecutive blank lines are not permitted."/>
-    </module>
     <module name="SuppressionFilter"> <!-- baseline-gradle: README.md -->
         <property name="file" value="${config_loc}/checkstyle-suppressions.xml"/>
     </module>
@@ -40,15 +31,6 @@
     <module name="SuppressWarningsFilter"/> <!-- baseline-gradle: README.md -->
     <module name="BeforeExecutionExclusionFileFilter">
         <property name="fileNamePattern" value="module\-info\.java$"/>
-    </module>
-    <module name="LineLength"> <!-- Java Style Guide: No line-wrapping -->
-        <property name="max" value="120"/>
-        <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://|\{@link"/>
-    </module>
-    <module name="SuppressWithPlainTextCommentFilter"> <!-- Suppression to prevent LineLength Check from flagging lines in Text-blocks -->
-        <property name="checkFormat" value="LineLength"/>
-        <property name="offCommentFormat" value="^.*&quot;&quot;&quot;\s*$"/>
-        <property name="onCommentFormat" value="^\s*&quot;&quot;&quot;\s*(?:[,;]|.+)$"/>
     </module>
     <module name="TreeWalker">
         <module name="SuppressionCommentFilter"/> <!-- baseline-gradle: README.md -->

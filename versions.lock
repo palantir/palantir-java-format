@@ -286,7 +286,7 @@ org.hamcrest:hamcrest-core:1.3 (1 constraints: cc05fe3f)
 
 org.immutables:serial:2.12.1 (1 constraints: 761145ef)
 
-org.junit.jupiter:junit-jupiter:6.1.3 (2 constraints: 911a3739)
+org.junit.jupiter:junit-jupiter:6.1.3 (2 constraints: bc1a4749)
 
 org.junit.jupiter:junit-jupiter-api:6.1.3 (6 constraints: 1a7543a9)
 
