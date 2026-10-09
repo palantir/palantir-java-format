@@ -25,6 +25,7 @@ import com.sun.source.tree.DefaultCaseLabelTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.PatternCaseLabelTree;
 import com.sun.source.tree.PatternTree;
+import com.sun.source.tree.Tree;
 import javax.lang.model.element.Name;
 
 /**
@@ -33,8 +34,23 @@ import javax.lang.model.element.Name;
  */
 @SuppressWarnings("Since21")
 public class Java21InputAstVisitor extends Java14InputAstVisitor {
+    // AnyPatternTree (the unnamed pattern `_`, JEP 456) is still a preview API on JDK 21, which this
+    // module compiles with, so match it by Tree.Kind name instead of by type.
+    private static final String ANY_PATTERN_KIND_NAME = "ANY_PATTERN";
+
     public Java21InputAstVisitor(OpsBuilder builder, int indentMultiplier) {
         super(builder, indentMultiplier);
+    }
+
+    @Override
+    public Void scan(Tree tree, Void unused) {
+        if (tree != null && tree.getKind().name().equals(ANY_PATTERN_KIND_NAME)) {
+            // No sync(tree): javac records the start position one past the `_`, which makes sync()
+            // think a token was skipped and throw. This branch emits one leaf token and never recurses.
+            token("_");
+            return null;
+        }
+        return super.scan(tree, null);
     }
 
     @Override
