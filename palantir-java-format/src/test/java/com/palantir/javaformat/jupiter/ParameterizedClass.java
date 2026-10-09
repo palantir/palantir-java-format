@@ -167,7 +167,6 @@ public final class ParameterizedClass implements TestTemplateInvocationContextPr
     }
 
     /** Users must provide a public static Object[][] method, and this invokes it *once*, caching the result. */
-    @SuppressWarnings("for-rollout:deprecation")
     private static List<Object[]> invokeUserParametersMethod(ExtensionContext extensionContext, Class<?> testClass) {
         List<Method> methods = AnnotationUtils.findAnnotatedMethods(
                 testClass, Parameters.class, ReflectionUtils.HierarchyTraversalMode.BOTTOM_UP);
@@ -204,7 +203,6 @@ public final class ParameterizedClass implements TestTemplateInvocationContextPr
         }
     }
 
-    @SuppressWarnings("for-rollout:deprecation")
     private static String findStringFormatTemplate(ExtensionContext extensionContext, Class<?> testClass) {
         return extensionContext
                 .getStore(namespace)
