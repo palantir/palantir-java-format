@@ -35,6 +35,7 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.EnumSet;
 import java.util.Locale;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.parallel.Execution;
@@ -516,6 +517,76 @@ public class MainTest {
                 in);
         assertThat(main.format("--skip-reflowing-long-strings", "-")).isEqualTo(0);
         assertThat(out.toString()).isEqualTo(joiner.join(expected));
+    }
+
+    // https://github.com/palantir/palantir-java-format/issues/1513: running the formatter from the command line with
+    // an incomplete classpath failed with a bare `NoClassDefFoundError: fj/F`, which gave no hint what was missing.
+    @Test
+    public void missingRuntimeDependencyIsExplained() {
+        Optional<String> hint = Main.commandLineSetupHint(new NoClassDefFoundError("fj/F"));
+
+        assertThat(hint).isPresent();
+        assertThat(hint.get()).contains("fj.F");
+        assertThat(hint.get()).contains("runtime classpath is incomplete");
+        assertThat(hint.get()).contains("functionaljava");
+        assertThat(hint.get()).contains("#running-from-the-command-line");
+    }
+
+    @Test
+    public void missingAddExportsIsExplained() {
+        Optional<String> hint = Main.commandLineSetupHint(new IllegalAccessError("class"
+                + " com.palantir.javaformat.java.JavaInput (in unnamed module @0x1) cannot access class"
+                + " com.sun.tools.javac.util.Log (in module jdk.compiler) because module jdk.compiler does not"
+                + " export com.sun.tools.javac.util to unnamed module @0x1"));
+
+        assertThat(hint).isPresent();
+        assertThat(hint.get()).contains("--add-exports");
+        assertThat(hint.get()).contains("#running-from-the-command-line");
+    }
+
+    @Test
+    public void unrelatedErrorsGetNoHint() {
+        assertThat(Main.commandLineSetupHint(new RuntimeException("boom"))).isEmpty();
+        assertThat(Main.commandLineSetupHint(new IllegalAccessError("unrelated access error")))
+                .isEmpty();
+    }
+
+    /**
+     * End-to-end reproduction of #1513: launch the formatter in a subprocess with functionaljava removed from the
+     * classpath, exactly as a hand-assembled command line would, and check the user is told what is missing.
+     */
+    @Test
+    public void incompleteClasspathReportsActionableError() throws Exception {
+        ImmutableList<String> fullClasspath =
+                ImmutableList.copyOf(System.getProperty("java.class.path").split(File.pathSeparator));
+        ImmutableList<String> withoutFunctionalJava = fullClasspath.stream()
+                .filter(entry -> !entry.contains("functionaljava"))
+                .collect(ImmutableList.toImmutableList());
+        // Guard against the test passing vacuously if functionaljava stops being a separate classpath entry.
+        assertWithMessage("expected functionaljava on the test classpath")
+                .that(withoutFunctionalJava)
+                .hasSize(fullClasspath.size() - 1);
+
+        Path input = testFolder.resolve("Test.java");
+        Files.write(input, "class Test {}\n".getBytes(UTF_8));
+
+        Process process = new ProcessBuilder(ImmutableList.<String>builder()
+                        .add(Paths.get(System.getProperty("java.home"))
+                                .resolve("bin/java")
+                                .toString())
+                        .addAll(ADD_EXPORTS)
+                        .add("-cp", Joiner.on(File.pathSeparator).join(withoutFunctionalJava))
+                        .add(Main.class.getName())
+                        .add(input.toString())
+                        .build())
+                .redirectError(Redirect.PIPE)
+                .redirectOutput(Redirect.PIPE)
+                .start();
+        String err = new String(ByteStreams.toByteArray(process.getErrorStream()), UTF_8);
+        assertThat(process.waitFor()).isEqualTo(1);
+
+        assertWithMessage("stderr was: " + err).that(err).contains("runtime classpath is incomplete");
+        assertWithMessage("stderr was: " + err).that(err).contains("functionaljava");
     }
 
     private static ProcessBuilder formatterMain(String... args) {

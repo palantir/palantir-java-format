@@ -1,0 +1,11 @@
+type: improvement
+improvement:
+  description: |-
+    Document how to run palantir-java-format from the command line, and explain
+    JVM setup errors instead of surfacing them raw. Running the formatter with an
+    incomplete classpath previously failed with a bare
+    `java.lang.NoClassDefFoundError: fj/F`; it now also prints a hint naming the
+    missing class and pointing at the docs. A missing `--add-exports` flag is
+    reported the same way.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/1779
