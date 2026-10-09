@@ -3363,13 +3363,12 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             rows.add(row);
         }
         int size0 = rows.get(0).size();
+        // Only the leading column has to look alike. Requiring the remaining columns to be parallel too meant that a
+        // grid the author had already laid out was thrown away whenever the values happened to be different kinds of
+        // expression - a variable in one row, a method call in the next - which says nothing about whether the
+        // arguments read well as a table. See #204.
         if (!expressionsAreParallel(rows, 0, rows.size())) {
             return -1;
-        }
-        for (int i = 1; i < size0; i++) {
-            if (!expressionsAreParallel(rows, i, rows.size() / 2 + 1)) {
-                return -1;
-            }
         }
         // if there are only two rows, they must be the same length
         if (rows.size() == 2) {
