@@ -42,7 +42,7 @@ com.google.errorprone:error_prone_annotations:2.50.0 (5 constraints: ad3740df)
 
 com.google.guava:failureaccess:1.0.3 (2 constraints: f3154f13)
 
-com.google.guava:guava:33.7.2-jre (16 constraints: 1d46203b)
+com.google.guava:guava:33.7.2-jre (16 constraints: 1a468e33)
 
 com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava (1 constraints: bd17c918)
 
@@ -126,7 +126,7 @@ org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10 (1 constraints: e210ffd2)
 
 org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10 (2 constraints: 8118c1c5)
 
-org.jspecify:jspecify:1.0.1 (15 constraints: 1cf48c9f)
+org.jspecify:jspecify:1.0.1 (15 constraints: 1df49aa1)
 
 org.openjdk.jmh:jmh-core:1.37 (5 constraints: 52476be6)
 
@@ -146,13 +146,13 @@ cglib:cglib-nodep:3.2.2 (1 constraints: 490ded24)
 
 com.github.ben-manes.caffeine:caffeine:3.3.0 (2 constraints: c6168e2b)
 
-com.google.auto.value:auto-value-annotations:1.11.0 (2 constraints: d01cd319)
+com.google.auto.value:auto-value-annotations:1.11.1 (2 constraints: d11cf419)
 
 com.google.guava:guava-testlib:33.5.0-jre (1 constraints: ab068053)
 
 com.google.inject:guice:5.1.0 (1 constraints: e20b61f3)
 
-com.google.testing.compile:compile-testing:0.23.0 (1 constraints: 3705303b)
+com.google.testing.compile:compile-testing:0.24.0 (1 constraints: 3805333b)
 
 com.google.truth:truth:1.4.5 (1 constraints: 1d1219fb)
 
