@@ -239,7 +239,11 @@ public class RemoveUnusedImportsTest {
                     "public class Test implements Foo, Bar, Baz, Bork {}",
                 },
                 {
+                    // `import java.lang.Foo;` is kept: `p` may also declare a `Foo`, which the
+                    // single-type-import shadows (JLS 6.4.1). `import p.Baz;` is still dropped, since a type
+                    // in the current package never needs importing.
                     "package p;",
+                    "import java.lang.Foo;",
                     "import java.lang.Foo.Bar;",
                     "import p.Baz.Bork;",
                     "public class Test implements Foo, Bar, Baz, Bork {}",
@@ -252,6 +256,77 @@ public class RemoveUnusedImportsTest {
                 },
                 {
                     "interface Test { private static void foo() {} }",
+                },
+            },
+            // https://github.com/palantir/palantir-java-format/issues/1334: a single-type-import of a java.lang
+            // type shadows same-package types and on-demand imports, so it must not be removed while it is used.
+            {
+                // disambiguates `Byte` against an on-demand import
+                {
+                    "package com.company.project.bar;",
+                    "import com.company.project.foo.*;",
+                    "import java.lang.Byte;",
+                    "public class Test { Byte foo() { return null; } }",
+                },
+                {
+                    "package com.company.project.bar;",
+                    "import com.company.project.foo.*;",
+                    "import java.lang.Byte;",
+                    "public class Test { Byte foo() { return null; } }",
+                },
+            },
+            {
+                // disambiguates `Byte` against a class declared in the same package
+                {
+                    "package com.company.project.bar;",
+                    "import java.lang.Byte;",
+                    "public class Test { Byte foo() { return null; } }",
+                },
+                {
+                    "package com.company.project.bar;",
+                    "import java.lang.Byte;",
+                    "public class Test { Byte foo() { return null; } }",
+                },
+            },
+            {
+                // a java.lang import that is only referenced from javadoc is still load-bearing
+                {
+                    "package p;", //
+                    "import java.lang.Byte;",
+                    "/** {@link Byte} */",
+                    "public class Test {}",
+                },
+                {
+                    "package p;", //
+                    "import java.lang.Byte;",
+                    "/** {@link Byte} */",
+                    "public class Test {}",
+                },
+            },
+            {
+                // `import java.lang.*;` is always redundant, java.lang is implicitly imported on demand
+                {
+                    "package p;", //
+                    "import java.lang.*;",
+                    "public class Test { Byte foo() { return null; } }",
+                },
+                {
+                    "package p;", //
+                    "public class Test { Byte foo() { return null; } }",
+                },
+            },
+            {
+                // an unused java.lang import is still removed, even alongside an on-demand import
+                {
+                    "package p;",
+                    "import java.lang.Byte;",
+                    "import q.*;",
+                    "public class Test { Short foo() { return null; } }",
+                },
+                {
+                    "package p;", //
+                    "import q.*;",
+                    "public class Test { Short foo() { return null; } }",
                 },
             },
         };
