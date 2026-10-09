@@ -1,0 +1,30 @@
+class PalantirJoinStringConcatenations {
+    void issue68() {
+        throw new SafeIllegalArgumentException("Invalid recipient field - contains multiple "
+                + "foreign key properties.", UnsafeArg.of("field", maybeField));
+    }
+
+    void joinsRunsAroundNonLiterals(String value) {
+        foo("one " + "two " + value + "three " + "four");
+    }
+
+    void leavesDeliberateWrappingAlone() {
+        String wrapped = "this is a really quite long string literal that will not fit on one line whatever we do "
+                + "and so it has to stay split across two lines";
+    }
+
+    void leavesCommentedConcatenationsAlone() {
+        String commented = "left " /* keep me here */ + "right";
+    }
+
+    void leavesShortOctalEscapesAlone() {
+        // Joining would turn the escape `\1` followed by `2` into the single character `\12`.
+        String octal = "a" + "\1" + "2" + "b";
+        // A three digit octal escape is already maximal, so this one is safe to join.
+        String maximal = "c" + "\377" + "7" + "d";
+    }
+
+    void keepsEscapesIntact() {
+        String escapes = "tab\there " + "quote\"there " + "backslash\\" + "1";
+    }
+}
