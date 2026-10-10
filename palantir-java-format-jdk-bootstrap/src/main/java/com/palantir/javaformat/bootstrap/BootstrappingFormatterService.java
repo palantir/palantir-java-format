@@ -25,6 +25,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import com.palantir.javaformat.java.FormatterException;
 import com.palantir.javaformat.java.FormatterService;
+import com.palantir.javaformat.java.JavaFormatterOptions;
 import com.palantir.javaformat.java.Replacement;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -44,11 +45,32 @@ public final class BootstrappingFormatterService implements FormatterService {
     private final Path jdkPath;
     private final Integer jdkMajorVersion;
     private final List<Path> implementationClassPath;
+    private final JavaFormatterOptions formatterOptions;
 
+    /**
+     * Creates a BootstrappingFormatterService with default formatter options.
+     * Provided for backward compatibility with code that does not pass JavaFormatterOptions.
+     *
+     * @deprecated Use {@link #BootstrappingFormatterService(Path, Integer, List, JavaFormatterOptions)} instead
+     */
+    @Deprecated
     public BootstrappingFormatterService(Path jdkPath, Integer jdkMajorVersion, List<Path> implementationClassPath) {
+        this(
+                jdkPath,
+                jdkMajorVersion,
+                implementationClassPath,
+                JavaFormatterOptions.builder().build());
+    }
+
+    public BootstrappingFormatterService(
+            Path jdkPath,
+            Integer jdkMajorVersion,
+            List<Path> implementationClassPath,
+            JavaFormatterOptions formatterOptions) {
         this.jdkPath = jdkPath;
         this.jdkMajorVersion = jdkMajorVersion;
         this.implementationClassPath = implementationClassPath;
+        this.formatterOptions = formatterOptions;
     }
 
     @Override
@@ -85,6 +107,7 @@ public final class BootstrappingFormatterService implements FormatterService {
                 .withJvmArgsForVersion(jdkMajorVersion)
                 .implementationClasspath(implementationClassPath)
                 .outputReplacements(true)
+                .skipReflowingLongStrings(formatterOptions.skipReflowingLongStrings())
                 .characterRanges(ranges.stream().map(RangeUtils::toStringRange).collect(Collectors.toList()))
                 .build();
 
@@ -103,6 +126,7 @@ public final class BootstrappingFormatterService implements FormatterService {
                 .withJvmArgsForVersion(jdkMajorVersion)
                 .implementationClasspath(implementationClassPath)
                 .outputReplacements(false)
+                .skipReflowingLongStrings(formatterOptions.skipReflowingLongStrings())
                 .build();
         return FormatterCommandRunner.runWithStdin(command.toArgs(), input, Optional.ofNullable(jdkPath.getParent()))
                 .orElse(input);
@@ -113,6 +137,8 @@ public final class BootstrappingFormatterService implements FormatterService {
         List<String> characterRanges();
 
         boolean outputReplacements();
+
+        boolean skipReflowingLongStrings();
 
         Path jdkPath();
 
@@ -136,6 +162,9 @@ public final class BootstrappingFormatterService implements FormatterService {
             }
             if (outputReplacements()) {
                 args.add("--output-replacements");
+            }
+            if (skipReflowingLongStrings()) {
+                args.add("--skip-reflowing-long-strings");
             }
 
             return args

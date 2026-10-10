@@ -25,6 +25,7 @@ import com.google.common.collect.Range;
 import com.palantir.javaformat.Utils;
 import com.palantir.javaformat.java.FormatterException;
 import com.palantir.javaformat.java.FormatterService;
+import com.palantir.javaformat.java.JavaFormatterOptions;
 import com.palantir.javaformat.java.Replacement;
 import java.net.URI;
 import java.nio.file.Files;
@@ -98,11 +99,14 @@ final class FormatterServicesTest {
     }
 
     private static Stream<FormatterService> getFormatters() {
+        JavaFormatterOptions options =
+                JavaFormatterOptions.builder().skipReflowingLongStrings(false).build();
+
         return Stream.of(
                 new BootstrappingFormatterService(
-                        javaBinPath(), Runtime.version().feature(), getClasspath()),
+                        javaBinPath(), Runtime.version().feature(), getClasspath(), options),
                 new NativeImageFormatterService(
-                        Path.of(System.getenv("NATIVE_IMAGE_CLASSPATH").toString())));
+                        Path.of(System.getenv("NATIVE_IMAGE_CLASSPATH").toString()), options));
     }
 
     private String getTestResourceContent(String resourceName) {
