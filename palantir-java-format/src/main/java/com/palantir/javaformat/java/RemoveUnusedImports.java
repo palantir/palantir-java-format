@@ -232,7 +232,7 @@ public class RemoveUnusedImports {
                 continue;
             }
             // delete the import
-            int endPosition = importTree.getEndPosition(unit.endPositions);
+            int endPosition = Trees.getEndPosition(importTree, unit);
             endPosition = Math.max(CharMatcher.isNot(' ').indexIn(contents, endPosition), endPosition);
             String sep = Newlines.guessLineSeparator(contents);
             if (endPosition + sep.length() < contents.length()
