@@ -124,6 +124,12 @@ public final class JavaCommentsHelper implements CommentsHelper {
     private List<String> wrapLineComments(List<String> lines, int column0) {
         List<String> result = new ArrayList<>();
         for (String line : lines) {
+            // From JDK 23 on, javac returns a run of `///` markdown lines as a single comment tok, so
+            // every line after the first still carries its source indentation. indentLineComments
+            // trims and re-indents all of them, so both the slash prefix and the width budget have to
+            // be read from the trimmed text: otherwise the prefix comes back empty and the wrapped
+            // remainder is emitted as bare code.
+            line = CharMatcher.whitespace().trimLeadingFrom(line);
             // Add missing leading spaces to line comments: `//foo` -> `// foo`.
             Matcher matcher = LINE_COMMENT_MISSING_SPACE_PREFIX.matcher(line);
             if (matcher.find()) {
