@@ -20,14 +20,10 @@ class T {
                 xxxxxxxxxxxxxxxxxxxxxxxxx,
                 xxxxxxxxxxxxxxxxxxxxxxxxx);
         f(
-                xxxxxxxxxxxxxxxxxxxxxxxxx,
-                xxxxxxxxxxxxxxxxxxxxxxx(),
-                xxxxxxxxxxxxxxxxxxxxxxxxx,
-                xxxxxxxxxxxxxxxxxxxxxxx(),
-                xxxxxxxxxxxxxxxxxxxxxxxxx,
-                xxxxxxxxxxxxxxxxxxxxxxxxx,
-                xxxxxxxxxxxxxxxxxxxxxxxxx,
-                xxxxxxxxxxxxxxxxxxxxxxxxx);
+                xxxxxxxxxxxxxxxxxxxxxxxxx, xxxxxxxxxxxxxxxxxxxxxxx(),
+                xxxxxxxxxxxxxxxxxxxxxxxxx, xxxxxxxxxxxxxxxxxxxxxxx(),
+                xxxxxxxxxxxxxxxxxxxxxxxxx, xxxxxxxxxxxxxxxxxxxxxxxxx,
+                xxxxxxxxxxxxxxxxxxxxxxxxx, xxxxxxxxxxxxxxxxxxxxxxxxx);
         f(
                 xxxxxxxxxxxxxxxxxxxxxxxxx, xxxxxxxxxxxxxxxxxxxxxxx(),
                 xxxxxxxxxxxxxxxxxxxxxxxxx, xxxxxxxxxxxxxxxxxxxxxxxxx,
