@@ -1,0 +1,21 @@
+class PalantirInlineMarkerAnnotationFields {
+    @Mock private SomeObjMetadata meta;
+    @Mock private Foo foo;
+    @Mock private Bar bar;
+
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS) private Job job;
+
+    @Mock @Inject private Baz baz;
+
+    @Nullable private String name;
+
+    @SuppressWarnings("unchecked") private List<String> values;
+
+    @Mock private SomeExtremelyLongTypeNameThatWillNotFitOnASingleLineTogetherWithItsAnnotation someVeryLongFieldNameIndeed;
+
+    @Override public String toString() { return "x"; }
+
+    void locals() {
+        @Nullable String local = null;
+    }
+}

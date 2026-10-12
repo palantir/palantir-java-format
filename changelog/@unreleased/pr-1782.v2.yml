@@ -1,0 +1,10 @@
+type: improvement
+improvement:
+  description: |-
+    Keep a single marker annotation on the field's line, so `@Mock private Foo
+    foo;` no longer breaks onto two lines with a blank line after it. This
+    matches how locals and parameters are already laid out. Annotations with
+    arguments, multiple annotations, and declarations too wide to fit still get
+    a line of their own.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/1782
