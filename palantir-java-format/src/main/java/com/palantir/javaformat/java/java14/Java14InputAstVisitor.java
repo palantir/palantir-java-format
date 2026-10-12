@@ -118,7 +118,7 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
         if (modifiers != null) {
             builder.addAll(visitModifiers(modifiers, Direction.HORIZONTAL, Optional.empty()));
         }
-        if (type == null) {
+        if (type == null || type.getKind().name().equals("VAR_TYPE")) {
             token("var");
         } else {
             scan(type, null);
