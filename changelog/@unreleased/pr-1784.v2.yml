@@ -1,0 +1,10 @@
+type: fix
+fix:
+  description: |-
+    Run the string wrapping pass to a fixed point, so formatting a file twice
+    gives the same result. The indentation chosen for a text block is derived
+    from the layout around it, which the same pass can move, so text blocks
+    inside nested array initialisers were re-indented again on a second run and
+    a freshly formatted file still counted as unformatted.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/1784
