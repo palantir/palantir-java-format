@@ -214,6 +214,20 @@ final class JavadocWriter {
         writeToken(token);
     }
 
+    void writeSnippetOpen(Token token) {
+        if (wroteAnythingSignificant) {
+            requestBlankLine();
+        }
+
+        writeToken(token);
+    }
+
+    void writeSnippetClose(Token token) {
+        writeToken(token);
+
+        requestBlankLine();
+    }
+
     void writeTableOpen(Token token) {
         requestBlankLine();
 
