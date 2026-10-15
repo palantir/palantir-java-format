@@ -1,0 +1,6 @@
+type: improvement
+improvement:
+  description: Allow selecting code style in Intellij plugin
+  links:
+    - https://github.com/palantir/palantir-java-format/pull/1256
+
