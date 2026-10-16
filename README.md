@@ -182,14 +182,27 @@ shortcut.
 
 ![Install plugin from disk](./docs/images/install_plugin_from_disk.png)
 
-## Java 21 Support
+<a id="java-21-support"></a>
 
-In [1211](https://github.com/palantir/palantir-java-format/pull/1211) we shipped Java 21 support. In order to use the 
-Java 21 formatting capabilities, ensure that either: 
+## Java language support
 
-- the Gradle daemon and the Intellij Project SDK are set to Java 21
-- or that the gradle property `palantir.native.formatter=true`. This will run the formatter as a native image, 
-- independent of the Gradle daemon/Intellij project JDK version. 
+In [1211](https://github.com/palantir/palantir-java-format/pull/1211) we shipped Java 21 support. Since then we've
+added compact source files with instance main methods (JEP 512), unnamed patterns in record deconstruction (JEP 456),
+and module import declarations (JEP 511).
+
+The formatter parses with preview features enabled, so which syntax it can format depends on the JVM that *runs* it:
+the Gradle daemon for the Gradle plugin and Spotless, the Project SDK for IntelliJ, the Eclipse JVM for the Eclipse
+plugin, and GraalVM 23 for the native image. Compact source files and unnamed patterns format on Java 21 and later; module imports need Java 23 or later.
+Markdown documentation comments (`///`, JEP 467) are recognised as documentation from Java 23 on, so on an older JVM
+an import referenced only from a markdown link (`/// see [List]`) is removed as unused.
+So, ensure that either:
+
+- the Gradle daemon and the Intellij Project SDK are set to a JDK that parses the syntax you use, or
+- the gradle property `palantir.native.formatter=true`, which runs the formatter as a native image, independent of the
+  Gradle daemon/Intellij project JDK version. The native image is built for Linux (glibc) and macOS aarch64 only, and
+  `spotlessApply` uses it only when the Gradle daemon runs on Java 20 or older (see
+  [Native image formatter](#native-image-formatter)) — on a newer daemon Spotless formats in the daemon, so the
+  daemon's JDK decides which syntax can be formatted.
 
 ### Native image formatter
 
