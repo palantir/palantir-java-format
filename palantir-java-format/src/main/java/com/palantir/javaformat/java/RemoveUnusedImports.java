@@ -263,26 +263,39 @@ public class RemoveUnusedImports {
         String qualifier = ((JCFieldAccess) importTree.getQualifiedIdentifier())
                 .getExpression()
                 .toString();
+        boolean onDemand = isOnDemand(importTree);
         if (qualifier.equals("java.lang")) {
-            return true;
+            // `import java.lang.*;` is always redundant, because java.lang is implicitly imported on demand.
+            //
+            // A single-type-import such as `import java.lang.Byte;` is *not* always redundant: JLS 6.4.1 says it
+            // shadows both types named `Byte` declared elsewhere in the current package and types named `Byte`
+            // brought in by an import-on-demand. Dropping it can therefore change which type a simple name resolves
+            // to, or make the reference ambiguous and fail to compile. We only ever see a single compilation unit
+            // here, so we cannot prove that no such clash exists; keep the import whenever its name is referenced.
+            return onDemand || !isUsed(usedNames, usedInJavadoc, simpleName);
         }
         if (unit.getPackageName() != null && unit.getPackageName().toString().equals(qualifier)) {
+            // Importing a type from the current package is always redundant: types declared in the current package
+            // already shadow import-on-demand declarations (JLS 6.4.1 - an import-on-demand never shadows anything),
+            // so the import cannot be disambiguating anything.
             return true;
         }
-        if (importTree.getQualifiedIdentifier() instanceof JCFieldAccess
+        if (onDemand) {
+            return false;
+        }
+        return !isUsed(usedNames, usedInJavadoc, simpleName);
+    }
+
+    private static boolean isOnDemand(ImportTree importTree) {
+        return importTree.getQualifiedIdentifier() instanceof JCFieldAccess
                 && ((JCFieldAccess) importTree.getQualifiedIdentifier())
                         .getIdentifier()
-                        .contentEquals("*")) {
-            return false;
-        }
+                        .contentEquals("*");
+    }
 
-        if (usedNames.contains(simpleName)) {
-            return false;
-        }
-        if (usedInJavadoc.containsKey(simpleName)) {
-            return false;
-        }
-        return true;
+    private static boolean isUsed(
+            Set<String> usedNames, Multimap<String, Range<Integer>> usedInJavadoc, String simpleName) {
+        return usedNames.contains(simpleName) || usedInJavadoc.containsKey(simpleName);
     }
 
     /** Applies the replacements to the given source, and re-format any edited javadoc. */
