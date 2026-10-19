@@ -152,6 +152,28 @@
       ]
     },
     {
+      "type": "com.sun.tools.javac.tree.EndPosTable"
+    },
+    {
+      "type": "com.sun.tools.javac.tree.JCTree",
+      "methods": [
+        {
+          "name": "getEndPosition",
+          "parameterTypes": [
+            "com.sun.tools.javac.tree.EndPosTable"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.tools.javac.tree.JCTree$JCCompilationUnit",
+      "fields": [
+        {
+          "name": "endPositions"
+        }
+      ]
+    },
+    {
       "type": "java.io.Serializable"
     },
     {
