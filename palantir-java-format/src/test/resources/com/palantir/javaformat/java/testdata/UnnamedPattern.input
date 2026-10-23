@@ -1,0 +1,34 @@
+class UnnamedPattern {
+  sealed interface Shape permits Box {}
+  record Box(Object a, Object b) implements Shape {}
+
+  record Pair(Box first, Object second) {}
+
+  int classify(Shape s) {
+    return switch (s) {
+      case Box(Integer i, _) when i > 0 -> i;
+      case Box(Integer i, _) -> i;
+      case Box(_, _) -> 0;
+    };
+  }
+
+  int nested(Object o) {
+    return switch (o) {
+      case Pair(Box(var _, Integer i), _) -> i;
+      case Pair(Box(_, _), _) -> 0;
+      default -> -1;
+    };
+  }
+
+  boolean isBox(Object o) {
+    return o instanceof Box(Integer _, _);
+  }
+
+  void swallow(Runnable r) {
+    try {
+      r.run();
+    } catch (Exception _) {
+      // ignored
+    }
+  }
+}
