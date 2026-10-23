@@ -36,14 +36,18 @@ import com.palantir.javaformat.doc.Obs.Exploration;
 import com.palantir.javaformat.doc.Obs.ExplorationNode;
 import com.palantir.javaformat.doc.Obs.LevelNode;
 import com.palantir.javaformat.doc.StartsWithBreakVisitor.Result;
+import com.palantir.javaformat.doc.State.LayoutInputs;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.Set;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -66,6 +70,13 @@ public final class Level extends Doc {
 
     @SuppressWarnings("Immutable") // Effectively immutable
     private final ImmutableSupplier<Integer> memoizedMaxDepth = Suppliers.memoize(() -> computeMaxDepth(docs))::get;
+
+    /**
+     * Where {@link #tryBreakLastLevel} has already failed. An attempt can lay out all of the last inner level before it
+     * fails, and each level above repeats it for every layout it tries, so without this deeply nested calls took time
+     * exponential in their depth to format.
+     */
+    private final Set<LastLevelAttempt> failedLastLevelAttempts = new HashSet<>();
 
     /** The immutable characteristics of this level determined before the level contents are available. */
     private final OpenOp openOp;
@@ -364,7 +375,44 @@ public final class Level extends Doc {
         }
         Level innerLevel = ((Level) getLast(docs));
 
-        return tryBreakInnerLevel(commentsHelper, maxWidth, state, explorationNode, innerLevel, isSimpleInliningSoFar);
+        LastLevelAttempt attempt = new LastLevelAttempt(maxWidth, isSimpleInliningSoFar, state.layoutInputs());
+        if (failedLastLevelAttempts.contains(attempt)) {
+            return Optional.empty();
+        }
+        Optional<State> result =
+                tryBreakInnerLevel(commentsHelper, maxWidth, state, explorationNode, innerLevel, isSimpleInliningSoFar);
+        if (result.isEmpty()) {
+            failedLastLevelAttempts.add(attempt);
+        }
+        return result;
+    }
+
+    /** A call of {@link #tryBreakLastLevel}, by everything besides this level that decides its outcome. */
+    private static final class LastLevelAttempt {
+        private final int maxWidth;
+        private final boolean isSimpleInliningSoFar;
+        private final LayoutInputs inputs;
+
+        private LastLevelAttempt(int maxWidth, boolean isSimpleInliningSoFar, LayoutInputs inputs) {
+            this.maxWidth = maxWidth;
+            this.isSimpleInliningSoFar = isSimpleInliningSoFar;
+            this.inputs = inputs;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (obj == null || obj.getClass() != this.getClass()) return false;
+            LastLevelAttempt that = (LastLevelAttempt) obj;
+            return this.maxWidth == that.maxWidth
+                    && this.isSimpleInliningSoFar == that.isSimpleInliningSoFar
+                    && Objects.equals(this.inputs, that.inputs);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(maxWidth, isSimpleInliningSoFar, inputs);
+        }
     }
 
     @SuppressWarnings("for-rollout:NullAway")
