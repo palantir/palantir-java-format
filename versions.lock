@@ -16,17 +16,17 @@ com.diffplug.spotless:spotless-plugin-gradle:8.10.4 (2 constraints: 0117e93b)
 
 com.fasterxml.jackson.core:jackson-annotations:2.22 (7 constraints: 507c7559)
 
-com.fasterxml.jackson.core:jackson-core:2.22.3 (6 constraints: b1744e9d)
+com.fasterxml.jackson.core:jackson-core:2.22.4 (6 constraints: b77419a1)
 
-com.fasterxml.jackson.core:jackson-databind:2.22.3 (7 constraints: 7688ba6d)
+com.fasterxml.jackson.core:jackson-databind:2.22.4 (7 constraints: 7b887272)
 
-com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.22.3 (4 constraints: fd5630b7)
+com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.22.4 (4 constraints: fe5611b8)
 
-com.fasterxml.jackson.datatype:jackson-datatype-guava:2.22.3 (3 constraints: cb3b7adc)
+com.fasterxml.jackson.datatype:jackson-datatype-guava:2.22.4 (3 constraints: cc3b10dd)
 
-com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.22.3 (2 constraints: df1f9adf)
+com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.22.4 (2 constraints: e01fe5df)
 
-com.fasterxml.jackson.module:jackson-module-parameter-names:2.22.3 (1 constraints: 3b053c3b)
+com.fasterxml.jackson.module:jackson-module-parameter-names:2.22.4 (1 constraints: 3c053d3b)
 
 com.fasterxml.woodstox:woodstox-core:7.2.0 (1 constraints: 3d174b26)
 
