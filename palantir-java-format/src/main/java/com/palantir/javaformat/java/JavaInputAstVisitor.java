@@ -707,7 +707,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             builder.addAll(visitModifiers(node.getClassBody().getModifiers(), Direction.HORIZONTAL, Optional.empty()));
         }
         scan(node.getIdentifier(), null);
-        addArguments(node.getArguments(), plusFour);
+        addArguments(node.getArguments(), plusFour, /* isMapFactory= */ false);
         builder.close();
         if (node.getClassBody() != null) {
             addBodyDeclarations(node.getClassBody().getMembers(), BracesOrNot.YES, FirstDeclarationsOrNot.YES);
@@ -807,7 +807,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
             builder.guessToken("(");
             builder.guessToken(")");
         } else {
-            addArguments(init.getArguments(), plusFour);
+            addArguments(init.getArguments(), plusFour, /* isMapFactory= */ false);
         }
         if (init.getClassBody() != null) {
             addBodyDeclarations(init.getClassBody().getMembers(), BracesOrNot.YES, FirstDeclarationsOrNot.YES);
@@ -3092,7 +3092,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                         .debugName("dotExpressionArgsAndParen")
                         .build());
                 MethodInvocationTree methodInvocation = (MethodInvocationTree) expression;
-                addArguments(methodInvocation.getArguments(), indent);
+                addArguments(methodInvocation.getArguments(), indent, isMapFactory(methodInvocation));
                 builder.close();
                 break;
             default:
@@ -3156,8 +3156,9 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
      *
      * @param arguments the arguments
      * @param plusIndent the extra indent for the arguments
+     * @param isMapFactory whether the arguments are key-value pairs of a map factory method such as {@code Map.of}
      */
-    void addArguments(List<? extends ExpressionTree> arguments, Indent plusIndent) {
+    void addArguments(List<? extends ExpressionTree> arguments, Indent plusIndent, boolean isMapFactory) {
         /*
          `preferBreakingLastInnerLevel` here in order to avoid immediately breaking a long
          invocation that can be one-lined:
@@ -3183,7 +3184,27 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
                 .build());
         token("(");
         if (!arguments.isEmpty()) {
-            if (arguments.size() % 2 == 0 && argumentsAreTabular(arguments) == 2) {
+            if (isMapFactory && arguments.size() % 2 == 0) {
+                builder.breakOp();
+                builder.open(ZERO);
+                boolean first = true;
+                for (int i = 0; i < arguments.size() - 1; i += 2) {
+                    ExpressionTree argument0 = arguments.get(i);
+                    ExpressionTree argument1 = arguments.get(i + 1);
+                    if (!first) {
+                        token(",");
+                        builder.breakOp(" ");
+                    }
+                    builder.open(plusFour);
+                    scan(argument0, null);
+                    token(",");
+                    builder.breakOp(" ");
+                    scan(argument1, null);
+                    builder.close();
+                    first = false;
+                }
+                builder.close();
+            } else if (arguments.size() % 2 == 0 && argumentsAreTabular(arguments) == 2) {
                 builder.forcedBreak();
                 builder.open(ZERO);
                 boolean first = true;
@@ -3221,6 +3242,41 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         token(")");
         builder.close();
     }
+
+    /**
+     * Returns true if the given method invocation is a map factory method such as {@code Map.of} or
+     * {@code ImmutableMap.of}, whose arguments are alternating keys and values.
+     */
+    private static boolean isMapFactory(MethodInvocationTree methodInvocation) {
+        ExpressionTree receiver = Trees.getMethodReceiver(methodInvocation);
+        if (receiver == null) {
+            return false;
+        }
+        if (!getMethodName(methodInvocation).contentEquals("of")) {
+            return false;
+        }
+        String receiverName;
+        switch (receiver.getKind()) {
+            case IDENTIFIER:
+                receiverName = ((IdentifierTree) receiver).getName().toString();
+                break;
+            case MEMBER_SELECT:
+                receiverName = ((MemberSelectTree) receiver).getIdentifier().toString();
+                break;
+            default:
+                return false;
+        }
+        return MAP_FACTORY_TYPES.contains(receiverName);
+    }
+
+    private static final ImmutableSet<String> MAP_FACTORY_TYPES =ImmutableSet.of(
+            "Map",
+            "ImmutableMap",
+            "ImmutableSortedMap",
+            "ImmutableBiMap",
+            "SortedMap",
+            "NavigableMap",
+            "ConcurrentMap");
 
     private void argList(List<? extends ExpressionTree> arguments) {
         builder.open(OpenOp.builder()
