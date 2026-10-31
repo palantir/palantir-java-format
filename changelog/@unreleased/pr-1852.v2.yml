@@ -1,0 +1,10 @@
+type: fix
+fix:
+  description: |-
+    A block comment on the same line as the opening `{` of a non-empty `if`, `else`,
+    `for`, `while`, `try`, `catch`, `finally`, `synchronized`, lambda, initializer or
+    plain block was moved to the next line indented one level too deep, so formatting
+    the output a second time moved it back and `spotlessCheck` failed right after
+    `spotlessApply`. The comment is now lined up with the first statement of the block.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/1852
