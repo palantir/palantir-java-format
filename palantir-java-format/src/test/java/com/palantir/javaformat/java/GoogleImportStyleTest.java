@@ -368,7 +368,9 @@ public class GoogleImportStyleTest {
                     "import",
                 },
                 {
-                    "!!Unexpected token after import: \n",
+                    // The line break after `import` is skipped, so the token we report is the
+                    // zero-width EOF tok rather than the newline.
+                    "!!Unexpected token after import: ",
                 }
             },
             {
@@ -403,13 +405,35 @@ public class GoogleImportStyleTest {
                     "!!Imports not contiguous (perhaps a comment separates them?)",
                 }
             },
+            // A block comment on the same line as the `;` trails its import and travels with it.
             {
                 {
-                    "import com.foo.Second; /* no block comments after imports */", //
+                    "import com.foo.Second; /* stays with Second */", //
+                    "import com.foo.First;",
+                },
+                {
+                    "import com.foo.First;", //
+                    "import com.foo.Second; /* stays with Second */",
+                }
+            },
+            // Javadoc is the exception: the formatter moves it onto a line of its own, which would
+            // separate the imports, so an import carrying one is still rejected.
+            {
+                {
+                    "import com.foo.Second; /** javadoc after an import */", //
                     "import com.foo.First;",
                 },
                 {
                     "!!Imports not contiguous (perhaps a comment separates them?)",
+                }
+            },
+            {
+                {
+                    "import /** javadoc inside an import */ com.foo.Second;", //
+                    "import com.foo.First;",
+                },
+                {
+                    "!!Unexpected token after import: /** javadoc inside an import */",
                 }
             },
             {
@@ -429,13 +453,15 @@ public class GoogleImportStyleTest {
                     "*/",
                 }
             },
+            // Whitespace may appear between the parts of a qualified name; it is normalized away.
             {
                 {
-                    "import com . foo . Second ;", // syntactically valid, but we don't support it
+                    "import com . foo . Second ;", //
                     "import com.foo.First;",
                 },
                 {
-                    "!!Expected ; after import",
+                    "import com.foo.First;", //
+                    "import com.foo.Second;",
                 }
             },
             {
@@ -524,6 +550,160 @@ public class GoogleImportStyleTest {
                     "class Test {}",
                 }
             },
+
+            // Module imports (JEP 511) sort between static and non-static type imports, as in
+            // google-java-format, each group separated by a blank line.
+            {
+                {
+                    "package foo;",
+                    "",
+                    "import java.util.List;",
+                    "import static com.google.truth.Truth.assertThat;",
+                    "import module java.desktop;",
+                    "import module java.base;",
+                    "",
+                    "public class Blim {}",
+                },
+                {
+                    "package foo;",
+                    "",
+                    "import static com.google.truth.Truth.assertThat;",
+                    "",
+                    "import module java.base;",
+                    "import module java.desktop;",
+                    "",
+                    "import java.util.List;",
+                    "",
+                    "public class Blim {}",
+                },
+            },
+
+            // A module whose name sorts after a non-module import: the module still comes first, and a
+            // blank line separates the two groups.
+            {
+                {
+                    "package foo;",
+                    "",
+                    "import java.util.List;",
+                    "import module org.example.api;",
+                    "",
+                    "public class Blim {}",
+                },
+                {
+                    "package foo;",
+                    "",
+                    "import module org.example.api;",
+                    "",
+                    "import java.util.List;",
+                    "",
+                    "public class Blim {}",
+                },
+            },
+
+            // Whitespace, line breaks and comments may appear between the tokens of an import. The
+            // comments are re-emitted after the semicolon so that nothing is dropped.
+            {
+                {
+                    "package foo;",
+                    "",
+                    "import module /* the base module */ java.base;",
+                    "import module",
+                    "    java.desktop;",
+                    "",
+                    "public class Blim {}",
+                },
+                {
+                    "package foo;",
+                    "",
+                    "import module /* the base module */ java.base;",
+                    "import module java.desktop;",
+                    "",
+                    "public class Blim {}",
+                },
+            },
+
+            // The same holds for ordinary and static imports, which had this limitation before.
+            {
+                {
+                    "package foo;",
+                    "",
+                    "import /* a type */ com.foo.Second;",
+                    "import static /* a member */ com.foo.First.first;",
+                    "import",
+                    "    com.foo.Third;",
+                    "",
+                    "public class Blim {}",
+                },
+                {
+                    "package foo;",
+                    "",
+                    "import static /* a member */ com.foo.First.first;",
+                    "",
+                    "import /* a type */ com.foo.Second;",
+                    "import com.foo.Third;",
+                    "",
+                    "public class Blim {}",
+                },
+            },
+
+            // A comment may also sit between the parts of the name, and stays there. Only the
+            // whitespace around it is normalized.
+            {
+                {
+                    "package foo;", "", "import com.foo./* the second one */Second;", "", "public class Blim {}",
+                },
+                {
+                    "package foo;", "", "import com.foo./* the second one */ Second;", "", "public class Blim {}",
+                },
+            },
+
+            // Identical declarations collapse into one; ones that differ are both kept, so that a
+            // comment does not disappear with the copy that goes.
+            {
+                {
+                    "package foo;",
+                    "",
+                    "import com.foo.First;",
+                    "import com.foo.First;",
+                    "import /* explanation A */ com.foo.Second;",
+                    "import /* explanation B */ com.foo.Second;",
+                    "",
+                    "public class Blim {}",
+                },
+                {
+                    "package foo;",
+                    "",
+                    "import com.foo.First;",
+                    "import /* explanation A */ com.foo.Second;",
+                    "import /* explanation B */ com.foo.Second;",
+                    "",
+                    "public class Blim {}",
+                },
+            },
+
+            // A package literally named `module` is an ordinary import, not a module import:
+            // `module` only introduces one when another identifier follows it.
+            {
+                {
+                    "package foo;",
+                    "",
+                    "import module.Foo;",
+                    "import java.util.List;",
+                    "import module java.base;",
+                    "",
+                    "public class Blim {}",
+                },
+                {
+                    "package foo;",
+                    "",
+                    "import module java.base;",
+                    "",
+                    "import java.util.List;",
+                    "import module.Foo;",
+                    "",
+                    "public class Blim {}",
+                },
+            },
         };
 
         ImmutableList.Builder<Object[]> builder = ImmutableList.builder();
@@ -537,6 +717,10 @@ public class GoogleImportStyleTest {
             String output = ImportOrderer.reorderImports(input, JavaFormatterOptions.Style.GOOGLE);
             assertWithMessage("Expected exception").that(reordered).doesNotMatch("^!!");
             assertWithMessage(input).that(output).isEqualTo(reordered);
+            // Reordering must be a fixed point: a formatted file has to survive being formatted again.
+            assertWithMessage("not idempotent: %s", output)
+                    .that(ImportOrderer.reorderImports(output, JavaFormatterOptions.Style.GOOGLE))
+                    .isEqualTo(output);
         } catch (FormatterException e) {
             if (!reordered.startsWith("!!")) {
                 throw e;
