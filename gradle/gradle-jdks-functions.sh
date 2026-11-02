@@ -29,7 +29,7 @@ export TMP_WORK_DIR
 write() { echo "$*" >&2; }
 
 cleanup() {
-  [ -d "$TMP_WORK_DIR" ] && rm -rf "$TMP_WORK_DIR"
+  [ -d "$TMP_WORK_DIR" ] && rm -rf "$TMP_WORK_DIR" && unset TMP_WORK_DIR
 }
 
 die() {
