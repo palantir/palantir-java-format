@@ -10,6 +10,36 @@ acceptedBreaks:
     - code: "java.class.removed"
       old: "class com.palantir.javaformat.gradle.UpdateIntellijXmlTask"
       justification: "nobody used this directly"
+  "2.103.0":
+    com.palantir.javaformat:gradle-palantir-java-format:
+    - code: "java.annotation.removed"
+      old: "method void com.palantir.javaformat.gradle.ConfigureJavaFormatterXml::<init>()"
+      new: "method void com.palantir.javaformat.gradle.ConfigureJavaFormatterXml::<init>()"
+      justification: "Not public api, not split over multiple jars"
+    - code: "java.class.nowFinal"
+      old: "class com.palantir.javaformat.gradle.ConfigureJavaFormatterXml"
+      new: "class com.palantir.javaformat.gradle.ConfigureJavaFormatterXml"
+      justification: "Not public api, not split over multiple jars"
+    - code: "java.method.removed"
+      old: "method groovy.lang.MetaClass com.palantir.javaformat.gradle.ConfigureJavaFormatterXml::getMetaClass()"
+      justification: "Not public api, not split over multiple jars"
+    - code: "java.method.removed"
+      old: "method void com.palantir.javaformat.gradle.ConfigureJavaFormatterXml::setMetaClass(groovy.lang.MetaClass)"
+      justification: "Not public api, not split over multiple jars"
+    - code: "java.method.visibilityReduced"
+      old: "method void com.palantir.javaformat.gradle.ConfigureJavaFormatterXml::<init>()"
+      new: "method void com.palantir.javaformat.gradle.ConfigureJavaFormatterXml::<init>()"
+      justification: "Not public api, not split over multiple jars"
+    - code: "java.method.visibilityReduced"
+      old: "method void com.palantir.javaformat.gradle.ConfigureJavaFormatterXml::configureJavaFormat(groovy.util.Node,\
+        \ java.util.List<java.net.URI>, java.util.Optional<java.net.URI>)"
+      new: "method void com.palantir.javaformat.gradle.ConfigureJavaFormatterXml::configureJavaFormat(groovy.util.Node,\
+        \ java.util.List<java.net.URI>, java.util.Optional<java.net.URI>)"
+      justification: "Not public api, not split over multiple jars"
+    - code: "java.method.visibilityReduced"
+      old: "method void com.palantir.javaformat.gradle.ConfigureJavaFormatterXml::configureWorkspaceXml(groovy.util.Node)"
+      new: "method void com.palantir.javaformat.gradle.ConfigureJavaFormatterXml::configureWorkspaceXml(groovy.util.Node)"
+      justification: "Not public api, not split over multiple jars"
   "2.33.0":
     com.palantir.javaformat:gradle-palantir-java-format:
     - code: "java.method.visibilityReduced"
