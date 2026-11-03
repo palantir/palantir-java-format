@@ -97,6 +97,15 @@ public class PalantirJavaFormatFormattingServiceTest {
         assertThat(delegatingFormatter.wasInvoked()).isTrue();
     }
 
+    @Test
+    public void skipReflowingLongStringsSettingPersists() throws Exception {
+        settings.setSkipReflowingLongStrings(true);
+        assertThat(settings.isSkipReflowingLongStrings()).isTrue();
+
+        settings.setSkipReflowingLongStrings(false);
+        assertThat(settings.isSkipReflowingLongStrings()).isFalse();
+    }
+
     protected Project getProject() {
         return fixture.getProject();
     }

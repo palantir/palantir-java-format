@@ -33,6 +33,7 @@ import com.intellij.openapi.util.SystemInfo;
 import com.palantir.javaformat.bootstrap.BootstrappingFormatterService;
 import com.palantir.javaformat.bootstrap.NativeImageFormatterService;
 import com.palantir.javaformat.java.FormatterService;
+import com.palantir.javaformat.java.JavaFormatterOptions;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
@@ -73,14 +74,18 @@ final class FormatterProvider {
                 getSdkVersion(project),
                 settings.getImplementationClassPath(),
                 settings.getNativeImageClassPath(),
-                settings.injectedVersionIsOutdated()));
+                settings.injectedVersionIsOutdated(),
+                settings.isSkipReflowingLongStrings()));
     }
 
     @SuppressWarnings("for-rollout:Slf4jLogsafeArgs")
     private static Optional<FormatterService> createFormatter(FormatterCacheKey cacheKey) {
+        JavaFormatterOptions options = JavaFormatterOptions.builder()
+                .skipReflowingLongStrings(cacheKey.skipReflowingLongStrings)
+                .build();
         if (cacheKey.nativeImageClassPath.isPresent()) {
             log.info("Using the native formatter with classpath: {}", cacheKey.nativeImageClassPath.get());
-            return Optional.of(new NativeImageFormatterService(Path.of(cacheKey.nativeImageClassPath.get())));
+            return Optional.of(new NativeImageFormatterService(Path.of(cacheKey.nativeImageClassPath.get()), options));
         }
         if (cacheKey.jdkMajorVersion.isEmpty()) {
             return Optional.empty();
@@ -96,7 +101,8 @@ final class FormatterProvider {
                 jdkMajorVersion, ApplicationInfo.getInstance().getBuild())) {
             Path jdkPath = getJdkPath(cacheKey.project);
             log.info("Using bootstrapping formatter with jdk version {} and path: {}", jdkMajorVersion, jdkPath);
-            return Optional.of(new BootstrappingFormatterService(jdkPath, jdkMajorVersion, implementationClasspath));
+            return Optional.of(
+                    new BootstrappingFormatterService(jdkPath, jdkMajorVersion, implementationClasspath, options));
         }
 
         // Use "in-process" formatter service
@@ -225,18 +231,21 @@ final class FormatterProvider {
         private final Optional<List<URI>> implementationClassPath;
         private final Optional<URI> nativeImageClassPath;
         private final boolean useBundledImplementation;
+        private final boolean skipReflowingLongStrings;
 
         FormatterCacheKey(
                 Project project,
                 OptionalInt jdkMajorVersion,
                 Optional<List<URI>> implementationClassPath,
                 Optional<URI> nativeImageClassPath,
-                boolean useBundledImplementation) {
+                boolean useBundledImplementation,
+                boolean skipReflowingLongStrings) {
             this.project = project;
             this.jdkMajorVersion = jdkMajorVersion;
             this.implementationClassPath = implementationClassPath;
             this.nativeImageClassPath = nativeImageClassPath;
             this.useBundledImplementation = useBundledImplementation;
+            this.skipReflowingLongStrings = skipReflowingLongStrings;
         }
 
         @Override
@@ -250,6 +259,7 @@ final class FormatterProvider {
             FormatterCacheKey that = (FormatterCacheKey) o;
             return Objects.equals(jdkMajorVersion, that.jdkMajorVersion)
                     && useBundledImplementation == that.useBundledImplementation
+                    && skipReflowingLongStrings == that.skipReflowingLongStrings
                     && Objects.equals(project, that.project)
                     && Objects.equals(implementationClassPath, that.implementationClassPath)
                     && Objects.equals(nativeImageClassPath, that.nativeImageClassPath);
@@ -258,7 +268,12 @@ final class FormatterProvider {
         @Override
         public int hashCode() {
             return Objects.hash(
-                    project, jdkMajorVersion, implementationClassPath, nativeImageClassPath, useBundledImplementation);
+                    project,
+                    jdkMajorVersion,
+                    implementationClassPath,
+                    nativeImageClassPath,
+                    useBundledImplementation,
+                    skipReflowingLongStrings);
         }
     }
 }

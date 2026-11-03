@@ -25,6 +25,7 @@ import com.google.common.collect.ImmutableList;
 import com.palantir.javaformat.bootstrap.BootstrappingFormatterService;
 import com.palantir.javaformat.bootstrap.NativeImageFormatterService;
 import com.palantir.javaformat.java.FormatterService;
+import com.palantir.javaformat.java.JavaFormatterOptions;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -104,11 +105,12 @@ class FormatDiffTest {
     }
 
     private static Stream<FormatterService> getFormatters() throws IOException {
+        JavaFormatterOptions options = JavaFormatterOptions.builder().build();
         return Stream.of(
                 new BootstrappingFormatterService(
-                        javaBinPath(), Runtime.version().feature(), getClasspath()),
+                        javaBinPath(), Runtime.version().feature(), getClasspath(), options),
                 new NativeImageFormatterService(
-                        Path.of(Files.readString(NATIVE_IMAGE_FILE.toPath()).trim())));
+                        Path.of(Files.readString(NATIVE_IMAGE_FILE.toPath()).trim()), options));
     }
 
     private static List<Path> getClasspath() throws IOException {
