@@ -1,0 +1,5 @@
+type: fix
+fix:
+  description: A `//` comment before the closing parens of an inlined lambda body no longer swallows the parens and produces uncompilable output.
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/1826

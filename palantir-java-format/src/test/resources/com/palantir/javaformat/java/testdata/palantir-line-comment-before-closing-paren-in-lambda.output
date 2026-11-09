@@ -1,0 +1,30 @@
+import java.util.stream.IntStream;
+
+// https://github.com/palantir/palantir-java-format/issues/1792
+class PalantirLineCommentBeforeClosingParenInLambda {
+    int find(Item[] items) {
+        return IntStream.range(0, items.length)
+                .filter(i ->
+                        (items[i].getName().equals("alpha")
+                                || items[i].getName().equals("beta")
+                                || items[i].getName().equals("gamma")
+                        // || (items[i].getName().equals("delta") && items.length > i
+                        // && items[i + 1].getName().equals("epsilon"))
+                        ))
+                .findFirst()
+                .orElse(-1);
+    }
+
+    void minimal() {
+        foo.filter(i ->
+                (aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                        || bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+                // a line comment before the closing parens must not swallow them
+                ));
+    }
+
+    void stillInlinedWithoutComment() {
+        foo.filter(i -> (aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                || bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb));
+    }
+}

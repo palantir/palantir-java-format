@@ -344,6 +344,15 @@ public final class Level extends Doc {
             return Optional.empty();
         }
 
+        // tryToLayOutLevelOnOneLine below marks every break of this level as not broken, including the ones after
+        // lastLevel. Bail out if any of those must break (e.g. the forced breaks around a `//` comment placed before a
+        // closing paren), otherwise the comment would swallow the code that follows it. This mirrors the trailing
+        // docs check in tryBreakInnerLevel.
+        List<Doc> trailingDocs = docs.subList(docs.indexOf(lastLevel) + 1, docs.size());
+        if (Float.isInfinite(getWidth(trailingDocs))) {
+            return Optional.empty();
+        }
+
         State newState = state.withNoIndent();
         if (keepIndent) {
             newState = newState.withIndentIncrementedBy(getPlusIndent());
