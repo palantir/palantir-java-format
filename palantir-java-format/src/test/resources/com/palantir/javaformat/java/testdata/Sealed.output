@@ -1,0 +1,15 @@
+class T {
+    sealed interface I extends A permits C, B, D {}
+
+    final class C implements I {}
+
+    private sealed interface A permits I {}
+
+    private non-sealed interface B extends I {}
+
+    abstract static non-sealed class D implements I {}
+
+    int notAModifier(int non, int sealed) {
+        return non - sealed;
+    }
+}

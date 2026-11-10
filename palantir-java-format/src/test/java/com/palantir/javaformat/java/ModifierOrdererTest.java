@@ -64,6 +64,15 @@ public class ModifierOrdererTest {
     }
 
     @Test
+    public void nonSealed() throws FormatterException {
+        assertThat(ModifierOrderer.reorderModifiers("non-sealed sealed public").getText())
+                .isEqualTo("public sealed non-sealed");
+        assertThat(ModifierOrderer.reorderModifiers("non-sealed/*1*/static/*2*/public class A extends B {}")
+                        .getText())
+                .isEqualTo("public/*1*/static/*2*/non-sealed class A extends B {}");
+    }
+
+    @Test
     public void subRange() throws FormatterException {
         String[] lines = {
             "class Test {", //
