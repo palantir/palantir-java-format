@@ -1,0 +1,44 @@
+import java.util.function.Supplier;
+
+class BlockCommentAfterOpeningBrace {
+  void m(boolean b, Iterable<String> xs) {
+    if (b) { /* if */
+      run();
+    } else { /* else */
+      run();
+    }
+    for (int i = 0; i < 3; i++) { /* for */
+      run();
+    }
+    for (String x : xs) { /* foreach */
+      run();
+    }
+    while (b) { /* while */
+      run();
+    }
+    try { /* try */
+      run();
+    } catch (RuntimeException e) { /* catch */
+      run();
+    } finally { /* finally */
+      run();
+    }
+    synchronized (this) { /* synchronized */
+      run();
+    }
+    Supplier<Integer> s = () -> { /* lambda */
+      return 1;
+    };
+    { /* block */
+      run();
+    }
+    if (b) { /* empty */
+    }
+  }
+
+  static { /* static initializer */
+    run();
+  }
+
+  static void run() {}
+}
