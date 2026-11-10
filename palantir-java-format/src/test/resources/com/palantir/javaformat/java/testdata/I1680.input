@@ -1,0 +1,16 @@
+class I1680 {
+    void test() throws Exception {
+        try (var con = getConnection()) {
+            con.createStatement()
+                    .execute("ALTER DATABASE tempdb MODIFY FILE (NAME = 'tempdev', FILENAME = 'D:\\tempDb\\DATA\\tempdb.mdf')");
+            con.createStatement()
+                    .execute("ALTER DATABASE tempdb MODIFY FILE (NAME = 'templog', FILENAME = 'D:\\tempDb\\DATA\\templog.ldf')");
+        }
+    }
+
+    // An escaped backslash followed by 't', 'n' or 'r' is not an escaped tab or newline.
+    String notEscapes = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx C:\\new\\readme.txt C:\\temp\\notes\\rules.txt";
+
+    // An escaped tab or newline that follows an escaped backslash is still a place to split.
+    String escapes = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\\tyyyyyyyy\\\nzzzzzzzz\\\r\nwwwwwwww";
+}
