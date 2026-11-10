@@ -17,6 +17,7 @@ package com.palantir.javaformat.java;
 import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.base.Joiner;
+import java.util.Random;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -46,6 +47,42 @@ public class StringWrapperTest {
                 "}");
 
         assertThat(StringWrapper.wrap(100, input, Formatter.create())).isEqualTo(output);
+    }
+
+    @Test
+    public void testEscapeSequencesAreNotSplit() throws Exception {
+        // The source text of string literal characters and escape sequences, including escaped backslashes followed
+        // by characters that would otherwise form escapes, and octal and Unicode escapes.
+        String[] atoms = {
+            "a",
+            "bb",
+            " ",
+            "\\\\",
+            "\\t",
+            "\\n",
+            "\\r\\n",
+            "\\\"",
+            "\\\\t",
+            "\\\\n",
+            "\\\\\\t",
+            "\\0",
+            "\\12",
+            "\\377",
+            "\\s",
+            "\\u0041",
+            "\\\\u0041"
+        };
+        Random random = new Random(42);
+        Formatter formatter = Formatter.create();
+        for (int i = 0; i < 200; i++) {
+            StringBuilder literal = new StringBuilder();
+            while (literal.length() < 150) {
+                literal.append(atoms[random.nextInt(atoms.length)]);
+            }
+            String input = "class T {\n  String s = \"" + literal + "\";\n}\n";
+            // StringWrapper checks that its output parses and has the same AST as its input.
+            StringWrapper.wrap(40, formatter.formatSource(input), formatter);
+        }
     }
 
     private static String lines(String... line) {
