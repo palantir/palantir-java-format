@@ -38,11 +38,11 @@ com.google.auto.service:auto-service-annotations:1.1.1 (1 constraints: 9c0f6a86)
 
 com.google.code.findbugs:jsr305:3.0.2 (1 constraints: 0705fc35)
 
-com.google.errorprone:error_prone_annotations:2.50.0 (5 constraints: ad3740df)
+com.google.errorprone:error_prone_annotations:2.52.0 (5 constraints: af37d6df)
 
 com.google.guava:failureaccess:1.0.3 (2 constraints: f3154f13)
 
-com.google.guava:guava:33.7.2-jre (16 constraints: 1b461c35)
+com.google.guava:guava:33.8.0-jre (16 constraints: 1a46f632)
 
 com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava (1 constraints: bd17c918)
 
@@ -160,7 +160,7 @@ com.googlecode.java-diff-utils:diffutils:1.3.0 (1 constraints: bd11fef4)
 
 com.netflix.nebula:nebula-test:10.6.2 (1 constraints: 9c18268f)
 
-com.palantir.baseline:gradle-baseline-java:7.14.0 (2 constraints: d314c9be)
+com.palantir.baseline:gradle-baseline-java:7.15.0 (2 constraints: d414fabe)
 
 com.palantir.baseline-error-prone:gradle-baseline-error-prone:0.7.0 (1 constraints: c01105f5)
 
@@ -194,9 +194,9 @@ com.palantir.gradle.plugintesting:gradle-plugin-testing-junit:0.54.0 (1 constrai
 
 com.palantir.gradle.plugintesting:plugin-testing-core:0.54.0 (1 constraints: 3b053f3b)
 
-com.palantir.gradle.utils:environment-variables:0.31.0 (3 constraints: a13e86fe)
+com.palantir.gradle.utils:environment-variables:0.31.0 (3 constraints: a23e06ff)
 
-com.palantir.gradle.utils:lazily-configured-mapping:0.31.0 (2 constraints: 79219ed1)
+com.palantir.gradle.utils:lazily-configured-mapping:0.31.0 (2 constraints: 7a21cfd1)
 
 com.palantir.gradle.utils:project-dependency-utils:0.31.0 (1 constraints: ef1b1a62)
 
@@ -220,7 +220,7 @@ one.util:streamex:0.9.0 (2 constraints: be381f75)
 
 org.apache.commons:commons-compress:1.28.0 (1 constraints: 940f5692)
 
-org.apache.commons:commons-lang3:3.21.0 (5 constraints: 5f4e51af)
+org.apache.commons:commons-lang3:3.22.0 (5 constraints: 604e04b0)
 
 org.apache.maven:maven-artifact:3.9.1 (3 constraints: 82293854)
 
