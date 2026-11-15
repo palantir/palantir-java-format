@@ -1,0 +1,21 @@
+class T {
+    Map<String, String> small = Map.of("one", "alpha", "two", "beta");
+
+    Map<String, String> big = Map.of(
+            "very long key number one", "very long value number one",
+            "very long key number two", "very long value number two",
+            "very long key number three", "very long value number three",
+            "very long key number four", "very long value number four");
+
+    Map<String, String> immutable = ImmutableMap.of(
+            "very long key number one", "very long value number one",
+            "very long key number two", "very long value number two",
+            "very long key number three", "very long value number three");
+
+    Map<String, String> oddArgs = Map.of(
+            "very long key number one",
+            "very long value number one",
+            "very long key number two",
+            "very long value number two",
+            "very long key number three");
+}
