@@ -38,11 +38,11 @@ com.google.auto.service:auto-service-annotations:1.1.1 (1 constraints: 9c0f6a86)
 
 com.google.code.findbugs:jsr305:3.0.2 (1 constraints: 0705fc35)
 
-com.google.errorprone:error_prone_annotations:2.50.0 (5 constraints: ad3740df)
+com.google.errorprone:error_prone_annotations:2.52.0 (5 constraints: da3248d9)
 
-com.google.guava:failureaccess:1.0.3 (2 constraints: f3154f13)
+com.google.guava:failureaccess:1.0.3 (2 constraints: f5155113)
 
-com.google.guava:guava:33.7.2-jre (16 constraints: 1b461c35)
+com.google.guava:guava:33.8.0-jre (16 constraints: 82469ebe)
 
 com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava (1 constraints: bd17c918)
 
@@ -68,7 +68,7 @@ com.squareup.okio:okio:3.6.0 (1 constraints: 530c38fd)
 
 com.squareup.okio:okio-jvm:3.6.0 (1 constraints: 500ad3b9)
 
-commons-codec:commons-codec:1.22.1 (2 constraints: 191e0d87)
+commons-codec:commons-codec:1.23.0 (3 constraints: 3c36db17)
 
 dev.equo.ide:solstice:1.8.2 (1 constraints: 781168da)
 
@@ -126,13 +126,13 @@ org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10 (1 constraints: e210ffd2)
 
 org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10 (2 constraints: 8118c1c5)
 
-org.jspecify:jspecify:1.0.1 (15 constraints: 1df49aa1)
+org.jspecify:jspecify:1.0.1 (14 constraints: 26e494b6)
 
 org.openjdk.jmh:jmh-core:1.37 (5 constraints: 52476be6)
 
 org.openjdk.jmh:jmh-generator-annprocess:1.37 (1 constraints: df04fc30)
 
-org.slf4j:slf4j-api:2.0.18 (5 constraints: fa4d332b)
+org.slf4j:slf4j-api:2.0.20 (10 constraints: 9faa6975)
 
 org.tukaani:xz:1.9 (1 constraints: 6b09e995)
 
@@ -144,9 +144,9 @@ aopalliance:aopalliance:1.0 (1 constraints: 170a83ac)
 
 cglib:cglib-nodep:3.2.2 (1 constraints: 490ded24)
 
-com.github.ben-manes.caffeine:caffeine:3.3.1 (2 constraints: c816c32b)
-
 com.google.auto.value:auto-value-annotations:1.11.1 (2 constraints: d11cf419)
+
+com.google.code.gson:gson:2.15.0 (1 constraints: f612c832)
 
 com.google.guava:guava-testlib:33.5.0-jre (1 constraints: ab068053)
 
@@ -160,7 +160,7 @@ com.googlecode.java-diff-utils:diffutils:1.3.0 (1 constraints: bd11fef4)
 
 com.netflix.nebula:nebula-test:10.6.2 (1 constraints: 9c18268f)
 
-com.palantir.baseline:gradle-baseline-java:7.14.0 (2 constraints: d314c9be)
+com.palantir.baseline:gradle-baseline-java:7.16.0 (2 constraints: d5142bbf)
 
 com.palantir.baseline-error-prone:gradle-baseline-error-prone:0.7.0 (1 constraints: c01105f5)
 
@@ -194,9 +194,9 @@ com.palantir.gradle.plugintesting:gradle-plugin-testing-junit:0.54.0 (1 constrai
 
 com.palantir.gradle.plugintesting:plugin-testing-core:0.54.0 (1 constraints: 3b053f3b)
 
-com.palantir.gradle.utils:environment-variables:0.31.0 (3 constraints: a13e86fe)
+com.palantir.gradle.utils:environment-variables:0.31.0 (3 constraints: a23e06ff)
 
-com.palantir.gradle.utils:lazily-configured-mapping:0.31.0 (2 constraints: 79219ed1)
+com.palantir.gradle.utils:lazily-configured-mapping:0.31.0 (2 constraints: 7a21cfd1)
 
 com.palantir.gradle.utils:project-dependency-utils:0.31.0 (1 constraints: ef1b1a62)
 
@@ -206,8 +206,6 @@ commons-io:commons-io:2.22.0 (4 constraints: f24a08f1)
 
 info.picocli:picocli:4.7.7 (1 constraints: 2816dcdd)
 
-javax.annotation:javax.annotation-api:1.2 (1 constraints: e01020af)
-
 javax.inject:javax.inject:1 (7 constraints: e66230f0)
 
 junit:junit:4.13.2 (7 constraints: 9b63a984)
@@ -216,45 +214,53 @@ net.bytebuddy:byte-buddy:1.18.3 (1 constraints: 530b55df)
 
 net.ltgt.gradle:gradle-errorprone-plugin:4.3.0 (2 constraints: 3d366a24)
 
-one.util:streamex:0.9.0 (2 constraints: be381f75)
+one.util:streamex:0.9.0 (3 constraints: 7f4a67f5)
 
 org.apache.commons:commons-compress:1.28.0 (1 constraints: 940f5692)
 
-org.apache.commons:commons-lang3:3.21.0 (5 constraints: 5f4e51af)
+org.apache.commons:commons-lang3:3.22.0 (2 constraints: 9421cbb5)
 
-org.apache.maven:maven-artifact:3.9.1 (3 constraints: 82293854)
+org.apache.httpcomponents:httpclient:4.5.14 (1 constraints: 2c18d66a)
 
-org.apache.maven:maven-builder-support:3.9.1 (3 constraints: 112c6464)
+org.apache.httpcomponents:httpcore:4.4.16 (2 constraints: 88280955)
 
-org.apache.maven:maven-core:3.9.1 (1 constraints: c6111bf5)
+org.apache.maven:maven-artifact:3.10.1 (3 constraints: fa29c3b9)
 
-org.apache.maven:maven-model:3.9.1 (4 constraints: cb3ac915)
+org.apache.maven:maven-builder-support:3.10.1 (3 constraints: 892c5ece)
 
-org.apache.maven:maven-model-builder:3.9.1 (2 constraints: 321d6d0a)
+org.apache.maven:maven-core:3.10.1 (1 constraints: ee110107)
 
-org.apache.maven:maven-plugin-api:3.9.1 (1 constraints: e90b70f3)
+org.apache.maven:maven-model:3.10.1 (4 constraints: 6b3ba0cd)
 
-org.apache.maven:maven-repository-metadata:3.9.1 (2 constraints: 321d6d0a)
+org.apache.maven:maven-model-builder:3.10.1 (2 constraints: 821d7a3b)
 
-org.apache.maven:maven-resolver-provider:3.9.1 (1 constraints: e90b70f3)
+org.apache.maven:maven-plugin-api:3.10.1 (1 constraints: 110c6aff)
 
-org.apache.maven:maven-settings:3.9.1 (2 constraints: ad1c8de9)
+org.apache.maven:maven-repository-metadata:3.10.1 (2 constraints: 821d7a3b)
 
-org.apache.maven:maven-settings-builder:3.9.1 (1 constraints: e90b70f3)
+org.apache.maven:maven-resolver-provider:3.10.1 (1 constraints: 110c6aff)
 
-org.apache.maven.resolver:maven-resolver-api:1.9.7 (5 constraints: 7c5643f6)
+org.apache.maven:maven-settings:3.10.1 (2 constraints: fd1cfc19)
 
-org.apache.maven.resolver:maven-resolver-impl:1.9.7 (2 constraints: 3a1d290b)
+org.apache.maven:maven-settings-builder:3.10.1 (1 constraints: 110c6aff)
 
-org.apache.maven.resolver:maven-resolver-named-locks:1.9.7 (1 constraints: 3513e634)
+org.apache.maven.resolver:maven-resolver-api:2.0.25 (8 constraints: 729e4d7b)
 
-org.apache.maven.resolver:maven-resolver-spi:1.9.7 (3 constraints: 6e306f6a)
+org.apache.maven.resolver:maven-resolver-connector-basic:2.0.25 (1 constraints: 7611b0e0)
 
-org.apache.maven.resolver:maven-resolver-util:1.9.7 (3 constraints: 6e306f6a)
+org.apache.maven.resolver:maven-resolver-impl:2.0.25 (2 constraints: 8a1d3a3c)
+
+org.apache.maven.resolver:maven-resolver-named-locks:2.0.25 (1 constraints: 5d132848)
+
+org.apache.maven.resolver:maven-resolver-spi:2.0.25 (6 constraints: 1478d409)
+
+org.apache.maven.resolver:maven-resolver-transport-apache:2.0.25 (1 constraints: 7611b0e0)
+
+org.apache.maven.resolver:maven-resolver-transport-file:2.0.25 (1 constraints: 7611b0e0)
+
+org.apache.maven.resolver:maven-resolver-util:2.0.25 (5 constraints: b060fb44)
 
 org.apache.maven.shared:maven-dependency-analyzer:1.17.2 (1 constraints: f4110b07)
-
-org.apache.maven.shared:maven-shared-utils:3.3.4 (1 constraints: e60b61f3)
 
 org.apiguardian:apiguardian-api:1.1.2 (11 constraints: 3ac82b62)
 
@@ -264,19 +270,19 @@ org.codehaus.groovy:groovy:3.0.24 (3 constraints: 133429dd)
 
 org.codehaus.plexus:plexus-cipher:2.0 (1 constraints: 641174c7)
 
-org.codehaus.plexus:plexus-classworlds:2.6.0 (3 constraints: 572b5104)
+org.codehaus.plexus:plexus-classworlds:2.12.1 (3 constraints: e02bc16f)
 
-org.codehaus.plexus:plexus-component-annotations:2.1.0 (2 constraints: 241d860a)
+org.codehaus.plexus:plexus-component-annotations:2.2.0 (2 constraints: 1e1db10a)
 
-org.codehaus.plexus:plexus-interpolation:1.26 (3 constraints: 7b2bf0f5)
+org.codehaus.plexus:plexus-interpolation:1.30.0 (3 constraints: 862cbfcd)
 
 org.codehaus.plexus:plexus-sec-dispatcher:2.0 (1 constraints: 5c100b99)
 
-org.codehaus.plexus:plexus-utils:3.5.1 (11 constraints: 3fa89966)
+org.codehaus.plexus:plexus-utils:3.6.2 (10 constraints: c19824e9)
 
-org.eclipse.sisu:org.eclipse.sisu.inject:0.3.5 (3 constraints: 852caa93)
+org.eclipse.sisu:org.eclipse.sisu.inject:1.1.2 (2 constraints: 3b1b8389)
 
-org.eclipse.sisu:org.eclipse.sisu.plexus:0.3.5 (2 constraints: 141abc34)
+org.eclipse.sisu:org.eclipse.sisu.plexus:1.1.2 (2 constraints: 0c1a0c34)
 
 org.graalvm.buildtools:junit-platform-native:0.10.4 (1 constraints: 3705273b)
 
@@ -320,7 +326,9 @@ org.opentest4j:opentest4j:1.3.0 (2 constraints: cf209249)
 
 org.opentest4j.reporting:open-test-reporting-tooling-spi:0.2.5 (1 constraints: cf12e318)
 
-org.ow2.asm:asm:9.11.1 (6 constraints: c26a2377)
+org.ow2.asm:asm:9.11.1 (9 constraints: be97d765)
+
+org.slf4j:jcl-over-slf4j:2.0.20 (1 constraints: 7111abe0)
 
 org.spockframework:spock-core:2.3-groovy-3.0 (3 constraints: 2c3deb38)
 
