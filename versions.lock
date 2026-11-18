@@ -56,7 +56,7 @@ com.palantir.gradle.idea-configuration:gradle-idea-configuration:0.8.0 (4 constr
 
 com.palantir.gradle.utils:exec:0.31.0 (2 constraints: bc1e0cb5)
 
-com.palantir.gradle.utils:platform:0.31.0 (6 constraints: c960e7c2)
+com.palantir.gradle.utils:platform:0.31.0 (6 constraints: ca60eac2)
 
 com.palantir.gradle.utils:providers:0.31.0 (1 constraints: 6f0ddb31)
 
@@ -184,7 +184,7 @@ com.palantir.gradle.jdks:gradle-jdks-setup:0.77.0 (1 constraints: 970f6192)
 
 com.palantir.gradle.jdks:gradle-jdks-setup-common:0.77.0 (3 constraints: 293b3b46)
 
-com.palantir.gradle.jdkslatest:gradle-jdks-latest:0.38.0 (1 constraints: 3d05433b)
+com.palantir.gradle.jdkslatest:gradle-jdks-latest:0.40.0 (1 constraints: 36052f3b)
 
 com.palantir.gradle.plugintesting:configuration-cache-spec:0.54.0 (1 constraints: 3b053f3b)
 
