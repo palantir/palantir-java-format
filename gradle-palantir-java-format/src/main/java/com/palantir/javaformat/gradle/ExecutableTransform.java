@@ -34,12 +34,14 @@ import org.gradle.api.file.FileSystemLocation;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.gradle.api.provider.Provider;
+import org.gradle.work.DisableCachingByDefault;
 
 /**
  * A transform that makes the input artifact executable.
  *
  * <p>This is useful for native-image executables, which need to be executable in order to run.
  */
+@DisableCachingByDefault(because = "Not opting into build caching; explicit opt-out is required by Gradle 9.7")
 public abstract class ExecutableTransform implements TransformAction<TransformParameters.None> {
 
     private static Logger logger = Logging.getLogger(ExecutableTransform.class);
