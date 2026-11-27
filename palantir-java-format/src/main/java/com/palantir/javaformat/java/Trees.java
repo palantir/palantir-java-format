@@ -117,7 +117,8 @@ class Trees {
                     lookup.findVarHandle(JCCompilationUnit.class, "endPositions", END_POS_TABLE_CLASS)
                             .toMethodHandle(VarHandle.AccessMode.GET));
         } catch (ReflectiveOperationException e) {
-            throw new IllegalStateException("Unsupported javac end position API", e);
+            throw new IllegalStateException(
+                    "Unsupported javac end position API on JDK " + Runtime.version() + ": " + e.getMessage(), e);
         }
     }
 
