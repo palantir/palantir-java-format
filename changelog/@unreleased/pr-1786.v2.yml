@@ -1,0 +1,5 @@
+type: improvement
+improvement:
+  description: Support JDK 27 (JDK-8372948, JDK-8268850)
+  links:
+  - https://github.com/palantir/palantir-java-format/pull/1786
