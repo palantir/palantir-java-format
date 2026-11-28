@@ -118,7 +118,8 @@ public class Java14InputAstVisitor extends JavaInputAstVisitor {
         if (modifiers != null) {
             builder.addAll(visitModifiers(modifiers, Direction.HORIZONTAL, Optional.empty()));
         }
-        if (type == null) {
+        // Compare by name: Tree.Kind.VAR_TYPE does not exist before JDK 27, and this must compile on older JDKs.
+        if (type == null || type.getKind().name().equals("VAR_TYPE")) {
             token("var");
         } else {
             scan(type, null);
